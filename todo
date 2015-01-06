@@ -1,0 +1,2 @@
+
+** Validate gpstime.py. All C-integers must be python integers!

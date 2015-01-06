@@ -1,0 +1,96 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "WGETERP" "1" "November 2014" "AutoBpe" "User Commands"
+.SH NAME
+wgeterp \- AutoBpe Software Collection
+.SH INTRODUCTION
+.sp
+AutoBpe Software Collection is a collection of tools that accomodates
+automatic processing of GNSS data mainly via Bernese GNSS.
+.SH SYNOPSIS
+.B wgeterp
+[\fIOPTIONS\fR]... \fI\-y [YEAR]\fR \fI\-d [DAY OF YEAR]\fR
+.SH DESCRIPTION
+.\" Add any additional description here
+.PP
+Download Earth Rotation Parameters (.erp) files, in erp format.
+.PP
+Mandatory arguments for long options are mandatory for short options too.
+.TP
+\fB\-a\fR, \fB\-\-analysis-center=\fR
+specify analysis center; valid analysis centers are \fBigs\fR and \fBcod\fR 
+.TP
+\fB\-t\fR, \fB\-\-type=\fR
+specify the product type; this can be: \fBf\fR for final, \fBr\fR for rapid and \fBu\fR for ultra-rapid.
+Note that if \fB-t\fR is not turned on (default), then the script will search for whatever type is available 
+(starting from final,then rapid and then for ultra-rapid) and download the first file that it finds.
+.TP
+\fB\-y\fR, \fB\-\-year=\fR
+specify year (4-digits)
+.TP
+\fB\-d\fR, \fB\-\-doy=\fR
+specify day of year
+.TP
+\fB\-o\fR, \fB\-\-output-directory=\fR
+specify output directory where the downloaded files are going to be saved (default ./)
+.TP
+\fB\-r\fR, \fB\-\-force-remove\fR
+if a file is found with the same name as the one to be downloaded, it will be deleted before downloading.
+The default behaviour is that if a file is found with the same name as the one to be downloaded, then
+the file will \fBNOT\fR be downloaded but counted as downloaded.
+.TP
+\fB\-z\fR, \fB\-\-decompress\fR
+decompress the downloaded files (default do not decompress).
+.TP
+\fB\-n\fR, \fB\-\-upper-case\fR
+truncate all downloaded files to upper case letters.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+only print the help message and exit
+.TP
+\fB\-s\fR, \fB\-\-standard-names\fR
+if this switch is turned on, then the downloaded file will be renamed to the standard naming convention
+(see the \fBEXPLICIT CASES\fR table)
+.SH "EXIT STATUS"
+The program will return an integer, denoting the exit status. There are two distinct cases,
+.IP \[bu] 2
+Exit Status = 255-1; this denotes that an error has occured
+.IP \[bu] 2
+Exit Status >=0 ; successeful run
+.SH "EXPLICIT CASES"
+.nf
+===============================================================================
++-----------------------------------------------------------------------------+
+| type | file              | ac  | wgeterp -t <type> -a <ac> | -s (on)        |
++------+-------------------+-----+---------------------------+----------------+
+| f    | igswwww7.erp.Z    | igs | igswwww7.erp.Z            | igswwwwd.erp.Z |
++------+-------------------+-----+---------------------------+----------------+
+| r    | igrwwwwd.erp.Z    | igs | igrwwwwd.erp.Z            | igrwwwwd.erp.Z |
++------+-------------------+-----+---------------------------+----------------+
+| u    | igrwwwwd_HH.erp.Z | igs | iguwwwwd.erp.Z            | iguwwwwd.erp.Z |
++------+-------------------+-----+---------------------------+----------------+
+| f    | CODWWWW7.ERP.Z    | cod | CODWWWW7.ERP.Z            | CODWWWWD.ERP.Z |
++------+-------------------+-----+---------------------------+----------------+
+| r    | CODWWWWD.ERP_R    | cod | CODWWWWD.ERP_R            | CORWWWWD.ERP.Z |
++------+-------------------+-----+---------------------------+----------------+
+| u    | COD.ERP_U         | cod | COD.ERP_U                 | COUWWWWD.ERP.Z |
++------+-------------------+-----+---------------------------+----------------+
+
+.SH "DEPENDANCIES"
+getopt, bpepy.gpstime, bpepy.products, python, read
+The python library bpepy.gpstime must be installed and
+set in the python path variable. the same holds for
+the python bpepy.products library.
+.SH "REPORTING BUGS"
+Report wgeterp bugs to
+.br
+Demitris Anastasiou <danast@mail.ntua.gr>
+.br
+Xanthos Papanikolaou <xanthos@mail.ntua.gr>
+.SH "AUTHOR"
+National Technical University of Athens,
+.br
+School of Rural and Surveying Engineering,
+.br
+Dionysos Satellite Observatory, Higher Geodesy Laboratory
+.br

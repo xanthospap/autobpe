@@ -1,0 +1,105 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "SETPCL" "1" "December 2014" "AutoBpe" "User Commands"
+.SH NAME
+setpcl \- AutoBpe Software Collection
+.SH INTRODUCTION
+.sp
+AutoBpe Software Collection is a collection of tools that accomodates
+automatic processing of GNSS data mainly via Bernese GNSS.
+.SH SYNOPSIS
+.B setpcl
+[\fIOPTIONS\fR]...
+.SH DESCRIPTION
+.\" Add any additional description here
+.PP
+Set variables in .PCL and .PCF file(s) to process data in automatic mode. The .PCL file to
+edit is ntua_pcs.pl. The .PCF is chosen by the user. Both scripts (as well as other
+specified files) must be in Bernese52 - specific directories.
+.PP
+Mandatory arguments for long options are mandatory for short options too.
+.TP
+\fB\-a\fR, \fB\-\-analysis-center=\fR
+Specify the analysis center; this can be e.g. igs
+.TP
+\fB\-b\fR, \fB\-\-bernese-loadvar=\fR
+Specify the Bernese LOADGPS.setvar file; this is needed to resolve the Bernese-related path variables. All other
+specified input files (e.g. .BLQ) are searched in the Bernese-specific directories.
+.TP
+\fB\-c\fR, \fB\-\-campaign=\fR
+Specify campaign name (to be processed). The directory \$P/CAMPAIGN must be present.
+.TP
+\fB\-i\fR, \fB\-\-solution-id=\fR
+Specify the solution id, for naming of product files. The solution id will have an effect on the naming of the Final, Preliminery
+and Size-Reduced solutionfiles. If e.g. the solution-id is set to NTA, then
+the Final solution files will be named NTA, the preliminery NTP and the size-reduced NTR.
+.TP
+\fB\-p\fR, \fB\-\-pcf-file=\fR
+Specify the .PCF file to be edited. This file must be present in /.../GPSUSER52/PCF/. No path,
+only the filename \fBwithout the extension\fR is required. The extension is supposed to be .PCF and is automatically
+added to the filename when needed.
+.TP
+\fB\-f\fR, \fB\-\-pcv-file=\fR
+Specify the .PCV file to be edited. This file must be present in /.../BERN52/GPS/GEN/. No path,
+only the filename \fBwithout extension\fR is required. The extension is supposed to be .I08 and is automatically
+added to the filename when needed.
+.TP
+\fB\-s\fR, \fB\-\-satellite-system=\fR
+Specify the Satellite System to be used in the processing. This can be \fBgps\fR or \fBmixed\fR. Mixed actually
+translates to gps plus glonass.
+.TP
+\fB\-e\fR, \fB\-\-elevation-angle=\fR
+Specify the elevation angle in degrees. An integer number is expected.
+.TP
+\fB\-l\fR, \fB\-\-blq=\fR
+Specify the ocean tide-loading correction file, blq format (with CMC). This file must be present in
+/.../GPSDATA/CAMPAIGN52/CAMPAIGN/STA/. Only filename required, \fBno path, no extension\fR. The extension is 
+supposed to be .BLQ and is automatically added to the filename when needed.
+.TP
+\fB\-t\fR, \fB\-\-atl=\fR
+Specify the atmospheric tide-loading correction file (with CMC). This file must be present in
+/.../GPSDATA/CAMPAIGN52/CAMPAIGN/STA/. Only filename required, \fBno path, no extension\fR. The extension is 
+supposed to be .ATL and is automatically added to the filename when needed.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+only print the help message and exit
+\fB\-v\fR, \fB\-\-version\fR
+only print version message and exit
+.SH "EXIT STATUS"
+The program will return an integer, denoting the exit status:
+.IP \[bu] 2
+Exit Status = 255-2; Error; some variable cannot be set
+.IP \[bu] 2
+Exit Status = 255-1; Error
+.IP \[bu] 2
+Exit Status =0; Success
+.SH "EXAMPLE USAGE"
+\fB-a emp -b LOADGPS.setvar -c CAMPGN -i NTA -p S_PCF -f S_PCV -s mixed -e 7 -l S_BLQ -t S_ATL\fR
+This command, will edit the S_PCF.PCF file (found in /.../GPSUSER52/PCF/) as follows:
+.nf
+VARIABLE DESCRIPTION                              DEFAULT
+8******* 40************************************** 30****************************
+V_B      Orbit/ERP, DCB, CLK information          EMP
+V_C      Preliminary (ambiguity-float) results    NTP
+V_E      Final (ambiguity-fixed) results          NTA
+V_F      Size-reduced NEQ information             NTR
+V_CRDINF Merged CRD/VEL filename                  CAMPGN
+V_BLQINF BLQ FILE NAME, CMC CORRECTIONS           S_BLQ
+V_ATLINF ATL FILE NAME, CMC CORRECTIONS           S_ATL
+V_SATSYS Select the GNSS (GPS, GPS/GLO)           GPS/GLO
+V_PCVINF PCV information file                     S_PCV
+V_ELANG  Elevation angle (mask) in degrees        7
+
+.SH "REPORTING BUGS"
+Report setpcl bugs to 
+.br
+Demitris Anastasiou <danast@mail.ntua.gr>
+.br
+Xanthos Papanikolaou <xanthos@mail.ntua.gr>
+.SH "AUTHOR"
+National Technical University of Athens,
+.br
+School of Rural and Surveying Engineering,
+.br
+Dionysos Satellite Observatory, Higher Geodesy Laboratory
+.br

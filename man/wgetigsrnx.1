@@ -1,0 +1,92 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "WGETIGSRNX" "1" "October 2014" "AutoBpe" "User Commands"
+.SH NAME
+wgetigsrnx \- AutoBpe Software Collection
+.SH INTRODUCTION
+.sp
+AutoBpe Software Collection is a collection of tools that accomodates
+automatic processing of GNSS data mainly via Bernese GNSS.
+.SH SYNOPSIS
+.B wgetigsrnx
+[\fIOPTIONS\fR]... \fI\-y [YEAR]\fR \fI\-d [DAY OF YEAR]\fR
+.SH DESCRIPTION
+.\" Add any additional description here
+.PP
+Download RINEX files (Hatanaka compressed) for IGS stations for a specific date. The data centers used in this script to
+download the files, are 
+.IP \[bu] 2
+ftp://cddis.gsfc.nasa.gov/pub/gps/data/daily and 
+.IP \[bu]
+ftp://igs.bkg.bund.de/IGS/obs/
+.PP
+Mandatory arguments for long options are mandatory for short options too.
+.TP
+\fB\-s\fR, \fB\-\-stations\fR
+specify stations to download seperated by whitespace (e.g -s penc pdel ...), see \fBSTATION PRIORITY\fR
+.TP
+\fB\-f\fR, \fB\-\-station-file\fR
+give a file specifying stations to be downloaded. The file must have one line, where each station is seperated
+by a whitespace character, see \fBSTATION PRIORITY\fR
+.TP
+\fB\-y\fR, \fB\-\-year\fR
+specify year (4-digits)
+.TP
+\fB\-d\fR, \fB\-\-doy\fR
+specify day of year
+.TP
+\fB\-o\fR, \fB\-\-output-directory\fR
+specify output directory where the downloaded files are going to be saved (default ./)
+.TP
+\fB\-m\fR, \fB\-\-max-stations\fR
+specify a station limit. When this limit is reached, no more stations are going to be
+downloaded.
+.TP
+\fB\-r\fR, \fB\-\-force-remove\fR
+if a file is found with the same name as the one to be downloaded, it will be deleted before downloading.
+The default behaviour is that if a file is found with the same name as the one to be downloaded, then
+the file will \fBNOT\fR be downloaded but counted as downloaded.
+.TP
+\fB\-z\fR, \fB\-\-decompress-Z\fR
+decompress the downloaded files (default do not decompress). If this switch is not enabled and a file
+is found matching a file to be downloaded but not compressed, then the existing file is going to be
+compressed (to match exactly the file as it would be downloaded).
+.TP
+\fB\-n\fR, \fB\-\-upper-case\fR
+truncate all downloaded files to upper case letters.
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+supress all messages, except for errors.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+only print the help message and exit
+\fB\-v\fR, \fB\-\-version\fR
+only print version message and exit
+.SH "EXIT STATUS"
+The program will return an integer, denoting the exit status. There are three distinct cases,
+.IP \[bu] 2
+Exit Status = 255-2; user has not provided any stations to download
+.IP \[bu] 2
+Exit Status = 255-1; this denotes that an error has occured
+.IP \[bu] 2
+Exit Status >=0 ; this denotes that the program had a seccesseful run and downloaded this many station files.
+Note that some of the stations may have not actualy been downloaded by this run, but the wanted file(s) was
+found.
+.SH "STATION PRIORITY"
+In case both -s and -f switches are used, the order of the stations is first 
+the -s stations and then the -f ones (e.g > wgetigsrnx -s sta1 sta2 -f filename ...
+and filename has stations sta3 sta4, then the list of stations to download will be:
+sta1 sta2 sta3 sta4). The order of stations is crucial when the -m switch is specified.
+.SH "REPORTING BUGS"
+Report wgetigsrnx bugs to 
+.br
+Demitris Anastasiou <danast@mail.ntua.gr>
+.br
+Xanthos Papanikolaou <xanthos@mail.ntua.gr>
+.SH "AUTHOR"
+National Technical University of Athens,
+.br
+School of Rural and Surveying Engineering,
+.br
+Dionysos Satellite Observatory, Higher Geodesy Laboratory
+.br

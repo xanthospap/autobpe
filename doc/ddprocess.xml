@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<chapter id="chap_01"><title>Running the DD Processing Scheme</title>
+  
+<abstract>
+  <para>
+  This chapter will present how a user can ignite the processing sequence: 
+  </para>
+  <para>
+  <itemizedlist>
+    <listitem><para>the basic script</para></listitem>
+    <listitem><para>the parameters needed</para></listitem>
+    <listitem><para>the sequence of programs involved</para></listitem>
+    <listitem><para></para></listitem>
+  </itemizedlist>
+  </para>
+</abstract>
+
+<sect1 id="sect_01_01"> 
+<title>Section1 title</title>
