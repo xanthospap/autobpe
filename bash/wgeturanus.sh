@@ -111,9 +111,9 @@ function help {
 MAX_URANUS_STA=  ## maximum number of Uranus stations in server
 MAX_2_DWNL=      ## maximum number of uranus stations to download
 URANUS_TBL=uranus.tbl  ## the Uranus table file
-URAURL=ftp://79.129.26.12/Rinex_URANUS
-usern=ntua
-passw=satm
+URAURL=`egrep -w ^URAURL.* ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
+usern=`egrep -w ^URAUSR.* ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
+passw=`egrep -w ^URAPAS.* ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
 FIX_RNX_NAME=0   ## fix the marker name (in header) to match the one in the tbl file
 YEAR=-1900       ## year
 YR2=00           ## last two digits of year
