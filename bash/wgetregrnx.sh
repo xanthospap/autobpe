@@ -274,6 +274,13 @@ function get_station {
       ##
       ## NOTE THAT THESE ARE RAW RECEIVER FILES THAT NEED TO BE CONVERTED
       ##
+      if ! test -f ntua.keys ; then
+        echo "*** ERROR! Cannot find key file ntua.keys"
+        exit 254
+      fi
+      NOA2URL=`egrep -w ^NOA2URL.* ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
+      NOA2USR=`egrep -w ^NOA2USR.* ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
+      NOA2PAS=`egrep -w ^NOA2PAS.* ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
 
       #
       # GET MONTH AND DAY OF MONTH
@@ -287,7 +294,7 @@ function get_station {
       ## STATION IDI1
       if [ "$st" = "idi1" ]; then
         filename=IDI0${MONTH}${DAY_OF_MONTH}a
-        wget --user=ntuacre --password='ntua' -O ${od}/${filename} -q --tries=2 ftp://194.177.194.102/IDI/${yr}/${dy}/${filename}
+        wget --user=${NOA2USR} --password='${NOA2PAS}' -O ${od}/${filename} -q --tries=2 ${NOA2URL}/IDI/${yr}/${dy}/${filename}
         if test -s ${od}/${filename}; then
           teqc -top tps -O.at "TPSCR.G5        TPSH" ${od}/${filename} > ${od}/idi1${dy}0.${y2}o 2>teqc_report
           rnx2crx ${od}/idi1${dy}0.${y2}o 2>>teqc_report
@@ -302,7 +309,7 @@ function get_station {
       ## STATION SIVA
       if [ "$st" = "siva" ]; then
         filename=SIVA${yr}${MONTH}${DAY_OF_MONTH}0000a.T00
-        wget --user=ntuacre --password='ntua' -O ${od}/${filename} -q --tries=2 ftp://194.177.194.102/SIVA/${yr}/${dy}/${filename}
+        wget --user=${NOA2USR} --password='${NOA2PAS}' -O ${od}/${filename} -q --tries=2 ${NOA2URL}/SIVA/${yr}/${dy}/${filename}
         if test -s ${od}/${filename}; then
           runpkr00 -d ${od}/${filename}
           fn=`echo $filename | sed 's|T00|dat|'`
@@ -319,7 +326,7 @@ function get_station {
       ## STATION VAM1
       if [ "$st" = "vam1" ]; then
         filename=VAM0${MONTH}${DAY_OF_MONTH}a
-        wget --user=ntuacre --password='ntua' -O ${od}/${filename} -q --tries=2 ftp://194.177.194.102/VAM/${yr}/${dy}/${filename}
+        wget --user=${NOA2USR} --password='${NOA2PAS}' -O ${od}/${filename} -q --tries=2 ${NOA2URL}/VAM/${yr}/${dy}/${filename}
         if test -s ${od}/${filename}; then
           teqc -top tps -O.at "TPSCR.G5        TPSH" ${od}/${filename} > ${od}/vam1${dy}0.${y2}o  2>>teqc_report
           rnx2crx ${od}/vam1${dy}0.${y2}o
@@ -334,7 +341,7 @@ function get_station {
       ## STATION ZKRO
       if [ "$st" = "zkro" ]; then
         filename=ZKRO${yr}${MONTH}${DAY_OF_MONTH}0000a.T00
-        wget --user=ntuacre --password='ntua' -O ${od}/${filename} -q --tries=2 ftp://194.177.194.102/ZKR/${yr}/${dy}/${filename}
+        wget --user=${NOA2USR} --password='${NOA2PAS}' -O ${od}/${filename} -q --tries=2 ${NOA2URL}/ZKR/${yr}/${dy}/${filename}
         if test -s ${od}/${filename}; then
           runpkr00 -d ${od}/${filename}
           fn=`echo $filename | sed 's|T00|dat|'`
