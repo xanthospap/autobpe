@@ -162,13 +162,13 @@ fi
 # JUST CALL PYTHON
 # //////////////////////////////////////////////////////////////////////////////
 if [ -z "$ODIR" ]; then ODIR="./"; fi
-python -c "import bpepy.gpstime
+PLIST=`python -c "import bpepy.gpstime
 import bpepy.products.vmfgrid
 import sys
 rtn = bpepy.products.vmfgrid.getvmf1 ($YEAR,$DOY,'"$ODIR"','yes')
 if rtn != 0: sys.exit (1)
 print rtn
-sys.exit (0)"
+sys.exit (0)"; 2>/dev/null`
 
 if [ $? -ne 0 ]; then
   echo "*** Error running bpepy.products.vmfgrid.getvmf1"

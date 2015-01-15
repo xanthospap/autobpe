@@ -83,7 +83,7 @@ function help {
   echo ""
   echo "    ** When using the Vienna Mapping Function (VMF1), the grid file must be present in the"
   echo "       \${DATAPOOL} area. This file must include all grid files for this day and the first"
-  echo "       grid of the next day, and should be named as VMFG_YYYYMMDD"
+  echo "       grid of the next day, and should be named as VMFG_YYYYDDD"
   echo ""
   echo " Exit Status: >0 -> error"
   echo " Exit Status:  0  -> sucesseful exit"
@@ -132,7 +132,7 @@ function help {
 # //////////////////////////////////////////////////////////////////////////////
 TABLES=/home/bpe2/tables                ## table area
 PRODUCT_AREA=/media/Seagate/solutions52 ## product area
-PCF_FILE=NTUA_DDP.PCF                   ## this will include the path after loading the LOADVAR file
+PCF_FILE=NTUA_DDP                       ## this will include the path after loading the LOADVAR file
 PL_FILE=ntua_pcs.pl                     ## the perl script to ignite the processing
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -411,7 +411,6 @@ DATAPOOL=${D}
 #
 # ORBITS
 # ------------------------------------------------------------------------------
-
 sp3=`/bin/grep --ignore-case "| ${AC} | ${SOL_TYPE}    | ${SAT_SYS} " <<EOF | awk '{print $8}'
  +---- +------+-------+-----------------------+
  | AC  | TYPE | GNSS  | FILE (as in datapool) |
@@ -426,9 +425,11 @@ sp3=`/bin/grep --ignore-case "| ${AC} | ${SOL_TYPE}    | ${SAT_SYS} " <<EOF | aw
  | cod | f    | mixed | codwwwwd.sp3          |
  | cod | r    | mixed | corwwwwd.sp3          |
  | cod | u    | mixed | couwwwwd.sp3          |
+ | cod | f    | gps   | codwwwwd.sp3          |
+ | cod | r    | gps   | corwwwwd.sp3          |
+ | cod | u    | gps   | couwwwwd.sp3          |
  +---- +------+-------+-----------------------+
 EOF`
-
 if test ${#sp3} -ne 12  ; then
   echo "*** Failed to resolve sp3 file"
   exit 1
@@ -526,8 +527,8 @@ fi
 
 #
 # LINK THE VIENNA GRID FILE WHICH SHOULD BE AT THE DATAPOOL AREA
-if $( test -f ${D}/VMFG_${YEAR}${MONTH}${DOM} ) && \
-   $( /bin/ln -sf ${D}/VMFG_${YEAR}${MONTH}${DOM} ${P}/${CAMPAIGN}/GRD/VMF1${YR2}${DOY}0.GRD ); then 
+if $( test -f ${D}/VMFG_${YEAR}${DOY} ) && \
+   $( /bin/ln -sf ${D}/VMFG_${YEAR}${DOY} ${P}/${CAMPAIGN}/GRD/VMF1${YR2}${DOY}0.GRD ); then 
   :
 else 
   echo "*** Failed to link VMF1 grid file ${D}/VMFG_${YEAR}${MONTH}${DOM}"
@@ -639,8 +640,13 @@ echo "Using a-priori coordinate file: $TMP"
 # //////////////////////////////////////////////////////////////////////////////
 # SET OPTIONS IN THE PCF FILE
 # //////////////////////////////////////////////////////////////////////////////
+
+# Strip the pcf files from path and extension
+TMP_PCF=${PCF_FILE##*/}
+TMP_PCF=${TMP_PCF%%.*}
+
 if ! /usr/local/bin/setpcf --analysis-center=${AC,,} --bernese-loadvar=${LOADVAR} --campaign=${CAMPAIGN} \
-    --solution-id=${SOL_ID} --pcf-file=${PCF_FILE} --pcv-file=${CAMPAIGN^^} --satellite-system=${STA_SYS,,} \
+    --solution-id=${SOL_ID} --pcf-file=${TMP_PCF} --pcv-file=${CAMPAIGN^^} --satellite-system=${STA_SYS,,} \
     --elevation-angle=${ELEV} --blq=${CAMPAIGN^^} --atl=${CAMPAIGN^^} ; then
   echo "*** Failed to set variables in the PCF file"
   exit 1

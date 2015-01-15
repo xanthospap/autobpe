@@ -33,25 +33,31 @@ MONTH=`echo $DATES_STR | awk '{print $3}'`;
 DOM=`echo $DATES_STR | awk '{print $4}'`;
 echo "$GPSW $DOW $MONTH $DOM"
 
-AC=igs
-SOL_TYPE=u
-SAT_SYS=mixed
-sp3=`/bin/grep --ignore-case "| ${AC} | ${SOL_TYPE}    | ${SAT_SYS} " <<EOF | awk '{print $9}'
-# +---- +------+-------+-----------------------+
-# | AC  | TYPE | GNSS  | FILE (as in datapool) |
-# +---- +------+-------+-----------------------+
-# | igs | f    | gps   | igswwwwd.sp3          |
-# | igs | r    | gps   | igrwwwwd.sp3          |
-# | igs | u    | gps   | iguwwwwd.sp3          |
-# | igs | f    | mixed | igswwwwd.sp3          |
-# | igs | r    | mixed | -                     |
-# | igs | u    | mixed | igvwwwwd.sp3          |
-# +---- +------+-------+-----------------------|
-# | cod | f    | mixed | codwwwwd.sp3          |
-# | cod | r    | mixed | corwwwwd.sp3          |
-# | cod | u    | mixed | couwwwwd.sp3          |
-# +---- +------+-------+-----------------------|
+AC=cod
+SOL_TYPE=f
+SAT_SYS=gps
+echo "| ${AC} | ${SOL_TYPE}    | ${SAT_SYS} "
+sp3=`/bin/grep --ignore-case "| ${AC} | ${SOL_TYPE}    | ${SAT_SYS} " <<EOF | awk '{print $8}'
+ +---- +------+-------+-----------------------+
+ | AC  | TYPE | GNSS  | FILE (as in datapool) |
+ +---- +------+-------+-----------------------+
+ | igs | f    | gps   | igswwwwd.sp3          |
+ | igs | r    | gps   | igrwwwwd.sp3          |
+ | igs | u    | gps   | iguwwwwd.sp3          |
+ | igs | f    | mixed | igswwwwd.sp3          |
+ | igs | r    | mixed | -                     |
+ | igs | u    | mixed | igvwwwwd.sp3          |
+ +---- +------+-------+-----------------------|
+ | cod | f    | mixed | codwwwwd.sp3          |
+ | cod | r    | mixed | corwwwwd.sp3          |
+ | cod | u    | mixed | couwwwwd.sp3          |
+ +---- +------+-------+-----------------------+
 EOF`
+echo $sp3
+if test ${#sp3} -ne 12  ; then
+  echo "*** Failed to resolve sp3 file"
+  exit 1
+fi
 
 if test -z $sp3; then echo "ERROR sp3"; exit 1; fi
 
