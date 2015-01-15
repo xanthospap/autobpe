@@ -22,7 +22,7 @@
 ## notes                 :
 ## TODO                  : PCV files should be linked to GEN
 ## detailed update list  : 
-                           LAST_UPDATE=DEC-2014
+                           LAST_UPDATE=JAN-2015
 ##
 ################################################################################
 
@@ -62,6 +62,10 @@ function help {
   echo "           -i --solution-id= specify solution id (e.g. FFG) --see Note 1"
   echo "           -l --stations-per-cluster= specify the number of stations per cluster"
   echo "            (default is 5)"
+  echo "           -m --calibration-model he extension (model) used for antenna calibration."
+  echo "            This can be e.g. I01, I05 or I08. What you enter here, will be appended to"
+  echo "            the pcv filename (provided via the -f switch) and all calibration-dependent"
+  echo "            Bernese processing files (e.g. SATELLITE.XXX). --see Note 2"
   echo "           -p --pcv-file= specify the .PCV file to be used --see Note 2"
   echo "           -s --satellite-system specify the satellite system; this can be"
   echo "              * gps, or"
@@ -101,7 +105,10 @@ function help {
   echo "       reduced NTR."
   echo " Note 2"
   echo "       The pcv file must reside in the tables/pcv folder, and will be linked by the"
-  echo "       script to the %GEN directory."
+  echo "       script to the %GEN directory. Do not provide the extension; it will be automatically"
+  echo "       generated using the pcv file and the extension given via the calibration model (-m)."
+  echo "       E.g. using -p GRE_PCV and -m I08, then the script will search for the pcv file"
+  echo "       \${TABLES}/pcv/GRE_PCV.I08"
   echo " Note 3"
   echo "       A list of files is expected to be present in the tables directory, specified by"
   echo "       the campaign name. I.e:"
@@ -132,7 +139,7 @@ function help {
 # //////////////////////////////////////////////////////////////////////////////
 TABLES=/home/bpe2/tables                ## table area
 PRODUCT_AREA=/media/Seagate/solutions52 ## product area
-PCF_FILE=NTUA_DDP                       ## this will include the path after loading the LOADVAR file
+PCF_FILE=NTUA_DDP.PCF                   ## this will include the path after loading the LOADVAR file
 PL_FILE=ntua_pcs.pl                     ## the perl script to ignite the processing
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -150,6 +157,7 @@ ELEV=                    ## elevation angle
 STA_PER_CLU=             ## stations per cluster
 SOL_TYPE=                ## solution type (f, or u)
 ION_PRODS_ID=()          ## search for these ion products (as a-priori)
+CLBR=                    ## calibration model (e.g. I08)
 DEBUG=NO                 ## debugging mode
 
 ## Variables that are set during the script ##
@@ -335,14 +343,10 @@ fi
 # 
 # CHECK THAT THE PCV FILE EXISTS AND LINK IT
 #
-#if ! /bin/ln -sf ${TABLES}/pcv/${PCV} ${X}/GEN/${PCV} ; then
-#  echo "*** Failed to link pcv file"
-#  exit 1
-#fi
-if $( test -f ${TABLES}/pcv/${PCV} ) && $( /bin/ln -sf ${TABLES}/pcv/${PCV} ${X}/GEN/${PCV} ); then 
+if $( test -f ${TABLES}/pcv/${PCV}.${CLBR} ) && $( /bin/ln -sf ${TABLES}/pcv/${PCV}.${CLBR} ${X}/GEN/${PCV}.${CLBR} ); then 
   :
 else 
-  echo "*** Failed to link pcv file ${TABLES}/pcv/${PCV}"
+  echo "*** Failed to link pcv file ${TABLES}/pcv/${PCV}.${CLBR}"
   exit 1
 fi
 
@@ -646,8 +650,8 @@ TMP_PCF=${PCF_FILE##*/}
 TMP_PCF=${TMP_PCF%%.*}
 
 if ! /usr/local/bin/setpcf --analysis-center=${AC,,} --bernese-loadvar=${LOADVAR} --campaign=${CAMPAIGN} \
-    --solution-id=${SOL_ID} --pcf-file=${TMP_PCF} --pcv-file=${CAMPAIGN^^} --satellite-system=${STA_SYS,,} \
-    --elevation-angle=${ELEV} --blq=${CAMPAIGN^^} --atl=${CAMPAIGN^^} ; then
+    --solution-id=${SOL_ID} --pcf-file=${TMP_PCF} --pcv-file=${PCV} --satellite-system=${STA_SYS,,} \
+    --elevation-angle=${ELEV} --blq=${CAMPAIGN^^} --atl=${CAMPAIGN^^} --calibration-model=${CLBR} ; then
   echo "*** Failed to set variables in the PCF file"
   exit 1
 fi

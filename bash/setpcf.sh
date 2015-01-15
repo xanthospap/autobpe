@@ -23,7 +23,7 @@
 ## notes                 :
 ## TODO                  : maybe set the variable V_CRXINF
 ## detailed update list  :
-                           LAST_UPDATE=DEC-2014
+                           LAST_UPDATE=JAN-2015
 ##
 ################################################################################
 
@@ -62,8 +62,9 @@ function help {
   echo "            not be provided; e.g. if user wants to specify the file some/path/foo.PCF,"
   echo "            the switch should be used as --pcf-file=foo"
   echo "           -f --pcv-file= specify the .PCV file to be used (no path). Do not provide the"
-  echo "            extension; it is supposed to be .I08"
-  echo "           -s --satellite-system specify the satellite system; this can be"
+  echo "            extension; it will be automatically apended using the value provided via the"
+  echo "            -m switch."
+  echo "           -s --satellite-system= specify the satellite system; this can be"
   echo "              * gps, or"
   echo "              * mixed (for gps + glonass)"
   echo "            default is gps"
@@ -71,6 +72,9 @@ function help {
   echo "            default value is 3 degrees"
   echo "           -l --blq= specify ocean tide loading correction file (format .blq). Do not"
   echo "            provide extension; it is supposed to be .BLQ"
+  echo "           -m --calibration-model= the extension (model) used for antenna calibration."
+  echo "            This can be e.g. I01, I05 or I08. What you enter here, will be appended to"
+  echo "            the pcv filename (provided via the -f switch)."
   echo "           -t --atl= specify atmospheric loading correction file (format .atl)."
   echo "            Do not provide extension; it is supposed to be .ATL"
   echo " [OBSOLETE]-w --warnings if set, then the following are tested and the script"
@@ -86,7 +90,7 @@ function help {
   echo " Exit Status:    0 -> sucess"
   echo ""
   echo " Example: $NAME -a emp -b LOADGPS.setvar -c CAMPGN -i NTA -p S_PCF -f S_PCV -s mixed\\"
-  echo "          -e 7 -l S_BLQ -t S_ATL"
+  echo "          -e 7 -l S_BLQ -t S_ATL -m I08"
   echo " this command, will configure the following variables in the S_PCF.PCF file:"
   echo "VARIABLE DESCRIPTION                              DEFAULT"
   echo "8******* 40************************************** 30****************************"
@@ -97,6 +101,7 @@ function help {
   echo "V_CRDINF Merged CRD/VEL filename                  CAMPGN"
   echo "V_BLQINF BLQ FILE NAME, CMC CORRECTIONS           S_BLQ"
   echo "V_ATLINF ATL FILE NAME, CMC CORRECTIONS           S_ATL"
+  echo "V_PCV    Absolute/relative PCV model              I08"
   echo "V_SATSYS Select the GNSS (GPS, GPS/GLO)           GPS/GLO"
   echo "V_PCVINF PCV information file                     S_PCV"
   echo "V_ELANG  Elevation angle (mask) in degrees        7"
@@ -106,6 +111,13 @@ function help {
   echo "       and Size-Reduced solutionfiles. If e.g. the solution-id is set to NTA, then"
   echo "       the Final solution files will be named NTA, the preliminery NTP and the size-"
   echo "       reduced NTR."
+  echo ""
+  echo " Note 2"
+  echo "       Default extensions used are :"
+  echo "       .PCF -> for the pcf file,"
+  echo "       .BLQ -> for the blq file,"
+  echo "       .ATL -> for the atl file"
+  echo "       All other files used, are composed using the input variables."
   echo ""
   echo " WARNING !! The long options are only available if the GNU-enhanced version of getopt is"
   echo "            available; else, the user must only use short options"
@@ -124,7 +136,6 @@ function help {
 PCF_EXT=PCF
 BLQ_EXT=BLQ
 ATL_EXT=ATL
-PCV_EXT=I08
 
 # //////////////////////////////////////////////////////////////////////////////
 # PRE-DEFINE BASIC VARIABLES
@@ -144,6 +155,7 @@ BBLQ=            ## blq file, no path
 BLQ=             ## blq, with path 
 BATL=            ## atl file, no path
 ATL=             ## atl, with path 
+CLBR=            ## calibration model
 CHECK=FALSE      ## check variables (file name extensions)
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -155,12 +167,12 @@ if [ "$#" == "0" ]; then help; fi
 getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   # GNU enhanced getopt is available
-  ARGS=`getopt -o a:b:i:p:f:s:e:hvw:c:l:t: \
-  -l analysis-center:,bernese-loadvar:,solution-id:,pcf-file:,pcv-file:,satellite-system:,elevation-angle:,help,version,warnings:,campaign:,blq:,atl: \
-  -n 'setpcl' -- "$@"`
+  ARGS=`getopt -o a:b:i:p:f:s:e:hvw:c:l:t:m: \
+  -l analysis-center:,bernese-loadvar:,solution-id:,pcf-file:,pcv-file:,satellite-system:,elevation-angle:,help,version,warnings:,campaign:,blq:,atl:,--calibration-model \
+  -n 'setpcf' -- "$@"`
 else
   # Original getopt is available (no long option names, no whitespace, no sorting)
-  ARGS=`getopt a:b:i:p:f:s:e:hvw:c:l:t: "$@"`
+  ARGS=`getopt a:b:i:p:f:s:e:hvw:c:l:t:m: "$@"`
 fi
 # check for getopt error
 if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 254 ; fi
@@ -180,7 +192,7 @@ while true ; do
     -p|--pcf-file)
       BPCF="${2}.${PCF_EXT}"; shift;;
     -f|--pcv-file)
-      BPCV="${2}.${PCV_EXT}"; shift;;
+      BPCV="${2}"; shift;;
     -s|--satellite-system)
       SATSYS="${2^^}"; shift;;
     -l|--blq)
@@ -189,6 +201,8 @@ while true ; do
       BATL="${2}.${ATL_EXT}"; shift;;
     -e|--elevation-angle)
       ELEV="${2}"; shift;;
+    -m|--calibration-model)
+      CLBR="${2}"; shift;;
     -w|--warnings)
       CHECK=TRUE;;
     -h|--help)
@@ -239,7 +253,7 @@ if ! test -f $PCF ; then
   exit 254
 fi
 
-PCV=${X}/GEN/$BPCV
+PCV=${X}/GEN/$BPCV.${CLBR}
 if test -z $BPCV ; then
   echo "***ERROR! Need to specify pcv file"
   exit 254
@@ -359,7 +373,7 @@ fi
 ## VARIABLE FOR BLQ FILE, SET IN LINE
 ## V_BLQINF BLQ FILE NAME, CMC CORRECTIONS           
 ## ---------------------------------------------------------------
-if ! sed -i "s|^V_BLQINF .*|V_BLQINF BLQ FILE NAME, CMC CORRECTIONS           ${BBLQ%${BLQ_EXT}}|g" \
+if ! sed -i "s|^V_BLQINF .*|V_BLQINF BLQ FILE NAME, CMC CORRECTIONS           ${BBLQ%.${BLQ_EXT}}|g" \
 $PCF 2>/dev/null; then 
   echo "***ERROR! Failed to set blq file"; 
   exit 253; 
@@ -368,7 +382,7 @@ fi
 ## VARIABLE FOR ATL FILE, SET IN LINE
 ## V_ATLINF ATL FILE NAME, CMC CORRECTIONS           
 ## ---------------------------------------------------------------
-if ! sed -i "s|^V_ATLINF .*|V_ATLINF ATL FILE NAME, CMC CORRECTIONS           ${BATL%${ATL_EXT}}|g" \
+if ! sed -i "s|^V_ATLINF .*|V_ATLINF ATL FILE NAME, CMC CORRECTIONS           ${BATL%.${ATL_EXT}}|g" \
 $PCF 2>/dev/null; then 
   echo "***ERROR! Failed to set atl file"; 
   exit 253; 
@@ -387,7 +401,7 @@ fi
 ## VARIABLE FOR PCV, SET IN LINE
 ## V_PCVINF PCV information file                     
 ## ---------------------------------------------------------------
-if ! sed -i "s|^V_PCVINF .*|V_PCVINF PCV information file                     ${BPCV%${PCV_EXT}}|g" \
+if ! sed -i "s|^V_PCVINF .*|V_PCVINF PCV information file                     ${BPCV%.${CLBR}}|g" \
 $PCF 2>/dev/null; then 
   echo "***ERROR! Failed to set gnss"; 
   exit 253; 
