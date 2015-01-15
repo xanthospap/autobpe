@@ -181,22 +181,22 @@ AVREG=()
 # GET COMMAND LINE ARGUMENTS
 # //////////////////////////////////////////////////////////////////////////////
 if [ "$#" == "0" ]; then help; fi
-# Call getopt to validate the provided input. This depends on the getopt version available
+## Call getopt to validate the provided input. This depends on the getopt version available
 getopt -T > /dev/null
 if [ $? -eq 4 ]; then
-  # GNU enhanced getopt is available
-  ARGS=`getopt -o hvc:b:a:i:p:s:e:y:d:l:t:f: \
-  -l  help,version,campaign:,bernese-loadvar:,analysis-center:,solution-id:,pcv-file:,satellite-system:,elevation-angle:,year:,doy:,stations-per-cluster:,solution-type:,ion-products:,debug \
+  ## GNU enhanced getopt is available
+  ARGS=`getopt -o hvc:b:a:i:p:s:e:y:d:l:t:f:m: \
+  -l  help,version,campaign:,bernese-loadvar:,analysis-center:,solution-id:,pcv-file:,satellite-system:,elevation-angle:,year:,doy:,stations-per-cluster:,solution-type:,ion-products:,debug,calibration-model: \
   -n 'ddprocess' -- "$@"`
 else
-  # Original getopt is available (no long option names, no whitespace, no sorting)
-  ARGS=`getopt hvc:b:a:i:p:s:e:y:d:l:t:f: "$@"`
+  ## Original getopt is available (no long option names, no whitespace, no sorting)
+  ARGS=`getopt hvc:b:a:i:p:s:e:y:d:l:t:f:m: "$@"`
 fi
-# check for getopt error
+## check for getopt error
 if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 254 ; fi
 eval set -- $ARGS
 
-# extract options and their arguments into variables.
+## extract options and their arguments into variables.
 while true ; do
   case "$1" in
     --debug)
@@ -215,6 +215,8 @@ while true ; do
       ELEV="${2}"; shift;;
     -s|satellite-system)
       SAT_SYS="${2}"; shift;;
+    -m|--calibration-model)
+      CLBR="${2}"; shift;;
     -p|pcv-file)
       PCV="${2}"; shift;;
     -i|solution-id)
@@ -346,7 +348,7 @@ fi
 if $( test -f ${TABLES}/pcv/${PCV}.${CLBR} ) && $( /bin/ln -sf ${TABLES}/pcv/${PCV}.${CLBR} ${X}/GEN/${PCV}.${CLBR} ); then 
   :
 else 
-  echo "*** Failed to link pcv file ${TABLES}/pcv/${PCV}.${CLBR}"
+  echo "*** Failed to link pcv file ${TABLES}/pcv/${PCV}.${CLBR} "
   exit 1
 fi
 
@@ -394,7 +396,7 @@ if month == -999 : sys.exit (1)
 print '%04i %1i %02i %02i' %(gpsweek,dow,month,dom)
 sys.exit (0);" 2>/dev/null`
     
-# check for error
+## check for error
 if test $? -ne 0 ; then
   echo "***ERROR! Failed to resolve the date"
   exit 1
@@ -543,11 +545,11 @@ fi
 # TRANSFER THE RINEX FILES FROM DATAPOOL
 # //////////////////////////////////////////////////////////////////////////////
 
-# Three arrays will be created/filled: the RINEX_AV including all available rinex files
-# found in the datapool area; RINEX_MS listing all missing rinex files and finaly
-# STATIONS listing all stations that should exist for this network. In addition,
-# three lists are created: AVIGS, AVEPN and AVREG containing all sites available (i.e
-# belonging to the RINEX_AV list) per network.
+##  Three arrays will be created/filled: the RINEX_AV including all available rinex files
+##+ found in the datapool area; RINEX_MS listing all missing rinex files and finaly
+##+ STATIONS listing all stations that should exist for this network. In addition,
+##+ three lists are created: AVIGS, AVEPN and AVREG containing all sites available (i.e
+##+ belonging to the RINEX_AV list) per network.
 
 for i in igs epn reg; do
   file=${TABLES}/crd/${CAMPAIGN,,}.${i}
@@ -608,7 +610,7 @@ done
 # CHOOSE A-PRIORI COORDINATES FILE FOR REGIONAL AND EPN STATIONS
 # //////////////////////////////////////////////////////////////////////////////
 
-# try for an already processed coordinate file (of same date)
+## try for an already processed coordinate file (of same date)
 for i in ${SOL_ID} ${SOL_ID%?}P ${SOL_ID%?}R; do
   TMP=${PRODUCT_AREA}/${YEAR}/${DOY}/${i}${YR2}${DOY}0.CRD.Z
   if [ "$DEBUG" == "YES" ];then echo -ne "(debug) checking crd file $TMP";fi
@@ -650,7 +652,7 @@ TMP_PCF=${PCF_FILE##*/}
 TMP_PCF=${TMP_PCF%%.*}
 
 if ! /usr/local/bin/setpcf --analysis-center=${AC,,} --bernese-loadvar=${LOADVAR} --campaign=${CAMPAIGN} \
-    --solution-id=${SOL_ID} --pcf-file=${TMP_PCF} --pcv-file=${PCV} --satellite-system=${STA_SYS,,} \
+    --solution-id=${SOL_ID} --pcf-file=${TMP_PCF} --pcv-file=${PCV} --satellite-system=${SAT_SYS,,} \
     --elevation-angle=${ELEV} --blq=${CAMPAIGN^^} --atl=${CAMPAIGN^^} --calibration-model=${CLBR} ; then
   echo "*** Failed to set variables in the PCF file"
   exit 1
@@ -659,8 +661,22 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # SET OPTIONS IN THE PL FILE
 # //////////////////////////////////////////////////////////////////////////////
-if ! /usr/local/bin/setpcl --pcf-file=${PCF_FILE} --campaign=${CAMPAIGN} \
-  -o G-NTUA_DDP -r G-NTUA_DDP -i GN ; then
+
+##  The identifiers for the process are taken from the campaign name (first three
+##+ characters) and pcf filename (3 more characters. These files will be used later 
+##+ on, to check for any possible error in the process run.
+SYSOUT=${CAMPAIGN:0:3}_${PCF_FILE:0:3}
+SYSRUN=${CAMPAIGN:0:3}_${PCF_FILE:0:3}
+TASKID=${CAMPAIGN:0:1}${PCF_FILE:0:1}
+
+if ! /usr/local/bin/setpcl --pcf-file=${TMP_PCF} --campaign=${CAMPAIGN} --pl-file=${PL_FILE%%.*} \
+    --campaign=${CAMPAIGN^^} --sys-out=${SYSOUT} --sys-run=${SYSRUN} --task-id=${TASKID} \
+    --bernese-loadvar=${LOADVAR} ; then
   echo "*** Failed to set variables in the PL file"
   exit 1
-if
+fi
+
+# //////////////////////////////////////////////////////////////////////////////
+# PROCESS THE DATA (AT LAST!)
+# //////////////////////////////////////////////////////////////////////////////
+${U}/SCRIPT/${PL_FILE} ${YEAR} ${DOY}0

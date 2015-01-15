@@ -125,7 +125,7 @@ getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   # GNU enhanced getopt is available
   ARGS=`getopt -o p:b:u:c:o:r:i:hvwl: \
-  -l  pcf-file:,bernese-loadvar:,--cpu-file:,campaign:,sys-out:,sys-run:,task-id:,help,version,warnings,--pl-file: \
+  -l  pcf-file:,bernese-loadvar:,--cpu-file:,campaign:,sys-out:,sys-run:,task-id:,help,version,warnings,pl-file: \
   -n 'setpcl' -- "$@"`
 else
   # Original getopt is available (no long option names, no whitespace, no sorting)
@@ -176,7 +176,7 @@ if ! test -f $LOADVAR ; then
   echo "*** Variable file $LOADVAR does not exist"
   exit 1
 fi
-. $LOADVAR
+. $LOADVAR 2>/dev/null
 if [ "$VERSION" != "52" ] ; then
   echo "***ERROR! Cannot load the source file: $LOADVAR"
   exit 1

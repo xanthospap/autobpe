@@ -168,7 +168,7 @@ getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   # GNU enhanced getopt is available
   ARGS=`getopt -o a:b:i:p:f:s:e:hvw:c:l:t:m: \
-  -l analysis-center:,bernese-loadvar:,solution-id:,pcf-file:,pcv-file:,satellite-system:,elevation-angle:,help,version,warnings:,campaign:,blq:,atl:,--calibration-model \
+  -l analysis-center:,bernese-loadvar:,solution-id:,pcf-file:,pcv-file:,satellite-system:,elevation-angle:,help,version,warnings:,campaign:,blq:,atl:,calibration-model: \
   -n 'setpcf' -- "$@"`
 else
   # Original getopt is available (no long option names, no whitespace, no sorting)
@@ -425,7 +425,7 @@ echo "Solution ID     : ${FSI} (Preliminary ${PSI}, Reduced ${RSI})"
 echo "BLQ Corrections : ${BBLQ%%.*} (.${BLQ_EXT})"
 echo "ATL Corrections : ${BATL%%.*} (.${ATL_EXT})"
 echo "Satellite System: ${GSYS}"
-echo "PCV Corrections : ${BPCV%%.*} (.${PCV_EXT})"
+echo "PCV Corrections : ${BPCV%%.*} (.${CLBR})"
 echo "Elevation Angle : ${ELEV} degrees"
 
 # //////////////////////////////////////////////////////////////////////////////
