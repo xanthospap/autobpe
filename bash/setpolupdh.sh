@@ -68,6 +68,9 @@ function help {
   echo " Exit Status: 255-1 -> Error"
   echo " Exit Status:     0 -> Success"
   echo ""
+  echo " IMPORTANT"
+  echo " The actual value for the (erp) file to be used is: \$B\$WD+0"
+  echo ""
   echo " Note"
   echo " This script will only edit two lines of the input POLUPD.INP file (marked below as 1 and 2)"
   echo ""
@@ -193,11 +196,11 @@ if test "${AC}" == "COD" ; then
   ##   ## emptyallowed = true
   ## 
   ## MSG_IEPFIL 1  "Foreign formatted ERP files"
-  if ! /bin/sed -i "s|^ERPFIL [0-1].*|ERPFIL 1  \"\$B\$Y\$S+0\"|g" $INP_FILE 2>/dev/null; then
+  if ! /bin/sed -i "s|^ERPFIL [0-1].*|ERPFIL 1  \"\$B\$WD+0\"|g" $INP_FILE 2>/dev/null; then
     echo "***ERROR! Failed to substitute 'ERPFIL' value"
     exit 254
   fi
-  if ! /bin/sed -i "s|^IEPFIL [0-1].*|IEPFIL 1  \"\"|g" $INP_FILE 2>/dev/null; then
+  if ! /bin/sed -i "s|^IEPFIL [0-1].*|IEPFIL 0  \"\"|g" $INP_FILE 2>/dev/null; then
     echo "***ERROR! Failed to substitute 'IEPFIL' value"
     exit 254
   fi
@@ -220,11 +223,11 @@ else
   ##   ## emptyallowed = true
   ## 
   ## MSG_IEPFIL 1  "Foreign formatted ERP files"
-  if ! /bin/sed -i "s|^IEPFIL [0-1].*|IEPFIL 1  \"\$B\$Y\$S+0\"|g" $INP_FILE 2>/dev/null; then
+  if ! /bin/sed -i "s|^IEPFIL [0-1].*|IEPFIL 1  \"\$B\$WD+0\"|g" $INP_FILE 2>/dev/null; then
     echo "***ERROR! Failed to substitute 'IEPFIL' value"
     exit 254
   fi
-  if ! /bin/sed -i "s|^ERPFIL [0-1].*|ERPFIL 1  \"\"|g" $INP_FILE 2>/dev/null; then
+  if ! /bin/sed -i "s|^ERPFIL [0-1].*|ERPFIL 0  \"\"|g" $INP_FILE 2>/dev/null; then
     echo "***ERROR! Failed to substitute 'ERPFIL' value"
     exit 254
   fi

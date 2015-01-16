@@ -177,6 +177,11 @@ if [ ! -z "$LOGFILE" ]; then
 else
   LOGFILE=/dev/null
 fi
+if [ "${LOGFILE}" == "/dev/null" ]; then
+  LOG=
+else
+  LOG="--log="; LOG=${LOG}${LOGFILE}
+fi
 
 # //////////////////////////////////////////////////////////////////////////////
 # MIRROR SOURCE TO TARGET
@@ -186,14 +191,14 @@ if [ "$QUITE_MODE" == "NO" ]; then echo "Synchronizing $TARGET WITH ${SOURCE_DIR
 if [ "$QUITE_MODE" = "NO" ]; then
   lftp $SOURCE_FTP << EOF
 cd ${SOURCE_DIR}
-mirror --only-newer --exclude DE200.EPH --log=$LOG_FILE ./ ${TARGET}
+mirror --only-newer --exclude DE200.EPH $LOG ./ ${TARGET}
 EOF
   STATUS=`echo $?`
 
 else
     lftp $SOURCE_FTP << EOF > /dev/null
 cd $SOURCE_DIR
-mirror --only-newer --exclude DE200.EPH --log=$LOG_FILE ./ $TARGET
+mirror --only-newer --exclude DE200.EPH $LOG ./ $TARGET
 EOF
   STATUS=`echo $?`
 fi

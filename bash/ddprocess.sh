@@ -134,6 +134,25 @@ function help {
   exit 0
 }
 
+## ------------------------------------------------------------------------- ##
+##                                                                           ##
+##                               NOTICE :                                    ##
+##                                                                           ##
+## All variables should be stripped-off paths, e.g. do not use               ##
+##     CAMPAIGN=${P}/CAMPAIGN/GREECE                                         ##
+##     but                                                                   ##
+##     CAMPAIGN=GREECE                                                       ##
+##                                                                           ##
+## The analysis center can have whatever value. In Bernese though (when set  ##
+##     via the $B variable) it should be capitalized.                        ##
+##                                                                           ##
+## When linking products and other files in campaign folders, truncate the   ##
+##     filenames to capital letters. For sp3, use the '.PRE' extension. For  ##
+##     erp use '.ERP' only if analysis center is CODE. Else use '.IEP'. Do   ##
+##     NOT rename the original files. Only rename the links or copies.       ##
+##                                                                           ##
+## ------------------------------------------------------------------------- ##
+
 # //////////////////////////////////////////////////////////////////////////////
 # HARDCODED VARIABLES
 # //////////////////////////////////////////////////////////////////////////////
@@ -241,7 +260,7 @@ while true ; do
 done
 
 # //////////////////////////////////////////////////////////////////////////////
-# CHECK VITAL : TEAY AND DOY
+# CHECK VITAL : YEAR AND DOY
 # //////////////////////////////////////////////////////////////////////////////
 
 # 
@@ -432,6 +451,9 @@ DOM=`echo $DATES_STR | awk '{print $4}'`;
 
 # //////////////////////////////////////////////////////////////////////////////
 # LINK REQUIRED PRODUCTS FROM DATAPOOL AREA
+#
+# Note that the names of the linked files should be capitalize for convinience
+# when this is possible
 # //////////////////////////////////////////////////////////////////////////////
 
 # WHERE IS DATAPOOL
@@ -465,9 +487,10 @@ if test ${#sp3} -ne 12  ; then
 fi
 
 SP3=${sp3/wwwwd/${GPSW}${DOW}}
+TRG_SP3=${SP3/.sp3/.PRE}
 
 if $( test -f ${DATAPOOL}/${SP3} ) && \
-   $( /bin/ln -sf ${DATAPOOL}/${SP3} ${P}/${CAMPAIGN}/ORB/${SP3^^} ); then 
+   $( /bin/ln -sf ${DATAPOOL}/${SP3} ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^} ); then 
   :
 else 
   echo "*** Failed to link orbit file ${DATAPOOL}/${SP3}"
@@ -484,9 +507,9 @@ erp=`/bin/grep --ignore-case "| ${AC} | ${SOL_TYPE}    |" <<EOF | awk '{print $7
  +---- +------+-------+-----------------------+
  | AC  | TYPE | GNSS  | FILE (as in datapool) |
  +---- +------+-------+-----------------------+
- | igs | f    |       | igswwwwd.iep          |
- | igs | r    |       | igrwwwwd.iep          |
- | igs | u    |       | iguwwwwd.iep          |
+ | igs | f    |       | igswwwwd.erp          |
+ | igs | r    |       | igrwwwwd.erp          |
+ | igs | u    |       | iguwwwwd.erp          |
  +---- +------+-------+-----------------------|
  | cod | f    |       | codwwwwd.erp          |
  | cod | r    |       | corwwwwd.erp          |
@@ -500,12 +523,32 @@ if test ${#erp} -ne 12 ; then
 fi
 
 ERP=${erp/wwwwd/${GPSW}${DOW}}
+if test ${AC^^} != "COD" ; then
+  TRG_ERP=${ERP/.erp/.IEP}
+else
+  TRG_ERP=${ERP}
+fi
 
 if $( test -f ${DATAPOOL}/${ERP} ) && \
-   $( /bin/ln -sf ${DATAPOOL}/${ERP} ${P}/${CAMPAIGN}/ORB/${ERP^^} ); then 
+   $( /bin/ln -sf ${DATAPOOL}/${ERP} ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^} ); then 
   :
 else 
   echo "*** Failed to link orbit file ${DATAPOOL}/${SP3}"
+  exit 1
+fi
+
+##  Depending on the AC, set the INP file POLUPD.INP to fill in the right widget, using
+##+ the script setpolupdh utility. But first, we have got to find out which directory
+##+ in the ${U}/OPT area holds the INP file. Note that only one line containing the
+##+ POLUPDH script is allowd in the PCF file.
+
+LNS=`/bin/grep POLUPDH ${U}/PCF/${PCF_FILE}.PCF | /bin/grep -v "#" | wc -l`
+if [ $LNS -ne 1 ]; then
+  echo "Non-unique line for POLUPDH in the PCF file; Don't know what to do! "
+  exit 1
+fi
+PAN=`/bin/grep POLUPDH ${U}/PCF/${PCF_FILE}.PCF | /bin/grep -v "#" | awk '{print $3}'`
+if ! /usr/local/bin/setpolupdh --bernese-loadvar=${LOADVAR} --analysis-center=${AC^^} --pan=${PAN} ; then
   exit 1
 fi
 
@@ -688,7 +731,7 @@ echo "Using a-priori coordinate file: $TMP"
 # TMP_PCF=${PCF_FILE##*/}
 # TMP_PCF=${TMP_PCF%%.*}
 
-if ! /usr/local/bin/setpcf --analysis-center=${AC,,} --bernese-loadvar=${LOADVAR} --campaign=${CAMPAIGN} \
+if ! /usr/local/bin/setpcf --analysis-center=${AC^^} --bernese-loadvar=${LOADVAR} --campaign=${CAMPAIGN} \
     --solution-id=${SOL_ID} --pcf-file=${PCF_FILE} --pcv-file=${PCV} --satellite-system=${SAT_SYS,,} \
     --elevation-angle=${ELEV} --blq=${CAMPAIGN^^} --atl=${CAMPAIGN^^} --calibration-model=${CLBR} ; then
   echo "*** Failed to set variables in the PCF file"
@@ -747,8 +790,8 @@ if test "${STATUS}" == "ERROR"; then
   FL=`/bin/grep localhost ${P}/${CAMPAIGN^^}/BPE/${SYSOUT}.OUT | /usr/bin/awk '{print $9"_"$10".LOG"}' 2>/dev/null`
 
   ## now right whatever message is in this file to the LOGFILE
-  cat ${P}/${CAMPAIGN^^}/BPE/${FL} >> $LOGFILE
+  cat ${P}/${CAMPAIGN^^}/BPE/${TASKID}${FL} >> $LOGFILE
   echo "***********************************************************************" ##>> $LOGFILE
 
-  for i in `ls ${P}/${CAMPAIGN^^}/BPE/${YR2}${DOY}0*.LOG`; do cat $i >> $LOGFILE; done
+  for i in `ls ${P}/${CAMPAIGN^^}/BPE/${TASKID}${YR2}${DOY}0*.LOG`; do cat $i >> $LOGFILE; done
 fi
