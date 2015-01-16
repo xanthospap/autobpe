@@ -139,8 +139,9 @@ function help {
 # //////////////////////////////////////////////////////////////////////////////
 TABLES=/home/bpe2/tables                ## table area
 PRODUCT_AREA=/media/Seagate/solutions52 ## product area
-PCF_FILE=NTUA_DDP.PCF                   ## this will include the path after loading the LOADVAR file
+PCF_FILE=NTUA_DDP                       ## the pcf file; no path, no extension
 PL_FILE=ntua_pcs.pl                     ## the perl script to ignite the processing
+LOG_DIR=/home/bpe2/log                  ## directory holding the log files
 
 # //////////////////////////////////////////////////////////////////////////////
 # VARIABLES
@@ -240,7 +241,7 @@ while true ; do
 done
 
 # //////////////////////////////////////////////////////////////////////////////
-# CHECK COMMAND LINE ARGUMENTS; SOURCE THE LOADVAR FILE; LINK THE TABLE FILES
+# CHECK VITAL : TEAY AND DOY
 # //////////////////////////////////////////////////////////////////////////////
 
 # 
@@ -260,6 +261,21 @@ elif [ $DOY -lt 100 ]; then DOY=0${DOY}
 else DOY=${DOY}
 fi
 
+# //////////////////////////////////////////////////////////////////////////////
+# CREATE / SET LOG FILE, WARNINGS FILE
+# //////////////////////////////////////////////////////////////////////////////
+LOGFILE=${LOG_DIR}/ddproc-${YEAR:2:2}${DOY}.log
+WARFILE=${LOG_DIR}/ddproc-${YEAR:2:2}${DOY}.wrn
+>$LOGFILE
+>$WARFILE
+echo "$*" >> $LOGFILE
+START_T_STAMP=`/bin/date`
+echo "Process started at: $START_T_STAMP" >> $LOGFILE
+
+# //////////////////////////////////////////////////////////////////////////////
+# CHECK REMAINING CMD; SOURCE LOADVAR
+# //////////////////////////////////////////////////////////////////////////////
+
 # 
 # CHECK THAT LOADVAR FILE EXISTS AND SOURCE IT
 #
@@ -272,7 +288,14 @@ if [ "$VERSION" != "52" ] ; then
   echo "***ERROR! Cannot load the source file: $LOADVAR"
   exit 1
 fi
-PCF_FILE=${U}/PCF/${PCF_FILE}
+
+#
+# CHECK THAT THE PCF FILE EXISTS
+#
+if ! test -f ${U}/PCF/${PCF_FILE}.PCF ; then
+  echo "*** Cannot find pcf file: ${U}/PCF/${PCF_FILE}.PCF"
+  exit 1
+fi
 
 #
 # CHECK THAT THE CAMPAIGN EXISTS
@@ -453,15 +476,17 @@ fi
 
 #
 # EARTH ROTATION PARAMETERS
+#
+# Note that if the AC is NOT cod, then the extension needs to be .IEP
 # ------------------------------------------------------------------------------
 
 erp=`/bin/grep --ignore-case "| ${AC} | ${SOL_TYPE}    |" <<EOF | awk '{print $7}'
  +---- +------+-------+-----------------------+
  | AC  | TYPE | GNSS  | FILE (as in datapool) |
  +---- +------+-------+-----------------------+
- | igs | f    |       | igswwwwd.erp          |
- | igs | r    |       | igrwwwwd.erp          |
- | igs | u    |       | iguwwwwd.erp          |
+ | igs | f    |       | igswwwwd.iep          |
+ | igs | r    |       | igrwwwwd.iep          |
+ | igs | u    |       | iguwwwwd.iep          |
  +---- +------+-------+-----------------------|
  | cod | f    |       | codwwwwd.erp          |
  | cod | r    |       | corwwwwd.erp          |
@@ -610,7 +635,18 @@ done
 # CHOOSE A-PRIORI COORDINATES FILE FOR REGIONAL AND EPN STATIONS
 # //////////////////////////////////////////////////////////////////////////////
 
-## try for an already processed coordinate file (of same date)
+##  Try for an already processed coordinate file (of same date). Check to see
+##+ if such a file exists in the product area, using the identifiers for the
+##+ final, preliminary and reduced solution (i.e. search for the files
+##+ [${SOL_ID}|${SOL_ID%?}P|${SOL_ID%?}R]YYDDD0.CRD.Z). If any of these files
+##+ exist, copy it at the cmapaign directory and CHECK that all stations to
+##+ be processed are listed.
+##+ If an already-processed crd file could not be found, or the ones found are
+##+ missing some stations (to be procesed), then copy the default file (i.e.
+##+ ${TABLES}/crd/${CAMPAIGN}.CRD
+##+ At the end, we should have a file named REGYYDDD0.CRD listing coordinates
+##+ for all stations to be processed.
+
 for i in ${SOL_ID} ${SOL_ID%?}P ${SOL_ID%?}R; do
   TMP=${PRODUCT_AREA}/${YEAR}/${DOY}/${i}${YR2}${DOY}0.CRD.Z
   if [ "$DEBUG" == "YES" ];then echo -ne "(debug) checking crd file $TMP";fi
@@ -641,18 +677,19 @@ if ! test -f ${P}/${CAMPAIGN}/STA/APRIORI.CRD; then
   fi
 fi
 
+mv ${P}/${CAMPAIGN}/STA/APRIORI.CRD ${P}/${CAMPAIGN}/STA/REG${YR2}${DOY}0.CRD
 echo "Using a-priori coordinate file: $TMP"
 
 # //////////////////////////////////////////////////////////////////////////////
 # SET OPTIONS IN THE PCF FILE
 # //////////////////////////////////////////////////////////////////////////////
 
-# Strip the pcf files from path and extension
-TMP_PCF=${PCF_FILE##*/}
-TMP_PCF=${TMP_PCF%%.*}
+# Strip the pcf files from path and extension (no need)
+# TMP_PCF=${PCF_FILE##*/}
+# TMP_PCF=${TMP_PCF%%.*}
 
 if ! /usr/local/bin/setpcf --analysis-center=${AC,,} --bernese-loadvar=${LOADVAR} --campaign=${CAMPAIGN} \
-    --solution-id=${SOL_ID} --pcf-file=${TMP_PCF} --pcv-file=${PCV} --satellite-system=${SAT_SYS,,} \
+    --solution-id=${SOL_ID} --pcf-file=${PCF_FILE} --pcv-file=${PCV} --satellite-system=${SAT_SYS,,} \
     --elevation-angle=${ELEV} --blq=${CAMPAIGN^^} --atl=${CAMPAIGN^^} --calibration-model=${CLBR} ; then
   echo "*** Failed to set variables in the PCF file"
   exit 1
@@ -669,7 +706,7 @@ SYSOUT=${CAMPAIGN:0:3}_${PCF_FILE:0:3}
 SYSRUN=${CAMPAIGN:0:3}_${PCF_FILE:0:3}
 TASKID=${CAMPAIGN:0:1}${PCF_FILE:0:1}
 
-if ! /usr/local/bin/setpcl --pcf-file=${TMP_PCF} --campaign=${CAMPAIGN} --pl-file=${PL_FILE%%.*} \
+if ! /usr/local/bin/setpcl --pcf-file=${PCF_FILE} --campaign=${CAMPAIGN} --pl-file=${PL_FILE%%.*} \
     --campaign=${CAMPAIGN^^} --sys-out=${SYSOUT} --sys-run=${SYSRUN} --task-id=${TASKID} \
     --bernese-loadvar=${LOADVAR} ; then
   echo "*** Failed to set variables in the PL file"
@@ -679,4 +716,39 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # PROCESS THE DATA (AT LAST!)
 # //////////////////////////////////////////////////////////////////////////////
+
+## empty the BPE directory
+rm ${P}/${CAMPAIGN^^}/BPE/*
+
 ${U}/SCRIPT/${PL_FILE} ${YEAR} ${DOY}0
+
+##  Check for errors in the SYSOUT file and set the status
+if /bin/grep ERROR ${P}/${CAMPAIGN^^}/BPE/${SYSOUT}.OUT ##&>/dev/null
+then
+	STATUS=ERROR
+else
+	STATUS=SUCCESS
+fi
+
+# //////////////////////////////////////////////////////////////////////////////
+# CREATE A LOG MESSAGE FOR PROCESS ERROR
+# //////////////////////////////////////////////////////////////////////////////
+if test "${STATUS}" == "ERROR"; then
+
+  echo "***********************************************************************" ##>> $LOGFILE
+  echo "-------------------- PROCESS ERROR ------------------------------------" ##>> $LOGFILE
+  echo "***********************************************************************" ##>> $LOGFILE
+
+  ##  get the Session and PID_SUB of last program written in the SYSOUT file
+  ##+ this info is extracted from the line:
+  ##+ CPU name  # of jobs    Total  Mean   Max   Min  Total   Max  Session  PID_SUB
+  ##+ -----------------------------------------------------------------------------
+  ##+ localhost          3       16     5    15     0      0     0   150010  201_000
+  FL=`/bin/grep localhost ${P}/${CAMPAIGN^^}/BPE/${SYSOUT}.OUT | /usr/bin/awk '{print $9"_"$10".LOG"}' 2>/dev/null`
+
+  ## now right whatever message is in this file to the LOGFILE
+  cat ${P}/${CAMPAIGN^^}/BPE/${FL} >> $LOGFILE
+  echo "***********************************************************************" ##>> $LOGFILE
+
+  for i in `ls ${P}/${CAMPAIGN^^}/BPE/${YR2}${DOY}0*.LOG`; do cat $i >> $LOGFILE; done
+fi
