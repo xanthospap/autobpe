@@ -594,6 +594,7 @@ if test -z $ion ; then
     exit 1
   fi
 fi
+rm .tmp 2>/dev/null
 
 #
 # TROPOSPHERIC CORRECTIONS
