@@ -50,7 +50,7 @@ function help {
   echo ""
   echo " Dependancies :"
   echo ""
-  echo " Switches: -a --abreviation-file= specify the abbrevioation file to be used"
+  echo " Switches: -a --abbreviation-file= specify the abbrevioation file to be used"
   echo "            for this campaign/session (Bernese-specific format, .ABB)."
   echo "           -n --stations-per-cluster= specify the number of stations to be"
   echo "            included in each cluster. Positive integer."
@@ -114,7 +114,7 @@ getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   # GNU enhanced getopt is available
   ARGS=`getopt -o a:n:hvf: \
-  -l abreviation-file:,stations-per-cluster:,help,version,station-file: \
+  -l abbreviation-file:,stations-per-cluster:,help,version,station-file: \
   -n 'makecluster' -- "$@"`
 else
   # Original getopt is available (no long option names, no whitespace, no sorting)
@@ -127,7 +127,7 @@ eval set -- $ARGS
 # extract options and their arguments into variables.
 while true ; do
   case "$1" in
-    -a|-abbreviation-file)
+    -a|--abbreviation-file)
       ABB="${2}"; shift;;
     -n|--stations-per-cluster)
       STA_PER_CLU="${2}"; shift;;

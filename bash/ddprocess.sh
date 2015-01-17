@@ -359,11 +359,13 @@ fi
 
 # 
 # CHECK THE STATIONS PER CLUSTER
-# TODO
-# if ! `echo $STA_PER_CLU | /bin/egrep [0-9]` ; then
-#   echo "*** Invalid stations per cluster"
-#   exit 1
-# fi
+# 
+if [[ $STA_PER_CLU =~ ^[0-9]+$ ]]; then
+    :
+else
+   echo "*** Invalid stations per cluster"
+   exit 1
+fi
 
 #
 # RESOLVE IONOSPHERIC PRODUCT IDENTIFIER
@@ -603,10 +605,10 @@ rm .tmp 2>/dev/null
 #
 # LINK THE VIENNA GRID FILE WHICH SHOULD BE AT THE DATAPOOL AREA
 if $( test -f ${D}/VMFG_${YEAR}${DOY} ) && \
-   $( /bin/ln -sf ${D}/VMFG_${YEAR}${DOY} ${P}/${CAMPAIGN}/GRD/VMF1${YR2}${DOY}0.GRD ); then 
+   $( /bin/ln -sf ${D}/VMFG_${YEAR}${DOY} ${P}/${CAMPAIGN}/GRD/VMF${YR2}${DOY}0.GRD ); then 
   :
 else 
-  echo "*** Failed to link VMF1 grid file ${D}/VMFG_${YEAR}${MONTH}${DOM}"
+  echo "*** Failed to link VMF1 grid file ${D}/VMFG_${YEAR}${DOY}"
   exit 1
 fi
 
@@ -673,7 +675,18 @@ done
 # CREATE THE CLUSTER FILE
 # //////////////////////////////////////////////////////////////////////////////
 
-## TODO
+##  dump all available rinex files (station names) on a temporary file;
+##+ then use the makecluster program to create a cluster file
+>.tmp
+for i in "${RINEX_AV[@]}"; do echo ${i:0:4} >> .tmp; done
+/usr/local/bin/makecluster --abbreviation-file=${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.ABB \
+                           --stations-per-cluster=${STA_PER_CLU} \
+                           --station-file=.tmp \
+                           1>${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.CLU
+if test $? -ne 0 ; then
+  echo "Failed to create the cluster file"
+  exit 1
+fi
 
 # //////////////////////////////////////////////////////////////////////////////
 # CHOOSE A-PRIORI COORDINATES FILE FOR REGIONAL AND EPN STATIONS
