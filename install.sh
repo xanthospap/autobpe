@@ -34,7 +34,7 @@ FAIL_W=NO ## exit if warning
 ## list of bash shell scripts
 BSS=(syncwbern_52.sh wgetepnrnx.sh wgetigsrnx.sh wgetregrnx.sh wgeturanus.sh \
   comparesta.sh extractStations.sh setpcl.sh ddprocess.sh setpcf.sh setpolupdh.sh \
-  makecluster.sh \
+  makecluster.sh clearcmp.sh \
   gutils/wgetorbit.sh gutils/wgeterp.sh gutils/wgetion.sh gutils/wgetvmf1.sh)
 ## list of prequisities
 PRG=(crx2rnx rnx2crx runpkr00 uncompress getopt)

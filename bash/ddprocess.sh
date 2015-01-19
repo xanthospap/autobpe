@@ -560,12 +560,12 @@ fi
 
 ## TODO
 
-DCB=DCB${MONTH}${YR2}.DCB
+#DCB=DCB${MONTH}${YR2}.DCB
 
-if ! /bin/ln -sf ${DATAPOOL}/${DCB} ${P}/${CAMPAIGN}/ORB/${DCB} ; then
-  echo "*** Failed to transfer dcb file $DCB from datapool"
-  exit 1
-fi
+#if ! /bin/ln -sf ${DATAPOOL}/${DCB} ${P}/${CAMPAIGN}/ORB/${DCB} ; then
+#  echo "*** Failed to transfer dcb file $DCB from datapool"
+#  exit 1
+#fi
 
 
 #
@@ -809,3 +809,10 @@ if test "${STATUS}" == "ERROR"; then
 
   for i in `ls ${P}/${CAMPAIGN^^}/BPE/${TASKID}${YR2}${DOY}0*.LOG`; do cat $i >> $LOGFILE; done
 fi
+
+# //////////////////////////////////////////////////////////////////////////////
+# CLEAR CAMPAIGN DIRECTORIES
+# //////////////////////////////////////////////////////////////////////////////
+/usr/local/bin/clearcmp --campaign=${CAMPAIGN} --analysis-center=${AC^^}  \
+                      --bernese-loadvar=${LOADVAR} --doy=${DOY} --year=${YEAR} \
+                      --ids=${SOL_ID} 2>/dev/null

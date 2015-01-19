@@ -178,7 +178,7 @@ else
   exit 254
 fi
 
-DOY=`echo $DOY | /bin/sed/ 's/^0*//'`
+DOY=`echo $DOY | /bin/sed 's/^0*//'`
 if [[ $DOY =~ ^[0-9]+$ ]]; then
   DOY3=$DOY
   if [ $DOY -lt 100 ]; then DOY3=0${DOY3}; fi
@@ -204,7 +204,7 @@ fi
 # remove leading '/' characters (if any)
 for i in "${!EXCLUDE_LIST[@]}"; do
   EXCLUDE_LIST[i]=${EXCLUDE_LIST[i]##/}
-fi
+done
 
 # //////////////////////////////////////////////////////////////////////////////
 # GO TO THE CAMPAIGN DIRECTORY FOR SAFETY
@@ -217,6 +217,10 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # REMOVE FILES FROM EVERY FOLDER
 # //////////////////////////////////////////////////////////////////////////////
+
+#
+DOY=$DOY3
+#
 
 #
 # ATM FOLDER
@@ -237,7 +241,8 @@ for i in "${ID_LIST[@]}" ; do
     fi
   done
 done
-echo "Removing from ATM -> ${RM_LIST[@]}"
+# echo "Removing from ATM -> ${RM_LIST[@]}"
+for i in "${RM_LIST[@]}"; do rm ${i}; done;
 
 #
 # BPE FOLDER
@@ -292,7 +297,8 @@ for i in "${ID_LIST[@]}" ; do
     fi
   done
 done
-echo "Removing from SOL -> ${RM_LIST[@]}"
+# echo "Removing from SOL -> ${RM_LIST[@]}"
+for i in "${RM_LIST[@]}"; do rm ${i}; done;
 
 #
 # STA FOLDER
@@ -328,7 +334,8 @@ for i in "${ID_LIST[@]}" ; do
     RM_LIST+=($i) 
   fi
 done
-echo "Removing from STA -> ${RM_LIST[@]}"
+# echo "Removing from STA -> ${RM_LIST[@]}"
+for i in "${RM_LIST[@]}"; do rm ${i}; done;
 
 # //////////////////////////////////////////////////////////////////////////////
 # EXIT
