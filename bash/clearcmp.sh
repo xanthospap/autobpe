@@ -47,7 +47,7 @@ function help {
   echo ""
   echo " Usage   : "
   echo ""
-  echo " Switches:"
+  echo " Switches: -a --analysis-center= specify the analysis center."
   echo "           -b --bernese-loadvar= specify the Bernese LOADGPS.setvar file; this"
   echo "            is needed to resolve the Bernese-related path variables"
   echo "           -c --campaign= specify the name of the campaign; this script will"
@@ -64,7 +64,8 @@ function help {
   echo "           -h --help print help message and exit"
   echo "           -v --version print version and exit"
   echo ""
-  echo " Exit Status: Always 0"
+  echo " Exit Status: Success 0"
+  echo "            : Error   255-1"
   echo ""
   echo " WARNING !! The long options are only available if the GNU-enhanced version of getopt is"
   echo "            available; else, the user must only use short options"
@@ -82,6 +83,7 @@ function help {
 # //////////////////////////////////////////////////////////////////////////////
 # PRE-DEFINE BASIC VARIABLES
 # //////////////////////////////////////////////////////////////////////////////
+AC=                ## analysis center
 LOADVAR=           ## the bernese loadvar file
 YEAR=              ## the year; 4-digit
 DOY=               ## the doy
@@ -100,12 +102,12 @@ if [ "$#" == "0" ]; then help; fi
 getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   # GNU enhanced getopt is available
-  ARGS=`getopt -o b:c:d:e:i:y:hv \
-  -l bernese-loadvar:,campaign:,doy:,exclude:,ids:,year:,help,version \
+  ARGS=`getopt -o a:b:c:d:e:i:y:hv \
+  -l analysis-center:,bernese-loadvar:,campaign:,doy:,exclude:,ids:,year:,help,version \
   -n 'clearcmp' -- "$@"`
 else
   # Original getopt is available (no long option names, no whitespace, no sorting)
-  ARGS=`getopt b:c:d:e:i:y:hv "$@"`
+  ARGS=`getopt a:b:c:d:e:i:y:hv "$@"`
 fi
 # check for getopt error
 if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 254 ; fi
@@ -114,6 +116,8 @@ eval set -- $ARGS
 # extract options and their arguments into variables.
 while true ; do
   case "$1" in
+    -a|--analysis-center)
+      AC="${2}"; shift;;
     -b|--bernese-loadvar)
       LOADVAR="${2}"; shift;;
     -c|--campaign)
@@ -205,7 +209,10 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # GO TO THE CAMPAIGN DIRECTORY FOR SAFETY
 # //////////////////////////////////////////////////////////////////////////////
-cd ${P}/${CAMPAIGN}
+if ! cd ${P}/${CAMPAIGN} ; then
+  echo "***ERROR! Failed to change into ${P}/${CAMPAIGN}"
+  exit 254
+fi
 
 # //////////////////////////////////////////////////////////////////////////////
 # REMOVE FILES FROM EVERY FOLDER
@@ -214,6 +221,116 @@ cd ${P}/${CAMPAIGN}
 #
 # ATM FOLDER
 #
+RM_LIST=()
+for i in "${ID_LIST[@]}" ; do
+  for j in TRO TRP; do
+    file=ATM/${i}${YR2}${DOY}0.${j}
+    addit=1
+    for k in "${EXCLUDE_LIST[@]}"; do
+      if test "${k}" == "${file}" ; then
+        addit=0
+      fi
+    done
+    if test $addit -eq 1
+    then 
+      RM_LIST+=($file) 
+    fi
+  done
+done
+echo "Removing from ATM -> ${RM_LIST[@]}"
 
-## ls | grep -P "^A.*[0-9]{2}$" | xargs -d"\n" rm
-## IFS=', ' read -a array <<< "$string"
+#
+# BPE FOLDER
+#
+rm BPE/*
+
+#
+# GRD FOLDER
+#
+rm GRD/*
+
+#
+# LOG FOLDER
+#
+rm LOG/*
+
+#
+# OBS FOLDER
+# WARNING not checked for exclude files
+rm OBS/????${DOY}0.???
+
+#
+# ORB FOLDER
+# WARNING not checked for exclude files
+rm ORB/${AC}${YR2}${DOY}0.???
+
+#
+# OUT FOLDER
+# WARNING not checked for exclude files
+rm OUT/*
+
+# RAW FOLDER
+# WARNING not checked for exclude files
+rm RAW/????${DOY}0.${YR2}?
+
+#
+# SOL FOLDER
+#
+RM_LIST=()
+for i in "${ID_LIST[@]}" ; do
+  for j in SNX NQ0; do
+    file=SOL/${i}${YR2}${DOY}0.${j}
+    addit=1
+    for k in "${EXCLUDE_LIST[@]}"; do
+      if test "${k}" == "${file}" ; then
+        addit=0
+      fi
+    done
+    if test $addit -eq 1
+    then 
+      RM_LIST+=($file) 
+    fi
+  done
+done
+echo "Removing from SOL -> ${RM_LIST[@]}"
+
+#
+# STA FOLDER
+#
+RM_LIST=()
+for i in ${YR2}${DOY}???.CLB \
+         APR${YR2}${DOY}0.CRD \
+         ???${YR2}${DOY}0.BSL \
+         REF${YR2}${DOY}0.CRD \
+         REG${YR2}${DOY}0.CRD ; do
+    addit=1
+    for k in "${EXCLUDE_LIST[@]}"; do
+      if test "${k}" == "${i}" ; then
+        addit=0
+      fi
+    done
+    if test $addit -eq 1
+    then 
+      RM_LIST+=($i) 
+    fi
+done
+
+for i in "${ID_LIST[@]}" ; do
+  file=${i}${YR2}${DOY}0.CRD
+  addit=1
+  for k in "${EXCLUDE_LIST[@]}"; do
+    if test "${k}" == "${file}" ; then
+      addit=0
+    fi
+  done
+  if test $addit -eq 1
+  then 
+    RM_LIST+=($i) 
+  fi
+done
+echo "Removing from STA -> ${RM_LIST[@]}"
+
+# //////////////////////////////////////////////////////////////////////////////
+# EXIT
+# //////////////////////////////////////////////////////////////////////////////
+exit 0
