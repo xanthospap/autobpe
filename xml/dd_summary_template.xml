@@ -1,17 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
-               "docbook/dtd/xml/4.2/docbookx.dtd">
-<article>
-  <articleinfo>
-    <title>
-      Making your DocBook/XML HTML output not suck
-    </title>
-  </articleinfo>
-  <section>
-    <title>Introduction</title>
-    <para>
-      Most modern UNIX and Linux distributions come with suitable DocBook/XML tools, yet by default..
-    </para>
-  </section>
-</article>
+

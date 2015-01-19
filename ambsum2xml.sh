@@ -1,0 +1,48 @@
+#! /bin/bash
+
+echo "<table>"
+echo "<title>Ambiguity Resolution Summary</title>"
+echo "<tgroup cols=\"14\">"
+for i in `seq 1 14`
+do
+  echo "<colspec colname=\"c${i}\">"
+done
+echo "<spanspec spanname=\"hspan12\" namest=\"c1\" nameend=\"c2\" align=\"center\">"
+echo "<spanspec spanname=\"hspan45\" namest=\"c4\" nameend=\"c5\" align=\"center\">"
+echo "<spanspec spanname=\"hspan67\" namest=\"c6\" nameend=\"c7\" align=\"center\">"
+echo "<spanspec spanname=\"hspan01\" namest=\"c10\" nameend=\"c11\" align=\"center\">"
+
+echo "<thead>"
+echo "<row>"
+echo "<entry>Station 1</entry>"
+echo "<entry>Station 2</entry>"
+echo "<entry>Length</entry>"
+echo "<entry spanname=\"hspan45\">Before</entry>"
+echo "<entry spanname=\"hspan67\">After</entry>"
+echo "<entry>Resolved</entry>"
+echo "<entry>Sat. System</entry>"
+echo "<entry spanname=\"hspan01\">Max/RMS L5</entry>"
+echo "<entry>Receiver 1</entry>"
+echo "<entry>Receiver 2</entry>"
+echo "</row>"
+echo "</thead>"
+
+echo "<tfoot>"
+echo "<row>"
+echo "<entry spanname=\"hspan12\">Total</entry>"
+echo "<entry>TOT_LENGTH</entry>"
+echo "<entry>TOT_BEF_AMB</entry>"
+echo "<entry>TOT_BEF_MM</entry>"
+echo "<entry>TOT_AFT_AMB</entry>"
+echo "<entry>TOT_AFT_MM</entry>"
+echo "<entry>TOT_RES</entry>"
+echo "<entry>TOT_SYS</entry>"
+echo "<entry>TOT_RMS_1</entry>"
+echo "<entry>TOT_RMS_2</entry>"
+echo "<entry> - </entry>"
+echo "<entry> - </entry>"
+echo "</row>"
+echo "</tfoot>"
+
+echo "</tgroup>"
+echo "</table>"
