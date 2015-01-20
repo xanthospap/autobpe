@@ -81,6 +81,11 @@ function help {
   echo " work exactly with this. You can see an example of such a file here: "
   echo " bpe2@vincenty.ntua.gr~/templates/dd/AMBYYDDD0.SUM"
   echo ""
+  echo " Note 2"
+  echo " This script only produces rows for a table which is set elsewhere. The format of this"
+  echo " table is vital and any change (there) may cast this script's output to gibberish."
+  echo " See : ambsum2xml.sh"
+  echo ""
   echo " |===========================================|"
   echo " |** Higher Geodesy Laboratory             **|"
   echo " |** Dionysos Satellite Observatory        **|"
@@ -155,22 +160,22 @@ if test $METHOD != "cbwl" ; then
             echo "***ERROR! Not valid method $METHOD; see help file"
             exit 254
           else
-            START="Direct L1\/L2 Ambiguity"; STOP="";
+            START="Direct L1\/L2 Ambiguity"; STOP=""; MTH="Direct L1 / L2";
           fi
         else
-          START="Quasi-Ionosphere-Free (QIF)"; STOP="Direct L1\/L2 Ambiguity";
+          START="Quasi-Ionosphere-Free (QIF)"; STOP="Direct L1\/L2 Ambiguity"; MTH="QIF";
         fi
       else
-        START="Phase-Based Narrowlane (L3)"; STOP="Quasi-Ionosphere-Free (QIF)";
+        START="Phase-Based Narrowlane (L3)"; STOP="Quasi-Ionosphere-Free (QIF)"; MTH="Phase-Based Narrowlane (L3)";
       fi
     else
-      START="Phase-Based Widelane (L5)"; STOP="Phase-Based Narrowlane (L3)";
+      START="Phase-Based Widelane (L5)"; STOP="Phase-Based Narrowlane (L3)"; MTH="Phase-Based Widelane (L5)";
     fi
   else
-    START="Code-Based Narrowlane (NL)"; STOP="Phase-Based Widelane (L5)";
+    START="Code-Based Narrowlane (NL)"; STOP="Phase-Based Widelane (L5)"; MTH="Code-Based Narrowlane (NL)";
   fi
 else
-  START="Code-Based Widelane (WL)"; STOP="Code-Based Narrowlane (NL)";
+  START="Code-Based Widelane (WL)"; STOP="Code-Based Narrowlane (NL)"; MTH="Code-Based Widelane (WL)";
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -221,10 +226,15 @@ sed -n "/${START}/,/${STOP}/p" $AMBFILE | \
 TOT_BSL=0
 if ! test -s .tmp ; then
   echo "<row>"
+  echo "<entry>${MTH}</entry>"
   for i in `seq 1 13`; do
     echo "<entry>-</entry>"
   done
   echo "</row>"
+  ## short summary
+  echo "<!-- ## Number of baselines   : 0      ## -->"
+  echo "<!-- ## Resolved baselines    : 0 %    ## -->"
+  echo "<!-- ## Mean baseline length  : 0 (km) ## -->"
   exit 0
 fi
 
@@ -243,6 +253,10 @@ for i in `seq 1 $TOT_BSL`; do
     exit 254
   fi
   echo "<row>"
+  ## if this is the first row of the method, add a vertical spanning row
+  if test ${i} -eq 1 ; then
+    echo "<entry morerows=\"${TOT_BSL}\" valign=\"middle\"><para>${MTH}</para></entry>"
+  fi
   # NOTE: Receiver models can have whitespaces in theri names, so they could span
   #       more than one elements in the array 'array'. e.g. if receiver1='ASHTECH Z-XII3'
   #       this would span 2 elements in the array. For that reason they should be read 
@@ -258,9 +272,26 @@ for i in `seq 1 $TOT_BSL`; do
   echo "</row>"
 done
 
+## Special care for the last line (the summary)
+let j=TOT_BSL+1
+array=()
+IFS=' ' read -a array <<< `sed -n "${j}p" < .tmp`
+echo "<row>"
+echo "<entry spanname=\"hspan12\"></entry>"
+for k in `seq 2 10`; do
+  echo "<entry>${array[${k}]}</entry>"
+done
+echo "<entry></entry>"
+echo "<entry></entry>"
+echo "</row>"
+
+## short summary
+echo "<!-- ## Number of baselines   : ${TOT_BSL}       ## -->"
+echo "<!-- ## Resolved baselines    : ${array[7]} %    ## -->"
+echo "<!-- ## Mean baseline length  : ${array[2]} (km) ## -->"
+
 # //////////////////////////////////////////////////////////////////////////////
 # EXIT
 # //////////////////////////////////////////////////////////////////////////////
-echo "<!-- ## Number of baselines : ${TOT_BSL} ## -->"
-#rm .tmp 2>/dev/null
+rm .tmp 2>/dev/null
 exit 0
