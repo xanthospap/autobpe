@@ -216,15 +216,27 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 if [ "$DECOMPRESS" == "YES" ]; then CHECK_FOR_UNC=True; else CHECK_FOR_UNC=False; fi
 if [ -z "$ODIR" ]; then ODIR="./"; fi
-P_LIST=`python -c \
-"import bpepy.gpstime; \
- import bpepy.products.erps; \
- rtn = bpepy.products.erps.geterp ($YEAR,$DOY,'"$AC"','"$ODIR"',${USE_STD_NAMES},'"$TYPE"',$FDEL,$CHECK_FOR_UNC); \
- print rtn"` ##2>.wgetorbir.py.getorb
+
+P_LIST=`python -c "import bpepy.gpstime
+import bpepy.products.erps
+import sys
+rtn = bpepy.products.erps.geterp ($YEAR,$DOY,'"$AC"','"$ODIR"',${USE_STD_NAMES},'"$TYPE"',$FDEL,$CHECK_FOR_UNC)
+if rtn[0] != 0:
+  sys.exit (1)
+print rtn
+sys.exit (0)" 2>/dev/null`
+
+if test $? -ne 0
+then
+  echo "***ERROR! Failed to run script bpepy.products.erps.geterp()"
+  echo "Answer: $P_LIST"
+  exit 254
+fi
 
 # //////////////////////////////////////////////////////////////////////////////
 # RESOLVE THE ANSWER STRING (LIST)
 # //////////////////////////////////////////////////////////////////////////////
+## TODO Re-write this a bit better !!
 PLIST=`echo "$P_LIST" | sed "s|'||g" | sed 's|,||g' | sed 's|\[||g' | sed 's|\]||g' | sed 's|(||g' | sed 's|)||g'`
 # echo $PLIST
 # first check the status

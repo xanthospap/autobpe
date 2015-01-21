@@ -638,7 +638,7 @@ def geterp_cod (date,save_dir='',translate='no',force_type='x',force_remove=Fals
         SOLUTION_TYPE = SOLUTION_TYPE + ' (repro 2013)'
       FTP_FILENAME  = FILE
       SV_FILENAME   = DFILE
-      return [0,FTP_FILENAME,SV_FILENAME,SOLUTION_TYPE]
+      return [1,FTP_FILENAME,SV_FILENAME,SOLUTION_TYPE]
   if check_for_z == True:
     p = re.compile ('.Z$')
     dfile = p.sub( '', DFILE)
@@ -649,7 +649,7 @@ def geterp_cod (date,save_dir='',translate='no',force_type='x',force_remove=Fals
         SOLUTION_TYPE = SOLUTION_TYPE + ' (repro 2013)'
       FTP_FILENAME  = FILE
       SV_FILENAME   = DFILE
-      return [0,FTP_FILENAME,SV_FILENAME,SOLUTION_TYPE]
+      return [1,FTP_FILENAME,SV_FILENAME,SOLUTION_TYPE]
   status = bpepy.utils.ftpget (HOST+'/'+DIRN,[FILE],[DFILE])
   if status == 0:
     DOWNLOADED = 'yes'
@@ -674,7 +674,7 @@ def geterp_cod (date,save_dir='',translate='no',force_type='x',force_remove=Fals
       if translate == 'yes':
         #DFILE = DFILE.replace ('.ERP_R','.ERP')
         #DFILE = DFILE.replace ('COD','COR')
-        DFILE = 'COR' + GPSW + SDOW + '.ERP'
+        DFILE = 'COR' + SGW + SDOW + '.ERP'
       else:
         DFILE=FILE
       if save_dir == '':

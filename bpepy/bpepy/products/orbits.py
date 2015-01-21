@@ -775,14 +775,12 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
     else:
       DIRN = 'aiub/CODE/' + SYR + '/'
     FILE  = identifier + SGW + SDOW + '.EPH.Z'
+    if translate == True:
+      DFILE = FINAL_
     if save_dir == '':
       DFILE = FILE
     else:
       DFILE = save_dir + '/' + FILE
-    if translate == True:
-      ##DFILE = (DFILE.replace ('.EPH','.SP3')).lower ()
-      ##DFILE = (DFILE.replace ('.z','.Z'))
-      DFILE = FINAL_
     if os.path.isfile (DFILE):
       if force_remove : 
         os.unlink (DFILE)
@@ -910,14 +908,12 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
   else:
     DIRN = 'aiub/CODE/' + SYR + '/'
   FILE  = identifier + SGW + SDOW + '.EPH.Z'
+  if translate == True:
+    DFILE = FINAL_
   if save_dir == '':
     DFILE = FILE
   else:
     DFILE = save_dir + '/' + FILE
-  if translate == True:
-    ##DFILE = (DFILE.replace ('.EPH','.SP3')).lower ()
-    ##DFILE = (DFILE.replace ('.z','.Z'))
-    DFILE = FINAL_
   if os.path.isfile (DFILE):
     if force_remove : 
       os.unlink (DFILE)
