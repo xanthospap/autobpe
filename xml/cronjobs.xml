@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"/usr/share/xml/docbook/schema/dtd/4.4/docbookx.dtd" [
+
+<!ENTITY chap1 SYSTEM "cronjobs_chap1.xml">
+]>
+
+<book>
+  
+  <!-- START INFORMATION -->
+  <bookinfo>
+    <title>Scheduled Jobs for bpe2 @ Vincenty</title>
+    <subtitle>A Cron Table Chronicle</subtitle>
+    <authorgroup>
+      <author>
+        <firstname>Demitris</firstname>
+        <surname>Anastasiou</surname>
+        <authorinitials>DA</authorinitials>
+        <affiliation>
+          <orgname>National Technical University of Athens</orgname>
+          <address>
+            <email>danast@mail.ntua.gr</email>
+          </address>
+        </affiliation>
+      </author>
+      <author>
+        <firstname>Vangelis</firstname>
+        <surname>Zacharis</surname>
+        <authorinitials>VZ</authorinitials>
+        <affiliation>
+          <orgname>National Technical University of Athens</orgname>
+          <address>
+            <email>vanzach@survey.ntua.gr</email>
+          </address>
+        </affiliation>
+      </author>
+      <author>
+        <firstname>Xanthos</firstname>
+        <surname>Papanikolaou</surname>
+        <authorinitials>XP</authorinitials>
+        <affiliation>
+          <orgname>National Technical University of Athens</orgname>
+          <address>
+            <email>xanthos@mail.ntua.gr</email>
+          </address>
+        </affiliation>
+      </author>
+    </authorgroup>
+  </bookinfo>
+  <!-- END INFORMATION -->
+  
+  <!-- START PREFACE -->
+  <preface>
+    
+    <title>Introduction</title>
+    <section id="intro_why">
+      <title>Why was this document written?</title>
+      <para>
+        Why was this document written? Because we always end up with a huge amount of shceduled cronjobs, that no-one knows what they
+        do and why they do it. Even worse, sometimes they keep on running for days, in a bugged state populating folders and consuming
+        huge amount of resources.
+      </para>
+      <para>Well ok ... by the way, it's a good opportunity to experiment with docbook ...</para>
+    </section>
+    
+    <section id="intro_audience">
+      <title>Audience</title>
+      <para>Anyone who uses the bpe account on vincenty should read this. The admin should make sure of that!</para>
+    </section>
+    
+    <section id="intro_revision">
+      <title>Revision History</title>
+      <para>
+        <revhistory>
+          <revision>
+            <revnumber>1.0</revnumber>
+            <date>2015-01-22</date>
+            <authorinitials>XP</authorinitials>
+            <revremark>Initial release.</revremark>
+          </revision>
+        </revhistory>
+      </para>
+    </section>
+    
+    <section id="intro_contrib">
+      <title>Contributions</title>
+      <para>Sadly just us. However, this document is base on the <ulink url="http://www.tldp.org/">Linux Documentation Project</ulink> 
+        templates, so we are grateful to this community.</para>
+    </section>
+    
+    <section id="intro_feedback">
+      <title>Feedback</title>
+      <para>
+        Missing information, missing links, missing characters?  Mail it to the
+        maintainers of this document: <address><email>xanthos@mail.ntua.gr</email></address>, <address><email>danast@mail.ntua.gr</email></address>,
+        <address><email>vanzach@survey.ntua.gr</email></address>.
+      </para>
+    </section>
+    
+    <section id="intro_copywrite">
+      <title>Copyright information</title>
+      <para>Copyright 2015 Dionysos Satellite Observatory, National Technical University of Athens.
+        This work is free. You can redistribute it and/or modify it under the
+        terms of the Do What The Fuck You Want To Public License, Version 2,
+        as published by Sam Hocevar. See <ulink url="http://www.wtfpl.net/">http://www.wtfpl.net/</ulink> for more details.
+      </para>
+      <para>Didn't get it? Ok, then let's write down the full license.</para>
+      <para><screen>
+          DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
+          Version 2, December 2004 
+          
+          Copyright (C) 2004 Sam Hocevar sam@hocevar.net 
+          
+          Everyone is permitted to copy and distribute verbatim or modified 
+          copies of this license document, and changing it is allowed as long 
+          as the name is changed. 
+          
+          DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
+          TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION 
+          
+          0. You just DO WHAT THE FUCK YOU WANT TO.
+          </screen></para>
+      <para>Still have questions? Probably they are answered at the <ulink url="http://www.wtfpl.net/">wtfpl</ulink> website.</para>
+    </section>
+    
+    <section id="intro_09">
+      <title>Conventions used in this document</title>
+      <para>The following typographic and usage conventions occur in this text:
+      </para>
+      <table id="conventions" frame="all"><title>Typographic and usage conventions</title>
+        <tgroup cols="2" align="left" colsep="1" rowsep="1">
+          
+          <thead>
+            <row><entry>Text type</entry><entry>Meaning</entry></row>
+          </thead>
+          
+          <tbody>
+            <row>
+              <entry><quote>Quoted text</quote></entry>
+              <entry>Quotes from people, quoted computer output.</entry>
+            </row>
+            <row>
+              <entry><screen>terminal view</screen></entry>
+              <entry>Literal computer input and output captured from the terminal, 
+                usually rendered with a light grey background.</entry>
+            </row>
+            <row>
+              <entry><command>command</command></entry>
+              <entry>Name of a command that can be entered on the command line.</entry>
+            </row>
+            <row>
+              <entry><varname>VARIABLE</varname></entry>
+              <entry>Name of a variable or pointer to content of a variable, as in 
+                <varname>$VARNAME</varname>.</entry>
+            </row>
+            <row>
+              <entry><option>option</option></entry>
+              <entry>Option to a command, as in <quote>the <option>-a</option> option to the 
+                  <command>ls</command> command</quote>.</entry>
+            </row>
+            <row>
+              <entry><parameter>argument</parameter></entry>
+              <entry>Argument to a command, as in <quote>read 
+                  <command>man <parameter>ls</parameter></command></quote>.</entry>
+            </row>
+            <row>
+              <entry><cmdsynopsis><command>command <option>options</option> 
+                    <parameter>arguments</parameter></command></cmdsynopsis></entry>
+              <entry>Command synopsis or general usage, on a separated line.</entry>
+            </row>
+            <row>
+              <entry><filename>filename</filename></entry>
+              <entry>Name of a file or directory, for example <quote>Change to the 
+                  <filename>/usr/bin</filename> directory.</quote></entry>
+            </row>
+            <row>
+              <entry><keycap>Key</keycap></entry>
+              <entry>Keys to hit on the keyboard, such as <quote>type <keycap>Q</keycap> 
+                  to quit</quote>.</entry>
+            </row>
+            <row>
+              <entry><guibutton>Button</guibutton></entry>
+              <entry>Graphical button to click, like the <guibutton>OK</guibutton> 
+                button.</entry>
+            </row> 
+            <row>
+              <entry><menuchoice><guimenu>Menu</guimenu><guimenuitem>Choice</guimenuitem>
+                  </menuchoice></entry>
+              <entry>Choice to select from a graphical menu, for instance: <quote>Select 
+                  <menuchoice><guimenu>Help</guimenu><guimenuitem>About Mozilla</guimenuitem>
+                    </menuchoice> in your browser.</quote></entry>
+            </row>
+            <row>
+              <entry><emphasis>Terminology</emphasis></entry>
+              <entry>Important term or concept: <quote>The Linux <emphasis>kernel</emphasis> 
+                  is the heart of the system.</quote></entry>
+            </row>
+            <!--
+            <row>
+              <entry>See <xref linkend="chap_01" /></entry><entry>link to related subject 
+                within this guide.</entry>
+            </row>
+            -->
+            <row>
+              <entry><ulink url="http://tille.soti.org">The author</ulink></entry>
+              <entry>Clickable link to an external web resource.</entry>
+            </row>
+          </tbody>
+          
+        </tgroup>
+      </table>
+    </section>
+    
+  </preface>
+  <!-- END PREFACE -->
+  
+  <toc></toc>
+  
+&chap1;
+  
+</book>

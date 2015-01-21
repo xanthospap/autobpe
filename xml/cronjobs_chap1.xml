@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+
+<chapter id="chap_01"><title>The bpe2 Account</title>
+  
+  <abstract>
+    <para>In this chapter we will introduce the bpe2 account; its directory tree, scope,
+      vital folders and programs, what it is supposed to be doing etc...</para>
+    <para>The account, is responsible for and should be doing the following:
+      <itemizedlist>
+        <listitem><para>Download various GNSS products and data,</para></listitem>
+        <listitem><para>Process GNSS networks on a routine basis,</para></listitem>
+        <listitem><para>Analyze GNSS stations time-series files</para></listitem>
+        <listitem><para>Upload various information to other servers for presentation.</para></listitem>
+      </itemizedlist>
+    </para>
+    <para>The account's directory tree and cron table should accomodate all of the above.</para>
+  </abstract>
+  
+</chapter>
