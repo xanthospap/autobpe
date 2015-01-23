@@ -15,8 +15,8 @@
 ## created               : NOV-2014
 ## usage                 : 
 ## exit code(s)          :   0 -> success
-##                       255-1 -> error
-##                           1 -> warning
+##                           1 -> error
+##                           2 -> warning
 ## discription           : 
 ## uses                  : 
 ## dependancies          : 
@@ -28,21 +28,30 @@
 ################################################################################
 
 STATUS=0  ## status
-PWD=`pwd` ## where are we ?
+RPWD=`pwd` ## where are we ?
 FORCE=NO  ## force install if previous version found
 FAIL_W=NO ## exit if warning
+
 ## list of bash shell scripts
-BSS=(syncwbern_52.sh wgetepnrnx.sh wgetigsrnx.sh wgetregrnx.sh wgeturanus.sh \
-  comparesta.sh extractStations.sh setpcl.sh ddprocess.sh setpcf.sh setpolupdh.sh \
-  makecluster.sh clearcmp.sh block_amb_read.sh ambsum2xml.sh\
-  gutils/wgetorbit.sh gutils/wgeterp.sh gutils/wgetion.sh gutils/wgetvmf1.sh)
+BSS=()
+
 ## list of prequisities
 PRG=(crx2rnx rnx2crx runpkr00 uncompress getopt)
-LINKP=/usr/local/bin ## default installation directory
-PYFLIST=bpepy/.python.file.list ## file with list of installed python modules
-UMANDIR=/usr/local/man/man1 ## default man directory
-UNINSTALL=NO ## uninstall package
-ADD_HTML=NO ## add html man pages
+
+## default installation directory
+INSTDIR=/usr/local/bin
+
+## file with list of installed python modules
+PYFLIST=bpepy/.python.file.list
+
+## default man directory
+MANDIR=/usr/local/man/man1
+
+## uninstall package
+UNINSTALL=NO
+
+## add html man pages
+ADD_HTML=NO
 
 # uninstall scripts
 function del_exe {
@@ -82,6 +91,8 @@ function help {
   echo "  -u uninstall package"
   echo "  -h display help massage"
   echo "  -i add html man pages; these will reside in man/html"
+  echo "  -d installation directory (default is $INSTDIR)"
+  echo "  -m man pages directory (default is $MANDIR)"
   echo "Script must be run with root priviladges"
   echo ""
   exit 0;
@@ -94,10 +105,10 @@ function help {
 getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   # GNU enhanced getopt is available
-  ARGS=`getopt -o fwuhi -n 'install.sh' -- "$@"`
+  ARGS=`getopt -o fwuhid:m: -n 'install.sh' -- "$@"`
 else
   # Original getopt is available (no long option names, no whitespace, no sorting)
-  ARGS=`getopt fwuhi "$@"`
+  ARGS=`getopt fwuhid:m: "$@"`
 fi
 # check for getopt error
 if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 254 ; fi
@@ -114,6 +125,10 @@ while true ; do
       UNINSTALL=YES;;
     -i)
       ADD_HTML=YES;;
+    -d)
+      INSTDIR="${2}"; shift;;
+    -m)
+      MANDIR="${2}"; shift;;
     -h)
       help;;
     --) # end of options
@@ -126,6 +141,214 @@ done
 # //////////////////////////////////////////////////////////////////////////////
 
 #
+# STEP 0.0 : CHECK THAT THE USER IS ROOT
+#
+#if [ "$EUID" -ne 0 ]; then
+#  echo "[ERROR] script must be run as root; installation terminated"
+#  exit 1
+#fi
+
+#
+# STEP 0.0 : CHECK THAT INSTALL AND MAN PAGE DIRS EXIST
+#
+if ! test -d $INSTDIR
+then
+  printf "[ERROR] Could not find installation directory : $INSTDIR \n"
+  printf "Installation terminated\n"
+  exit 1
+fi
+if ! test -d $MANDIR
+then
+  printf "[ERROR] Could not find man-page directory : $MANDIR \n"
+  printf "Installation terminated \n"
+  exit 1
+fi
+
+printf "#########################################################################\n"
+printf "                   Installing package AutoBpe Utils\n"
+printf "#########################################################################\n"
+printf " Installation Directory $INSTDIR\n"
+printf " Man-Page Directory     $MANDIR\n"
+
+#
+# STEP 0.1 : CHECK FOR THE PREQUISITIES
+#
+printf " Checking for dependancies\n"
+# check that all prequisities are available
+for i in "${PRG[@]}"; do
+  if ! type "$i" &>/dev/null; then
+    printf "\t[WARNING] Program $i not installed or not set in PATH; some scripts may not work"
+    STATUS=2
+    if [ "$FAIL_W" == "YES" ]
+    then 
+      printf "[FATAL]\n"
+      exit ${STATUS}
+    else
+      printf "[WARNINGS IGNORED]\n"
+    fi
+    else
+      p=`which $i`
+      printf "\tProgram $i found as $p \n"
+  fi
+done
+
+#
+# STEP 0.2 : CHECK getopt
+#
+printf " Checking getopt version ... "
+# check getopt version; warn for long options
+getopt -T &>/dev/null
+if [ $? -ne 4 ]; then
+  # Original getopt is available (no long option names, no whitespace, no sorting)
+  printf "\n\t[WARNING] GNU/getopt not detected; only use short options\n"
+  STATUS=2
+  if [ "$FAIL_W" == "YES" ]; then exit ${STATUS}; fi
+else
+  printf "GNU enhanced version available [OK]\n"
+fi
+
+#
+# STEP 0.3 : CHECK g++
+#
+printf " Checking GNU/gcc version ... "
+GCCV=`g++ --version | head -n1 | awk '{print $4}' | sed 's|\.||g'`
+if test $? -ne 0
+then
+  printf " \n[ERROR] Cannot locate GNU/g++\n"
+  exit 1
+fi
+python -c "
+import sys
+vrs = '$GCCV'
+if vrs < 450:
+  sys.exit(1)
+else:
+  sys.exit(0)"
+if test $? -ne 0
+then
+  printf "\n\t[WARNING] Found g++ version $GCCV ; You should change the\n"
+  printf "\tmakefiles in src/cpp/* according to src/cpp/xyz2flh/readme\n"
+else
+  printf "found g++ version $GCCV [OK]\n"
+fi
+
+#
+# STEP 0.5 : GET A LIST OF ALL BASH SHELL SCRIPTS TO INSTALL
+#
+BSS=( $(find src/ -type f -name "*.sh") )
+printf " Getting list of (bash) shell scripts ... "
+# for i in "${BSS[@]}"; do printf "\t$i\n"; done
+printf " found ${#BSS[@]} programs\n"
+
+#
+# STEP 1.0 : INSTALL (i.e. link) THE SHELL SCRIPTS
+#
+printf " Installing shell executables\n"
+
+# check for previous versions
+for i in "${BSS[@]}"; do
+  exe=`basename ${i} | sed 's|.sh||g'`
+  if [ -L ${INSTDIR}/${exe} ]; then
+    if [ "${FORCE}" == "NO" ]; then
+      printf " [ERROR] previous version detected; installation terminated\n"
+      printf " [HINT]  -- use the -f switch to overwrite\n"
+      exit 1
+    else
+      rm ${INSTDIR}/${exe}
+    fi
+  fi
+done
+
+# link shell scripts to the bin path
+for i in "${BSS[@]}"; do
+  if [ ! -f ${RPWD}/${i} ]; then
+    printf " [ERROR] Missing bash script ${i}; installation terminated\n"
+    exit 1
+  else
+    chmod +x ${RPWD}/${i}
+    ##${RPWD}/${i} -v
+    exe=`basename ${i} | sed 's|.sh||g'`
+    ln -sf ${RPWD}/${i} ${INSTDIR}/${exe}
+  fi
+done
+
+printf " Done! shell executables installed successefuly\n"
+
+#
+# STEP 2.0 : INSTALL PYTHON LIBRARIES
+#
+printf " Installing python modules\n"
+# install python libraries
+cd src/python
+python setup.py install --record ../../.python.file.list &>/dev/null
+if [ $? -ne 0 ]; then
+  printf " [ERROR] Failed to install python libraries; installation terminated\n"
+  cd ${RPWD}
+  exit 1
+fi
+cd ${RPWD}
+
+#
+# STEP 2.2 : CHECK INSTALLED PYTHON LIBRARIES
+#
+printf " Checking python modules ... "
+python -c "
+import bpepy.gpstime
+import bpepy.products.orbits" 2>/dev/null
+if [ $? -ne 0 ]; then
+  printf " [ERROR] Failed to load installed python modules; installation failed!\n"
+  exit 1
+else
+  printf " OK!\n Python modules installed successefuly (summary written in ../../.python.file.list)\n"
+fi
+
+#
+# STEP 4.5 : INSTALL C++ LIBRARIES
+#
+printf " Installing C++ modules\n"
+rm .stamp.file 2>/dev/null
+touch .stamp.file
+cd src/cpp
+if test $? -ne 0
+then
+  printf "\n\t[ERROR] Failed to locate cpp directory!\n"
+  cd $RPWD
+  exit 1
+fi
+CSS=( $(find ./* -type d) )
+for i in "${CSS[@]}"
+do
+  cd $i && make &>/dev/null
+  if test $? -ne 0
+  then
+    printf " [ERROR] Failed to compile dir : src/cpp/${i}\n"
+    cd $RPWD
+    exit 1
+  else
+    printf "\tCompiled module src/cpp/${i} [OK]\n"
+    cd ../
+  fi
+done
+cd $RPWD
+printf "\tLinking programs ... "
+CSS=( $(find bin/ -type f -name "*.e" -cnewer .stamp.file) )
+# link programs to the bin path
+COUNTER=0
+for i in "${CSS[@]}"; do
+  chmod +x ${RPWD}/${i}
+  exe=`basename ${i} | sed 's|.e||g'`
+  ln -sf ${RPWD}/${i} ${INSTDIR}/${exe}
+  let COUNTER=COUNTER+1
+  # echo "linked ${RPWD}/${i} ${INSTDIR}/${exe}"
+done
+printf "linked $COUNTER / ${#CSS[@]} [OK]\n"
+rm .stamp.file 2>/dev/null
+
+exit 0
+##################################################################################################
+#
+
+#
 # STEP -1 : UNINSTALL
 #
 if [ "$UNINSTALL" == "YES" ]; then
@@ -136,16 +359,6 @@ if [ "$UNINSTALL" == "YES" ]; then
   del_man
   del_pym
   exit 0
-fi
-
-echo "Installing package AutoBpe Utils"
-
-#
-# STEP 0 : CHECK THAT THE USER IS ROOT
-#
-if [ "$EUID" -ne 0 ]; then
-  echo "[ERROR] script must be run as root; installation terminated"
-  exit 254
 fi
 
 #
