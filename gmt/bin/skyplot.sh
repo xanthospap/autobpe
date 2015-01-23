@@ -64,11 +64,14 @@ function help {
   echo "            (positive integer)"
   echo "           -x --rinex-file= specify the input rinex file"
   echo "           -m --mp1-file= specify the mp1 file"
+  echo "           -g --set-gmt if this switch is used, then a 'gmt' will be used"
+  echo "            before the actual gmt program names (i.e. instead of using 'psxy [...]'"
+  echo "            the script will issue 'gmt psxy [...]'"
   echo "           -h --help display (this) help message and exit"
   echo "           -v --version dsiplay version and exit"
   echo ""
-  echo " Exit Status:255-1 -> error"
-  echo " Exit Status:    0 -> sucess"
+  echo " Exit Status: 1 -> error"
+  echo " Exit Status: 0 -> sucess"
   echo ""
   echo " Example Usage"
   echo ""
@@ -95,6 +98,7 @@ STA_NAME=              ## Station name
 ORBIT_FILE=            ## Orbit information file
 ELEVATION=             ## Cut off angle
 RINEX=                 ## Rinex file
+SET_GMT=NO             ## Use 'gmt gmtname' instead of 'gmtname'
 INP=cf2sky.inp         ## the skyplot .inp file
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -106,12 +110,12 @@ if [ "$#" == "0" ]; then help; fi
 getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   # GNU enhanced getopt is available
-  ARGS=`getopt -o s:e:n:r:c:x:hv \
-  -l  start-date:,end-date:,station-name:,orbit-file:,cut-off-angle:,rinex-file:,help,version \
+  ARGS=`getopt -o s:e:n:r:c:x:hvg \
+  -l  start-date:,end-date:,station-name:,orbit-file:,cut-off-angle:,rinex-file:,help,version,set-gmt \
   -n 'skyplot' -- "$@"`
 else
   # Original getopt is available (no long option names, no whitespace, no sorting)
-  ARGS=`getopt s:e:n:r:c:x:hv "$@"`
+  ARGS=`getopt s:e:n:r:c:x:hvg "$@"`
 fi
 # check for getopt error
 if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 1 ; fi
@@ -134,6 +138,8 @@ while true ; do
       RINEX="${2}"; shift;;
     -m|--mp1-file)
       MP1="${2}"; shift;;
+    -g|--set-gmt)
+      SET_GMT=YES;;
     -h|--help)
       help; exit 0;;
     -v|--version)
@@ -169,6 +175,10 @@ I=${RINEX:(-3)}
 if test -z $MP1 ; then
   MP1=${RINEX%%${I}}mp1
   echo "## MP1 filename missing; Set from rinex file, as: $MP1"
+fi
+if ! test -f ${MP1} ; then
+  echo "ERROR. Failed to locate mp1 file : $MP1"
+  exit 1
 fi
 
 ## if the station name file not defined, set its name from rinex
@@ -285,6 +295,7 @@ echo $MP1 1>>${INP}
 rm cf2sky.log 2>/dev/null
 ./cf2sky.e &>/dev/null
 if ! cat cf2sky.log | grep "^Normal Termination" &>/dev/null ; then
+#if ! cat cf2sky.log | grep "^Normal Termination" ; then
   echo "ERROR. Failed run of cf2sky.e"
   exit 1
 fi
@@ -293,6 +304,11 @@ fi
 # RUN THE BATCH FILE SKYPLOT.BAT
 # //////////////////////////////////////////////////////////////////////////////
 chmod +x skyplot.bat
+if test "${SET_GMT}" == "YES" ; then
+  sed -i 's|^psxy|gmt psxy|g' skyplot.bat
+  sed -i 's|^pstext|gmt pstext|g' skyplot.bat
+  sed -i 's|^psvelo|gmt psvelo|g' skyplot.bat
+fi
 ./skyplot.bat &>/dev/null
 mv skyplot.ps ${STA_NAME}-${STAMP}-cf2sky.ps &>/dev/null
 if test $? -ne 0 ; then
@@ -303,5 +319,5 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # EXIT
 # //////////////////////////////////////////////////////////////////////////////
-rm cf2sky.inp cf2sky.log rm.me skyplot.inp 2>/dev/null
+rm cf2sky.inp cf2sky.log rm.me skyplot.inp skyplot.bat 2>/dev/null
 exit 0

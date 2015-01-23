@@ -248,3 +248,40 @@ if ! test -f $FILE ; then echo "ERROR. INVALID VMF1 REPORT (2)"; exit 1; fi
 mv .tmp ${FILE}.meta
 
 ##  Download the DCB file(s)
+##  First get the running
+if ! wget --tries=50 --output-document=${POOL}/P1C1_RINEX.DCB \
+          ftp://ftp.unibe.ch/aiub/CODE/P1C1_RINEX.DCB &>/dev/null
+then
+  echo "ERROR. FAILED TO DOWNLOAD RUNNING DCBs FROM CODE"
+  exit 1
+fi
+
+DT=$(/bin/date '+%Y-%m-%d')
+echo "CODE'S 30-DAY GNSS P1-C1 DCB (P1C1_RINEX.DCB) SOLUTION DOWNLOADED AT ${DT}" \
+      > ${POOL}/P1C1_RINEX.DCB.meta
+
+##  If today and -20 days belong to the same month, we need no other file; else
+##+ first check if an appropriate file already exists. If not, try downloading
+##+ it. If that fails, no problem !
+if test "${YESTERDAY[1]}" != "${M20DAYS[1]}"
+then
+	YR2=${M20DAYS[0]}
+	YR2=${YR2:2:2}
+	if ! test -f ${POOL}/P1C1${YR2}${M20DAYS[1]}.DCB
+	then
+		wget -O ${POOL}/P1C1${YR2}${M20DAYS[1]}.DCB.Z \
+			ftp://ftp.unibe.ch/aiub/CODE/${M20DAYS[0]}/P1C1${YR2}${M20DAYS[1]}_RINEX.DCB \
+			2>/dev/null
+		if test $? -ne 0
+		then
+			rm ${POOL}/P1C1${YR2}${M20DAYS[1]}.DCB.Z
+		else
+			uncompress -f ${POOL}/P1C1${YR2}${M20DAYS[1]}.DCB.Z
+			echo "CODE'S FINAL GNSS P1-C1 DCB (P1C1${YR2}${M20DAYS[1]}_RINEX.DCB) SOLUTION" \
+				> ${POOL}/P1C1${YR2}${M20DAYS[1]}.DCB.meta
+		fi
+	fi
+fi
+
+##  Finaly !! All done for today
+exit 0

@@ -1,3 +1,6 @@
+<?xml version="1.0"?>
+<style>
+
 body {
          font-family: luxi sans,sans-serif;
 }
@@ -39,7 +42,13 @@ body {
   font-size: 1.2em;
 }
 
+a { 
+  text-decoration: none;
+  border-bottom: 1px dotted #000; 
+}
+
 a:hover {
   background-color: #777;
   color: #fff; 
 }
+ </style>

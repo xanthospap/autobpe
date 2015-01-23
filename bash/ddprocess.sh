@@ -161,6 +161,7 @@ PRODUCT_AREA=/media/Seagate/solutions52 ## product area
 PCF_FILE=NTUA_DDP                       ## the pcf file; no path, no extension
 PL_FILE=ntua_pcs.pl                     ## the perl script to ignite the processing
 LOG_DIR=/home/bpe2/log                  ## directory holding the log files
+TMP=/home/bpe2/tmp                      ## a temp folder with r+w premissions
 
 # //////////////////////////////////////////////////////////////////////////////
 # VARIABLES
@@ -454,9 +455,15 @@ DOM=`echo $DATES_STR | awk '{print $4}'`;
 # //////////////////////////////////////////////////////////////////////////////
 # LINK REQUIRED PRODUCTS FROM DATAPOOL AREA
 #
-# Note that the names of the linked files should be capitalize for convinience
-# when this is possible
+# NOTE: the names of the linked files should be capitalize for convinience
+#       when this is possible
+# NOTE: allong with the products themselves, specify the .meta files which
+#       hold the product information
 # //////////////////////////////////////////////////////////////////////////////
+ORB_META=
+ERP_META=
+ION_META=
+DCB_META=
 
 # WHERE IS DATAPOOL
 DATAPOOL=${D}
@@ -493,7 +500,7 @@ TRG_SP3=${SP3/.sp3/.PRE}
 
 if $( test -f ${DATAPOOL}/${SP3} ) && \
    $( /bin/ln -sf ${DATAPOOL}/${SP3} ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^} ); then 
-  :
+  ORB_META=${DATAPOOL}/${SP3}.meta
 else 
   echo "*** Failed to link orbit file ${DATAPOOL}/${SP3}"
   exit 1
@@ -533,7 +540,7 @@ fi
 
 if $( test -f ${DATAPOOL}/${ERP} ) && \
    $( /bin/ln -sf ${DATAPOOL}/${ERP} ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^} ); then 
-  :
+  ERP_META=${DATAPOOL}/${ERP}.meta
 else 
   echo "*** Failed to link orbit file ${DATAPOOL}/${SP3}"
   exit 1
@@ -557,26 +564,58 @@ fi
 #
 # DIFFERENTIAL CODE BIAS
 # ------------------------------------------------------------------------------
+DCB=DCB${YR2}${MONTH}.DCB
+CUR_MONTH=`/bin/date '+%m'`
+DCB_META=${DATAPOOL}/P1C1_RINEX.DCB.meta ## we'll see about that ...
 
-## TODO
-
-#DCB=DCB${MONTH}${YR2}.DCB
-
-#if ! /bin/ln -sf ${DATAPOOL}/${DCB} ${P}/${CAMPAIGN}/ORB/${DCB} ; then
-#  echo "*** Failed to transfer dcb file $DCB from datapool"
-#  exit 1
-#fi
-
+if test "${MONTH}" == "${CUR_MONTH}"
+then
+	if ! /bin/ln -sf ${DATAPOOL}/P1C1_RINEX.DCB ${P}/${CAMPAIGN}/ORB/${DCB}
+	then
+		echo "*** Failed to transfer dcb file ${DATAPOOL}/P1C1_RINEX.DCB from datapool"
+		exit 1
+	fi
+else
+	if test -f ${DATAPOOL}/${DCB}
+	then
+		if ! /bin/ln -sf ${DATAPOOL}/${DCB} ${P}/${CAMPAIGN}/ORB/${DCB}
+		then
+			echo "*** Failed to transfer dcb file ${DATAPOOL}/${DCB}"
+			exit 1
+		else
+			DCB_META=${DATAPOOL}/${DCB}.meta
+		fi
+	else
+		if ! /bin/ln -sf ${DATAPOOL}/P1C1_RINEX.DCB ${P}/${CAMPAIGN}/ORB/${DCB}
+		then
+			echo "*** Failed to transfer dcb file ${DATAPOOL}/P1C1_RINEX.DCB from datapool"
+			exit 1
+		fi
+	fi
+fi
 
 #
 # IONOSPHERIC CORRECTIONS
 # ------------------------------------------------------------------------------
+
+##  Create a .meta file in the TMP directory. We will write info later on.
+ION_META=${TMP}/ion.meta
+>${ION_META}
+
+## Ok. Let's search the product area for a suitable solution file
 for i in $ION_PRODS_ID; do
   ion=${i}${YR2}${DOY}0.ION.Z
-  if [ "$DEBUG" == "YES" ];then echo -ne "(debug) checking ion file ${PRODUCT_AREA}/${YEAR}/${DOY}/${i}${YR2}${DOY}0.ION.Z";fi
-  if $( test -f ${PRODUCT_AREA}/${YEAR}/${DOY}/${i}${YR2}${DOY}0.ION.Z ) && \
-     $( cp -f ${PRODUCT_AREA}/${YEAR}/${DOY}/${i}${YR2}${DOY}0.ION.Z ${P}/${CAMPAIGN}/ATM/ ); then 
-    /bin/uncompress -f ${P}/${CAMPAIGN}/ION/${i}${YR2}${DOY}0.ION.Z
+
+  if [ "$DEBUG" == "YES" ]
+  then 
+	  echo -ne "(debug) checking ion file ${PRODUCT_AREA}/${YEAR}/${DOY}/${i}${YR2}${DOY}0.ION.Z"
+  fi
+
+  if $( test -f ${PRODUCT_AREA}/${YEAR}/${DOY}/${ion} ) && \
+     $( cp -f ${PRODUCT_AREA}/${YEAR}/${DOY}/${ion} ${P}/${CAMPAIGN}/ATM/ )
+  then 
+    /bin/uncompress -f ${P}/${CAMPAIGN}/ION/${ion}
+    echo "(ddprocess) Ionospheric correction file (ion) : ${PRODUCT_AREA}/${YEAR}/${DOY}/${ion} from AC: ntua" >> ${ION_META}
     if [ "$DEBUG" == "YES" ];then echo -ne "... file found!\n";fi
     break
   else 
@@ -585,6 +624,7 @@ for i in $ION_PRODS_ID; do
   fi
 done
 
+##  did we download it already ?
 if test -z $ion ; then
   if [ "$DEBUG" == "YES" ];then echo -ne "(debug) downloading CODE's ion file";fi
   if /usr/local/bin/wgetion --output-directory=${P}/${CAMPAIGN}/ATM --force-remove --standard-names \
