@@ -222,10 +222,10 @@ fi
 ##  '(wgetvmf1) Downloaded VMF1 grid file \
 ##+ /home/bpe2/data/GPSDATA/DATAPOOLVMFG_20150120.H00 (final) ; merged to \
 ##+ /home/bpe2/data/GPSDATA/DATAPOOL/VMFG_2015020'
-##  There should be 4 such lines.
+##  There should be 5 such lines.
 cat .tmp >> $LOGF
 LNS=`cat .tmp | wc -l`
-if test $LNS -ne 4 ; then echo "ERROR. INVALID VMF1 REPORT"; exit 1; fi
+if test $LNS -ne 5 ; then echo "ERROR. INVALID VMF1 REPORT"; exit 1; fi
 FILE=`cat .tmp | head -n 1 | awk '{print $11}'`
 if ! test -f $FILE ; then echo "ERROR. INVALID VMF1 REPORT (2)"; exit 1; fi
 mv .tmp ${FILE}.meta
@@ -242,7 +242,7 @@ fi
 
 cat .tmp >> $LOGF
 LNS=`cat .tmp | wc -l`
-if test $LNS -ne 4 ; then echo "ERROR. INVALID VMF1 REPORT"; exit 1; fi
+if test $LNS -ne 5 ; then echo "ERROR. INVALID VMF1 REPORT"; exit 1; fi
 FILE=`cat .tmp | head -n 1 | awk '{print $11}'`
 if ! test -f $FILE ; then echo "ERROR. INVALID VMF1 REPORT (2)"; exit 1; fi
 mv .tmp ${FILE}.meta
@@ -257,7 +257,7 @@ then
 fi
 
 DT=$(/bin/date '+%Y-%m-%d')
-echo "CODE'S 30-DAY GNSS P1-C1 DCB (P1C1_RINEX.DCB) SOLUTION DOWNLOADED AT ${DT}" \
+echo "(cron_products) CODE'S 30-DAY GNSS P1-C1 DCB (P1C1_RINEX.DCB) SOLUTION DOWNLOADED AT ${DT}" \
       > ${POOL}/P1C1_RINEX.DCB.meta
 
 ##  If today and -20 days belong to the same month, we need no other file; else
@@ -277,7 +277,7 @@ then
 			rm ${POOL}/P1C1${YR2}${M20DAYS[1]}.DCB.Z
 		else
 			uncompress -f ${POOL}/P1C1${YR2}${M20DAYS[1]}.DCB.Z
-			echo "CODE'S FINAL GNSS P1-C1 DCB (P1C1${YR2}${M20DAYS[1]}_RINEX.DCB) SOLUTION" \
+            echo "(cron_products) CODE'S FINAL GNSS P1-C1 DCB (P1C1${YR2}${M20DAYS[1]}_RINEX.DCB) SOLUTION" \
 				> ${POOL}/P1C1${YR2}${M20DAYS[1]}.DCB.meta
 		fi
 	fi
