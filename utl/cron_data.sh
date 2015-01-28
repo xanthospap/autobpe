@@ -113,7 +113,7 @@ NSG=0
                           --output-directory ${POOL} \
                           --force-remove \
                           --decompress \
-                          &>${LOG}
+                          &>>${LOG}
 STATUS=$?
 if test $STATUS -gt 250
 then
@@ -128,7 +128,7 @@ NSG=$((NSG + STATUS))
                           --output-directory ${POOL} \
                           --force-remove \
                           --decompress \
-                          &>${LOG}
+                          &>>${LOG}
 STATUS=$?
 if test $STATUS -gt 250
 then
@@ -144,7 +144,7 @@ NSG=$((NSG + STATUS))
                           --force-remove \
                           --decompress \
                           --fix-header \
-                          &>${LOG}
+                          &>>${LOG}
 STATUS=$?
 if test $STATUS -gt 250
 then
@@ -163,7 +163,7 @@ NSG=0
                           --doy ${M20DAYS[3]} \
                           --output-directory ${POOL} \
                           --decompress \
-                          &>${LOG}
+                          &>>${LOG}
 STATUS=$?
 if test $STATUS -gt 250
 then
@@ -177,7 +177,7 @@ NSG=$((NSG + STATUS))
                           --doy ${M20DAYS[3]} \
                           --output-directory ${POOL} \
                           --decompress \
-                          &>${LOG}
+                          &>>${LOG}
 STATUS=$?
 if test $STATUS -gt 250
 then
@@ -192,7 +192,7 @@ NSG=$((NSG + STATUS))
                           --output-directory ${POOL} \
                           --decompress \
                           --fix-header \
-                          &>${LOG}
+                          &>>${LOG}
 STATUS=$?
 if test $STATUS -gt 250
 then
@@ -202,3 +202,15 @@ fi
 NSG=$((NSG + STATUS))
 
 echo "DOWNLOADED $NSG STATIONS FOR NETWOK GREECE FOR FINAL"
+
+## DECOMPRESS THE RINEX : HATANAKA -> PLAIN RINEX
+for crx in ${POOL}/????${M20DAYS[3]}0.${M20DAYS[0]:2:2}d 
+do
+  /usr/local/bin/crx2rnx $crx 2>/dev/null
+  if test $? -eq 0
+  then
+    rm $crx
+  else
+    echo "Failed to decompress (Hatanaka) rinex $crx" >> ${LOG}
+  fi
+done

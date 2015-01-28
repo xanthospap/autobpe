@@ -7,10 +7,10 @@ SRC = geolib.cpp car2ell.cpp ell2car.cpp
 HDR = geolib.hpp
 OBJ = $(SRC:%.cpp=%.o)
 
-all : ../../../bin/xyz2flh.e
+all : ../bin/xyz2flh.e
 
-../../../bin/xyz2flh.e : $(OBJ) $(HDR) xyz2flh.cpp
-	$(CXX) $(LFLAGS) $(OBJ) -o ../../../bin/xyz2flh.e xyz2flh.cpp
+../bin/xyz2flh.e : $(OBJ) $(HDR) xyz2flh.cpp
+	$(CXX) $(LFLAGS) $(OBJ) -o ../bin/xyz2flh.e xyz2flh.cpp
 
 geolib.o : $(HDR) geolib.cpp
 	$(CXX) $(CFLAGS) -o geolib.o geolib.cpp

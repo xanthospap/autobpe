@@ -1,6 +1,6 @@
 CXX := g++
 C11 := -std=c++11
-EXE := ../../../bin/cf2sky.e
+EXE := ../bin/cf2sky.e
 SRC := datetime.cpp \
        intrpSP3.cpp \
        rinex.cpp

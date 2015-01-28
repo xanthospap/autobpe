@@ -315,7 +315,7 @@ then
   cd $RPWD
   exit 1
 fi
-CSS=( $(find ./* -type d) )
+CSS=( $(find ./* -type d -not -name "*bin*") )
 for i in "${CSS[@]}"
 do
   cd $i && make &>/dev/null
@@ -329,20 +329,21 @@ do
     cd ../
   fi
 done
-cd $RPWD
 printf "\tLinking programs ... "
-CSS=( $(find bin/ -type f -name "*.e" -cnewer .stamp.file) )
+#CSS=( $(find bin/ -type f -name "*.e" -cnewer ../../.stamp.file) )
+CSS=( $(find bin/ -type f -name "*.e") )
 # link programs to the bin path
 COUNTER=0
 for i in "${CSS[@]}"; do
-  chmod +x ${RPWD}/${i}
+  chmod +x ${i}
   exe=`basename ${i} | sed 's|.e||g'`
-  ln -sf ${RPWD}/${i} ${INSTDIR}/${exe}
+  ln -sf ${RPWD}/src/cpp/${i} ${INSTDIR}/${exe}
   let COUNTER=COUNTER+1
-  # echo "linked ${RPWD}/${i} ${INSTDIR}/${exe}"
+  printf "\n\t${i} -> ${INSTDIR}/${exe}"
 done
-printf "linked $COUNTER / ${#CSS[@]} [OK]\n"
-rm .stamp.file 2>/dev/null
+printf "\n linked $COUNTER / ${#CSS[@]} [OK]\n"
+rm ../../.stamp.file 2>/dev/null
+cd $RPWD
 
 exit 0
 ##################################################################################################

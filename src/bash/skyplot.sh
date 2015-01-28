@@ -67,6 +67,7 @@ function help {
   echo "           -g --set-gmt if this switch is used, then a 'gmt' will be used"
   echo "            before the actual gmt program names (i.e. instead of using 'psxy [...]'"
   echo "            the script will issue 'gmt psxy [...]'"
+  echo "           -o --output-dir= specify the output directory"
   echo "           -h --help display (this) help message and exit"
   echo "           -v --version dsiplay version and exit"
   echo ""
@@ -99,7 +100,9 @@ ORBIT_FILE=            ## Orbit information file
 ELEVATION=             ## Cut off angle
 RINEX=                 ## Rinex file
 SET_GMT=NO             ## Use 'gmt gmtname' instead of 'gmtname'
+OUT_DIR=               ## Output directory
 INP=cf2sky.inp         ## the skyplot .inp file
+>${INP}
 
 # //////////////////////////////////////////////////////////////////////////////
 # GET COMMAND LINE ARGUMENTS
@@ -140,6 +143,8 @@ while true ; do
       MP1="${2}"; shift;;
     -g|--set-gmt)
       SET_GMT=YES;;
+    -o|--output-dir)
+      OUT_DIR="${2}"; shift;;
     -h|--help)
       help; exit 0;;
     -v|--version)
@@ -197,7 +202,7 @@ fi
 
 ## if end date not defined, set its name from rinex
 if test -z $END_DATE_STR ; then
-  END_DATE_STR=`tail -n 50 $RINEX | tail -n 50 $RINEX | egrep [0-9]G | tail -n 1 | \
+  END_DATE_STR=`tail -n 150 $RINEX | egrep [0-9]G | tail -n 1 | \
                 awk '{printf "%02i-%02i-%02i:%02i-%02i-%02i",$1,$2,$3,$4,$5,$6}' 2>/dev/null`
   if test ${END_DATE_STR:0:2} -lt 50 ; then
     END_DATE_STR=20${END_DATE_STR}
@@ -293,9 +298,8 @@ echo $MP1 1>>${INP}
 # RUN cf2sky.e (SKYPLOT)
 # //////////////////////////////////////////////////////////////////////////////
 rm cf2sky.log 2>/dev/null
-./cf2sky.e &>/dev/null
+/usr/local/bin/cf2sky &>/dev/null
 if ! cat cf2sky.log | grep "^Normal Termination" &>/dev/null ; then
-#if ! cat cf2sky.log | grep "^Normal Termination" ; then
   echo "ERROR. Failed run of cf2sky.e"
   exit 1
 fi
@@ -313,7 +317,21 @@ fi
 mv skyplot.ps ${STA_NAME}-${STAMP}-cf2sky.ps &>/dev/null
 if test $? -ne 0 ; then
   echo "ERROR. PostScript file seems to be missing."
+  rm cf2sky.inp cf2sky.log rm.me skyplot.inp skyplot.bat 2>/dev/null
   exit 1
+fi
+
+# //////////////////////////////////////////////////////////////////////////////
+# MOVE THE PLOT TO THE OUTPUT DIRECTORY
+# //////////////////////////////////////////////////////////////////////////////
+if ! test -z $OUT_DIR
+then
+  if test -d ${OUT_DIR}
+  then
+    mv ${STA_NAME}-${STAMP}-cf2sky.ps ${OUT_DIR}/${STA_NAME}-${STAMP}-cf2sky.ps
+  else
+    echo "ERROR. Failed to move plot; direcoty $OUT_DIR does not exist"
+  fi
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
