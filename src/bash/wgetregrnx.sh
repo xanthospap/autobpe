@@ -274,13 +274,13 @@ function get_station {
       ##
       ## NOTE THAT THESE ARE RAW RECEIVER FILES THAT NEED TO BE CONVERTED
       ##
-      if ! test -f ntua.keys ; then
-        echo "*** ERROR! Cannot find key file ntua.keys"
+      if ! test -f /home/bpe2/ntua.keys ; then
+        echo "*** ERROR! Cannot find key file /home/bpe2/ntua.keys"
         exit 254
       fi
-      NOA2URL=`egrep -w ^NOA2URL.* ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
-      NOA2USR=`egrep -w ^NOA2USR.* ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
-      NOA2PAS=`egrep -w ^NOA2PAS.* ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
+      NOA2URL=`egrep -w ^NOA2URL.* /home/bpe2/ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
+      NOA2USR=`egrep -w ^NOA2USR.* /home/bpe2/ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
+      NOA2PAS=`egrep -w ^NOA2PAS.* /home/bpe2/ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
 
       #
       # GET MONTH AND DAY OF MONTH

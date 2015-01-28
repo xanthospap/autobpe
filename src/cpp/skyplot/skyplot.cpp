@@ -268,11 +268,11 @@ std::cout<<"\ngot line: ["<<stemp<<"]";
 
   #ifdef GMT4
   outbat << "echo off " << endl;                                                         // -X0.75 -Y1.0
-  outbat << "psxy elevRings.dat  -R-1.6/1.6/-1.6/1.6 -JX7.0  -W1.0p/0/0/0 -G230 -V -M -K -P -X0.75 -Y1.0 > skyplot.ps " << endl;
+  outbat << "psxy elevRings.dat  -R-1.6/1.6/-1.6/1.6 -JX16.0  -W1.0p/0/0/0 -G230 -V -M -K -P -X1.5 -Y2.0 > skyplot.ps " << endl;
   outbat << "psxy cutoffRing.dat -R -JX  -W0.2t4_8:0p  -G255 -V -M -O -K -P >> skyplot.ps " << endl;
   outbat << "psxy elevRings.dat  -R -JX  -W1.0p/0/0/0  -V -M -O -K -P >> skyplot.ps " << endl;
   outbat << "psxy elevRings.dat  -R -JX  -W0.5p/255/255/255  -V -M -O -K -P >> skyplot.ps " << endl;
-  outbat << "pstext title.txt -F+a0+jCM+f -R -JX  -N -V  -O -K -P >> skyplot.ps " << endl;
+  outbat << "pstext title.txt -R -JX  -N -V  -O -K -P >> skyplot.ps " << endl;
   outbat << "psvelo mp.xy  -R -JX  -L  -W0.5p/0/255/0 -Se1/0.95/0 -A0.0/0.0/0.0 " <<
     " -N  -H0 -O -K -P -V >>  skyplot.ps " << endl;
   #endif

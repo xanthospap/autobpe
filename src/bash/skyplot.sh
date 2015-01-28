@@ -113,12 +113,12 @@ if [ "$#" == "0" ]; then help; fi
 getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   # GNU enhanced getopt is available
-  ARGS=`getopt -o s:e:n:r:c:x:hvg \
-  -l  start-date:,end-date:,station-name:,orbit-file:,cut-off-angle:,rinex-file:,help,version,set-gmt \
+  ARGS=`getopt -o s:e:n:r:c:x:hvgo: \
+  -l  start-date:,end-date:,station-name:,orbit-file:,cut-off-angle:,rinex-file:,help,version,set-gmt,output-dir: \
   -n 'skyplot' -- "$@"`
 else
   # Original getopt is available (no long option names, no whitespace, no sorting)
-  ARGS=`getopt s:e:n:r:c:x:hvg "$@"`
+  ARGS=`getopt s:e:n:r:c:x:hvgo: "$@"`
 fi
 # check for getopt error
 if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 1 ; fi

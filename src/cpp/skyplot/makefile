@@ -5,7 +5,7 @@ SRC := datetime.cpp \
        intrpSP3.cpp \
        rinex.cpp
 EXS := skyplot.cpp
-GMTV := -DGMT5
+GMTV := -DGMT4
 CFLAGS   = -c $(C11) -Wall -Wunused-variable $(GMTV)
 LFLAGS   = $(C11) -Wall -Wunused-variable $(GMTV)
 OBJ := $(SRC:%.cpp=%.o)
