@@ -218,15 +218,17 @@ MJD=`egrep -A2 \
 imjd=${MJD%%.*}
 fmjd=${MJD/*./0.}
 
-DATE_STR=`python -c "import bpepy.gpstime, sys
-s,d = bpepy.gpstime.jd2gd (imjd,fmjd)
+DATE_STR=`python -c "
+import bpepy.gpstime
+import sys
+s,d = bpepy.gpstime.jd2gd ('$imjd','$fmjd')
 if s != 0 : sys.exit (1)
 d.strftime ('%Y %j %m %d')
-sys.exit (0)" 2>/dev/null`
+sys.exit (0)"` ##2>/dev/null`
     
 # check for error
 if test $? -ne 0 ; then
-  echo "***ERROR! Failed to resolve MJD $MJD"
+  echo "***ERROR! Failed to resolve MJD $MJD ($DATE_STR)"
   exit 254
 fi
 

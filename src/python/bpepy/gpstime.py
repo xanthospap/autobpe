@@ -247,7 +247,8 @@ def jd2gd (imjd,fmjd):
     @retval     a list as [Exit_Code, datetime.instnce]
   """
 
-  mjd = int (imjd);
+  mjd  = int (imjd);
+  fmjd = float(fmjd);
 
   if mjd < 50000 or (fmjd < 0 or fmjd > 1.):
     return 1,datetime.datetime.now()
