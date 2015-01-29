@@ -182,7 +182,7 @@ if test -z $MP1 ; then
   echo "## MP1 filename missing; Set from rinex file, as: $MP1"
 fi
 if ! test -f ${MP1} ; then
-  echo "ERROR. Failed to locate mp1 file : $MP1"
+  echo "ERROR. Failed to locate mp1 file : $MP1 rinex: $RINEX"
   exit 1
 fi
 
@@ -225,7 +225,7 @@ fi
 
 if test ${HAS_TIME} -eq 0 ; then
   if ! date -d $START_DATE_STR '+%Y %m %d %H %M %S' 1>${INP} ; then
-    echo "ERROR! Invalid start date: $START_DATE_STR"
+    echo "ERROR! Invalid start date: $START_DATE_STR rinex: $RINEX"
     exit 1
   fi
 else
@@ -233,7 +233,7 @@ else
   HMS=${START_DATE_STR##[0-9]*:}
   HMS=`echo $HMS | sed 's|-|:|g'`
   if ! date -d "$SDS $HMS" '+%Y %m %d %H %M %S' 1>>${INP} ; then
-    echo "ERROR! Invalid start date: $START_DATE_STR"
+    echo "ERROR! Invalid start date: $START_DATE_STR rinex: $RINEX"
     exit 1
   fi
 fi
@@ -246,7 +246,7 @@ fi
 
 if test ${HAS_TIME} -eq 0 ; then
   if ! date -d $END_DATE_STR '+%Y %m %d %H %M %S' 1>>${INP} ; then
-    echo "ERROR! Invalid end date: $END_DATE_STR"
+    echo "ERROR! Invalid end date: $END_DATE_STR rinex: $RINEX"
     exit 1
   fi
 else
@@ -254,7 +254,7 @@ else
   HMS=${END_DATE_STR##[0-9]*:}
   HMS=`echo $HMS | sed 's|-|:|g'`
   if ! date -d "$SDS $HMS" '+%Y %m %d %H %M %S' 1>>${INP} ; then
-    echo "ERROR! Invalid end date: $END_DATE_STR"
+    echo "ERROR! Invalid end date: $END_DATE_STR rinex: $RINEX"
     exit 1
   fi
 fi
@@ -280,7 +280,7 @@ echo "P1 Pseudorange Multipath at $STA_NAME" 1>>${INP}
 if [[ $ELEVATION =~ ^[0-9]+$ ]]; then
     echo $ELEVATION 1>>${INP}
 else
-   echo "ERROR. Invalid elevation angle $ELEVATION"
+   echo "ERROR. Invalid elevation angle $ELEVATION rinex: $RINEX"
    exit 1
 fi
 
@@ -300,7 +300,7 @@ echo $MP1 1>>${INP}
 rm cf2sky.log 2>/dev/null
 /usr/local/bin/cf2sky &>/dev/null
 if ! cat cf2sky.log | grep "^Normal Termination" &>/dev/null ; then
-  echo "ERROR. Failed run of cf2sky.e"
+  echo "ERROR. Failed run of cf2sky.e rinex: $RINEX"
   exit 1
 fi
 
@@ -316,7 +316,7 @@ fi
 ./skyplot.bat &>/dev/null
 mv skyplot.ps ${STA_NAME}-${STAMP}-cf2sky.ps &>/dev/null
 if test $? -ne 0 ; then
-  echo "ERROR. PostScript file seems to be missing."
+  echo "ERROR. PostScript file seems to be missing. rinex: $RINEX"
   rm cf2sky.inp cf2sky.log rm.me skyplot.inp skyplot.bat 2>/dev/null
   exit 1
 fi
@@ -330,7 +330,7 @@ then
   then
     mv ${STA_NAME}-${STAMP}-cf2sky.ps ${OUT_DIR}/${STA_NAME}-${STAMP}-cf2sky.ps
   else
-    echo "ERROR. Failed to move plot; direcoty $OUT_DIR does not exist"
+    echo "ERROR. Failed to move plot; direcoty $OUT_DIR does not exist rinex: $RINEX"
   fi
 fi
 

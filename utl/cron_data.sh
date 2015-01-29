@@ -204,7 +204,7 @@ NSG=$((NSG + STATUS))
 echo "DOWNLOADED $NSG STATIONS FOR NETWOK GREECE FOR FINAL"
 
 ## DECOMPRESS THE RINEX : HATANAKA -> PLAIN RINEX
-for crx in ${POOL}/????${M20DAYS[3]}0.${M20DAYS[0]:2:2}d 
+for crx in ${POOL}/????${M20DAYS[3]}0.${M20DAYS[0]:2:2}d
 do
   /usr/local/bin/crx2rnx $crx 2>/dev/null
   if test $? -eq 0
@@ -225,11 +225,10 @@ do
     echo "Failed to decompress (Hatanaka) rinex $crx" >> ${LOG}
   fi
 done
+
 ## MAKE MULTIPATH PLOTS IN $HOME/TMP DIRECTORY
 ## get broadcast ephemeris
 brdc=brdc${M20DAYS[3]}0.${M20DAYS[0]:2:2}n
-echo $brdc
-echo "wget -q -O ${POOL}/${brdc}.Z ftp://cddis.gsfc.nasa.gov/gnss/data/daily/${M20DAYS[0]}/${M20DAYS[3]}/${M20DAYS[0]:2:2}n/${brdc}.Z"
 wget -q -O ${POOL}/${brdc}.Z ftp://cddis.gsfc.nasa.gov/gnss/data/daily/${M20DAYS[0]}/${M20DAYS[3]}/${M20DAYS[0]:2:2}n/${brdc}.Z
 if test $? -ne 0
 then
@@ -239,19 +238,20 @@ fi
 
 if test "${brdc}" != "NO"
 then
-    uncompress ${POOL}/${brdc}.Z
+    uncompress -f ${POOL}/${brdc}.Z
     for rnx in ${POOL}/????${M20DAYS[3]}0.${M20DAYS[0]:2:2}o*
     do
-        TRNX=`basename $RNX`
+        TRNX=`basename $rnx`
         sta=${TRNX:0:4}
         if ! test -f /home/bpe2/tmp/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-cf2sky.ps
         then
-          /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} -o /home/bpe2/tmp
+          /usr/local/bin/teqc +qc $rnx &>${POOL}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-qc
+          /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} -o /home/bpe2/tmp &>>${LOG}
         fi
     done
 fi
 
-brdc=brdc${YESTERDAY[3]}0.${YESTERDAY[0]:2:2}n.Z
+brdc=brdc${YESTERDAY[3]}0.${YESTERDAY[0]:2:2}n
 wget -q -O ${POOL}/${brdc}.Z ftp://cddis.gsfc.nasa.gov/gnss/data/daily/${YESTERDAY[0]}/${YESTERDAY[3]}/${YESTERDAY[0]:2:2}n/${brdc}.Z
 if test $? -ne 0
 then
@@ -261,14 +261,15 @@ fi
 
 if test "${brdc}" != "NO"
 then
-    uncompress ${POOL}/${brdc}.Z
+    uncompress -f ${POOL}/${brdc}.Z
     for rnx in ${POOL}/????${YESTERDAY[3]}0.${YESTERDAY[0]:2:2}o*
     do
-        TRNX=`basename $RNX`
+        TRNX=`basename $rnx`
         sta=${TRNX:0:4}
         if ! test -f /home/bpe2/tmp/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps
         then
-          /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} -o /home/bpe2/tmp
+          /usr/local/bin/teqc +qc $rnx &>${POOL}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-qc
+          /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} -o /home/bpe2/tmp &>>${LOG}
         fi
     done
 fi
