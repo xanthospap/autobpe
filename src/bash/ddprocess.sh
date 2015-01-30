@@ -74,8 +74,13 @@ function help {
   echo "           -t --solution-type specify the dolution type; this can be:"
   echo "              * final, or"
   echo "              * urapid"
-  echo "           --debug set debugging mode"
+  echo "           -u --update= specify which records/files should be updated; valid values are:"
+  echo "              * sta update station-specific files, i.e. time-series records for the stations"
+  echo "              * ntw update update network-specific records"
+  echo "              * all both the above"
+  echo "            See Note 6 for this option"
   echo "           -y --year= specify year (4-digit)"
+  echo "           --debug set debugging mode"
   echo "           -h --help display (this) help message and exit"
   echo "           -v --version dsiplay version and exit"
   echo ""
@@ -180,6 +185,8 @@ SOL_TYPE=                ## solution type (f, or u)
 ION_PRODS_ID=()          ## search for these ion products (as a-priori)
 CLBR=                    ## calibration model (e.g. I08)
 DEBUG=NO                 ## debugging mode
+UPD_STA=NO               ## update station time-series
+UPD_NTW=NO               ## update netowrk file/records
 
 ## Variables that are set during the script ##
 GPSW=
@@ -206,12 +213,12 @@ if [ "$#" == "0" ]; then help; fi
 getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   ## GNU enhanced getopt is available
-  ARGS=`getopt -o hvc:b:a:i:p:s:e:y:d:l:t:f:m: \
-  -l  help,version,campaign:,bernese-loadvar:,analysis-center:,solution-id:,pcv-file:,satellite-system:,elevation-angle:,year:,doy:,stations-per-cluster:,solution-type:,ion-products:,debug,calibration-model: \
+  ARGS=`getopt -o hvc:b:a:i:p:s:e:y:d:l:t:f:m:u: \
+  -l  help,version,campaign:,bernese-loadvar:,analysis-center:,solution-id:,pcv-file:,satellite-system:,elevation-angle:,year:,doy:,stations-per-cluster:,solution-type:,ion-products:,debug,calibration-model:,update: \
   -n 'ddprocess' -- "$@"`
 else
   ## Original getopt is available (no long option names, no whitespace, no sorting)
-  ARGS=`getopt hvc:b:a:i:p:s:e:y:d:l:t:f:m: "$@"`
+  ARGS=`getopt hvc:b:a:i:p:s:e:y:d:l:t:f:m:u: "$@"`
 fi
 ## check for getopt error
 if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 254 ; fi
@@ -240,14 +247,16 @@ while true ; do
       CLBR="${2}"; shift;;
     -p|pcv-file)
       PCV="${2}"; shift;;
-    -i|solution-id)
+    -i|--solution-id)
       SOL_ID="${2}"; shift;;
-    -a|analysis-center)
+    -a|--analysis-center)
       AC="${2}"; shift;;
-    -b|bernese-loadvar)
+    -b|--bernese-loadvar)
       LOADVAR="${2}"; shift;;
     -c|--campaign)
       CAMPAIGN="${2}"; shift;;
+    -u|--update)
+      UPD_OPTION="${2}"; shift;;
     -h|--help)
       help; exit 0;;
     -v|--version)
@@ -381,6 +390,30 @@ fi
 if [ "$SOL_TYPE" != "f" -a "$SOL_TYPE" != "u" ]; then
   echo "*** Invalid solution type"
   exit 1
+fi
+
+#
+# CHECK THE UPDATE OPTIONS
+#
+if ! test -z "$UPD_OPTION"
+then
+  if [ "$UPD_OPTION" == "all" ]
+  then
+    UPD_STA=YES
+    UPD_NTW=YES
+  else
+    if [ "$UPD_OPTION" == "sta" ]
+    then
+      UPD_STA=YES
+      UPD_NTW=NO
+    elif [ "$UPD_OPTION" == "ntw" ]
+      UPD_STA=NO
+      UPD_NTW=YES
+    else
+      echo "*** Invalid update option : $UPD_OPTION"
+      exit 1
+    fi
+  fi
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -832,9 +865,9 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 if test "${STATUS}" == "ERROR"; then
 
-  echo "***********************************************************************" ##>> $LOGFILE
-  echo "-------------------- PROCESS ERROR ------------------------------------" ##>> $LOGFILE
-  echo "***********************************************************************" ##>> $LOGFILE
+  echo "***********************************************************************" >> $LOGFILE
+  echo "-------------------- PROCESS ERROR ------------------------------------" >> $LOGFILE
+  echo "***********************************************************************" >> $LOGFILE
 
   ##  get the Session and PID_SUB of last program written in the SYSOUT file
   ##+ this info is extracted from the line:
@@ -845,7 +878,7 @@ if test "${STATUS}" == "ERROR"; then
 
   ## now right whatever message is in this file to the LOGFILE
   cat ${P}/${CAMPAIGN^^}/BPE/${TASKID}${FL} >> $LOGFILE
-  echo "***********************************************************************" ##>> $LOGFILE
+  echo "***********************************************************************" >> $LOGFILE
 
   for i in `ls ${P}/${CAMPAIGN^^}/BPE/${TASKID}${YR2}${DOY}0*.LOG`; do cat $i >> $LOGFILE; done
 fi
