@@ -591,7 +591,7 @@ if $( test -f ${DATAPOOL}/${ERP} ) && \
   echo "Linked erp file ${DATAPOOL}/${ERP} to ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^}" >> $LOGFILE
   echo "Meta-File $ERP_META" >> $LOGFILE
 else 
-  echo "*** Failed to link orbit file ${DATAPOOL}/${SP3}"
+  echo "*** Failed to link erp file ${DATAPOOL}/${ERP}"
   exit 1
 fi
 
