@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+
+<chapter id="chap_01">
+  <title>The AutoBpe Software Package</title>
+  
+  <abstract id="chap_01_01"><title>Purpose</title>
+    <para>The purpose of the AutoBpe Software Package is to assist the routine prossesing of 
+      <glossterm linkend="gnss">GNSS</glossterm> data at <glossterm linkend="dso">DSO</glossterm>. 
+      With time, it has grown to support a wide range of activities connected (either directly or not) 
+      with the analysis of such data. The package programs support (but are not limited to):
+      <itemizedlist>
+        <listitem><para>downloading <glossterm linkend="gnss">GNSS</glossterm> data and products,</para></listitem>
+        <listitem><para>preproccesing rinex data (via <glossterm linkend="teqc">teqc</glossterm>),</para></listitem>
+        <listitem><para>proccessing <glossterm linkend="gnss">GNSS</glossterm> data via Bernese software,</para></listitem>
+        <listitem><para>compiling summary files, reports, graphs, time-series files, etc,</para></listitem>
+        </itemizedlist>
+        </para>
+  </abstract>
+  
+</chapter>

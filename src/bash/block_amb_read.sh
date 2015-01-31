@@ -228,7 +228,7 @@ if ! test -s .tmp ; then
   echo "<row>"
   echo "<entry>${MTH}</entry>"
   for i in `seq 1 13`; do
-    echo "<entry>-</entry>"
+    echo "<entry></entry>"
   done
   echo "</row>"
   ## short summary

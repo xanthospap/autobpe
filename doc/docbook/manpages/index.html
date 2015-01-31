@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>block_amb_read</title><meta name="generator" content="DocBook XSL Stylesheets V1.78.1" /><link rel="home" href="index.html" title="block_amb_read" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">
+       <span class="application">block_amb_read</span>
+     </th></tr></table><hr /></div><div class="refentry"><a id="idm140357678453472"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>
+       <span class="application">block_amb_read</span>
+      — 
+       Extract ambiguity resolution info to an xml table.
+     </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="cmdsynopsis"><p><code class="command">block_amb_read</code>  [<code class="option">-f --summary-file=</code><em class="replaceable"><code>file</code></em>] [<code class="option">-m --method=      </code><em class="replaceable"><code>method</code></em>] [<code class="option">-h --help         </code>] [<code class="option">-v --version      </code>]</p></div></div><div class="refsect1"><a id="idm140357678525088"></a><h2>DESCRIPTION</h2><p>
+       <span class="command"><strong>block_amb_read</strong></span> will read an ambiguity summary file and report a block of ambiguity information
+       in an xml table. I.e. it will create xml table row entries (one for each baseline, plus one for
+       each method --kind of method summary). The format of the summary file is very stringent and 
+       applies to output from Bernese v5.2 RNX2SNX output. The xml output is directed to stdout.
+     </p></div><div class="refsect1"><a id="idm140357678522016"></a><h2>OPTIONS</h2><div class="variablelist"><dl class="variablelist"><dt><span class="term">-f --summary-file= <em class="replaceable"><code>file</code></em></span></dt><dd><p>
+             Takes <code class="filename">file</code> i.e. the ambiguity resolution summary file. 
+             The ambiguity summary file has a very stringent format and this program is hardcoded to
+             work exactly with this. You can see an example of such a file at:
+             <code class="filename">bpe2@vincenty.ntua.gr~/templates/dd/AMBYYDDD0.SUM</code>.
+           </p></dd><dt><span class="term">-m --method= <em class="replaceable"><code>resolution_method</code></em></span></dt><dd><p>
+             Specify an ambiguity resolution strategy to extract. The parameter
+             <em class="replaceable"><code>resolution_method</code></em> can take one of the following
+             values:
+             </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"> 'cbwl' for Code-Based WideLane,</li><li class="listitem"> 'cbnl' for Code-Based NarrowLane,</li><li class="listitem"> 'pbwl' for Phase-Based WideLane,</li><li class="listitem"> 'pbnl' for Phase-Based NarrowLane,</li><li class="listitem"> 'qif'  for QIF,</li><li class="listitem"> 'dir'  for Direct L1/L2</li></ul></div><p>
+           </p></dd><dt><span class="term">-h --help</span></dt><dd><p>
+            Print help message and exit.
+           </p></dd><dt><span class="term">-v --version</span></dt><dd><p>
+             Print version and exit.
+           </p></dd></dl></div></div><div class="refsect1"><a id="idm140357674070128"></a><h2>USAGE</h2><p>
+       <span class="command"><strong>block_amb_read</strong></span> -f some_file -m qif
+     </p></div><div class="refsect1"><a id="idm140357674068208"></a><h2>EXIT CODES</h2><p>
+       </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"> 0 success, or</li><li class="listitem"> 1 error</li></ul></div><p>
+     </p></div><div class="refsect1"><a id="idm140357674065808"></a><h2>NOTES</h2><p>
+       </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">The output of a program run, cannot be interpreted as a standalone xml document. It
+           is normally used a part of a lager file (e.g. daily summary report of GNSS processing).</li><li class="listitem">If the specified method is not reported in the input summary file, then the program
+           will output an empty row (i.e. all entries/columns will be empty).</li><li class="listitem">Apart from the row entries, the program will also report important statistics about
+           the baselines proccessed with the requested method, as xml comments. E.g.
+             </li></ul></div><p>
+     </p></div><div class="refsect1"><a id="idm140357678599216"></a><h2>BUGS</h2><p>
+       Please report any bugs to <code class="email">&lt;<a class="email" href="mailto:xanthos@mail.ntua.gr">xanthos@mail.ntua.gr</a>&gt;</code> or <code class="email">&lt;<a class="email" href="mailto:danast@mail.ntua.gr">danast@mail.ntua.gr</a>&gt;</code>.
+     </p></div><div class="refsect1"><a id="idm140357678597136"></a><h2>SEE ALSO</h2><p>
+       <span class="command"><strong>ambsum2xml</strong></span>
+     </p></div><div class="refsect1"><a id="idm140357678595264"></a><h2>AUTHOR</h2><p>
+       <span class="author"><span class="firstname">Xanthos</span> <span class="surname">Papanikolaou</span></span>
+       <span class="author"><span class="firstname">Demitris</span> <span class="surname">Anastasiou</span></span> 
+     </p></div></div><div class="navfooter"><hr /></div></body></html>

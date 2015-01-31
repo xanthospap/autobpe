@@ -9,20 +9,15 @@
 ## |===========================================|
 ##
 ## filename              : extractStations.sh
-                           NAME=comparesta
+                           NAME=extractStations
 ## version               : v-1.0
                            VERSION=v-1.0
                            RELEASE=beta
 ## created               : MAY-2013
-## usage                 : extractStations.sh -y [YEAR] -d [DOY] -c [CAMPAIGN] -t [SOLUTION TYPE]
+## usage                 : extractStations.sh
 ## exit code(s)          : 0 -> success
 ##                        -1 -> error
-## discription           : This script will read a processing output file (e.g. /media/.../FFG122000.OUT),
-##                         and it will update the station-specific files for each of the stations
-##                         listed in the file specified. The station-specific
-##                         files to be updated are: [station].c.cts, [station].g.cts, [station].upd.
-##                         If the -r switch is used, then diffrences are reported (solution-
-##                         a-priori crd's) but station-specific files are NOT updated
+## discription           : 
 ## uses                  :
 ## needs                 : 
 ##                         solution output file (e.g. FFG122000.OUT)

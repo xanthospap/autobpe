@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- Works on OpenSUSE 
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"/usr/share/xml/docbook/schema/dtd/4.4/docbookx.dtd" [
+
+<!ENTITY chap1 SYSTEM "cronjobs_chap1.xml">
+]>
+-->
+
+<!-- Works on Fedora -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"/usr/share/sgml/docbook/xml-dtd-4.4/docbookx.dtd" [
+]>
+
+ <refentry>
+   
+   <refentryinfo>
+     <date>22 Jan 2015</date>
+   </refentryinfo>
+   
+   <refmeta>
+     <refentrytitle>
+       <application>block_amb_read</application>
+     </refentrytitle>
+     <manvolnum>1</manvolnum>
+     <refmiscinfo> 1.0</refmiscinfo>
+   </refmeta>
+   
+   <refnamediv>
+     <refname>
+       <application>block_amb_read</application>
+     </refname>
+     <refpurpose>
+       Extract ambiguity resolution info to an xml table.
+     </refpurpose>
+   </refnamediv>
+   
+   <refsynopsisdiv>
+     <refsynopsisdivinfo>
+       <date>22 Jan 2015</date>
+     </refsynopsisdivinfo>
+     <cmdsynopsis>
+       <command>block_amb_read</command>
+       <arg><option>-f --summary-file=</option><replaceable class="parameter">file</replaceable></arg>
+       <arg><option>-m --method=      </option><replaceable class="parameter">method</replaceable></arg>
+       <arg><option>-h --help         </option></arg>
+       <arg><option>-v --version      </option></arg>
+     </cmdsynopsis>
+   </refsynopsisdiv>
+   
+   <refsect1>
+     <refsect1info>
+       <date>22 Jan 2015</date>
+     </refsect1info>
+     <title>DESCRIPTION</title>
+     <para>
+       <command>block_amb_read</command> will read an ambiguity summary file and report a block of ambiguity information
+       in an xml table. I.e. it will create xml table row entries (one for each baseline, plus one for
+       each method --kind of method summary). The format of the summary file is very stringent and 
+       applies to output from Bernese v5.2 RNX2SNX output. The xml output is directed to stdout.
+     </para>
+   </refsect1>
+   
+   <refsect1>
+     <title>OPTIONS</title>
+     <variablelist>
+       
+       <varlistentry>
+         <term>-f --summary-file= <replaceable class="parameter">file</replaceable></term>
+         <listitem>
+           <para>
+             Takes <filename>file</filename> i.e. the ambiguity resolution summary file. 
+             The ambiguity summary file has a very stringent format and this program is hardcoded to
+             work exactly with this. You can see an example of such a file at:
+             <filename>bpe2@vincenty.ntua.gr~/templates/dd/AMBYYDDD0.SUM</filename>.
+           </para>
+         </listitem>
+       </varlistentry>
+       
+       <varlistentry>
+         <term>-m --method= <replaceable class="parameter">resolution_method</replaceable></term>
+         <listitem>
+           <para>
+             Specify an ambiguity resolution strategy to extract. The parameter
+             <replaceable class="parameter">resolution_method</replaceable> can take one of the following
+             values:
+             <itemizedlist>
+               <listitem> 'cbwl' for Code-Based WideLane,</listitem>
+              <listitem> 'cbnl' for Code-Based NarrowLane,</listitem>
+              <listitem> 'pbwl' for Phase-Based WideLane,</listitem>
+              <listitem> 'pbnl' for Phase-Based NarrowLane,</listitem>
+              <listitem> 'qif'  for QIF,</listitem>
+              <listitem> 'dir'  for Direct L1/L2</listitem>
+              </itemizedlist>
+           </para>
+         </listitem>
+       </varlistentry>
+       
+       <varlistentry>
+         <term>-h --help</term>
+         <listitem>
+           <para>
+            Print help message and exit.
+           </para>
+         </listitem>
+       </varlistentry>
+       
+       <varlistentry>
+         <term>-v --version</term>
+         <listitem>
+           <para>
+             Print version and exit.
+           </para>
+         </listitem>
+       </varlistentry>
+       
+     </variablelist>
+   </refsect1>
+   
+   <refsect1>
+     <title>USAGE</title>
+     <para>
+       <command>block_amb_read</command> -f some_file -m qif
+     </para>
+   </refsect1>
+   
+   <refsect1>
+     <title>EXIT CODES</title>
+     <para>
+       <itemizedlist>
+         <listitem> 0 success, or</listitem>
+         <listitem> 1 error</listitem>
+         </itemizedlist>
+     </para>
+   </refsect1>
+   
+   <refsect1>
+     <title>NOTES</title>
+     <para>
+       <itemizedlist>
+         <listitem>The output of a program run, cannot be interpreted as a standalone xml document. It
+           is normally used a part of a lager file (e.g. daily summary report of GNSS processing).</listitem>
+         <listitem>If the specified method is not reported in the input summary file, then the program
+           will output an empty row (i.e. all entries/columns will be empty).</listitem>
+         <listitem>Apart from the row entries, the program will also report important statistics about
+           the baselines proccessed with the requested method, as xml comments. E.g.
+             <!-- ## Number of baselines   : 4       ## -->
+             <!-- ## Resolved baselines    : 63.7 %    ## -->
+         <!-- ## Mean baseline length  : 1765.816 (km) ## --></listitem>
+       </itemizedlist>
+     </para>
+   </refsect1>
+   
+   <!--
+   <refsect1>
+     <title>CAVEATS</title>
+     <para>
+       Other programs named <command>foo</command> may exist and actually
+       do something!
+     </para>
+   </refsect1>
+   -->
+   
+   <refsect1>
+     <title>BUGS</title>
+     <para>
+       Please report any bugs to <email>xanthos@mail.ntua.gr</email> or <email>danast@mail.ntua.gr</email>.
+     </para>
+   </refsect1>
+   
+   <refsect1>
+     <title>SEE ALSO</title>
+     <para>
+       <command>ambsum2xml</command>
+     </para>
+   </refsect1>
+   
+   <refsect1>
+     <title>AUTHOR</title>
+     <para>
+       <author>
+         <firstname>Xanthos</firstname>
+         <!--<othername role="mi">E</othername>-->
+         <surname>Papanikolaou</surname>
+         <email>xanthos@mail.ntua.gr</email>
+         <contrib>Original author</contrib>
+       </author>
+       <author>
+         <firstname>Demitris</firstname>
+         <!--<othername role="mi">E</othername>-->
+         <surname>Anastasiou</surname>
+         <email>danast@mail.ntua.gr</email>
+         <contrib>Original author</contrib>
+       </author> 
+     </para>
+   </refsect1>
+   
+ </refentry>
