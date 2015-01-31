@@ -300,8 +300,13 @@ WARFILE=${LOG_DIR}/ddproc-${YEAR:2:2}${DOY}.wrn
 echo "$*" >> $LOGFILE
 START_T_STAMP=`/bin/date`
 echo "Process started at: $START_T_STAMP" >> $LOGFILE
-tmpd=${TMP}/${YEAR}${DOY}-ddprocess-${NETWORK}
-mkdir ${tmpd}
+tmpd=${TMP}/${YEAR}${DOY}-ddprocess-${CAMPAIGN,,}
+if test -d $tmpd
+then
+  rm -rf $tmpd/*
+else
+  mkdir ${tmpd}
+fi
 echo "Temporary directory : ${tmpd}" >> $LOGFILE
 echo "Log File            : ${LOGFILE}" >> $LOGFILE
 echo "Warnings            : ${WARFILE}" >> $LOGFILE
@@ -413,6 +418,7 @@ then
       UPD_STA=YES
       UPD_NTW=NO
     elif [ "$UPD_OPTION" == "ntw" ]
+    then
       UPD_STA=NO
       UPD_NTW=YES
     else
@@ -452,7 +458,7 @@ fi
 #
 if $( test -f ${TABLES}/blq/${CAMPAIGN}.BLQ ) && \
    $( /bin/ln -sf ${TABLES}/blq/${CAMPAIGN}.BLQ ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ ); then 
-  echo "Linked ${TABLES}/blq/${CAMPAIGN}.BLQ to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ"
+  echo "Linked ${TABLES}/blq/${CAMPAIGN}.BLQ to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ" >> $LOGFILE
 else 
   echo "*** Failed to link blq file ${TABLES}/blq/${CAMPAIGN}.BLQ"
   exit 1
@@ -463,7 +469,7 @@ fi
 #
 if $( test -f ${TABLES}/atl/${CAMPAIGN}.ATL ) && \
    $( /bin/ln -sf ${TABLES}/atl/${CAMPAIGN}.ATL ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.ATL ); then 
-  echo "Linked ${TABLES}/atl/${CAMPAIGN}.ATL to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.ATL"
+  echo "Linked ${TABLES}/atl/${CAMPAIGN}.ATL to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.ATL" >> $LOGFILE
 else 
   echo "*** Failed to link atl file ${TABLES}/atl/${CAMPAIGN}.ATL"
   exit 1
@@ -473,16 +479,16 @@ fi
 # TRANSFORM DATE IN VARIOUS FORMATS
 # //////////////////////////////////////////////////////////////////////////////
 DATES_STR=`python -c "import bpepy.gpstime, sys
-gpsweek,dow = bpepy.gpstime.yd2gpsweek ($YEAR,$DOY)
+gpsweek,dow = bpepy.gpstime.yd2gpsweek ($YEAR,'"$DOY"')
 if gpsweek == -999 : sys.exit (1)
-month,dom = bpepy.gpstime.yd2month ($YEAR,$DOY)
+month,dom = bpepy.gpstime.yd2month ($YEAR,'"$DOY"')
 if month == -999 : sys.exit (1)
 print '%04i %1i %02i %02i' %(gpsweek,dow,month,dom)
-sys.exit (0);" 2>/dev/null`
+sys.exit (0);" 2>${LOGFILE}`
     
 ## check for error
 if test $? -ne 0 ; then
-  echo "***ERROR! Failed to resolve the date"
+  echo "***ERROR! Failed to resolve the date (got $DATES_STR)"
   exit 1
 fi
 
