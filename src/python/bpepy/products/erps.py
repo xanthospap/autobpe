@@ -672,15 +672,10 @@ def geterp_cod (date,save_dir='',translate='no',force_type='x',force_remove=Fals
       FILE  = 'COD' + SGW + SDOW + '.ERP_R'
       DIRN = 'aiub/CODE/'
       if translate == 'yes':
-        #DFILE = DFILE.replace ('.ERP_R','.ERP')
-        #DFILE = DFILE.replace ('COD','COR')
         DFILE = 'COR' + SGW + SDOW + '.ERP'
       else:
         DFILE=FILE
-      if save_dir == '':
-        DFILE = FILE
-      else:
-        DFILE = save_dir + '/' + FILE
+      DFILE = save_dir + '/' + DFILE
       if os.path.isfile (DFILE):
         if force_remove:
           os.unlink (DFILE)
@@ -733,12 +728,7 @@ def geterp_cod (date,save_dir='',translate='no',force_type='x',force_remove=Fals
         DFILE = 'COU' + SGW + SDOW + '.ERP'
       else:
         DFILE=FILE
-      #if translate == 'yes':
-      #  DFILE = ('COD' + SGW + SDOW + '.ERP').lower ()
-      if save_dir == '':
-        DFILE = DFILE
-      else:
-        DFILE = save_dir + '/' + FILE
+      DFILE = save_dir + '/' + DFILE
       if os.path.isfile (DFILE):
         if force_remove:
           os.unlink (DFILE)
