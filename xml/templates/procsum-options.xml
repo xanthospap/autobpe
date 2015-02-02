@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+
+<!-- VRIABLES
+V_TODAY
+V_DATE_PROCCESSED
+V_NETWORK
+V_USER_N
+V_HOST_N
+V_PROGRAM
+V_SYSTEM_INFO
+V_SCRIPT
+V_BERN_INFO
+V_GEN_UPD
+-->
+
+<chapter id="options"><title>Processing Options and Products</title>
+  
+  <section><title>Options Used</title>
+  <screen>
+  PCF FILE                 : <filename>PCF_FILE</filename>
+  USE BERN50 PRODUCTS      : NO
+  ELEVATION ANGLE          : V_ELEVATION
+  TROPOSPHERIC CORR. MODEL : V_TROPO
+  SOLUTION TYPE            : V_SOL_TYPE
+  AC CENTER                : V_AC_CENTER
+  SATELLITE SYSTEM         : V_SAT_SYS
+  STATIONS PER CLUSTER     : V_STA_PER_CLU
+  UPDATE CRD FILE          : V_UPDATE_CRD
+  UPDATE STA FILES         : V_UPDATE_STA
+  UPDATE NETWORK STATISTICS: V_UPDATE_NET
+  MAKE PLOTS               : V_MAKE_PLOTS
+  SAVE DIRECTORY           : <filename>V_SAVE_DIR</filename>
+  ATX FILE                 : <filename>V_ATX</filename>
+</screen>
+</section>
+
+  <section><title>Products and A-Priori Information</title>
+    
+    <section><title>Orbit Information</title>
+      <para>V_ORBIT_META</para>
+    </section>
+    
+    <section><title>Earth Orientation Parameters</title>
+      <para>V_ERP_META</para>
+    </section>
+    
+    <section><title>Differential Code Bias</title>
+      <para>V_DCB_META</para>
+    </section>
+    
+    <section><title>Ionospheric Corrections</title>
+      <para>V_ION_META</para>
+    </section>
+
+    <section><title>Tropospheric Corrections (grid)</title>
+      <para>V_TRP_META</para>
+    </section>
+    
+    <section><title>A-Priori Coordinates</title>
+      <para>V_CRD_META</para>
+    </section>
+    
+    <section><title>Phase Center Variations</title>
+      <para>V_PCV_META</para>
+    </section>
+    
+  </section>
+    
+</chapter>

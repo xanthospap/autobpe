@@ -67,6 +67,8 @@ function help {
   echo "            the pcv filename (provided via the -f switch) and all calibration-dependent"
   echo "            Bernese processing files (e.g. SATELLITE.XXX). --see Note 2"
   echo "           -p --pcv-file= specify the .PCV file to be used --see Note 2"
+  echo "           -r --savedir= specify directory where the solution will be saved; note that"
+  echo "            if the directory does not exist, it will be created"
   echo "           -s --satellite-system specify the satellite system; this can be"
   echo "              * gps, or"
   echo "              * mixed (for gps + glonass)"
@@ -167,6 +169,7 @@ PCF_FILE=NTUA_DDP                       ## the pcf file; no path, no extension
 PL_FILE=ntua_pcs.pl                     ## the perl script to ignite the processing
 LOG_DIR=/home/bpe2/log                  ## directory holding the log files
 TMP=/home/bpe2/tmp                      ## a temp folder with r+w premissions
+XML_TEMPLATES=/home/bpe2/src/autobpe/xml
 
 # //////////////////////////////////////////////////////////////////////////////
 # VARIABLES
@@ -187,6 +190,7 @@ CLBR=                    ## calibration model (e.g. I08)
 DEBUG=NO                 ## debugging mode
 UPD_STA=NO               ## update station time-series
 UPD_NTW=NO               ## update netowrk file/records
+SAVE_DIR=                ## where to save this solution
 
 ## Variables that are set during the script ##
 GPSW=
@@ -213,12 +217,12 @@ if [ "$#" == "0" ]; then help; fi
 getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   ## GNU enhanced getopt is available
-  ARGS=`getopt -o hvc:b:a:i:p:s:e:y:d:l:t:f:m:u: \
-  -l  help,version,campaign:,bernese-loadvar:,analysis-center:,solution-id:,pcv-file:,satellite-system:,elevation-angle:,year:,doy:,stations-per-cluster:,solution-type:,ion-products:,debug,calibration-model:,update: \
+  ARGS=`getopt -o hvc:b:a:i:p:s:e:y:d:l:t:f:m:u:r: \
+  -l  help,version,campaign:,bernese-loadvar:,analysis-center:,solution-id:,pcv-file:,satellite-system:,elevation-angle:,year:,doy:,stations-per-cluster:,solution-type:,ion-products:,debug,calibration-model:,update:,save-dir: \
   -n 'ddprocess' -- "$@"`
 else
   ## Original getopt is available (no long option names, no whitespace, no sorting)
-  ARGS=`getopt hvc:b:a:i:p:s:e:y:d:l:t:f:m:u: "$@"`
+  ARGS=`getopt hvc:b:a:i:p:s:e:y:d:l:t:f:m:u:r: "$@"`
 fi
 ## check for getopt error
 if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 254 ; fi
@@ -257,6 +261,8 @@ while true ; do
       CAMPAIGN="${2}"; shift;;
     -u|--update)
       UPD_OPTION="${2}"; shift;;
+    -r|--save-dir)
+      SAVE_DIR="${2}"; shift;;
     -h|--help)
       help; exit 0;;
     -v|--version)
@@ -426,6 +432,25 @@ then
       exit 1
     fi
   fi
+fi
+
+#
+# CHECK THAT THE SAVE DIRECTORY EXISTS OR CREATE IT
+#
+if test -z $SAVE_DIR ; then
+  echo "***ERROR! Need to specify save directory name"
+  exit 1
+fi
+if ! test -d $SAVE_DIR
+then
+  if ! mkdir -p ${SAVE_DIR}
+  then
+    echo "Failed to create save directory: $SAVE_DIR"
+    exit 1
+  fi
+else
+  :
+  #rm -rf ${SAVE_DIR}/*
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -1002,8 +1027,60 @@ if test "${STATUS}" == "ERROR"; then
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
+# SAVE THE FILES WE WANT
+# //////////////////////////////////////////////////////////////////////////////
+for i in ATM/${SOL_ID}${YR2}${DOY}0.TRO \
+         ATM/${SOL_ID}${YR2}${DOY}0.TRP \
+         OUT/AMB${YR2}${DOY}0.SUM \
+         OUT/${SOL_ID}${YR2}${DOY}0.OUT \
+         SOL/${SOL_ID}${YR2}${DOY}0.NQ0 \
+         SOL/${SOL_ID}${YR2}${DOY}0.SNX \
+         SOL/${SOLID%?}P${YR2}${DOY}0.NQ0 \
+         SOL/${SOLID%?}R${YR2}${DOY}0.NQ0 ; do
+  if ! test -f ${P}/CAMPAIGN/${i}
+  then
+    echo "ERROR! Failed to locate file $i"
+    exit 1
+  else
+    cp ${P}/CAMPAIGN/${i} ${SAVE_DIR}/${i}
+    compress ${SAVE_DIR}/${i}
+  fi
+done
+
+# //////////////////////////////////////////////////////////////////////////////
 # CLEAR CAMPAIGN DIRECTORIES
 # //////////////////////////////////////////////////////////////////////////////
 /usr/local/bin/clearcmp --campaign=${CAMPAIGN} --analysis-center=${AC^^}  \
                       --bernese-loadvar=${LOADVAR} --doy=${DOY} --year=${YEAR} \
                       --ids=${SOL_ID} 2>/dev/null
+
+# //////////////////////////////////////////////////////////////////////////////
+# MAKE XML SUMMARY
+# //////////////////////////////////////////////////////////////////////////////
+mkdir ${tmpd}/xml
+cp ${XML_TEMPLATES}/* ${tmpd}/xml
+
+V_TODAY=`date`
+V_DATE_PROCCESSED=`echo "${YEAR}-${MONTH}-${DOM} (DOY: ${DOY})"`
+V_NETWORK=${CAMPAIGN}
+V_USER_N=`echo $USER`
+V_HOST_N=`echo $HOSTNAME`
+V_SYSTEM_INFO=`uname -a`
+V_SCRIPT=ddprocess
+V_BERN_INFO=`cat /home/bpe2/bern52/info/bern52_release. | tail -1`
+V_GEN_UPD=`cat /home/bpe2/bern52/info/bern52_GEN_upd. | tail -1`
+V_ID=${SOL_ID}
+PCF_FILE=${PCF_FILE}
+V_ELEVATION=${ELEv}
+V_TROPO=VMF1
+V_SOL_TYPE=${SOL_TYPE}
+V_AC_CENTER=${AC}
+V_SAT_SYS=${SAT_SYS}
+V_STA_PER_CLU=${STA_PER_CLU}
+V_UPDATE_CRD=
+V_UPDATE_STA=${UPD_STA}
+V_UPDATE_NET=${UPD_NTW}
+V_MAKE_PLOTS=${MAKE_PLOTS}
+V_SAVE_DIR=${SAVE_DIR}
+V_ATX=`cat ${TABLES}/atx/atx-inuse.dat | tail -2`
+V_LOG=${LOGFILE}

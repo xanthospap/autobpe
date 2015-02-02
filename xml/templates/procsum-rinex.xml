@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+
+<!-- VRIABLES
+V_TODAY
+V_DATE_PROCCESSED
+V_NETWORK
+V_USER_N
+V_HOST_N
+V_PROGRAM
+-->
+
+<chapter id="rinex"><title>Rinex Data</title>
+  
+  <section id="rinex_01"><title>Available and Missing RINEX Files</title>
+    
+    <table><title>Rinex Information</title>
+      <tgroup cols="3">
+        <thead>
+          <row><entry>Rinex File</entry><entry>Station Name</entry><entry>SubNetwork</entry><entry>Available</entry><entry>Processed</entry><entry>Skyplot</entry><entry>QC Report</entry></row>
+        </thead>
+        <tbody>
+          V_RINEX_TABLE
+        </tbody>
+      </tgroup>
+    </table>
+  </section>
+  
+</chapter>
