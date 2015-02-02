@@ -542,6 +542,7 @@ fi
 
 SP3=${sp3/wwwwd/${GPSW}${DOW}}
 TRG_SP3=${SP3/.sp3/.PRE}
+TRG_SP3=${TRG_SP3/${TRG_SP3:0:3}/${AC^^}}
 
 if $( test -f ${DATAPOOL}/${SP3} ) && \
    $( /bin/ln -sf ${DATAPOOL}/${SP3} ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^} ); then 
@@ -567,9 +568,9 @@ erp=`/bin/grep --ignore-case "| ${AC} | ${SOL_TYPE}    |" <<EOF | awk '{print $7
  | igs | r    |       | igrwwwwd.erp          |
  | igs | u    |       | iguwwwwd.erp          |
  +---- +------+-------+-----------------------|
- | cod | f    |       | codwwwwd.erp          |
- | cod | r    |       | corwwwwd.erp          |
- | cod | u    |       | couwwwwd.erp          |
+ | cod | f    |       | CODwwwwd.ERP          |
+ | cod | r    |       | CORwwwwd.ERP          |
+ | cod | u    |       | COUwwwwd.ERP          |
  +---- +------+-------+-----------------------+
 EOF`
 
@@ -584,15 +585,35 @@ if test ${AC^^} != "COD" ; then
 else
   TRG_ERP=${ERP}
 fi
+TRG_ERP=${TRG_ERP/${TRG_ERP:0:3}/${AC^^}}
 
 if $( test -f ${DATAPOOL}/${ERP} ) && \
    $( /bin/ln -sf ${DATAPOOL}/${ERP} ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^} ); then 
   ERP_META=${DATAPOOL}/${ERP}.meta
   echo "Linked erp file ${DATAPOOL}/${ERP} to ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^}" >> $LOGFILE
   echo "Meta-File $ERP_META" >> $LOGFILE
-else 
-  echo "*** Failed to link erp file ${DATAPOOL}/${ERP}"
-  exit 1
+else
+  echo "Failed to link erp ${DATAPOOL}/${ERP}" >> $LOGFILE
+  ##  wait a minute! if this is an ultra-rapid solution, then maybe we could
+  ##+ use a rapid erp if such can be found in the datapool area.
+  if test "$SOL_TYPE" == "u"
+  then
+    ERP=${ERP/U/R}
+    ERP=${ERP/u/r}
+    if $( test -f ${DATAPOOL}/${ERP} ) && \
+      $( /bin/ln -sf ${DATAPOOL}/${ERP} ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^} ) 
+    then
+      ERP_META=${DATAPOOL}/${ERP}.meta
+      echo "Linked erp file ${DATAPOOL}/${ERP} to ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^}" >> $LOGFILE
+      echo "Meta-File $ERP_META" >> $LOGFILE
+    else
+      echo "*** Failed to link erp file ${DATAPOOL}/${ERP}"
+      exit 1
+    fi
+  else
+    #echo "*** Failed to link erp file ${DATAPOOL}/${ERP}"
+    exit 1
+  fi
 fi
 
 ##  Depending on the AC, set the INP file POLUPD.INP to fill in the right widget, using

@@ -953,9 +953,7 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
       else:
         DFILE = save_dir + '/' + FILE
       if translate == True:
-        ##DFILE = (DFILE.replace ('.EPH_R','.SP3')).lower ()
-        ##DFILE = (DFILE.replace ('.z','.Z'))
-        DFILE = RAPID_
+        DFILE = DFILE.replace(FILE,RAPID_)
       if os.path.isfile (DFILE):
         if force_remove : 
           os.unlink (DFILE)
