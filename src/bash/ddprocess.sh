@@ -163,13 +163,14 @@ function help {
 # //////////////////////////////////////////////////////////////////////////////
 # HARDCODED VARIABLES
 # //////////////////////////////////////////////////////////////////////////////
-TABLES=/home/bpe2/tables                ## table area
-PRODUCT_AREA=/media/Seagate/solutions52 ## product area
-PCF_FILE=NTUA_DDP                       ## the pcf file; no path, no extension
-PL_FILE=ntua_pcs.pl                     ## the perl script to ignite the processing
-LOG_DIR=/home/bpe2/log                  ## directory holding the log files
-TMP=/home/bpe2/tmp                      ## a temp folder with r+w premissions
-XML_TEMPLATES=/home/bpe2/src/autobpe/xml
+TABLES=/home/bpe2/tables                 ## table area
+PRODUCT_AREA=/media/Seagate/solutions52  ## product area
+PCF_FILE=NTUA_DDP                        ## the pcf file; no path, no extension
+PL_FILE=ntua_pcs.pl                      ## the perl script to ignite the processing
+LOG_DIR=/home/bpe2/log                   ## directory holding the log files
+TMP=/home/bpe2/tmp                       ## a temp folder with r+w premissions
+XML_TEMPLATES=/home/bpe2/src/autobpe/xml/templates ## xml templates for summary
+STA_TS_DIR=/media/Seagate/solutions52/stations     ## path to station ts files
 
 # //////////////////////////////////////////////////////////////////////////////
 # VARIABLES
@@ -1035,30 +1036,65 @@ for i in ATM/${SOL_ID}${YR2}${DOY}0.TRO \
          OUT/${SOL_ID}${YR2}${DOY}0.OUT \
          SOL/${SOL_ID}${YR2}${DOY}0.NQ0 \
          SOL/${SOL_ID}${YR2}${DOY}0.SNX \
-         SOL/${SOLID%?}P${YR2}${DOY}0.NQ0 \
-         SOL/${SOLID%?}R${YR2}${DOY}0.NQ0 ; do
-  if ! test -f ${P}/CAMPAIGN/${i}
+         SOL/${SOL_ID%?}P${YR2}${DOY}0.NQ0 \
+         SOL/${SOL_ID%?}R${YR2}${DOY}0.NQ0 ; do
+  if ! test -f ${P}/${CAMPAIGN}/${i}
   then
-    echo "ERROR! Failed to locate file $i"
+    echo "ERROR! Failed to locate file ${P}/${CAMPAIGN^^}/${i}"
     exit 1
   else
-    cp ${P}/CAMPAIGN/${i} ${SAVE_DIR}/${i}
-    compress ${SAVE_DIR}/${i}
+    cp ${P}/${CAMPAIGN}/${i} ${SAVE_DIR}/${i#*/}
+    compress -f ${SAVE_DIR}/${i#*/}
   fi
 done
 
 # //////////////////////////////////////////////////////////////////////////////
+# UPDATE STATION TIME-SERIE
+# //////////////////////////////////////////////////////////////////////////////
+if test "${UPD_STA}" == "YES"
+then
+  if test "${SOL_TYPE}" == "u"
+  then
+    SET_U="--ultra-rapid"
+  else
+    SET_U=
+  fi
+  /usr/local/bin/extractStations \
+    --station-file ${TABLES}/crd/${CAMPAIGN,,}.update \
+    --solution-summary ${P}/${CAMPAIGN^^}/OUT/${SOL_ID}${YR2}${DOY}0.OUT \
+    --save-dir ${STA_TS_DIR} \
+    --quiet \
+    ${SET_U} 1>${tmpd}/xs.diffs 2>>${LOGFILE}
+ TS_UPDATED=$?
+ if test ${TS_UPDATED} -gt 250
+ then
+   echo "Script extractStations seems to have failed! Exit status: ${TS_UPDATED}"
+   exit 1
+ fi
+ echo "(extractStations) Updated ${TS_UPDATED} time-series files" >> $LOGFILE
+fi
+
+# //////////////////////////////////////////////////////////////////////////////
 # CLEAR CAMPAIGN DIRECTORIES
 # //////////////////////////////////////////////////////////////////////////////
-/usr/local/bin/clearcmp --campaign=${CAMPAIGN} --analysis-center=${AC^^}  \
-                      --bernese-loadvar=${LOADVAR} --doy=${DOY} --year=${YEAR} \
-                      --ids=${SOL_ID} 2>/dev/null
+#for i in ATM \
+#         BPE \
+#         GRD \
+#         LOG \
+#         OBS \
+#         ORB \
+#         ORX \
+#         OUT \
+#         RAW \
+#         SOL ; do
+#    rm -rf ${P}/${CAMPAIGN}/${i}/* 2>/dev/null
+#done
 
 # //////////////////////////////////////////////////////////////////////////////
 # MAKE XML SUMMARY
 # //////////////////////////////////////////////////////////////////////////////
 mkdir ${tmpd}/xml
-cp ${XML_TEMPLATES}/* ${tmpd}/xml
+cp ${XML_TEMPLATES}/*.xml ${tmpd}/xml
 
 V_TODAY=`date`
 V_DATE_PROCCESSED=`echo "${YEAR}-${MONTH}-${DOM} (DOY: ${DOY})"`
@@ -1084,3 +1120,6 @@ V_MAKE_PLOTS=${MAKE_PLOTS}
 V_SAVE_DIR=${SAVE_DIR}
 V_ATX=`cat ${TABLES}/atx/atx-inuse.dat | tail -2`
 V_LOG=${LOGFILE}
+
+/usr/local/bin/ambsum2xml ${P}/${CAMPAIGN}/OUT/AMB${YR2}${DOY}0.SUM 1>${tmpd}/amb.xml
+
