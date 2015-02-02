@@ -813,6 +813,7 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
       # print >> sys.stderr, 'ERROR: No rapid files available for REPRO2013'
       DOWNLOADED = 'no'
     else:
+      DIRN = 'aiub/CODE/'
       FILE  = 'COD' + SGW + SDOW + '.EPH_R'
       if save_dir == '':
         DFILE = FILE
@@ -947,13 +948,14 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
       # print >> sys.stderr, 'ERROR: No rapid files available for REPRO2013'
       DOWNLOADED = 'no'
     else:
+      DIRN = 'aiub/CODE/'
       FILE  = 'COD' + SGW + SDOW + '.EPH_R'
-      if save_dir == '':
-        DFILE = FILE
-      else:
-        DFILE = save_dir + '/' + FILE
       if translate == True:
-        DFILE = DFILE.replace(FILE,RAPID_)
+        DFILE = RAPID_
+      else:
+        DFILE = FILE
+      if save_dir != '':
+        DFILE = save_dir + '/' + DFILE
       if os.path.isfile (DFILE):
         if force_remove : 
           os.unlink (DFILE)
@@ -961,12 +963,6 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
           DOWNLOADED = 'yes'
           ##print >> sys.stderr, 'File',dfile,'already available; skipping download'
           return [0,FILE,DFILE,'rapid']
-      #if check_for_z == True:
-      #  p = re.compile ('.Z$')
-      #  dfile = p.sub( '', DFILE)
-      #  if os.path.isfile (dfile):
-      #    DOWNLOADED = 'yes'
-      #    return [0,FILE,dfile,'rapid']
       status = bpepy.utils.ftpget (HOST+'/'+DIRN,[FILE],[DFILE])
       if status == 0:
         DOWNLOADED = 'yes'
