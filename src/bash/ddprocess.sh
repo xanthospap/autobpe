@@ -504,6 +504,8 @@ DOM=`echo $DATES_STR | awk '{print $4}'`;
 #       when this is possible
 # NOTE: allong with the products themselves, specify the .meta files which
 #       hold the product information
+# NOTE: if we preocess the ultra-rapid solution, then first try for matching
+#       rapid products; if no such exist, try for ultra-rapid
 # //////////////////////////////////////////////////////////////////////////////
 ORB_META=
 ERP_META=
@@ -543,6 +545,11 @@ fi
 SP3=${sp3/wwwwd/${GPSW}${DOW}}
 TRG_SP3=${SP3/.sp3/.PRE}
 TRG_SP3=${TRG_SP3/${TRG_SP3:0:3}/${AC^^}}
+if test "$SOL_TYPE" == "u"
+then
+  SP3=${SP3/U/R}
+  SP3=${SP3/u/r}
+fi
 
 if $( test -f ${DATAPOOL}/${SP3} ) && \
    $( /bin/ln -sf ${DATAPOOL}/${SP3} ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^} ); then 
@@ -550,8 +557,25 @@ if $( test -f ${DATAPOOL}/${SP3} ) && \
   echo "Linked orbit file ${DATAPOOL}/${SP3} to ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^}" >> $LOGFILE
   echo "Meta-file : $ORB_META" >> $LOGFILE
 else 
-  echo "*** Failed to link orbit file ${DATAPOOL}/${SP3}"
-  exit 1
+  # failed to find/link rapid sp3; try for ultra-rapid
+  echo "Failed to find/link file ${DATAPOOL}/${SP3}"
+  if test "$SOL_TYPE" == "u"
+  then
+    SP3=${SP3/R/U}
+    SP3=${SP3/r/u}
+    if $( test -f ${DATAPOOL}/${SP3} ) && \
+      $( /bin/ln -sf ${DATAPOOL}/${SP3} ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^} )
+    then
+      ORB_META=${DATAPOOL}/${SP3}.meta
+      echo "Linked orbit file ${DATAPOOL}/${SP3} to ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^}" >> $LOGFILE$
+      echo "Meta-file : $ORB_META" >> $LOGFILE
+    else
+      echo "*** Failed to link orbit file ${DATAPOOL}/${SP3}"
+      exit 1
+    fi
+  else
+    exit 1
+  fi
 fi
 
 #
@@ -586,6 +610,11 @@ else
   TRG_ERP=${ERP}
 fi
 TRG_ERP=${TRG_ERP/${TRG_ERP:0:3}/${AC^^}}
+if test "$SOL_TYPE" == "u"
+then
+  ERP=${ERP/U/R}
+  ERP=${ERP/u/r}
+fi
 
 if $( test -f ${DATAPOOL}/${ERP} ) && \
    $( /bin/ln -sf ${DATAPOOL}/${ERP} ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^} ); then 
@@ -594,12 +623,10 @@ if $( test -f ${DATAPOOL}/${ERP} ) && \
   echo "Meta-File $ERP_META" >> $LOGFILE
 else
   echo "Failed to link erp ${DATAPOOL}/${ERP}" >> $LOGFILE
-  ##  wait a minute! if this is an ultra-rapid solution, then maybe we could
-  ##+ use a rapid erp if such can be found in the datapool area.
   if test "$SOL_TYPE" == "u"
   then
-    ERP=${ERP/U/R}
-    ERP=${ERP/u/r}
+    ERP=${ERP/R/U}
+    ERP=${ERP/r/u}
     if $( test -f ${DATAPOOL}/${ERP} ) && \
       $( /bin/ln -sf ${DATAPOOL}/${ERP} ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^} ) 
     then
@@ -611,7 +638,6 @@ else
       exit 1
     fi
   else
-    #echo "*** Failed to link erp file ${DATAPOOL}/${ERP}"
     exit 1
   fi
 fi
@@ -637,7 +663,7 @@ fi
 #
 # DIFFERENTIAL CODE BIAS
 # ------------------------------------------------------------------------------
-DCB=DCB${YR2}${MONTH}.DCB
+DCB=P1C1${YR2}${MONTH}.DCB
 CUR_MONTH=`/bin/date '+%m'`
 DCB_META=${DATAPOOL}/P1C1_RINEX.DCB.meta ## we'll see about that ...
 
@@ -711,13 +737,20 @@ done
 if test -z $ion ; then
   if [ "$DEBUG" == "YES" ];then echo -ne "(debug) downloading CODE's ion file";fi
   if /usr/local/bin/wgetion --output-directory=${P}/${CAMPAIGN}/ATM --force-remove --standard-names \
-	      --decompress --year=${YEAR} --doy=${DOY} 1>${tmpd}/.tmp 2>/dev/null; then
-    ion=`cat ${tmpd}/.tmp | awk '{print $5}'`
+	      --decompress --year=${YEAR} --doy=${DOY} 1>${ION_META} 2>/dev/null; then
+    ##  if this in not a final solution, then the downloaded ion file will be
+    ##+ named as e.g. COUWWWD.ION ; need to replace the right analysis center
+    ##+ i.e. 'COD' instead of 'COU' or 'COR'
+    ion=`cat ${ION_META} | awk '{print $7}'`
+    if [ "$SOL_TYPE" == "u" ]
+    then
+      mv $ion ${ion/COU/COD} 2>/dev/null
+      mv $ion ${ion/COR/COD} 2>/dev/null
+    fi
     echo "/usr/local/bin/wgetion --output-directory=${P}/${CAMPAIGN}/ATM --force-remove --standard-names \
           --decompress --year=${YEAR} --doy=${DOY} 1>${tmpd}/.tmp 2>/dev/null" >> $LOGFILE
     echo "Downloaded CODE's ION file $ion" >> $LOGFILE
     echo "Meta-File ${ION_META}" >> $LOGFILE
-    if [ "$DEBUG" == "YES" ];then echo -ne "... ok, downloaded $ion\n";fi
   else
     echo "*** Failed to download / locate ion file"
     exit 1
