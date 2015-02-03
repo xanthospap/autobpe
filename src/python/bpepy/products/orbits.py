@@ -777,23 +777,21 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
     FILE  = identifier + SGW + SDOW + '.EPH.Z'
     if translate == True:
       DFILE = FINAL_
-    if save_dir == '':
-      DFILE = FILE
     else:
-      DFILE = save_dir + '/' + FILE
+      DFILE = FILE
+    if save_dir != '':
+      DFILE = save_dir + '/' + DFILE
     if os.path.isfile (DFILE):
       if force_remove : 
         os.unlink (DFILE)
       else : 
         DOWNLOADED = 'yes'
-        ##print >> sys.stderr, 'File',dfile,'already available; skipping download'
         return [0,FILE,DFILE,'final']
     if check_for_z == True:
       p = re.compile ('.Z$')
       dfile = p.sub( '', DFILE)
       if os.path.isfile (dfile):
         DOWNLOADED = 'yes'
-        ##print >> sys.stderr, 'File',dfile,'already available; skipping download'
         return [0,FILE,dfile,'final']
     status = bpepy.utils.ftpget (HOST+'/'+DIRN,[FILE],[DFILE])
     if status == 0:
@@ -810,32 +808,22 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
       return [1,'','','']
   elif force_type == 'r':  ## only rapid
     if use_repro_2013 == 'yes':
-      # print >> sys.stderr, 'ERROR: No rapid files available for REPRO2013'
       DOWNLOADED = 'no'
     else:
       DIRN = 'aiub/CODE/'
       FILE  = 'COD' + SGW + SDOW + '.EPH_R'
-      if save_dir == '':
-        DFILE = FILE
-      else:
-        DFILE = save_dir + '/' + FILE
       if translate == True:
-        ##DFILE = (DFILE.replace ('.EPH_R','.SP3')).lower ()
-        ##DFILE = (DFILE.replace ('.z','.Z'))
         DFILE = RAPID_
+      else:
+        DFILE = FILE
+      if save_dir != '':
+        DFILE = save_dir + '/' + DFILE
       if os.path.isfile (DFILE):
         if force_remove : 
           os.unlink (DFILE)
         else : 
           DOWNLOADED = 'yes'
-          ##print >> sys.stderr, 'File',dfile,'already available; skipping download'
           return [0,FILE,DFILE,'rapid']
-      #if check_for_z == True:
-      #  p = re.compile ('.Z$')
-      #  dfile = p.sub( '', DFILE)
-      #  if os.path.isfile (dfile):
-      #    DOWNLOADED = 'yes'
-      #    return [0,FILE,dfile,'rapid']
       status = bpepy.utils.ftpget (HOST+'/'+DIRN,[FILE],[DFILE])
       if status == 0:
         DOWNLOADED = 'yes'
@@ -849,7 +837,6 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
         return [1,'','','']
   elif force_type == 'u':  ## only ultra-rapid
     if use_repro_2013 == 'yes':
-      # print >> sys.stderr, 'ERROR: No ultra-rapid files available for REPRO2013'
       DOWNLOADED = 'no'
     else:
       delta_days = (date - datetime.datetime.today ()).days
@@ -866,11 +853,10 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
         DOWNLOADED = 'no'
         return [1,'','','']
       if translate == True:
-        ##DFILE = ('COD' + SGW + SDOW + '.SP3').lower ()
         DFILE = ULTRA_
-      if save_dir == '':
-        DFILE = DFILE
       else:
+        DFILE = FILE
+      if save_dir != '':
         DFILE = save_dir + '/' + DFILE
       if os.path.isfile (DFILE):
         if force_remove : 
@@ -911,23 +897,21 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
   FILE  = identifier + SGW + SDOW + '.EPH.Z'
   if translate == True:
     DFILE = FINAL_
-  if save_dir == '':
-    DFILE = FILE
   else:
-    DFILE = save_dir + '/' + FILE
+    DFILE = FILE
+  if save_dir != '':
+    DFILE = save_dir + '/' + DFILE
   if os.path.isfile (DFILE):
     if force_remove : 
       os.unlink (DFILE)
     else : 
       DOWNLOADED = 'yes'
-      ##print >> sys.stderr, 'File',dfile,'already available; skipping download'
       return [0,FILE,DFILE,'final']
   if check_for_z == True:
     p = re.compile ('.Z$')
     dfile = p.sub( '', DFILE)
     if os.path.isfile (dfile):
       DOWNLOADED = 'yes'
-      ##print >> sys.stderr, 'File',dfile,'already available; skipping download'
       return [0,FILE,dfile,'final']
   status = bpepy.utils.ftpget (HOST+'/'+DIRN,[FILE],[DFILE])
   if status == 0:
@@ -945,7 +929,6 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
   ## Rapid Solution
   if DOWNLOADED == 'no':
     if use_repro_2013 == 'yes':
-      # print >> sys.stderr, 'ERROR: No rapid files available for REPRO2013'
       DOWNLOADED = 'no'
     else:
       DIRN = 'aiub/CODE/'
@@ -961,7 +944,6 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
           os.unlink (DFILE)
         else : 
           DOWNLOADED = 'yes'
-          ##print >> sys.stderr, 'File',dfile,'already available; skipping download'
           return [0,FILE,DFILE,'rapid']
       status = bpepy.utils.ftpget (HOST+'/'+DIRN,[FILE],[DFILE])
       if status == 0:
@@ -977,7 +959,6 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
   ## Ultra Rapid Solution
   if DOWNLOADED == 'no':
     if use_repro_2013 == 'yes':
-      # print >> sys.stderr, 'ERROR: No ultra-rapid files available for REPRO2013'
       DOWNLOADED = 'no'
     else:
       delta_days = (date - datetime.datetime.today ()).days
@@ -994,26 +975,17 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
         DOWNLOADED = 'no'
         return [1,'','','']
       if translate == True:
-        ##DFILE = ('COD' + SGW + SDOW + '.SP3').lower ()
         DFILE = ULTRA_
-      if save_dir == '':
-        DFILE = DFILE
       else:
+        DFILE = FILE
+      if save_dir != '':
         DFILE = save_dir + '/' + DFILE
       if os.path.isfile (DFILE):
         if force_remove : 
           os.unlink (DFILE)
         else : 
           DOWNLOADED = 'yes'
-          ##print >> sys.stderr, 'File',dfile,'already available; skipping download'
           return [0,FILE,DFILE,'ultra-rapid']
-      #if check_for_z == True:
-      #  p = re.compile ('.Z$')
-      #  dfile = p.sub( '', DFILE)
-      #  if os.path.isfile (dfile):
-      #    DOWNLOADED = 'yes'
-      #    return [0,FILE,dfile,'ultra-rapid']
-      status = bpepy.utils.ftpget (HOST+'/'+DIRN,[FILE],[DFILE])
       if status == 0:
         DOWNLOADED = 'yes'
         SOLUTION_TYPE = 'ultra-rapid'
