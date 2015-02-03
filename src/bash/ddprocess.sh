@@ -67,7 +67,7 @@ function help {
   echo "            the pcv filename (provided via the -f switch) and all calibration-dependent"
   echo "            Bernese processing files (e.g. SATELLITE.XXX). --see Note 2"
   echo "           -p --pcv-file= specify the .PCV file to be used --see Note 2"
-  echo "           -r --savedir= specify directory where the solution will be saved; note that"
+  echo "           -r --save-dir= specify directory where the solution will be saved; note that"
   echo "            if the directory does not exist, it will be created"
   echo "           -s --satellite-system specify the satellite system; this can be"
   echo "              * gps, or"
@@ -77,9 +77,12 @@ function help {
   echo "              * final, or"
   echo "              * urapid"
   echo "           -u --update= specify which records/files should be updated; valid values are:"
+  echo "              * crd update the default network crd file"
   echo "              * sta update station-specific files, i.e. time-series records for the stations"
   echo "              * ntw update update network-specific records"
   echo "              * all both the above"
+  echo "            More than one options can be provided, in a comma seperated string e.g. "
+  echo "            --update=crd,sta"
   echo "            See Note 6 for this option"
   echo "           -y --year= specify year (4-digit)"
   echo "           --debug set debugging mode"
@@ -136,6 +139,17 @@ function help {
   echo "       If none of these files are found (or if the -f switch is not used), then the script"
   echo "       will try to download a Bernese-specific ION file from CODE's ftp, using the program"
   echo "       wgetion. This downloaded files can be final, rapid or ultra-rapid."
+  echo " Note 6"
+  echo "      The update options, need the following:"
+  echo "       UPDATE STA : This will update the station-specific time-series files. These files"
+  echo "                    should be preswent in the \$STA_TS_DIR variable (hardcoded); seperate"
+  echo "                    files for final/rapid solutions are assumed. The list of stations to"
+  echo "                    be updated, are given by the file \${TABLES}/crd/\${network}.update. Both"
+  echo "                    cartesian and geodetic coordinate files are updated."
+  echo "       UPDATE CRD : This option will forec the network's default coordinate file to be updated."
+  echo "                    This (default) file is \${TABLES}/crd/\${network}.CRD. All stations"
+  echo "                    processed will have their coordinates updated in the default file (obviously"
+  echo "                    using the newly estimated values)".
   echo ""
   echo "/******************************************************************************/"
   exit 0
@@ -191,6 +205,7 @@ CLBR=                    ## calibration model (e.g. I08)
 DEBUG=NO                 ## debugging mode
 UPD_STA=NO               ## update station time-series
 UPD_NTW=NO               ## update netowrk file/records
+UPD_CRD=NO               ## update network's default crd file
 SAVE_DIR=                ## where to save this solution
 
 ## Variables that are set during the script ##
@@ -415,26 +430,32 @@ fi
 #
 if ! test -z "$UPD_OPTION"
 then
-  if [ "$UPD_OPTION" == "all" ]
-  then
-    UPD_STA=YES
-    UPD_NTW=YES
-  else
-    if [ "$UPD_OPTION" == "sta" ]
-    then
+  UPDOPT=()
+  IFS=',' read -a UPDOPT <<<"$UPD_OPTION"
+  for o in "${UPDOPT[@]}"
+  do
+    case "${o}" in
+    all)
       UPD_STA=YES
-      UPD_NTW=NO
-    elif [ "$UPD_OPTION" == "ntw" ]
-    then
-      UPD_STA=NO
       UPD_NTW=YES
-    else
-      echo "*** Invalid update option : $UPD_OPTION"
+      UPD_CRD=YES
+      ;;
+    crd)
+      UPD_CRD=YES
+      ;;
+    sta)
+      UPD_STA=YES
+      ;;
+    ntw)
+      UPD_NTW=YES
+      ;;
+    *)
+      echo "Invalid option for update! See help"
       exit 1
-    fi
-  fi
+      ;;
+    esac
+  done
 fi
-
 #
 # CHECK THAT THE SAVE DIRECTORY EXISTS OR CREATE IT
 #
@@ -1153,6 +1174,34 @@ then
    exit 1
  fi
  echo "(extractStations) Updated ${TS_UPDATED} time-series files" >> $LOGFILE
+fi
+
+# //////////////////////////////////////////////////////////////////////////////
+# UPDATE DEFAULT CRD FILE
+# //////////////////////////////////////////////////////////////////////////////$
+if test "${UPD_CRD}" == "YES"
+then
+  /usr/local/bin/updatecrd \
+    --update-file=${TABLES}/crd/${CAMPAIGN}.CRD \
+    --reference-file=${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD \
+    --station-file=${TABLES}/crd/${CAMPAIGN,,}.update \
+    --flags=W,A,P,C \
+    --limit \
+    &>>$LOGFILE
+  if test $? -gt 250
+  then
+    echo "Error updating default crd file; see log"
+    exit 1
+  else
+    echo ""
+    echo "Default crd file updated" >> $LOGFILE
+    echo "  /usr/local/bin/updatecrd \
+      --update-file=${TABLES}/crd/${CAMPAIGN}.CRD \
+      --reference-file=${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD \
+      --station-file=${TABLES}/crd/${CAMPAIGN,,}.update \
+      --flags=W,A,P,C \
+      --limit" >> $LOGFILE
+  fi
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
