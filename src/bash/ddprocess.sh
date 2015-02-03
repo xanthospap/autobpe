@@ -306,7 +306,6 @@ WARFILE=${LOG_DIR}/ddproc-${YEAR:2:2}${DOY}.wrn
 >$WARFILE
 echo "$*" >> $LOGFILE
 START_T_STAMP=`/bin/date`
-echo "Process started at: $START_T_STAMP" >> $LOGFILE
 tmpd=${TMP}/${YEAR}${DOY}-ddprocess-${CAMPAIGN,,}
 if test -d $tmpd
 then
@@ -314,9 +313,10 @@ then
 else
   mkdir ${tmpd}
 fi
-echo "Temporary directory : ${tmpd}" >> $LOGFILE
-echo "Log File            : ${LOGFILE}" >> $LOGFILE
-echo "Warnings            : ${WARFILE}" >> $LOGFILE
+echo "Temporary directory : ${tmpd}"        >> $LOGFILE
+echo "Log File            : ${LOGFILE}"     >> $LOGFILE
+echo "Warnings            : ${WARFILE}"     >> $LOGFILE
+echo "Process started at  : $START_T_STAMP" >> $LOGFILE
 
 # //////////////////////////////////////////////////////////////////////////////
 # CHECK REMAINING CMD; SOURCE LOADVAR
@@ -458,10 +458,14 @@ fi
 # CHECK & LINK (IF NEEDED) THE TABLE FILES
 # //////////////////////////////////////////////////////////////////////////////
 
+echo "" >> $LOGFILE
+echo "Linking required tables from ${TABLES}" >> $LOGFILE
+
 # 
 # CHECK THAT THE PCV FILE EXISTS AND LINK IT
 #
-if $( test -f ${TABLES}/pcv/${PCV}.${CLBR} ) && $( /bin/ln -sf ${TABLES}/pcv/${PCV}.${CLBR} ${X}/GEN/${PCV}.${CLBR} ); then 
+if $( test -f ${TABLES}/pcv/${PCV}.${CLBR} ) && 
+  $( /bin/ln -sf ${TABLES}/pcv/${PCV}.${CLBR} ${X}/GEN/${PCV}.${CLBR} ); then 
   echo "Linked  ${TABLES}/pcv/${PCV}.${CLBR} to ${X}/GEN/${PCV}.${CLBR}" >> $LOGFILE
 else 
   echo "*** Failed to link pcv file ${TABLES}/pcv/${PCV}.${CLBR} "
@@ -473,7 +477,8 @@ fi
 #
 if $( test -f ${TABLES}/sta/${CAMPAIGN}52.STA ) && \
    $( /bin/ln -sf ${TABLES}/sta/${CAMPAIGN}52.STA ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.STA ); then 
-  echo "Linked ${TABLES}/sta/${CAMPAIGN}52.STA to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.STA" >> $LOGFILE
+  echo "Linked ${TABLES}/sta/${CAMPAIGN}52.STA to \
+    ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.STA" >> $LOGFILE
 else 
   echo "*** Failed to link sta file ${TABLES}/sta/${CAMPAIGN}52.STA"
   exit 1
@@ -484,7 +489,8 @@ fi
 #
 if $( test -f ${TABLES}/blq/${CAMPAIGN}.BLQ ) && \
    $( /bin/ln -sf ${TABLES}/blq/${CAMPAIGN}.BLQ ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ ); then 
-  echo "Linked ${TABLES}/blq/${CAMPAIGN}.BLQ to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ" >> $LOGFILE
+  echo "Linked ${TABLES}/blq/${CAMPAIGN}.BLQ to \
+    ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ" >> $LOGFILE
 else 
   echo "*** Failed to link blq file ${TABLES}/blq/${CAMPAIGN}.BLQ"
   exit 1
@@ -495,7 +501,8 @@ fi
 #
 if $( test -f ${TABLES}/atl/${CAMPAIGN}.ATL ) && \
    $( /bin/ln -sf ${TABLES}/atl/${CAMPAIGN}.ATL ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.ATL ); then 
-  echo "Linked ${TABLES}/atl/${CAMPAIGN}.ATL to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.ATL" >> $LOGFILE
+  echo "Linked ${TABLES}/atl/${CAMPAIGN}.ATL to \
+    ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.ATL" >> $LOGFILE
 else 
   echo "*** Failed to link atl file ${TABLES}/atl/${CAMPAIGN}.ATL"
   exit 1
@@ -541,6 +548,9 @@ DCB_META=
 # WHERE IS DATAPOOL
 DATAPOOL=${D}
 
+echo "" >> $LOGFILE
+echo "Linking required products from ${DATAPOOL}" >> $LOGFILE
+
 #
 # ORBITS
 # ------------------------------------------------------------------------------
@@ -578,9 +588,11 @@ then
 fi
 
 if $( test -f ${DATAPOOL}/${SP3} ) && \
-   $( /bin/ln -sf ${DATAPOOL}/${SP3} ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^} ); then 
+   $( /bin/ln -sf ${DATAPOOL}/${SP3} ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^} )
+then
   ORB_META=${DATAPOOL}/${SP3}.meta
-  echo "Linked orbit file ${DATAPOOL}/${SP3} to ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^}" >> $LOGFILE
+  echo "Linked orbit file ${DATAPOOL}/${SP3} to \
+    ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^}" >> $LOGFILE
   echo "Meta-file : $ORB_META" >> $LOGFILE
 else 
   # failed to find/link rapid sp3; try for ultra-rapid
@@ -593,7 +605,8 @@ else
       $( /bin/ln -sf ${DATAPOOL}/${SP3} ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^} )
     then
       ORB_META=${DATAPOOL}/${SP3}.meta
-      echo "Linked orbit file ${DATAPOOL}/${SP3} to ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^}" >> $LOGFILE$
+      echo "Linked orbit file ${DATAPOOL}/${SP3} to \
+        ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^}" >> $LOGFILE$
       echo "Meta-file : $ORB_META" >> $LOGFILE
     else
       echo "*** Failed to link orbit file ${DATAPOOL}/${SP3}"
@@ -645,7 +658,8 @@ fi
 if $( test -f ${DATAPOOL}/${ERP} ) && \
    $( /bin/ln -sf ${DATAPOOL}/${ERP} ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^} ); then 
   ERP_META=${DATAPOOL}/${ERP}.meta
-  echo "Linked erp file ${DATAPOOL}/${ERP} to ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^}" >> $LOGFILE
+  echo "Linked erp file ${DATAPOOL}/${ERP} to \
+    ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^}" >> $LOGFILE
   echo "Meta-File $ERP_META" >> $LOGFILE
 else
   echo "Failed to link erp ${DATAPOOL}/${ERP}" >> $LOGFILE
@@ -657,7 +671,8 @@ else
       $( /bin/ln -sf ${DATAPOOL}/${ERP} ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^} ) 
     then
       ERP_META=${DATAPOOL}/${ERP}.meta
-      echo "Linked erp file ${DATAPOOL}/${ERP} to ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^}" >> $LOGFILE
+      echo "Linked erp file ${DATAPOOL}/${ERP} to \
+        ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^}" >> $LOGFILE
       echo "Meta-File $ERP_META" >> $LOGFILE
     else
       echo "*** Failed to link erp file ${DATAPOOL}/${ERP}"
@@ -679,11 +694,18 @@ if [ $LNS -ne 1 ]; then
   exit 1
 fi
 PAN=`/bin/grep POLUPDH ${U}/PCF/${PCF_FILE}.PCF | /bin/grep -v "#" | awk '{print $3}'`
-if ! /usr/local/bin/setpolupdh --bernese-loadvar=${LOADVAR} --analysis-center=${AC^^} --pan=${PAN} ; then
+if ! /usr/local/bin/setpolupdh \
+  --bernese-loadvar=${LOADVAR} \
+  --analysis-center=${AC^^} \
+  --pan=${PAN}
+then
   exit 1
 else
-  echo "Settin right the POLUPD.INP:"
-  echo "/usr/local/bin/setpolupdh --bernese-loadvar=${LOADVAR} --analysis-center=${AC^^} --pan=${PAN}" >> $LOGFILE
+  echo "Setting right the POLUPD.INP:" >> $LOGFILE
+  echo "/usr/local/bin/setpolupdh \
+    --bernese-loadvar=${LOADVAR} \
+    --analysis-center=${AC^^} \
+    --pan=${PAN}" >> $LOGFILE
 fi
 
 #
@@ -731,6 +753,9 @@ fi
 # IONOSPHERIC CORRECTIONS
 # ------------------------------------------------------------------------------
 
+echo "" >> $LOGFILE
+echo "Ionospheric Corrections" >> $LOGFILE
+
 ##  Create a .meta file in the TMP directory. We will write info later on.
 ION_META=${TMP}/ion.meta
 >${ION_META}
@@ -739,31 +764,32 @@ ION_META=${TMP}/ion.meta
 for i in $ION_PRODS_ID; do
   ion=${i}${YR2}${DOY}0.ION.Z
 
-  if [ "$DEBUG" == "YES" ]
-  then 
-	  echo -ne "(debug) checking ion file ${PRODUCT_AREA}/${YEAR}/${DOY}/${i}${YR2}${DOY}0.ION.Z"
-  fi
-
   if $( test -f ${PRODUCT_AREA}/${YEAR}/${DOY}/${ion} ) && \
      $( cp -f ${PRODUCT_AREA}/${YEAR}/${DOY}/${ion} ${P}/${CAMPAIGN}/ATM/ )
   then 
     /bin/uncompress -f ${P}/${CAMPAIGN}/ION/${ion}
-    echo "(ddprocess) Ionospheric correction file (ion) : ${PRODUCT_AREA}/${YEAR}/${DOY}/${ion} from AC: ntua" >> ${ION_META}
-    if [ "$DEBUG" == "YES" ];then echo -ne "... file found!\n";fi
+    echo "(ddprocess) Ionospheric correction file (ion) : \
+      ${PRODUCT_AREA}/${YEAR}/${DOY}/${ion} from AC: ntua" >> ${ION_META}
     break
-    echo "Copying ion file ${PRODUCT_AREA}/${YEAR}/${DOY}/${ion} to ${P}/${CAMPAIGN}/ATM/" >> $LOGFILE
+    echo "Copying ion file ${PRODUCT_AREA}/${YEAR}/${DOY}/${ion} \
+      to ${P}/${CAMPAIGN}/ATM/" >> $LOGFILE
     echo "Meta-File ${ION_META}" >> $LOGFILE
   else 
     ion=
-    if [ "$DEBUG" == "YES" ];then echo -ne "... file does not exist\n";fi
   fi
 done
 
 ##  did we download it already ?
 if test -z $ion ; then
-  if [ "$DEBUG" == "YES" ];then echo -ne "(debug) downloading CODE's ion file";fi
-  if /usr/local/bin/wgetion --output-directory=${P}/${CAMPAIGN}/ATM --force-remove --standard-names \
-	      --decompress --year=${YEAR} --doy=${DOY} 1>${ION_META} 2>/dev/null; then
+  if /usr/local/bin/wgetion \
+    --output-directory=${P}/${CAMPAIGN}/ATM \
+    --force-remove \
+    --standard-names \
+    --decompress \
+    --year=${YEAR} \
+    --doy=${DOY} \
+    1>${ION_META} 2>/dev/null
+  then
     ##  if this in not a final solution, then the downloaded ion file will be
     ##+ named as e.g. COUWWWD.ION ; need to replace the right analysis center
     ##+ i.e. 'COD' instead of 'COU' or 'COR'
@@ -773,8 +799,14 @@ if test -z $ion ; then
       mv $ion ${ion/COU/COD} 2>/dev/null
       mv $ion ${ion/COR/COD} 2>/dev/null
     fi
-    echo "/usr/local/bin/wgetion --output-directory=${P}/${CAMPAIGN}/ATM --force-remove --standard-names \
-          --decompress --year=${YEAR} --doy=${DOY} 1>${tmpd}/.tmp 2>/dev/null" >> $LOGFILE
+    echo "/usr/local/bin/wgetion \
+      --output-directory=${P}/${CAMPAIGN}/ATM \
+      --force-remove \
+      --standard-names \
+      --decompress \
+      --year=${YEAR} \
+      --doy=${DOY} \
+      1>${tmpd}/.tmp 2>/dev/null" >> $LOGFILE
     echo "Downloaded CODE's ION file $ion" >> $LOGFILE
     echo "Meta-File ${ION_META}" >> $LOGFILE
   else
@@ -792,8 +824,9 @@ rm ${tmpd}/.tmp 2>/dev/null
 # LINK THE VIENNA GRID FILE WHICH SHOULD BE AT THE DATAPOOL AREA
 if $( test -f ${D}/VMFG_${YEAR}${DOY} ) && \
    $( /bin/ln -sf ${D}/VMFG_${YEAR}${DOY} ${P}/${CAMPAIGN}/GRD/VMF${YR2}${DOY}0.GRD ); then 
-  echo "Linked VMF grid file ${D}/VMFG_${YEAR}${DOY} ${P}/${CAMPAIGN}/GRD/VMF${YR2}${DOY}0.GRD" >> $LOGFILE
-  echo "Meta-File ??"
+  echo "Linked VMF grid file ${D}/VMFG_${YEAR}${DOY} \
+    ${P}/${CAMPAIGN}/GRD/VMF${YR2}${DOY}0.GRD" >> $LOGFILE
+  echo "Meta-File ??" >> $LOGFILE
 else 
   echo "*** Failed to link VMF1 grid file ${D}/VMFG_${YEAR}${DOY}"
   exit 1
@@ -802,6 +835,9 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # TRANSFER THE RINEX FILES FROM DATAPOOL
 # //////////////////////////////////////////////////////////////////////////////
+
+echo "" >> $LOGFILE
+echo "Checking / transfering Rinex files" >> $LOGFILE
 
 ##  Three arrays will be created/filled: the RINEX_AV including all available rinex files
 ##+ found in the datapool area; RINEX_MS listing all missing rinex files and finaly
@@ -838,10 +874,10 @@ if test ${#AVREG[@]} -lt 1; then
   exit 1
 fi
 
-echo "Transfered Rinex files: " >> $LOGFILE
-echo "igs -> $AVIGS" >> $LOGFILE
-echo "epn -> $AVEPN" >> $LOGFILE
-echo "reg -> $AVREG" >> $LOGFILE
+echo "Transfered Rinex files: "  >> $LOGFILE
+echo "igs -> ${#AVIGS[@]}"       >> $LOGFILE
+echo "epn -> ${#AVEPN[@]}"       >> $LOGFILE
+echo "reg -> ${#AVREG[@]}"       >> $LOGFILE
 echo "missing : ${#RINEX_MS[@]}" >> $LOGFILE
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -849,8 +885,10 @@ echo "missing : ${#RINEX_MS[@]}" >> $LOGFILE
 # //////////////////////////////////////////////////////////////////////////////
 for i in ${RINEX_AV[@]}; do
   sta_name=`echo ${i:0:4} | tr 'a-z' 'A-Z'`
-  if ! /bin/egrep "^  ${sta_name} *" ${TABLES}/blq/${CAMPAIGN}.BLQ; then
-    echo "Warning -- station ${sta_name} missing ocean loading corrections; file ${TABLES}/blq/${CAMPAIGN}.BLQ" >> $WARFILE
+  if ! /bin/egrep "^  ${sta_name} *" ${TABLES}/blq/${CAMPAIGN}.BLQ
+  then
+    echo "Warning -- station ${sta_name} missing ocean loading corrections; \
+      file ${TABLES}/blq/${CAMPAIGN}.BLQ" >> $WARFILE
   fi
 done
 
@@ -859,8 +897,10 @@ done
 # //////////////////////////////////////////////////////////////////////////////
 for i in ${RINEX_AV[@]}; do
   sta_name=`echo ${i:0:4} | tr 'a-z' 'A-Z'`
-  if ! /bin/egrep "^  ${sta_name} *" ${TABLES}/atl/${CAMPAIGN}.ATL; then
-    echo "Warning -- station ${sta_name} missing atmospheric loading corrections; file ${TABLES}/atl/${CAMPAIGN}.ATL" >> $WARFILE
+  if ! /bin/egrep "^  ${sta_name} *" ${TABLES}/atl/${CAMPAIGN}.ATL
+  then
+    echo "Warning -- station ${sta_name} missing atmospheric loading corrections; \
+      file ${TABLES}/atl/${CAMPAIGN}.ATL" >> $WARFILE
   fi
 done
 
@@ -872,19 +912,23 @@ done
 ##+ then use the makecluster program to create a cluster file
 >${tmpd}/.tmp
 for i in "${RINEX_AV[@]}"; do echo ${i:0:4} >> ${tmpd}/.tmp; done
-/usr/local/bin/makecluster --abbreviation-file=${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.ABB \
-                           --stations-per-cluster=${STA_PER_CLU} \
-                           --station-file=${tmpd}/.tmp \
-                           1>${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.CLU
+
+/usr/local/bin/makecluster \
+  --abbreviation-file=${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.ABB \
+  --stations-per-cluster=${STA_PER_CLU} \
+  --station-file=${tmpd}/.tmp \
+  1>${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.CLU
 if test $? -ne 0 ; then
   echo "Failed to create the cluster file"
   exit 1
 else
+  echo "" >> $LOGFILE
   echo "Cluster file created as ${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.CLU" >> $LOGFILE
-  echo "/usr/local/bin/makecluster --abbreviation-file=${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.ABB \
-                           --stations-per-cluster=${STA_PER_CLU} \
-                           --station-file=${tmpd}/.tmp \
-                           1>${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.CLU" >> $LOGFILE
+  echo "/usr/local/bin/makecluster \
+    --abbreviation-file=${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.ABB \
+    --stations-per-cluster=${STA_PER_CLU} \
+    --station-file=${tmpd}/.tmp \
+    1>${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.CLU" >> $LOGFILE
 fi
 rm ${tmpd}/.tmp
 
@@ -903,14 +947,14 @@ rm ${tmpd}/.tmp
 ##+ ${TABLES}/crd/${CAMPAIGN}.CRD
 ##+ At the end, we should have a file named REGYYDDD0.CRD listing coordinates
 ##+ for all stations to be processed.
+
+echo "" >> $LOGFILE
 echo "Choosing apropriate crd fle" >> $LOGFILE
 
 for i in ${SOL_ID} ${SOL_ID%?}P ${SOL_ID%?}R; do
   TMP=${PRODUCT_AREA}/${YEAR}/${DOY}/${i}${YR2}${DOY}0.CRD.Z
-  #if [ "$DEBUG" == "YES" ];then echo -ne "(debug) checking crd file $TMP";fi
   printf "\nChecking $TMP ..." >> $LOGFILE
   if test -f ${PRODUCT_AREA}/${YEAR}/${DOY}/${i}${YR2}${DOY}0.CRD.Z ; then
-    #if [ "$DEBUG" == "YES" ];then echo -ne " ... file exists";fi
     cp ${PRODUCT_AREA}/${YEAR}/${DOY}/${i}${YR2}${DOY}0.CRD.Z ${P}/${CAMPAIGN}/STA/APRIORI.CRD.Z
     /bin/uncompress -f ${P}/${CAMPAIGN}/STA/APRIORI.CRD.Z
     for j in ${RINEX_AV[@]}; do
@@ -918,12 +962,10 @@ for i in ${SOL_ID} ${SOL_ID%?}P ${SOL_ID%?}R; do
       if ! /bin/egrep " ${j^^} " ${P}/${CAMPAIGN}/STA/APRIORI.CRD &>/dev/null; then
         rm ${P}/${CAMPAIGN}/STA/APRIORI.CRD
         TMP=
-        #if [ "$DEBUG" == "YES" ];then echo -ne "... missing station $j \n";fi
         printf "station $j missing; file skipped" >> $LOGFILE
         break
       fi
     done
-    #if [ "$DEBUG" == "YES" ];then echo -ne "... ok!\n";fi
     printf "ok! using a a-priori" >> $LOGFILE
   else
     printf "not available !" >> $LOGFILE
@@ -932,13 +974,13 @@ done
 
 if ! test -f ${P}/${CAMPAIGN}/STA/APRIORI.CRD; then
   TMP=${TABLES}/crd/${CAMPAIGN}.CRD
-  #if [ "$DEBUG" == "YES" ];then echo -ne "(debug) using default crd file $TMP";fi
   if ! cp ${TABLES}/crd/${CAMPAIGN}.CRD ${P}/${CAMPAIGN}/STA/APRIORI.CRD; then
     echo "*** Failed to copy a-priori coordinate file ${TABLES}/crd/${CAMPAIGN}.CRD"
     TMP=
     exit 1
   else
-    echo "Copying default crd file ${TABLES}/crd/${CAMPAIGN}.CRD to ${P}/${CAMPAIGN}/STA/APRIORI.CRD" >> $LOGFILE
+    echo "Copying default crd file ${TABLES}/crd/${CAMPAIGN}.CRD to \
+      ${P}/${CAMPAIGN}/STA/APRIORI.CRD" >> $LOGFILE
   fi
 fi
 
@@ -952,16 +994,36 @@ mv ${P}/${CAMPAIGN}/STA/APRIORI.CRD ${P}/${CAMPAIGN}/STA/REG${YR2}${DOY}0.CRD
 # TMP_PCF=${PCF_FILE##*/}
 # TMP_PCF=${TMP_PCF%%.*}
 
-if ! /usr/local/bin/setpcf --analysis-center=${AC^^} --bernese-loadvar=${LOADVAR} --campaign=${CAMPAIGN} \
-    --solution-id=${SOL_ID} --pcf-file=${PCF_FILE} --pcv-file=${PCV} --satellite-system=${SAT_SYS,,} \
-    --elevation-angle=${ELEV} --blq=${CAMPAIGN^^} --atl=${CAMPAIGN^^} --calibration-model=${CLBR} ; then
+if ! /usr/local/bin/setpcf \
+  --analysis-center=${AC^^} \
+  --bernese-loadvar=${LOADVAR} \
+  --campaign=${CAMPAIGN} \
+  --solution-id=${SOL_ID} \
+  --pcf-file=${PCF_FILE} \
+  --pcv-file=${PCV} \
+  --satellite-system=${SAT_SYS,,} \
+  --elevation-angle=${ELEV} \
+  --blq=${CAMPAIGN^^} \
+  --atl=${CAMPAIGN^^} \
+  --calibration-model=${CLBR}
+then
   echo "*** Failed to set variables in the PCF file"
   exit 1
 else
+  echo "" >> $LOGFILE
   echo "Options set a pcf file:" >> $LOGFILE
-  echo "/usr/local/bin/setpcf --analysis-center=${AC^^} --bernese-loadvar=${LOADVAR} --campaign=${CAMPAIGN} \
-    --solution-id=${SOL_ID} --pcf-file=${PCF_FILE} --pcv-file=${PCV} --satellite-system=${SAT_SYS,,} \
-    --elevation-angle=${ELEV} --blq=${CAMPAIGN^^} --atl=${CAMPAIGN^^} --calibration-model=${CLBR}" >> $LOGFILE
+  echo "/usr/local/bin/setpcf \
+    --analysis-center=${AC^^} \
+    --bernese-loadvar=${LOADVAR} \
+    --campaign=${CAMPAIGN} \
+    --solution-id=${SOL_ID} \
+    --pcf-file=${PCF_FILE} \
+    --pcv-file=${PCV} \
+    --satellite-system=${SAT_SYS,,} \
+    --elevation-angle=${ELEV} \
+    --blq=${CAMPAIGN^^} \
+    --atl=${CAMPAIGN^^} \
+    --calibration-model=${CLBR}" >> $LOGFILE
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -975,15 +1037,29 @@ SYSOUT=${CAMPAIGN:0:3}_${PCF_FILE:0:3}
 SYSRUN=${CAMPAIGN:0:3}_${PCF_FILE:0:3}
 TASKID=${CAMPAIGN:0:1}${PCF_FILE:0:1}
 
-if ! /usr/local/bin/setpcl --pcf-file=${PCF_FILE} --campaign=${CAMPAIGN} --pl-file=${PL_FILE%%.*} \
-    --campaign=${CAMPAIGN^^} --sys-out=${SYSOUT} --sys-run=${SYSRUN} --task-id=${TASKID} \
-    --bernese-loadvar=${LOADVAR} ; then
+if ! /usr/local/bin/setpcl \
+  --pcf-file=${PCF_FILE} \
+  --campaign=${CAMPAIGN} \
+  --pl-file=${PL_FILE%%.*} \
+  --campaign=${CAMPAIGN^^} \
+  --sys-out=${SYSOUT} \
+  --sys-run=${SYSRUN} \
+  --task-id=${TASKID} \
+  --bernese-loadvar=${LOADVAR}
+then
   echo "*** Failed to set variables in the PL file"
   exit 1
 else
+  echo "" >> $LOGFILE
   echo "Options set in the perl script" >> $LOGFILE
-  echo "/usr/local/bin/setpcl --pcf-file=${PCF_FILE} --campaign=${CAMPAIGN} --pl-file=${PL_FILE%%.*} \
-    --campaign=${CAMPAIGN^^} --sys-out=${SYSOUT} --sys-run=${SYSRUN} --task-id=${TASKID} \
+  echo "/usr/local/bin/setpcl \
+    --pcf-file=${PCF_FILE} \
+    --campaign=${CAMPAIGN} \
+    --pl-file=${PL_FILE%%.*} \
+    --campaign=${CAMPAIGN^^} \
+    --sys-out=${SYSOUT} \
+    --sys-run=${SYSRUN} \
+    --task-id=${TASKID} \
     --bernese-loadvar=${LOADVAR}" >> $LOGFILE
 fi
 
@@ -994,7 +1070,7 @@ fi
 ## empty the BPE directory
 rm ${P}/${CAMPAIGN^^}/BPE/*
 
-${U}/SCRIPT/${PL_FILE} ${YEAR} ${DOY}0
+${U}/SCRIPT/${PL_FILE} ${YEAR} ${DOY}0 &>>$LOGFILE
 
 ##  Check for errors in the SYSOUT file and set the status
 if /bin/grep ERROR ${P}/${CAMPAIGN^^}/BPE/${SYSOUT}.OUT ##&>/dev/null
@@ -1018,13 +1094,18 @@ if test "${STATUS}" == "ERROR"; then
   ##+ CPU name  # of jobs    Total  Mean   Max   Min  Total   Max  Session  PID_SUB
   ##+ -----------------------------------------------------------------------------
   ##+ localhost          3       16     5    15     0      0     0   150010  201_000
-  FL=`/bin/grep localhost ${P}/${CAMPAIGN^^}/BPE/${SYSOUT}.OUT | /usr/bin/awk '{print $9"_"$10".LOG"}' 2>/dev/null`
+  FL=`/bin/grep localhost ${P}/${CAMPAIGN^^}/BPE/${SYSOUT}.OUT | \
+    /usr/bin/awk '{print $9"_"$10".LOG"}' 2>/dev/null`
 
   ## now right whatever message is in this file to the LOGFILE
   cat ${P}/${CAMPAIGN^^}/BPE/${TASKID}${FL} >> $LOGFILE
   echo "***********************************************************************" >> $LOGFILE
 
-  for i in `ls ${P}/${CAMPAIGN^^}/BPE/${TASKID}${YR2}${DOY}0*.LOG`; do cat $i >> $LOGFILE; done
+  for i in `ls ${P}/${CAMPAIGN^^}/BPE/${TASKID}${YR2}${DOY}0*.LOG`
+  do 
+    cat $i >> $LOGFILE
+  done
+  exit 1
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
