@@ -1,18 +1,6 @@
 <?xml version='1.0' encoding='ISO-8859-1'?>
 
-<!-- VRIABLES
-V_TODAY
-V_DATE_PROCCESSED
-V_NETWORK
-V_USER_N
-V_HOST_N
-V_SYSTEM_INFO
-V_SCRIPT
-V_BERN_INFO
-V_GEN_UPD
--->
-
-<chapter id="info"><title>General Information</title>
+<chapter id='info'><title>General Information</title>
   
   <screen>
   Date Run          : V_TODAY

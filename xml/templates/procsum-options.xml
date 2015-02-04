@@ -13,24 +13,24 @@ V_BERN_INFO
 V_GEN_UPD
 -->
 
-<chapter id="options"><title>Processing Options and Products</title>
+<chapter id='options'><title>Processing Options and Products</title>
   
   <section><title>Options Used</title>
   <screen>
-  PCF FILE                 : <filename>PCF_FILE</filename>
+    PCF FILE                 : <filename>${PCF_FILE}</filename>
   USE BERN50 PRODUCTS      : NO
-  ELEVATION ANGLE          : V_ELEVATION
-  TROPOSPHERIC CORR. MODEL : V_TROPO
-  SOLUTION TYPE            : V_SOL_TYPE
-  AC CENTER                : V_AC_CENTER
-  SATELLITE SYSTEM         : V_SAT_SYS
-  STATIONS PER CLUSTER     : V_STA_PER_CLU
-  UPDATE CRD FILE          : V_UPDATE_CRD
-  UPDATE STA FILES         : V_UPDATE_STA
-  UPDATE NETWORK STATISTICS: V_UPDATE_NET
-  MAKE PLOTS               : V_MAKE_PLOTS
-  SAVE DIRECTORY           : <filename>V_SAVE_DIR</filename>
-  ATX FILE                 : <filename>V_ATX</filename>
+  ELEVATION ANGLE          : ${V_ELEVATION}
+  TROPOSPHERIC CORR. MODEL : ${V_TROPO}
+  SOLUTION TYPE            : ${V_SOL_TYPE}
+  AC CENTER                : ${V_AC_CENTER}
+  SATELLITE SYSTEM         : ${V_SAT_SYS}
+  STATIONS PER CLUSTER     : ${V_STA_PER_CLU}
+  UPDATE CRD FILE          : ${V_UPDATE_CRD}
+  UPDATE STA FILES         : ${V_UPDATE_STA}
+  UPDATE NETWORK STATISTICS: ${V_UPDATE_NET}
+  MAKE PLOTS               : ${V_MAKE_PLOTS}
+  SAVE DIRECTORY           : <filename>${V_SAVE_DIR}</filename>
+  ATX FILE                 : <filename>${V_ATX} (Bernese format)</filename>
 </screen>
 </section>
 

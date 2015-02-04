@@ -1087,6 +1087,9 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # PROCESS THE DATA (AT LAST!)
 # //////////////////////////////////////////////////////////////////////////////
+KOKO=A
+if test "$KOKO" == "LALA"
+then
 
 ## empty the BPE directory
 rm ${P}/${CAMPAIGN^^}/BPE/*
@@ -1151,7 +1154,7 @@ for i in ATM/${SOL_ID}${YR2}${DOY}0.TRO \
 done
 
 # //////////////////////////////////////////////////////////////////////////////
-# UPDATE STATION TIME-SERIE
+# UPDATE STATION TIME-SERIES
 # //////////////////////////////////////////////////////////////////////////////
 if test "${UPD_STA}" == "YES"
 then
@@ -1223,33 +1226,97 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # MAKE XML SUMMARY
 # //////////////////////////////////////////////////////////////////////////////
+fi
+
+echo "MAKING XML"
 mkdir ${tmpd}/xml
-cp ${XML_TEMPLATES}/*.xml ${tmpd}/xml
+#cp ${XML_TEMPLATES}/*.xml ${tmpd}/xml
 
 V_TODAY=`date`
+export V_TODAY
 V_DATE_PROCCESSED=`echo "${YEAR}-${MONTH}-${DOM} (DOY: ${DOY})"`
+export V_DATE_PROCCESSED
 V_NETWORK=${CAMPAIGN}
+export V_NETWORK
 V_USER_N=`echo $USER`
+export V_USER_N
 V_HOST_N=`echo $HOSTNAME`
+export V_HOST_N
 V_SYSTEM_INFO=`uname -a`
+export V_SYSTEM_INFO
 V_SCRIPT=ddprocess
+export V_SCRIPT
 V_BERN_INFO=`cat /home/bpe2/bern52/info/bern52_release. | tail -1`
+export V_BERN_INFO
 V_GEN_UPD=`cat /home/bpe2/bern52/info/bern52_GEN_upd. | tail -1`
+export V_GEN_UPD
 V_ID=${SOL_ID}
+export V_ID
 PCF_FILE=${PCF_FILE}
+export PCF_FILE
 V_ELEVATION=${ELEv}
+export V_ELEVATION
 V_TROPO=VMF1
+export V_TROPO
 V_SOL_TYPE=${SOL_TYPE}
+export V_SOL_TYPE
 V_AC_CENTER=${AC}
+export V_AC_CENTER
 V_SAT_SYS=${SAT_SYS}
+export V_SAT_SYS
 V_STA_PER_CLU=${STA_PER_CLU}
+export V_STA_PER_CLU
 V_UPDATE_CRD=
+export V_UPDATE_CRD
 V_UPDATE_STA=${UPD_STA}
+export V_UPDATE_STA
 V_UPDATE_NET=${UPD_NTW}
+export V_UPDATE_NET
 V_MAKE_PLOTS=${MAKE_PLOTS}
+export V_MAKE_PLOTS
 V_SAVE_DIR=${SAVE_DIR}
-V_ATX=`cat ${TABLES}/atx/atx-inuse.dat | tail -2`
+export V_SAVE_DIR
+V_ATX=${TABLES}/pcv/${PCV}.${CLBR}
+export V_ATX
 V_LOG=${LOGFILE}
+export V_LOG
 
-/usr/local/bin/ambsum2xml ${P}/${CAMPAIGN}/OUT/AMB${YR2}${DOY}0.SUM 1>${tmpd}/amb.xml
+export ORB_META
+export ERP_META
+export ION_META
+export DCB_META
+export tmpd
+export XML_TEMPLATES
 
+/usr/local/bin/extractStations \
+    --station-file ${TABLES}/crd/${CAMPAIGN,,}.update \
+    --solution-summary ${P}/${CAMPAIGN^^}/OUT/${SOL_ID}${YR2}${DOY}0.OUT \
+    --save-dir ${STA_TS_DIR} \
+    --quiet \
+    --only-report \
+    1>${tmpd}/xs.diffs
+
+/usr/local/bin/ambsum2xml \
+  ${P}/${CAMPAIGN}/OUT/AMB${YR2}${DOY}0.SUM \
+  1>${tmpd}/amb.xml
+
+>${tmpd}/rnx.av
+for i in "${RINEX_AV[@]}"
+do
+  echo -ne "${i} " >> ${tmpd}/rnx.av
+done
+/usr/local/bin/rnxsum2xml \
+  ${CAMPAIGN} \
+  ${tmpd}/rnx.av \
+   ${tmpd}/xs.diffs \
+  ${YEAR} \
+  ${DOY} \
+  ${MONTH} \
+  ${DOM} \
+  1>/${tmpd}/rnx.xml
+
+eval "echo \"$(< ${XML_TEMPLATES}/procsum-main.xml)\"" > ${tmpd}/xml/main.xml
+eval "echo \"$(< ${XML_TEMPLATES}/procsum-info.xml)\"" > ${tmpd}/xml/info.xml
+eval "echo \"$(< ${XML_TEMPLATES}/procsum-options.xml)\"" > ${tmpd}/xml/options.xml
+/home/bpe2/src/autobpe/xml/src/makeoptionsxml.sh
+/home/bpe2/src/autobpe/xml/src/makerinexxml.sh
