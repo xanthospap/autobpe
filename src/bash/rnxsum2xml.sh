@@ -124,18 +124,30 @@ do
     rnx="-"
     if ls ${POOL}/${j}${DOY}0.${YR2}o &>/dev/null; then rnx=${POOL}/${j}${DOY}0.${YR2}o; fi
     if ls ${POOL}/${j^^}${DOY}0.${YR2}O &>/dev/null; then rnx=${POOL}/${j^^}${DOY}0.${YR2}O; fi
+    if test "${rnx}" != "-"
+    then
+        rnx=`echo $rnx | sed 's|/home/bpe2/data/GPSDATA/DATAPOOL/||g'`
+    fi
 
     ## Search for the multipath plot
     mplot="-"
     if ls ${TMP}/${j^^}-${YEAR}${MONTH}${DOM}-cf2sky.ps &>/dev/null
     then
       mplot=${TMP}/${j^^}-${YEAR}${MONTH}${DOM}-cf2sky.ps
+      mplot=`echo $mplot | sed 's|/home/bpe2/tmp/|http://dionysos.survey.ntua.gr/mirror/bpe2/tmp/|g'`
+      mplot="<ulink url=\'${mplot}\'>${j}.ps</ulink>"
     fi
 
     ## Search for the qc summary file
     qcs="-"
-    if ls ${POOL}/${j}${DOY}0.${YR2}S &>/dev/null; then qcs=${POOL}/${j}${DOY}0.${YR2}S; fi
-    if ls ${POOL}/${j^^}${DOY}0.${YR2}S &>/dev/null; then qcs=${POOL}/${j^^}${DOY}0.${YR2}S; fi
+    if ls ${TMP}/${j}${DOY}0.${YR2}S &>/dev/null; then qcs=${TMP}/${j}${DOY}0.${YR2}S; fi
+    if ls ${TMP}/${j^^}${DOY}0.${YR2}S &>/dev/null; then qcs=${TMP}/${j^^}${DOY}0.${YR2}S; fi
+    if test "${qcs}" != "-"
+    then
+        qcs=`echo $qcs | sed 's|/home/bpe2/tmp/|http://dionysos.survey.ntua.gr/mirror/bpe2/tmp/|g'`
+        f=`basename $qcs`
+        qcs="<ulink url=\'${qcs}\'>${f}</ulink>"
+    fi
 
     ## print result
     #echo "$rnx $j $i $avlb $prc $mplot $qcs $difs" >> .tmp

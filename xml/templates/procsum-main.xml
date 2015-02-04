@@ -5,7 +5,7 @@
 <!ENTITY chap1 SYSTEM 'info.xml'>
 <!ENTITY chap2 SYSTEM 'options.xml'>
 <!ENTITY chap3 SYSTEM 'rinex.xml'>
-
+<!ENTITY chap4 SYSTEM 'ambiguities.xml'>
 ]>
 
 <book>
@@ -104,4 +104,5 @@
   &chap1;
   &chap2;
   &chap3;
+  &chap4;
 </book>

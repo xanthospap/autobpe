@@ -1,0 +1,12 @@
+<chapter id='ambiguities'>
+  <title>Ambiguity Resolution Information</title>a
+  <!-- INSERT TABLE HERE -->
+
+  <mediaobject>
+    <imageobject condition='print'>
+      <imagedata fileref='V_AMB_PS' format='PS' />
+    </imageobject>
+    <caption><para>Ambiguity resolution information, depending on baseline length</para></caption>
+  </mediaobject>
+
+</chapter>

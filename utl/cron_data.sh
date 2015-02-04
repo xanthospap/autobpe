@@ -70,6 +70,9 @@ function help {
 ##  Where is the DATAPOOL area?
 POOL=/home/bpe2/data/GPSDATA/DATAPOOL
 
+## Temp area
+TMP=/home/bpe2/tmp
+
 ## Log file
 LOG=/home/bpe2/log/cron_data$(/bin/date '+%Y-%m-%d')
 >${LOG}
@@ -245,7 +248,7 @@ then
         sta=${TRNX:0:4}
         if ! test -f /home/bpe2/tmp/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-cf2sky.ps
         then
-          /usr/local/bin/teqc +qc $rnx &>${POOL}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-qc
+          /usr/local/bin/teqc +qc $rnx &>${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-qc
           /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} -o /home/bpe2/tmp &>>${LOG}
         fi
     done
@@ -268,7 +271,7 @@ then
         sta=${TRNX:0:4}
         if ! test -f /home/bpe2/tmp/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps
         then
-          /usr/local/bin/teqc +qc $rnx &>${POOL}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-qc
+          /usr/local/bin/teqc +qc $rnx &>${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-qc
           /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} -o /home/bpe2/tmp &>>${LOG}
         fi
     done

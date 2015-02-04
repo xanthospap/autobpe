@@ -17,7 +17,7 @@ V_GEN_UPD
   
   <section><title>Options Used</title>
   <screen>
-    PCF FILE                 : <filename>${PCF_FILE}</filename>
+  PCF FILE                 : <filename>${PCF_FILE}</filename>
   USE BERN50 PRODUCTS      : NO
   ELEVATION ANGLE          : ${V_ELEVATION}
   TROPOSPHERIC CORR. MODEL : ${V_TROPO}

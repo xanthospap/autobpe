@@ -1228,6 +1228,8 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 fi
 
+## TODO check that the script /usr/local/bin/plot-amb-sum is available
+/usr/local/bin/plot-amb-sum ${P}/${CAMPAIGN^^}/OUT/AMB${YR2}${DOY}0.SUM ${tmpd}/${CAMPAIGN,,}${YEAR}${DOY}-amb.ps
 echo "MAKING XML"
 mkdir ${tmpd}/xml
 #cp ${XML_TEMPLATES}/*.xml ${tmpd}/xml
@@ -1280,6 +1282,10 @@ V_ATX=${TABLES}/pcv/${PCV}.${CLBR}
 export V_ATX
 V_LOG=${LOGFILE}
 export V_LOG
+V_YEAR=${YEAR}
+export V_YEAR
+V_DOY=${DOY}
+export V_DOY
 
 export ORB_META
 export ERP_META
@@ -1320,3 +1326,4 @@ eval "echo \"$(< ${XML_TEMPLATES}/procsum-info.xml)\"" > ${tmpd}/xml/info.xml
 eval "echo \"$(< ${XML_TEMPLATES}/procsum-options.xml)\"" > ${tmpd}/xml/options.xml
 /home/bpe2/src/autobpe/xml/src/makeoptionsxml.sh
 /home/bpe2/src/autobpe/xml/src/makerinexxml.sh
+/home/bpe2/src/autobpe/xml/src/makeambxml.sh
