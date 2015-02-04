@@ -1,12 +1,8 @@
-<chapter id='ambiguities'>
-  <title>Ambiguity Resolution Information</title>a
+<chapter id='mauprp'>
+  <title>Phase Pre-Processing Results</title>
+  <para>Phase pre-processing is perfomed in baseline mode. Ths following table
+    summarizes the processing results, as reported in the respective summary
+    file.</para>
   <!-- INSERT TABLE HERE -->
-
-  <mediaobject>
-    <imageobject condition='print'>
-      <imagedata fileref='V_AMB_PS' format='PS' />
-    </imageobject>
-    <caption><para>Ambiguity resolution information, depending on baseline length</para></caption>
-  </mediaobject>
 
 </chapter>
