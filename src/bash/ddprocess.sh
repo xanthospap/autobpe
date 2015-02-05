@@ -1328,3 +1328,5 @@ eval "echo \"$(< ${XML_TEMPLATES}/procsum-options.xml)\"" > ${tmpd}/xml/options.
 /home/bpe2/src/autobpe/xml/src/makerinexxml.sh
 /home/bpe2/src/autobpe/xml/src/makeambxml.sh
 /home/bpe2/src/autobpe/xml/src/mauprpxml.sh ${P}/${CAMPAIGN^^}/OUT/MPR${YR2}${DOY}0.SUM
+mkdir ${tmpd}/xml/html
+cd ${tmpd}/xml/ && xmlto --skip-validation -o html html main.xml
