@@ -93,6 +93,8 @@ function help {
   echo "           -y --year specify year (4-digit)"
   echo "           -d --doy specify day of year"
   echo "           -u --upper-case rename downloaded file to upper case"
+  echo "           -x --xml-output provide a summary file in xml format. The file will be named"
+  echo "            as the downloaded file, using an extra .meta extension"
   echo "           -h --help display (this) help message and exit"
   echo "           -v --version dsiplay version and exit"
   echo ""
@@ -158,6 +160,7 @@ DOY=                 ## doy
 TRUNCATE=NO          ## rename to upper case
 CHECK_FOR_UNC=NO     ## check for uncompressed files
 XML_SENTENCE="<command>$NAME " ## command run in xml format
+XML_OUT=NO           ## provide xml output file
 
 # //////////////////////////////////////////////////////////////////////////////
 # GET COMMAND LINE ARGUMENTS
@@ -167,12 +170,12 @@ if [ "$#" == "0" ]; then help; fi
 getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   # GNU enhanced getopt is available
-  ARGS=`getopt -o y:d:a:t:o:rsnzhuv \
-  -l year:,doy:,analysis-center:,type:,output-directory:,force-remove,standard-names,no-glonass,decompress,help,upper-case,version \
+  ARGS=`getopt -o y:d:a:t:o:rsnzhuvx \
+  -l year:,doy:,analysis-center:,type:,output-directory:,force-remove,standard-names,no-glonass,decompress,help,upper-case,version,xml-output \
   -n 'wgetorbit.sh' -- "$@"`
 else
   # Original getopt is available (no long option names, no whitespace, no sorting)
-  ARGS=`getopt a:t:o:rsnzhy:d:uv "$@"`
+  ARGS=`getopt a:t:o:rsnzhy:d:uvx "$@"`
 fi
 # check for getopt error
 if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 254 ; fi
@@ -211,6 +214,9 @@ while true ; do
     -u|--upper-case)
       XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       TRUNCATE=YES;;
+    -x|--xml-output)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
+      XML_OUT=YES;;
     -h|--help)
       help; exit 0;;
     -v|--version)
@@ -369,8 +375,8 @@ fi
 # REPORT
 # //////////////////////////////////////////////////////////////////////////////
 if test "${XML_OUT}" == "YES"
-  > ${DF1}.meta
 then
+  > ${DF1}.meta
   echo -ne "<para>Orbit meta-information details: \
     Script run <command>$NAME</command> ${VERSION} (${RELEASE}) ${LAST_UPDATE} \
     Command run $XML_SENTENCE " >> ${DF1}.meta
@@ -385,7 +391,7 @@ then
   else
     echo -ne "Downloaded file <filename>$OF1</filename>, stored localy as \
       <filename>${DF1}</filename>, of type <emphasis>$TF1</emphasis> \
-      from ${AC} Analysis Center." >> ${DF1}.meta
+      from ${AC} Analysis Center.</para>" >> ${DF1}.meta
   fi
 else
     echo "(wgetorbit) Downloaded Orbit File: $OF1 as ${DF1} of type: $TF1 from AC: ${AC}"

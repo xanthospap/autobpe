@@ -57,6 +57,8 @@ function help {
   echo "            the running directory"
   echo "           -y --year specify year (4-digit)"
   echo "           -d --doy specify day of year"
+  echo "           -x --xml-output provide a summary file in xml format. The file will be named"
+  echo "            as the downloaded file, using an extra .meta extension"
   echo "           -h --help display (this) help message and exit"
   echo "           -v --version dsiplay version and exit"
   echo ""
@@ -93,6 +95,8 @@ ODIR=                ## output directory
 FDEL=False           ## force remove
 YEAR=                ## year (4-digit)
 DOY=                 ## doy
+XML_SENTENCE="<command>$NAME " ## command run in xml format
+XML_OUT=NO           ## provide xml output file
 
 # //////////////////////////////////////////////////////////////////////////////
 # GET COMMAND LINE ARGUMENTS
@@ -103,12 +107,12 @@ if [ "$#" == "0" ]; then help; fi
 getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   # GNU enhanced getopt is available
-  ARGS=`getopt -o y:d:o:rhv \
-  -l year:,doy:,output-directory:,force-remove,help,version \
-  -n 'wgetorbit.sh' -- "$@"`
+  ARGS=`getopt -o y:d:o:rhvx \
+  -l year:,doy:,output-directory:,force-remove,help,version,xml-output \
+  -n 'wgetvmf1.sh' -- "$@"`
 else
   # Original getopt is available (no long option names, no whitespace, no sorting)
-  ARGS=`getopt o:rhy:d:v "$@"`
+  ARGS=`getopt o:rhy:d:vx "$@"`
 fi
 # check for getopt error
 if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 254 ; fi
@@ -118,13 +122,20 @@ eval set -- $ARGS
 while true ; do
   case "$1" in
     -y|--year)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       YEAR="$2"; shift;;
     -d|--doy)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       DOY=`echo "$2" | sed 's|^0*||g'`; shift;;
     -o|--output-directory)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       ODIR="$2"; shift;;
     -r|--force-remove)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       FDEL=True;;
+    -x|--xml-output)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
+      XML_OUT=YES;;
     -h|--help)
       help; exit 0;;
     -v|--version)
@@ -136,6 +147,7 @@ while true ; do
   esac
   shift 
 done
+XML_SENTENCE="${XML_SENTENCE}</command>"
 
 # //////////////////////////////////////////////////////////////////////////////
 # CHECK THAT YEAR AND DOY IS SET AND VALID
@@ -212,6 +224,17 @@ if [ "${ODIR}" == "./" ]; then MERGED=VMFG_${YEAR}${DOY3}; fi
 MERGED=`echo "$MERGED" | sed 's|//|/|g'`
 > $MERGED
 
+if test "${XML_OUT}" == "YES"
+then
+  > ${MERGED}.meta
+  echo -ne "<para>Vienna Mapping Function grid details: \
+    Script run <command>$NAME</command> ${VERSION} (${RELEASE}) ${LAST_UPDATE} \
+    Command run $XML_SENTENCE " >> ${MERGED}.meta
+  echo -ne "Grid file created, named as <filename>${MERGED}</filename> \
+    containing the following individual grid files: \
+    <itemizedlist mark='bullet'>" >> ${MERGED}.meta
+fi
+
 for n in {0..9}; do
   out=$(( $n % 2 ))
   if [ $out -eq 0 ]; then
@@ -219,10 +242,19 @@ for n in {0..9}; do
     rm "${array[${n}]}"
   else
     np=$(( $n - 1 ))
-    echo "(wgetvmf1) Downloaded VMF1 grid file ${array[${np}]} (${array[${n}]}) ; merged to $MERGED"
+    if test "${XML_OUT}" == "YES"
+    then
+      echo -ne "<listitem>grid file <filename>${array[${np}]}</filename></listitem>" >> ${MERGED}.meta
+    else
+      echo "(wgetvmf1) Downloaded VMF1 grid file ${array[${np}]} (${array[${n}]}) ; merged to $MERGED"
+    fi
   fi
 done
 
+if test "${XML_OUT}" == "YES"
+then
+  echo -ne "</itemizedlist></para>" >> ${MERGED}.meta
+fi
 # //////////////////////////////////////////////////////////////////////////////
 # EXIT
 # //////////////////////////////////////////////////////////////////////////////

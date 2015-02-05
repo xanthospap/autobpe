@@ -84,6 +84,8 @@ function help {
   echo "           -y --year specify year (4-digit)"
   echo "           -d --doy specify day of year"
   echo "           -u --upper-case rename downloaded file to upper case"
+  echo "           -x --xml-output provide a summary file in xml format. The file will be named"
+  echo "            as the downloaded file, using an extra .meta extension"
   echo "           -h --help display (this) help message and exit"
   echo "           -v --version dsiplay version and exit"
   echo ""
@@ -135,6 +137,7 @@ DOY=                 ## doy
 TRUNCATE=NO          ## rename to upper case
 CHECK_FOR_UNC=NO     ## check for uncompressed files
 XML_SENTENCE="<command>$NAME " ## command run in xml format
+XML_OUT=NO           ## provide xml output file
 
 # //////////////////////////////////////////////////////////////////////////////
 # GET COMMAND LINE ARGUMENTS
@@ -144,12 +147,12 @@ if [ "$#" == "0" ]; then help; fi
 getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   # GNU enhanced getopt is available
-  ARGS=`getopt -o y:d:a:t:o:rszhuv \
-  -l year:,doy:,analysis-center:,type:,output-directory:,force-remove,standard-names,decompress,help,upper-case,version \
-  -n 'wgetorbit.sh' -- "$@"`
+  ARGS=`getopt -o y:d:a:t:o:rszhuvx \
+  -l year:,doy:,analysis-center:,type:,output-directory:,force-remove,standard-names,decompress,help,upper-case,version,xml-output \
+  -n 'wgeterp.sh' -- "$@"`
 else
   # Original getopt is available (no long option names, no whitespace, no sorting)
-  ARGS=`getopt a:t:o:rszhy:d:uv "$@"`
+  ARGS=`getopt a:t:o:rszhy:d:uvx "$@"`
 fi
 # check for getopt error
 if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 254 ; fi
@@ -159,31 +162,35 @@ eval set -- $ARGS
 while true ; do
   case "$1" in
     -y|--year)
-      
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       YEAR="$2"; shift;;
     -d|--doy)
-
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       DOY=`echo "$2" | sed 's|^0*||g'`; shift;;
     -a|--analysis-center)
-
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       AC=`echo "$2" | tr 'A-Z' 'a-z'`; shift;;
     -t|--type)
-
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       TYPE=`echo "$2" | tr 'A-Z' 'a-z'`; shift;;
     -o|--output-directory)
-
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       ODIR="$2"; shift;;
     -r|--force-remove)
-
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       FDEL=True;;
     -s|--standard-names)
-
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       USE_STD_NAMES=True;;
-
     -z|--decompress)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       DECOMPRESS=YES;;
     -u|--upper-case)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       TRUNCATE=YES;;
+    -x|--xml-output)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
+      XML_OUT=YES;;
     -h|--help)
       help; exit 0;;
     -v|--version)
@@ -195,6 +202,7 @@ while true ; do
   esac
   shift 
 done
+XML_SENTENCE="${XML_SENTENCE}</command>"
 
 # //////////////////////////////////////////////////////////////////////////////
 # CHECK THAT YEAR AND DOY IS SET AND VALID
@@ -295,7 +303,18 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # REPORT
 # //////////////////////////////////////////////////////////////////////////////
-echo "(wgeterp) Downloaded ERP File: $OF as $DF  of type: $TF from AC: ${AC}"
+if test "${XML_OUT}" == "YES"
+then
+  > ${DF}.meta
+  echo -ne "<para>Earth Rotation Parameters (ERP) meta-information details: \
+    Script run <command>$NAME</command> ${VERSION} (${RELEASE}) ${LAST_UPDATE} \
+    Command run $XML_SENTENCE " >> ${DF}.meta
+  echo -ne "Downloaded file <filename>$OF</filename>, stored localy as \
+    <filename>${DF}</filename>, of type <emphasis>$TF</emphasis> \
+    from ${AC} Analysis Center.</para>" >> ${DF}.meta
+else
+  echo "(wgeterp) Downloaded ERP File: $OF as $DF  of type: $TF from AC: ${AC}"
+fi
 
 # //////////////////////////////////////////////////////////////////////////////
 # EXIT
