@@ -157,6 +157,7 @@ YEAR=                ## year (4-digit)
 DOY=                 ## doy
 TRUNCATE=NO          ## rename to upper case
 CHECK_FOR_UNC=NO     ## check for uncompressed files
+XML_SENTENCE="<command>$NAME " ## command run in xml format
 
 # //////////////////////////////////////////////////////////////////////////////
 # GET COMMAND LINE ARGUMENTS
@@ -181,24 +182,34 @@ eval set -- $ARGS
 while true ; do
   case "$1" in
     -y|--year)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       YEAR="$2"; shift;;
     -d|--doy)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       DOY=`echo "$2" | sed 's|^0*||g'`; shift;;
     -a|--analysis-center)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       AC=`echo "$2" | tr 'A-Z' 'a-z'`; shift;;
     -t|--type)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       TYPE=`echo "$2" | tr 'A-Z' 'a-z'`; shift;;
     -o|--output-directory)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       ODIR="$2"; shift;;
     -r|--force-remove)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       FDEL=True;;
     -s|--standard-names)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       USE_STD_NAMES=True;;
     -n|--no-glonass)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       USE_GLONASS=False;;
     -z|--decompress)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       DECOMPRESS=YES;;
     -u|--upper-case)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       TRUNCATE=YES;;
     -h|--help)
       help; exit 0;;
@@ -211,6 +222,7 @@ while true ; do
   esac
   shift 
 done
+XML_SENTENCE="${XML_SENTENCE}</command>"
 
 # //////////////////////////////////////////////////////////////////////////////
 # SOME CASES ARE UNRESOLVED
@@ -356,11 +368,32 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # REPORT
 # //////////////////////////////////////////////////////////////////////////////
-echo "(wgetorbit) Downloaded Orbit File: $OF1 as ${DF1} of type: $TF1 from AC: ${AC}"
-if [ $NF -eq 2 ]; then
-  echo "(wgetorbit) Downloaded Orbit File: $OF1 as ${ORIGINAL_DF1} of type: $TF1 from AC: ${AC}"
-  echo "(wgetorbit) Downloaded Orbit File: $OF2 as ${DF2} of type: $TF2 from AC: ${AC}"
-  echo "(wgetorbit) Orbit files merged to: $DF1"
+if test "${XML_OUT}" == "YES"
+  > ${DF1}.meta
+then
+  echo -ne "<para>Orbit meta-information details: \
+    Script run <command>$NAME</command> ${VERSION} (${RELEASE}) ${LAST_UPDATE} \
+    Command run $XML_SENTENCE " >> ${DF1}.meta
+  if [ $NF -eq 2 ]
+  then
+    echo -ne "Downloaded file <filename>$OF1</filename>, stored localy as \
+      <filename>${ORIGINAL_DF1}</filename>, of type <emphasis>$TF1</emphasis> \
+      and <filename>$OF2</filename>, stored localy as \
+      <filename>${DF2}</filename>, of type <emphasis>$TF2</emphasis> \
+      both from ${AC} Analysis Center. The two files were merged to \
+      <filename>$DF1</filename>." >> ${DF1}.meta
+  else
+    echo -ne "Downloaded file <filename>$OF1</filename>, stored localy as \
+      <filename>${DF1}</filename>, of type <emphasis>$TF1</emphasis> \
+      from ${AC} Analysis Center." >> ${DF1}.meta
+  fi
+else
+    echo "(wgetorbit) Downloaded Orbit File: $OF1 as ${DF1} of type: $TF1 from AC: ${AC}"
+    if [ $NF -eq 2 ]; then
+        echo "(wgetorbit) Downloaded Orbit File: $OF1 as ${ORIGINAL_DF1} of type: $TF1 from AC: ${AC}"
+        echo "(wgetorbit) Downloaded Orbit File: $OF2 as ${DF2} of type: $TF2 from AC: ${AC}"
+        echo "(wgetorbit) Orbit files merged to: $DF1"
+    fi
 fi
 
 # //////////////////////////////////////////////////////////////////////////////

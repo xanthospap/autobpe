@@ -134,6 +134,7 @@ YEAR=                ## year (4-digit)
 DOY=                 ## doy
 TRUNCATE=NO          ## rename to upper case
 CHECK_FOR_UNC=NO     ## check for uncompressed files
+XML_SENTENCE="<command>$NAME " ## command run in xml format
 
 # //////////////////////////////////////////////////////////////////////////////
 # GET COMMAND LINE ARGUMENTS
@@ -158,19 +159,27 @@ eval set -- $ARGS
 while true ; do
   case "$1" in
     -y|--year)
+      
       YEAR="$2"; shift;;
     -d|--doy)
+
       DOY=`echo "$2" | sed 's|^0*||g'`; shift;;
     -a|--analysis-center)
+
       AC=`echo "$2" | tr 'A-Z' 'a-z'`; shift;;
     -t|--type)
+
       TYPE=`echo "$2" | tr 'A-Z' 'a-z'`; shift;;
     -o|--output-directory)
+
       ODIR="$2"; shift;;
     -r|--force-remove)
+
       FDEL=True;;
     -s|--standard-names)
+
       USE_STD_NAMES=True;;
+
     -z|--decompress)
       DECOMPRESS=YES;;
     -u|--upper-case)
