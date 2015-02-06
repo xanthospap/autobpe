@@ -7,6 +7,7 @@
 <!ENTITY chap3 SYSTEM 'rinex.xml'>
 <!ENTITY chap4 SYSTEM 'mauprp.xml'>
 <!ENTITY chap5 SYSTEM 'ambiguities.xml'>
+<!ENTITY chap6 SYSTEM 'crddifs.xml'>
 ]>
 
 <book>
@@ -107,4 +108,5 @@
   &chap3;
   &chap4;
   &chap5;
+  &chap6;
 </book>

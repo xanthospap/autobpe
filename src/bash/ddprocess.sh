@@ -774,6 +774,7 @@ fi
 # IONOSPHERIC CORRECTIONS
 # ------------------------------------------------------------------------------
 
+# TODO if the ionospheric file is copied from ntua's products, it doesn't have a meta file
 echo "" >> $LOGFILE
 echo "Ionospheric Corrections" >> $LOGFILE
 
@@ -809,12 +810,20 @@ if test -z $ion ; then
     --decompress \
     --year=${YEAR} \
     --doy=${DOY} \
-    1>${ION_META} 2>/dev/null
+    --xml-output \
+    &>> $LOGFILE
   then
     ##  if this in not a final solution, then the downloaded ion file will be
     ##+ named as e.g. COUWWWD.ION ; need to replace the right analysis center
     ##+ i.e. 'COD' instead of 'COU' or 'COR'
-    ion=`cat ${ION_META} | awk '{print $7}'`
+    ion=${P}/${CAMPAIGN}/ATM/COD${GPSW}${DOW}.ION
+    if ! test -f ${ion}
+    then
+      echo "Error! Failed to download ion file $ion"
+      exit 1
+    else
+      ION_META=${ion}.meta
+    fi
     if [ "$SOL_TYPE" == "u" ]
     then
       mv $ion ${ion/COU/COD} 2>/dev/null
@@ -1087,6 +1096,8 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # PROCESS THE DATA (AT LAST!)
 # //////////////////////////////////////////////////////////////////////////////
+
+## (skip processing)
 KOKO=A
 if test "$KOKO" == "LALA"
 then
@@ -1226,6 +1237,8 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # MAKE XML SUMMARY
 # //////////////////////////////////////////////////////////////////////////////
+
+## (skip processing)
 fi
 
 ## TODO check that the script /usr/local/bin/plot-amb-sum is available
@@ -1328,5 +1341,6 @@ eval "echo \"$(< ${XML_TEMPLATES}/procsum-options.xml)\"" > ${tmpd}/xml/options.
 /home/bpe2/src/autobpe/xml/src/makerinexxml.sh
 /home/bpe2/src/autobpe/xml/src/makeambxml.sh
 /home/bpe2/src/autobpe/xml/src/mauprpxml.sh ${P}/${CAMPAIGN^^}/OUT/MPR${YR2}${DOY}0.SUM
+/home/bpe2/src/autobpe/xml/src/crddifs.sh ${tmpd}/xs.diffs
 mkdir ${tmpd}/xml/html
 cd ${tmpd}/xml/ && xmlto --skip-validation -o html html main.xml

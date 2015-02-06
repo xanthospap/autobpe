@@ -20,19 +20,26 @@ if test -z ${ORB_META}
 then
   echo "ORB_META not set! Refusing to make options.xml"
   exit 1
+else
+  if ! test -f ${ORB_META}
+  then
+    echo "ORB_META ($ORB_META) not found! Refusing to make options.xml"
+    exit 1
+  fi
 fi
 
-SC=`cat ${ORB_META} | awk '{print $1}' | sed 's/[)(]//g'`
-OR=`cat ${ORB_META} | awk '{print $5}'`
-DO=`cat ${ORB_META} | awk '{print $7}'`
-TY=`cat ${ORB_META} | awk '{print $10}'`
-AC=`cat ${ORB_META} | awk '{print $13}'`
+#SC=`cat ${ORB_META} | awk '{print $1}' | sed 's/[)(]//g'`
+#OR=`cat ${ORB_META} | awk '{print $5}'`
+#DO=`cat ${ORB_META} | awk '{print $7}'`
+#TY=`cat ${ORB_META} | awk '{print $10}'`
+#AC=`cat ${ORB_META} | awk '{print $13}'`
 
-SENTENCE="Orbit Information (sp3) file: <filename>${SC}</filename> \
-(stored localy as <filename>${DO}</filename>). Type of information: \
-<emphasis>${TY}</emphasis>. Source of information (i.e. analysis center: \
-<emphasis>${AC}</emphasis>. Script used for \
-downloading was <application>${SC}</application>."
+#SENTENCE="Orbit Information (sp3) file: <filename>${SC}</filename> \
+#(stored localy as <filename>${DO}</filename>). Type of information: \
+#<emphasis>${TY}</emphasis>. Source of information (i.e. analysis center: \
+#<emphasis>${AC}</emphasis>. Script used for \
+#downloading was <application>${SC}</application>."
+SENTENCE=`cat ${ORB_META}`
 
 sed -i "s|V_ORBIT_META|${SENTENCE}|g" ${tmpd}/xml/options.xml
 
@@ -48,19 +55,26 @@ if test -z ${ERP_META}
 then
   echo "ERP_META not set! Refusing to make options.xml"
   exit 1
+else
+  if ! test -f ${ERP_META}
+  then
+    echo "ERP_META ($ERP_META) not found! Refusing to make options.xml"
+    exit 1
+  fi
 fi
 
-SC=`cat ${ORB_META} | awk '{print $1}' | sed 's/[)(]//g'`
-OR=`cat ${ORB_META} | awk '{print $5}'`
-DO=`cat ${ORB_META} | awk '{print $7}'`
-TY=`cat ${ORB_META} | awk '{print $10}'`
-AC=`cat ${ORB_META} | awk '{print $13}'`
+#SC=`cat ${ORB_META} | awk '{print $1}' | sed 's/[)(]//g'`
+#OR=`cat ${ORB_META} | awk '{print $5}'`
+#DO=`cat ${ORB_META} | awk '{print $7}'`
+#TY=`cat ${ORB_META} | awk '{print $10}'`
+#AC=`cat ${ORB_META} | awk '{print $13}'`
 
-SENTENCE="Earth Orientation Parameters (erp) Information file: <filename>${SC}</filename> \
-(stored localy as <filename>${DO}</filename>). Type of information: \
-<emphasis>${TY}</emphasis>. Source of information (i.e. analysis center: \
-<emphasis>${AC}</emphasis>. Script used for \
-downloading was <application>${SC}</application>."
+#SENTENCE="Earth Orientation Parameters (erp) Information file: <filename>${SC}</filename> \
+#(stored localy as <filename>${DO}</filename>). Type of information: \
+#<emphasis>${TY}</emphasis>. Source of information (i.e. analysis center: \
+#<emphasis>${AC}</emphasis>. Script used for \
+#downloading was <application>${SC}</application>."
+SENTENCE=`cat ${ERP_META}`
 
 sed -i "s|V_ERP_META|${SENTENCE}|g" ${tmpd}/xml/options.xml
 
@@ -75,19 +89,27 @@ if test -z ${ION_META}
 then
   echo "ION_META not set! Refusing to make options.xml"
   exit 1
+else 
+  if ! test -f ${ION_META}
+  then
+    echo "ION_META file ($ION_META) not found! Refusing to make options.xml"
+    exit 1
+  fi
 fi
 
-SC=`cat ${ION_META} | awk '{print $1}' | sed 's/[)(]//g'`
-OR=`cat ${ION_META} | awk '{print $5}'`
-DO=`cat ${ION_META} | awk '{print $7}'`
-TY=`cat ${ION_META} | awk '{print $10}'`
-AC=`cat ${ION_META} | awk '{print $13}'`
+#SC=`cat ${ION_META} | awk '{print $1}' | sed 's/[)(]//g'`
+#OR=`cat ${ION_META} | awk '{print $5}'`
+#DO=`cat ${ION_META} | awk '{print $7}'`
+#TY=`cat ${ION_META} | awk '{print $10}'`
+#AC=`cat ${ION_META} | awk '{print $13}'`
 
-SENTENCE="Ionospheric Corrections (ion) Information file: <filename>${SC}</filename> \
-(stored localy as <filename>${DO}</filename>). Type of information: \
-<emphasis>${TY}</emphasis>. Source of information (i.e. analysis center: \
-<emphasis>${AC}</emphasis>. Script used for \
-downloading was <application>${SC}</application>."
+#SENTENCE="Ionospheric Corrections (ion) Information file: <filename>${SC}</filename> \
+#(stored localy as <filename>${DO}</filename>). Type of information: \
+#<emphasis>${TY}</emphasis>. Source of information (i.e. analysis center: \
+#<emphasis>${AC}</emphasis>. Script used for \
+#downloading was <application>${SC}</application>."
+
+SENTENCE=`cat ${ION_META}`
 
 sed -i "s|V_ION_META|${SENTENCE}|g" ${tmpd}/xml/options.xml
 

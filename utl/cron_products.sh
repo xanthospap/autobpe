@@ -114,24 +114,12 @@ if ! /usr/local/bin/wgetorbit --analysis-center=cod \
                               --year=${YESTERDAY[0]} \
                               --doy=${YESTERDAY[3]} \
                               --force-remove \
-                              2>>${LOGF} \
-                              1>.tmp
+                              --xml-output \
+                              &>>${LOGF}
 then
   echo "ERROR. FAILED TO DOWNLOAD YESTERDAY'S ORBIT"
   exit 1
 fi
-
-##  Ok. Now we have a file named as '.tmp' wchich should contain one line, with
-##+ something like:
-##  '(wgetorbit) Downloaded Orbit File: COD18254.EPH.Z as 
-##+ /home/bpe2/data/GPSDATA/DATAPOOL/COD18254.EPH of type: final from AC: cod'
-##  Check that this is the case, and write the meta file.
-cat .tmp >> $LOGF
-LNS=`cat .tmp | wc -l`
-if test $LNS -ne 1 ; then echo "ERROR. INVALID ORBIT REPORT"; exit 1; fi
-FILE=`cat .tmp | awk '{print $7}'`
-if ! test -f $FILE ; then echo "ERROR. INVALID ORBIT REPORT (2)"; exit 1; fi
-mv .tmp ${FILE}.meta
 
 ##  Download orbits. Next the final one
 if ! /usr/local/bin/wgetorbit --analysis-center=cod \
@@ -142,20 +130,12 @@ if ! /usr/local/bin/wgetorbit --analysis-center=cod \
                               --doy=${M20DAYS[3]} \
                               --type=f \
                               --force-remove \
-                              2>>${LOGF} \
-                              1>.tmp
+                              --xml-output \
+                              &>>${LOGF}
 then
   echo "ERROR. FAILED TO DOWNLOAD FINAL ORBIT"
   exit 1
 fi
-
-##  Again, make the meta file
-cat .tmp >> $LOGF
-LNS=`cat .tmp | wc -l`
-if test $LNS -ne 1 ; then echo "ERROR. INVALID ORBIT REPORT"; exit 1; fi
-FILE=`cat .tmp | awk '{print $7}'`
-if ! test -f $FILE ; then echo "ERROR. INVALID ORBIT REPORT (2)"; exit 1; fi
-mv .tmp ${FILE}.meta
 
 ##  Hopefully all done with orbits; lets continue ...
 
@@ -168,22 +148,12 @@ if ! /usr/local/bin/wgeterp --analysis-center=cod \
                             --force-remove \
                             --year=${YESTERDAY[0]} \
                             --doy=${YESTERDAY[3]} \
-                            2>>${LOGF} \
-                            1>.tmp
+                            --xml-output \
+                            &>>${LOGF}
 then
   echo "ERROR. FAILED TO DOWNLOAD YESTERDAY'S ERP"
   exit 1
 fi
-
-##  Now the returned string (stored in .tmp) looks like:
-##  '(wgeterp) Downloaded ERP File: COD18257.ERP.Z as \
-##+ /home/bpe2/data/GPSDATA/DATAPOOL/COD18254.ERP  of type: final from AC: cod'
-cat .tmp >> $LOGF
-LNS=`cat .tmp | wc -l`
-if test $LNS -ne 1 ; then echo "ERROR. INVALID ERP REPORT"; exit 1; fi
-FILE=`cat .tmp | awk '{print $7}'`
-if ! test -f $FILE ; then echo "ERROR. INVALID ERP REPORT (2)"; exit 1; fi
-mv .tmp ${FILE}.meta
 
 if ! /usr/local/bin/wgeterp --analysis-center=cod \
                             --output-directory=${POOL} \
@@ -193,59 +163,33 @@ if ! /usr/local/bin/wgeterp --analysis-center=cod \
                             --type=f \
                             --year=${M20DAYS[0]} \
                             --doy=${M20DAYS[3]} \
-                            2>>${LOGF} \
-                            1>.tmp
+                            --xml-output \
+                            &>>${LOGF}
 then
   echo "ERROR. FAILED TO DOWNLOAD FINAL ERP"
   exit 1
 fi
 
-cat .tmp >> $LOGF
-LNS=`cat .tmp | wc -l`
-if test $LNS -ne 1 ; then echo "ERROR. INVALID ERP REPORT"; exit 1; fi
-FILE=`cat .tmp | awk '{print $7}'`
-if ! test -f $FILE ; then echo "ERROR. INVALID ERP REPORT (2)"; exit 1; fi
-mv .tmp ${FILE}.meta
-
 ## Download VMF1 grid files.
 if ! /usr/local/bin/wgetvmf1 --output-directory=${POOL} \
                              --year=${YESTERDAY[0]} \
                              --doy=${YESTERDAY[3]} \
-                             2>>${LOGF} \
-                             1>.tmp
+                             --xml-output \
+                             &>>${LOGF}
 then
   echo "ERROR. FAILED TO DOWNLOAD VMF1 GRID FILE FOR YESTERDAY"
   exit 1
 fi
 
-##  Now we have to make the .meta file. The output (.tmp) looks like:
-##  '(wgetvmf1) Downloaded VMF1 grid file \
-##+ /home/bpe2/data/GPSDATA/DATAPOOLVMFG_20150120.H00 (final) ; merged to \
-##+ /home/bpe2/data/GPSDATA/DATAPOOL/VMFG_2015020'
-##  There should be 5 such lines.
-cat .tmp >> $LOGF
-LNS=`cat .tmp | wc -l`
-if test $LNS -ne 5 ; then echo "ERROR. INVALID VMF1 REPORT"; exit 1; fi
-FILE=`cat .tmp | head -n 1 | awk '{print $11}'`
-if ! test -f $FILE ; then echo "ERROR. INVALID VMF1 REPORT (2)"; exit 1; fi
-mv .tmp ${FILE}.meta
-
 if ! /usr/local/bin/wgetvmf1 --output-directory=${POOL} \
                              --year=${M20DAYS[0]} \
                              --doy=${M20DAYS[3]} \
-                             2>>${LOGF} \
-                             1>.tmp
+                             --xml-output \
+                             &>>${LOGF}
 then
   echo "ERROR. FAILED TO DOWNLOAD VMF1 GRID FILE (FINAL)"
   exit 1
 fi
-
-cat .tmp >> $LOGF
-LNS=`cat .tmp | wc -l`
-if test $LNS -ne 5 ; then echo "ERROR. INVALID VMF1 REPORT"; exit 1; fi
-FILE=`cat .tmp | head -n 1 | awk '{print $11}'`
-if ! test -f $FILE ; then echo "ERROR. INVALID VMF1 REPORT (2)"; exit 1; fi
-mv .tmp ${FILE}.meta
 
 ##  Download the DCB file(s)
 ##  First get the running

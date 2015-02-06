@@ -56,7 +56,7 @@ V_GEN_UPD
       <para>V_TRP_META</para>
     </section>
     
-    <section><title>A-Priori Coordinates</title>
+    <section id='options_crd'><title>A-Priori Coordinates</title>
       <para>V_CRD_META</para>
     </section>
     
