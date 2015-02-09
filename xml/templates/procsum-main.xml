@@ -8,6 +8,7 @@
 <!ENTITY chap4 SYSTEM 'mauprp.xml'>
 <!ENTITY chap5 SYSTEM 'ambiguities.xml'>
 <!ENTITY chap6 SYSTEM 'crddifs.xml'>
+<!ENTITY chap7 SYSTEM 'chksum.xml'>
 ]>
 
 <book>
@@ -109,4 +110,5 @@
   &chap4;
   &chap5;
   &chap6;
+  &chap7;
 </book>

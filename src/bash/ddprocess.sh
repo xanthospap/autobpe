@@ -85,6 +85,7 @@ function help {
   echo "            --update=crd,sta"
   echo "            See Note 6 for this option"
   echo "           -y --year= specify year (4-digit)"
+  echo "           -x --xml-output produce an xml (actually docbook) output summary"
   echo "           --debug set debugging mode"
   echo "           -h --help display (this) help message and exit"
   echo "           -v --version dsiplay version and exit"
@@ -207,6 +208,7 @@ UPD_STA=NO               ## update station time-series
 UPD_NTW=NO               ## update netowrk file/records
 UPD_CRD=NO               ## update network's default crd file
 SAVE_DIR=                ## where to save this solution
+XML_OUT=NO               ## xml output
 
 ## Variables that are set during the script ##
 GPSW=
@@ -233,12 +235,12 @@ if [ "$#" == "0" ]; then help; fi
 getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   ## GNU enhanced getopt is available
-  ARGS=`getopt -o hvc:b:a:i:p:s:e:y:d:l:t:f:m:u:r: \
-  -l  help,version,campaign:,bernese-loadvar:,analysis-center:,solution-id:,pcv-file:,satellite-system:,elevation-angle:,year:,doy:,stations-per-cluster:,solution-type:,ion-products:,debug,calibration-model:,update:,save-dir: \
+  ARGS=`getopt -o hvc:b:a:i:p:s:e:y:d:l:t:f:m:u:r:x \
+  -l  help,version,campaign:,bernese-loadvar:,analysis-center:,solution-id:,pcv-file:,satellite-system:,elevation-angle:,year:,doy:,stations-per-cluster:,solution-type:,ion-products:,debug,calibration-model:,update:,save-dir:,xml-output \
   -n 'ddprocess' -- "$@"`
 else
   ## Original getopt is available (no long option names, no whitespace, no sorting)
-  ARGS=`getopt hvc:b:a:i:p:s:e:y:d:l:t:f:m:u:r: "$@"`
+  ARGS=`getopt hvc:b:a:i:p:s:e:y:d:l:t:f:m:u:r:x "$@"`
 fi
 ## check for getopt error
 if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 254 ; fi
@@ -279,6 +281,8 @@ while true ; do
       UPD_OPTION="${2}"; shift;;
     -r|--save-dir)
       SAVE_DIR="${2}"; shift;;
+    -x|--xml-output)
+      XML_OUT=YES;;
     -h|--help)
       help; exit 0;;
     -v|--version)
@@ -816,7 +820,15 @@ if test -z $ion ; then
     ##  if this in not a final solution, then the downloaded ion file will be
     ##+ named as e.g. COUWWWD.ION ; need to replace the right analysis center
     ##+ i.e. 'COD' instead of 'COU' or 'COR'
-    ion=${P}/${CAMPAIGN}/ATM/COD${GPSW}${DOW}.ION
+    for i in D R U
+    do
+      if test -f ${P}/${CAMPAIGN}/ATM/CO${i}${GPSW}${DOW}.ION
+      then
+        ion=${P}/${CAMPAIGN}/ATM/CO${i}${GPSW}${DOW}.ION
+        break
+      fi
+    done
+    # ion=${P}/${CAMPAIGN}/ATM/COD${GPSW}${DOW}.ION
     if ! test -f ${ion}
     then
       echo "Error! Failed to download ion file $ion"
@@ -1098,9 +1110,9 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 
 ## (skip processing)
-KOKO=A
-if test "$KOKO" == "LALA"
-then
+##KOKO=A
+##if test "$KOKO" == "LALA"
+##then
 
 ## empty the BPE directory
 rm ${P}/${CAMPAIGN^^}/BPE/*
@@ -1235,12 +1247,17 @@ fi
 #done
 
 # //////////////////////////////////////////////////////////////////////////////
+#
+# //////////////////////////////////////////////////////////////////////////////
+
+# //////////////////////////////////////////////////////////////////////////////
 # MAKE XML SUMMARY
 # //////////////////////////////////////////////////////////////////////////////
 
 ## (skip processing)
-fi
-
+##fi
+if test "${XML_OUT}" == "YES"
+then
 ## TODO check that the script /usr/local/bin/plot-amb-sum is available
 /usr/local/bin/plot-amb-sum ${P}/${CAMPAIGN^^}/OUT/AMB${YR2}${DOY}0.SUM ${tmpd}/${CAMPAIGN,,}${YEAR}${DOY}-amb.ps
 echo "MAKING XML"
@@ -1337,10 +1354,18 @@ done
 eval "echo \"$(< ${XML_TEMPLATES}/procsum-main.xml)\"" > ${tmpd}/xml/main.xml
 eval "echo \"$(< ${XML_TEMPLATES}/procsum-info.xml)\"" > ${tmpd}/xml/info.xml
 eval "echo \"$(< ${XML_TEMPLATES}/procsum-options.xml)\"" > ${tmpd}/xml/options.xml
+echo "Creating options.xml"
 /home/bpe2/src/autobpe/xml/src/makeoptionsxml.sh
+echo "Creating rinex.xml"
 /home/bpe2/src/autobpe/xml/src/makerinexxml.sh
+echo "Creating ambiguities.xml"
 /home/bpe2/src/autobpe/xml/src/makeambxml.sh
+echo "Creating mauprp.xml"
 /home/bpe2/src/autobpe/xml/src/mauprpxml.sh ${P}/${CAMPAIGN^^}/OUT/MPR${YR2}${DOY}0.SUM
+echo "Creating crddifs.xml"
 /home/bpe2/src/autobpe/xml/src/crddifs.sh ${tmpd}/xs.diffs
+echo "Creating chksum.xml"
+/home/bpe2/src/autobpe/xml/src/chksumxml.sh ${P}/${CAMPAIGN^^}/OUT/CHK${YR2}${DOY}0.OUT
 mkdir ${tmpd}/xml/html
 cd ${tmpd}/xml/ && xmlto --skip-validation -o html html main.xml
+fi
