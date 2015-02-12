@@ -1,17 +1,4 @@
-<?xml version='1.0' encoding='ISO-8859-1'?>
-
-<!-- VRIABLES
-V_TODAY
-V_DATE_PROCCESSED
-V_NETWORK
-V_USER_N
-V_HOST_N
-V_PROGRAM
-V_SYSTEM_INFO
-V_SCRIPT
-V_BERN_INFO
-V_GEN_UPD
--->
+<?xml version='1.0' encoding='UTF-8'?>
 
 <chapter id='options'><title>Processing Options and Products</title>
   
@@ -36,31 +23,31 @@ V_GEN_UPD
 
   <section><title>Products and A-Priori Information</title>
     
-    <section><title>Orbit Information</title>
+    <section id='sp3_apriori'><title>Orbit Information</title>
       <para>V_ORBIT_META</para>
     </section>
     
-    <section><title>Earth Orientation Parameters</title>
+    <section id='erp_apriori'><title>Earth Orientation Parameters</title>
       <para>V_ERP_META</para>
     </section>
     
-    <section><title>Differential Code Bias</title>
+    <section id='dcb_apriori'><title>Differential Code Bias</title>
       <para>V_DCB_META</para>
     </section>
     
-    <section><title>Ionospheric Corrections</title>
+    <section id='ion_apriori'><title>Ionospheric Corrections</title>
       <para>V_ION_META</para>
     </section>
 
-    <section><title>Tropospheric Corrections (grid)</title>
-      <para>V_TRP_META</para>
+    <section id='tro_apriori'><title>Tropospheric Corrections (grid)</title>
+      <para>V_TRO_META</para>
     </section>
     
-    <section id='options_crd'><title>A-Priori Coordinates</title>
+    <section id='crd_apriori'><title>A-Priori Coordinates</title>
       <para>V_CRD_META</para>
     </section>
     
-    <section><title>Phase Center Variations</title>
+    <section id='pcv_apriori'><title>Phase Center Variations</title>
       <para>V_PCV_META</para>
     </section>
     

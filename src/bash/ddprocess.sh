@@ -209,6 +209,7 @@ UPD_NTW=NO               ## update netowrk file/records
 UPD_CRD=NO               ## update network's default crd file
 SAVE_DIR=                ## where to save this solution
 XML_OUT=NO               ## xml output
+XML_SENTENCE="<command>$NAME" ## the command issued as xml
 
 ## Variables that are set during the script ##
 GPSW=
@@ -250,38 +251,55 @@ eval set -- $ARGS
 while true ; do
   case "$1" in
     --debug)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       DEBUG=YES;;
     -f|--ion-products)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       ION_STRING="$2"; shift;;
     -t|--solution-type)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       SOL_TYPE=`echo ${2:0:1} | tr 'A-Z' 'a-z'`; shift;;
     -l|--stations-per-cluster)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       STA_PER_CLU="${2}"; shift;;
     -y|--year)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       YEAR="${2}"; shift;;
     -d|--doy)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       DOY=`echo "${2}" | sed 's|^0||g'`; shift;;
     -e|elevation-angle)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       ELEV="${2}"; shift;;
     -s|satellite-system)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       SAT_SYS="${2}"; shift;;
     -m|--calibration-model)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       CLBR="${2}"; shift;;
     -p|pcv-file)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       PCV="${2}"; shift;;
     -i|--solution-id)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       SOL_ID="${2}"; shift;;
     -a|--analysis-center)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       AC="${2}"; shift;;
     -b|--bernese-loadvar)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       LOADVAR="${2}"; shift;;
     -c|--campaign)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       CAMPAIGN="${2}"; shift;;
     -u|--update)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       UPD_OPTION="${2}"; shift;;
     -r|--save-dir)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       SAVE_DIR="${2}"; shift;;
     -x|--xml-output)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       XML_OUT=YES;;
     -h|--help)
       help; exit 0;;
@@ -294,6 +312,7 @@ while true ; do
   esac
   shift 
 done
+XML_SENTENCE="${XML_SENTENCE}</command>"
 
 # //////////////////////////////////////////////////////////////////////////////
 # CHECK VITAL : YEAR AND DOY
@@ -865,10 +884,12 @@ rm ${tmpd}/.tmp 2>/dev/null
 #
 # LINK THE VIENNA GRID FILE WHICH SHOULD BE AT THE DATAPOOL AREA
 if $( test -f ${D}/VMFG_${YEAR}${DOY} ) && \
-   $( /bin/ln -sf ${D}/VMFG_${YEAR}${DOY} ${P}/${CAMPAIGN}/GRD/VMF${YR2}${DOY}0.GRD ); then 
+   $( /bin/ln -sf ${D}/VMFG_${YEAR}${DOY} ${P}/${CAMPAIGN}/GRD/VMF${YR2}${DOY}0.GRD )
+then 
   echo "Linked VMF grid file ${D}/VMFG_${YEAR}${DOY} \
     ${P}/${CAMPAIGN}/GRD/VMF${YR2}${DOY}0.GRD" >> $LOGFILE
   echo "Meta-File ??" >> $LOGFILE
+  TRO_META=${D}/VMFG_${YEAR}${DOY}.meta
 else 
   echo "*** Failed to link VMF1 grid file ${D}/VMFG_${YEAR}${DOY}"
   exit 1
@@ -1110,9 +1131,9 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 
 ## (skip processing)
-##KOKO=A
-##if test "$KOKO" == "LALA"
-##then
+KOKO=A
+if test "$KOKO" == "LALA"
+then
 
 ## empty the BPE directory
 rm ${P}/${CAMPAIGN^^}/BPE/*
@@ -1255,7 +1276,7 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 
 ## (skip processing)
-##fi
+fi
 if test "${XML_OUT}" == "YES"
 then
 ## TODO check that the script /usr/local/bin/plot-amb-sum is available
@@ -1276,29 +1297,36 @@ V_HOST_N=`echo $HOSTNAME`
 export V_HOST_N
 V_SYSTEM_INFO=`uname -a`
 export V_SYSTEM_INFO
-V_SCRIPT=ddprocess
+V_SCRIPT="${NAME} ${VERSION} (${RELEASE}) ${LAST_UPDATE}"
 export V_SCRIPT
+V_COMMAND=${XML_SENTENCE}
+export V_COMMAND
 V_BERN_INFO=`cat /home/bpe2/bern52/info/bern52_release. | tail -1`
 export V_BERN_INFO
 V_GEN_UPD=`cat /home/bpe2/bern52/info/bern52_GEN_upd. | tail -1`
 export V_GEN_UPD
-V_ID=${SOL_ID}
+V_ID="${SOL_ID} (preliminery: ${SOL_ID%?}P, size-reduced: ${SOL_ID%?}R)"
 export V_ID
 PCF_FILE=${PCF_FILE}
 export PCF_FILE
-V_ELEVATION=${ELEv}
+V_ELEVATION=${ELEV}
 export V_ELEVATION
 V_TROPO=VMF1
 export V_TROPO
-V_SOL_TYPE=${SOL_TYPE}
+if test "${SOL_TYPE}" == "f"
+then
+    V_SOL_TYPE=FINAL
+else
+    V_SOL_TYPE="RAPID/ULTRA_RAPID"
+fi
 export V_SOL_TYPE
-V_AC_CENTER=${AC}
+V_AC_CENTER=${AC^^}
 export V_AC_CENTER
 V_SAT_SYS=${SAT_SYS}
 export V_SAT_SYS
 V_STA_PER_CLU=${STA_PER_CLU}
 export V_STA_PER_CLU
-V_UPDATE_CRD=
+V_UPDATE_CRD=${UPD_CRD}
 export V_UPDATE_CRD
 V_UPDATE_STA=${UPD_STA}
 export V_UPDATE_STA
@@ -1317,15 +1345,36 @@ export V_YEAR
 V_DOY=${DOY}
 export V_DOY
 
+AVAIL_RNX="${#RINEX_AV[@]}"
+V_IGS_RNX="${#AVIGS[@]}"
+V_EPN_RNX="${#AVEPN[@]}"
+V_REG_RNX="${#AVREG[@]}"
+V_RNX_MIS="${#RINEX_MS[@]}"
+V_RNX_TOT="${#STATIONS[@]}"
+export AVAIL_RNX
+export V_IGS_RNX
+export V_EPN_RNX
+export V_REG_RNX
+export V_RNX_MIS
+export V_RNX_TOT
+
 export ORB_META
 export ERP_META
 export ION_META
+export TRO_META
 export DCB_META
 export tmpd
 export XML_TEMPLATES
 
+##  note that here we are interested in all stations NOT just the ones
+##+ to be updated
+>${tmpd}/xml/all.stations
+for i in ${STATIONS[@]}
+do
+  echo -ne "$i " >> ${tmpd}/xml/all.stations
+done
 /usr/local/bin/extractStations \
-    --station-file ${TABLES}/crd/${CAMPAIGN,,}.update \
+    --station-file ${tmpd}/xml/all.stations \
     --solution-summary ${P}/${CAMPAIGN^^}/OUT/${SOL_ID}${YR2}${DOY}0.OUT \
     --save-dir ${STA_TS_DIR} \
     --quiet \
@@ -1349,6 +1398,7 @@ done
   ${DOY} \
   ${MONTH} \
   ${DOM} \
+  ${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD \
   1>/${tmpd}/rnx.xml
 
 eval "echo \"$(< ${XML_TEMPLATES}/procsum-main.xml)\"" > ${tmpd}/xml/main.xml
@@ -1363,7 +1413,7 @@ echo "Creating ambiguities.xml"
 echo "Creating mauprp.xml"
 /home/bpe2/src/autobpe/xml/src/mauprpxml.sh ${P}/${CAMPAIGN^^}/OUT/MPR${YR2}${DOY}0.SUM
 echo "Creating crddifs.xml"
-/home/bpe2/src/autobpe/xml/src/crddifs.sh ${tmpd}/xs.diffs
+/home/bpe2/src/autobpe/xml/src/crddifs.sh ${tmpd}/xs.diffs ${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD
 echo "Creating chksum.xml"
 /home/bpe2/src/autobpe/xml/src/chksumxml.sh ${P}/${CAMPAIGN^^}/OUT/CHK${YR2}${DOY}0.OUT
 mkdir ${tmpd}/xml/html

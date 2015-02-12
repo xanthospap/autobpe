@@ -66,6 +66,10 @@ MONTH=${6}
 ## ARGV[7] -> day of month (2digit)
 DOM=${7}
 
+##  ARGV[8] -> (final) coordinate files from processing
+##+ needed for flags
+FCF=${8}
+
 ## We will also need:
 POOL=/home/bpe2/data/GPSDATA/DATAPOOL  ## RINES FILES
 TABLES=/home/bpe2/tables               ## NETWORK FILES
@@ -80,6 +84,12 @@ fi
 if ! test -f "$XSTA"
 then
   echo "(rnxsum2xml) ERROR! Failed to locate file $XSTA"
+  exit 1
+fi
+
+if ! test -f "$FCF"
+then
+  echo "(rnxsum2xml) ERROR! Failed to locate file $FCF (coordinate file)"
   exit 1
 fi
 
@@ -114,10 +124,18 @@ do
     ##+ crd differences
     prc=no
     difs="- - - - - -"
+    flag=
     if grep -i ${j} ${XSTA} &>/dev/null
     then
       prc=yes
       difs=`grep -i ${j} ${XSTA} | awk '{print $3,$4,$5,$6,$7,$8}'`
+    fi
+    if test $prc == "yes"
+    then
+        FLAG=`grep -i ${j} ${FCF} | awk '{print substr ($0,70,10)}' | sed 's/ //g'`
+        if test ${FLAG} == "A"; then flag="A (free)"; fi
+        if test ${FLAG} == "W"; then flag="W (used for allignment)"; fi
+        if test ${FLAG} == "F"; then flag="F (fixed)"; fi
     fi
 
     ## Search for the rinex file in the datapool area
@@ -127,10 +145,12 @@ do
     if test "${rnx}" != "-"
     then
         rnx=`echo $rnx | sed 's|/home/bpe2/data/GPSDATA/DATAPOOL/||g'`
+    else
+        rnx=
     fi
 
     ## Search for the multipath plot
-    mplot="-"
+    mplot=
     if ls ${TMP}/${j^^}-${YEAR}${MONTH}${DOM}-cf2sky.ps &>/dev/null
     then
       mplot=${TMP}/${j^^}-${YEAR}${MONTH}${DOM}-cf2sky.ps
@@ -139,10 +159,10 @@ do
     fi
 
     ## Search for the qc summary file
-    qcs="-"
+    qcs=
     if ls ${TMP}/${j}${DOY}0.${YR2}S &>/dev/null; then qcs=${TMP}/${j}${DOY}0.${YR2}S; fi
     if ls ${TMP}/${j^^}${DOY}0.${YR2}S &>/dev/null; then qcs=${TMP}/${j^^}${DOY}0.${YR2}S; fi
-    if test "${qcs}" != "-"
+    if test "${qcs}" != ""
     then
         qcs=`echo $qcs | sed 's|/home/bpe2/tmp/|http://dionysos.survey.ntua.gr/mirror/bpe2/tmp/|g'`
         f=`basename $qcs`
@@ -151,7 +171,7 @@ do
 
     ## print result
     #echo "$rnx $j $i $avlb $prc $mplot $qcs $difs" >> .tmp
-    printf "<row><entry>$rnx</entry><entry>$j</entry><entry>$i</entry><entry>$avlb</entry><entry>$prc</entry><entry>$mplot</entry><entry>$qcs</entry></row>\n"
+    printf "<row><entry>$rnx</entry><entry>$j</entry><entry>$i</entry><entry>$avlb</entry><entry>$prc</entry><entry>$flag</entry><entry>$mplot</entry><entry>$qcs</entry></row>\n"
 
   done
 done

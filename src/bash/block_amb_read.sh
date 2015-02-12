@@ -283,6 +283,7 @@ let j=TOT_BSL+1
 array=()
 IFS=' ' read -a array <<< `sed -n "${j}p" < .tmp`
 echo "<row>"
+echo "<?dbhtml bgcolor='#CCCCFF' ?><?dbfo bgcolor='#CCCCFF' ?>"
 echo "<entry spanname=\"hspan12\"></entry>"
 for k in `seq 2 10`; do
   echo "<entry>${array[${k}]}</entry>"

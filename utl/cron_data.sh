@@ -242,7 +242,7 @@ fi
 if test "${brdc}" != "NO"
 then
     uncompress -f ${POOL}/${brdc}.Z
-    for rnx in ${POOL}/????${M20DAYS[3]}0.${M20DAYS[0]:2:2}o*
+    for rnx in ${POOL}/????${M20DAYS[3]}0.${M20DAYS[0]:2:2}o
     do
         TRNX=`basename $rnx`
         sta=${TRNX:0:4}
@@ -250,6 +250,12 @@ then
         then
           /usr/local/bin/teqc +qc $rnx &>${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-qc
           /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} -o /home/bpe2/tmp &>>${LOG}
+          rnx_ne=${rnx/${M20DAYS[0]:2:2}o/}
+          for k in iod ion mp1 mp2 sn1 sn2
+          do
+            mv ${rnx_ne}.${k} ${TMP} 2>/dev/null
+          done
+          mv ${rnx/%o/S} ${TMP} 2>/dev/null
         fi
     done
 fi
@@ -265,7 +271,7 @@ fi
 if test "${brdc}" != "NO"
 then
     uncompress -f ${POOL}/${brdc}.Z
-    for rnx in ${POOL}/????${YESTERDAY[3]}0.${YESTERDAY[0]:2:2}o*
+    for rnx in ${POOL}/????${YESTERDAY[3]}0.${YESTERDAY[0]:2:2}o
     do
         TRNX=`basename $rnx`
         sta=${TRNX:0:4}
@@ -273,6 +279,12 @@ then
         then
           /usr/local/bin/teqc +qc $rnx &>${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-qc
           /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} -o /home/bpe2/tmp &>>${LOG}
+          rnx_ne=${rnx/${M20DAYS[0]:2:2}o/}
+          for k in iod ion mp1 mp2 sn1 sn2
+          do
+            mv ${rnx_ne}.${k} ${TMP} 2>/dev/null
+          done
+          mv ${rnx/%o/S} ${TMP} 2>/dev/null
         fi
     done
 fi

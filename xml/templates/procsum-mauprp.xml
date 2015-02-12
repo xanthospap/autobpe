@@ -1,8 +1,32 @@
-<chapter id='mauprp'>
-  <title>Phase Pre-Processing Results</title>
-  <para>Phase pre-processing is perfomed in baseline mode. Ths following table
-    summarizes the processing results, as reported in the respective summary
-    file.</para>
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!-- 
+     This template is to be used for creating a chapter
+     holding phase-preprocessing information, after a
+     successeful run of ddprocess.
+     It is populated by the script 'mauprpxml.sh'.
+     Any changes here, will affect 'mauprp.sh' and might
+     end up in an unsucesseful run.
+     -->
+
+<chapter id='mauprp'><title>Phase Pre-Processing Results</title>
+  <para>Phase pre-processing is perfomed in baseline mode. 
+    The following table summarizes the processing results, 
+    as reported in the respective summary file.</para>
+  <para>Phase preprocessing is performed by means of program
+    <application>MAUPRP</application>. Phase-only observables are analyzed,
+    using the <emphasis>COMBINED</emphasis> strategy. Note that the
+    RMS error of the epoch-difference solution should not be much 
+    larger than 2 cm. A short explanation is provided for the following
+    columns:
+    <itemizedlist>
+      <listitem><para><emphasis>'#SL'</emphasis> denotes the number of corrected cycle slips</para></listitem>
+      <listitem><para><emphasis>'#DL'</emphasis> denotes the number of deleted points</para></listitem>
+      <listitem><para><emphasis>'#MA'</emphasis> denotes the number of multiple ambiguities</para></listitem>
+      <listitem><para><emphasis>'MAXL3'</emphasis> maximum residual for the ionosphere-free linear combination</para></listitem>
+      <listitem><para><emphasis>'MIN. SLIP'</emphasis> smallest corrected cycle slip</para></listitem>
+  </itemizedlist></para>
+
   <!-- INSERT TABLE HERE -->
 
 </chapter>

@@ -140,7 +140,7 @@ echo "     INPUT FILE : ${1}                               "
 echo "     RAN AT ${DATE_STAMP}                            "
 echo "-->"
 
-echo "<table>"
+echo "<table id='amb_res_table'>"
 echo "<title>Ambiguity Resolution Summary</title>"
 echo "<tgroup cols=\"14\">"
 for i in `seq 0 14`

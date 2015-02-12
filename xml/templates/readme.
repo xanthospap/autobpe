@@ -1,0 +1,16 @@
+# --------------------------------------------------------- #
+#  README for xml/templates/
+# --------------------------------------------------------- #
+
+This folder contains a list of template files for creating xml
+(actually docbook) processing summary report(s). They are used
+by the script 'ddprocess', found in the src/bash/ directory.
+
+These are only generic template files and do not hold any
+actual information. They are populated by a list of bash scripts
+under the xml/src directory.
+
+Any changes in these files, should be followed by corresponding
+changes in the scripts at xml/src directory and/or ddprocess.
+
+(xp) FEB-2015

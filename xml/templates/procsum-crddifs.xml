@@ -1,8 +1,18 @@
-<?xml version='1.0' encoding='ISO-8859-1'?>
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!-- 
+     This template is to be used for creating a chapter
+     holding coordinate dofferences information, after a
+     successeful run of ddprocess.
+     It is populated by the script 'crddifs.sh'.
+     Any changes here, will affect 'crddifs.sh' and might
+     end up in an unsucesseful run.
+     -->
 
 <chapter id='crddifs'><title>Coordinate Differences</title>
   <section id='rcddifs_01'><title>A-priori - A-posteriori Differences</title>
-    <para>The following paragraph summarizes the differences between the estimated and the a-priori (input) coordinates, for every station processed. For more information on the a-priori coordinates used, see <xref linkend="options_crd" />.
+    <para>The following paragraph summarizes the differences between the estimated and the a-priori (input) coordinates, for every station processed. For more information on the a-priori coordinates used, see <xref linkend="crd_apriori" />.
+
       <!-- INSERT TABLE HERE -->
 
     </para>

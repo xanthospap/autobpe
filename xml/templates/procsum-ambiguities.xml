@@ -1,12 +1,34 @@
-<chapter id='ambiguities'>
-  <title>Ambiguity Resolution Information</title>
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!-- 
+     This template is to be used for creating a chapter
+     holding ambiguity resolution information, after a
+     successeful run of ddprocess.
+     It is populated by the script 'makeamb.sh'.
+     Any changes here, will affect 'makeamb.sh' and might
+     end up in an unsucesseful run.
+     The table to be inserted, has the id: amb_res_table'
+     -->
+
+<chapter id='ambiguities'><title>Ambiguity Resolution Information</title>
+  <para>Ambiguity resolution is performed in <emphasis>baseline mode</emphasis>, using various methods
+    depending on the baseline length, i.e.
+    <itemizedlist mark='opencircle'>
+      <listitem>
+        <para>Direct L1/L2 method (&lt; 11 km)</para></listitem>
+      <listitem>
+        <para>Phase-based widelane/narrowlane method (&lt; 201 km)</para></listitem>
+      <listitem>
+        <para>Quasi-Ionosphere-Free (QIF) approach (&lt; 2000 km)</para></listitem>
+      <listitem>
+        <para>Melbourne-Wuebbena approach (&lt; 6000 km)</para></listitem>
+    </itemizedlist>
+    When needed, GNSS-derived global ionosphere map information is used to support ambiguity resolution.
+    More information on this map is given in <xref linkend='ion_apriori' /></para>
+
+    <para>The following table, summarizes the ambiguity resolution information for the network.
+
   <!-- INSERT TABLE HERE -->
 
-  <mediaobject>
-    <imageobject condition='print'>
-      <imagedata fileref='V_AMB_PS' format='PS' />
-    </imageobject>
-    <caption><para>Ambiguity resolution information, depending on baseline length</para></caption>
-  </mediaobject>
-
+</para>
 </chapter>
