@@ -344,7 +344,7 @@ WARFILE=${LOG_DIR}/ddproc-${YEAR:2:2}${DOY}.wrn
 >$WARFILE
 echo "$*" >> $LOGFILE
 START_T_STAMP=`/bin/date`
-tmpd=${TMP}/${YEAR}${DOY}-ddprocess-${CAMPAIGN,,}
+tmpd=${TMP}/${YEAR}${DOY}-ddprocess-${CAMPAIGN,,}-${SOL_TYPE}
 if test -d $tmpd
 then
   rm -rf $tmpd/*
@@ -1131,9 +1131,9 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 
 ## (skip processing)
-KOKO=A
-if test "$KOKO" == "LALA"
-then
+##KOKO=A
+##if test "$KOKO" == "LALA"
+##then
 
 ## empty the BPE directory
 rm ${P}/${CAMPAIGN^^}/BPE/*
@@ -1252,37 +1252,24 @@ then
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
-# CLEAR CAMPAIGN DIRECTORIES
-# //////////////////////////////////////////////////////////////////////////////
-#for i in ATM \
-#         BPE \
-#         GRD \
-#         LOG \
-#         OBS \
-#         ORB \
-#         ORX \
-#         OUT \
-#         RAW \
-#         SOL ; do
-#    rm -rf ${P}/${CAMPAIGN}/${i}/* 2>/dev/null
-#done
-
-# //////////////////////////////////////////////////////////////////////////////
-#
-# //////////////////////////////////////////////////////////////////////////////
-
-# //////////////////////////////////////////////////////////////////////////////
 # MAKE XML SUMMARY
 # //////////////////////////////////////////////////////////////////////////////
 
 ## (skip processing)
-fi
+##fi
 if test "${XML_OUT}" == "YES"
 then
 ## TODO check that the script /usr/local/bin/plot-amb-sum is available
 /usr/local/bin/plot-amb-sum ${P}/${CAMPAIGN^^}/OUT/AMB${YR2}${DOY}0.SUM ${tmpd}/${CAMPAIGN,,}${YEAR}${DOY}-amb.ps
+
 echo "MAKING XML"
-mkdir ${tmpd}/xml
+mkdir -p ${tmpd}/xml/figures
+
+## conver ps to png (ambiguity plot)
+amb_png=${tmpd}/xml/figures/ambiguity.png
+ps2raster ${tmpd}/${CAMPAIGN,,}${YEAR}${DOY}-amb.ps -Tg -P
+mv ${tmpd}/${CAMPAIGN,,}${YEAR}${DOY}-amb.png ${amb_png}
+
 #cp ${XML_TEMPLATES}/*.xml ${tmpd}/xml
 
 V_TODAY=`date`
@@ -1371,10 +1358,10 @@ export XML_TEMPLATES
 >${tmpd}/xml/all.stations
 for i in ${STATIONS[@]}
 do
-  echo -ne "$i " >> ${tmpd}/xml/all.stations
+  echo -ne "$i " >> ${tmpd}/all.stations
 done
 /usr/local/bin/extractStations \
-    --station-file ${tmpd}/xml/all.stations \
+    --station-file ${tmpd}/all.stations \
     --solution-summary ${P}/${CAMPAIGN^^}/OUT/${SOL_ID}${YR2}${DOY}0.OUT \
     --save-dir ${STA_TS_DIR} \
     --quiet \
@@ -1417,5 +1404,31 @@ echo "Creating crddifs.xml"
 echo "Creating chksum.xml"
 /home/bpe2/src/autobpe/xml/src/chksumxml.sh ${P}/${CAMPAIGN^^}/OUT/CHK${YR2}${DOY}0.OUT
 mkdir ${tmpd}/xml/html
-cd ${tmpd}/xml/ && xmlto --skip-validation -o html html main.xml
+## cd ${tmpd}/xml/ && xmlto --skip-validation -o html html main.xml
+cd ${tmpd}/xml/ && xsltproc /usr/share/xml/docbook/stylesheet/nwalsh/xhtml/chunk.xsl main.xml
+mv ${tmpd}/xml/*.html ${tmpd}/xml/html/
+mkdir ${tmpd}/xml/html/figures
+cp ${amb_png} ${tmpd}/xml/html/figures/ambiguity.png
 fi
+
+# //////////////////////////////////////////////////////////////////////////////
+# CLEAR CAMPAIGN DIRECTORIES
+# //////////////////////////////////////////////////////////////////////////////
+for i in ATM \
+         BPE \
+         GRD \
+         LOG \
+         OBS \
+         ORB \
+         ORX \
+         OUT \
+         RAW \
+         SOL ; do
+    rm -rf ${P}/${CAMPAIGN}/${i}/*${YR2}${DOY}* 2>/dev/null
+done
+
+## Remove everything from OBS, OUT, RAW, BPE directory
+for i in OBS OUT RAW BPE
+do
+    rm ${P}/${CAMPAIGN}/${i}/* 2>/dev/null
+done

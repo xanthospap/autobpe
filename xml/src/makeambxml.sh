@@ -63,7 +63,7 @@ head -n 30 ${XML_TEMPLATES}/procsum-ambiguities.xml > ${tmpd}/xml/ambiguities.xm
 cat ${tmpd}/amb.xml >> ${tmpd}/xml/ambiguities.xml
 
 ## paste the rest of the template
-tail -n 2 ${XML_TEMPLATES}/procsum-ambiguities.xml >> ${tmpd}/xml/ambiguities.xml
+tail -n 10 ${XML_TEMPLATES}/procsum-ambiguities.xml >> ${tmpd}/xml/ambiguities.xml
 
 ##PICTURE=${V_NETWORK,,}${V_YEAR}${V_DOY}-amb.ps
 ##sed -i "s|V_AMB_PS|${PICTURE}|g" ${tmpd}/xml/ambiguities.xml

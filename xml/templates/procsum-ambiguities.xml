@@ -28,7 +28,15 @@
 
     <para>The following table, summarizes the ambiguity resolution information for the network.
 
-  <!-- INSERT TABLE HERE -->
+      <!-- INSERT TABLE HERE -->
+
+      <figure><title>Ambiguity Information per Baseline</title>
+        <mediaobject>
+          <imageobject>
+            <imagedata contentwidth='1280px' contentdepth='800px' fileref="figures/ambiguity.png"/>
+          </imageobject>
+        </mediaobject>
+      </figure>
 
 </para>
 </chapter>
