@@ -1179,6 +1179,7 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # SAVE THE FILES WE WANT
 # //////////////////////////////////////////////////////////////////////////////
+>${tmpd}/saved.files
 for i in ATM/${SOL_ID}${YR2}${DOY}0.TRO \
          ATM/${SOL_ID}${YR2}${DOY}0.TRP \
          OUT/AMB${YR2}${DOY}0.SUM \
@@ -1194,12 +1195,14 @@ for i in ATM/${SOL_ID}${YR2}${DOY}0.TRO \
   else
     cp ${P}/${CAMPAIGN}/${i} ${SAVE_DIR}/${i#*/}
     compress -f ${SAVE_DIR}/${i#*/}
+  echo "<listitem><para>Saved file <filename>${i}</filename> to <filename>${SAVE_DIR}/${i#*/}.Z</filename></para></listitem>" >> ${tmpd}/saved.files
   fi
 done
 
 # //////////////////////////////////////////////////////////////////////////////
 # UPDATE STATION TIME-SERIES
 # //////////////////////////////////////////////////////////////////////////////
+>${tmpd}/ts.update
 if test "${UPD_STA}" == "YES"
 then
   if test "${SOL_TYPE}" == "u"
@@ -1221,11 +1224,23 @@ then
    exit 1
  fi
  echo "(extractStations) Updated ${TS_UPDATED} time-series files" >> $LOGFILE
+ echo "<program>extractStations</program> successefuly updated records for ${TS_UPDATED} time-series files" >> ${tmpd}/ts.update
+ ## check to see if the updated stations match the sum of available reg + epn stations
+ tmp_nreg=${#AVREG[@]}
+ tmp_nepn=${#AVEPN[@]}
+ let should=tmp_nreg+tmp_nepn
+ if test ${should} != ${TS_UPDATED}
+ then
+   echo "<warning><para>Updated station time-series do not add up to the sum of available EPN and REGIONAL stations.</para></warning>" >> ${tmpd}/ts.update
+ fi
+else
+  echo "<important><para>No time-series files were updated, no such command given! see <xref linkend='general_options' /></para></important>" >> ${tmpd}/ts.update
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
 # UPDATE DEFAULT CRD FILE
 # //////////////////////////////////////////////////////////////////////////////$
+>${tmpd}/crd.update
 if test "${UPD_CRD}" == "YES"
 then
   /usr/local/bin/updatecrd \
@@ -1248,7 +1263,11 @@ then
       --station-file=${TABLES}/crd/${CAMPAIGN,,}.update \
       --flags=W,A,P,C \
       --limit" >> $LOGFILE
+    echo "<program>updatecrd</program> successefuly updated coordinate records regional sites." >> ${tmpd}/crd.update
+    echo "Default file updated : <filename>${TABLES}/crd/${CAMPAIGN}.CRD</filename> using the reference file <filename>${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD</filename>" >> ${tmpd}/crd.update
   fi
+else
+  echo "<important><para>No coordinate files were updated, no such command given! see <xref linkend='general_options' /></para></important>" >> ${tmpd}/crd.update
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -1256,7 +1275,7 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 
 ## (skip processing)
-##fi
+#fi
 if test "${XML_OUT}" == "YES"
 then
 ## TODO check that the script /usr/local/bin/plot-amb-sum is available
@@ -1403,6 +1422,8 @@ echo "Creating crddifs.xml"
 /home/bpe2/src/autobpe/xml/src/crddifs.sh ${tmpd}/xs.diffs ${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD
 echo "Creating chksum.xml"
 /home/bpe2/src/autobpe/xml/src/chksumxml.sh ${P}/${CAMPAIGN^^}/OUT/CHK${YR2}${DOY}0.OUT
+echo "Creating savedfiles.xml"
+/home/bpe2/src/autobpe/xml/src/savedfiles.sh ${tmpd}/saved.files ${tmpd}/ts.update ${tmpd}/crd.update
 mkdir ${tmpd}/xml/html
 ## cd ${tmpd}/xml/ && xmlto --skip-validation -o html html main.xml
 cd ${tmpd}/xml/ && xsltproc /usr/share/xml/docbook/stylesheet/nwalsh/xhtml/chunk.xsl main.xml
@@ -1414,21 +1435,21 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # CLEAR CAMPAIGN DIRECTORIES
 # //////////////////////////////////////////////////////////////////////////////
-for i in ATM \
-         BPE \
-         GRD \
-         LOG \
-         OBS \
-         ORB \
-         ORX \
-         OUT \
-         RAW \
-         SOL ; do
-    rm -rf ${P}/${CAMPAIGN}/${i}/*${YR2}${DOY}* 2>/dev/null
-done
+#for i in ATM \
+#         BPE \
+#         GRD \
+#         LOG \
+#         OBS \
+#         ORB \
+#         ORX \
+#         OUT \
+#         RAW \
+#         SOL ; do
+#    rm -rf ${P}/${CAMPAIGN}/${i}/*${YR2}${DOY}* 2>/dev/null
+#done
 
 ## Remove everything from OBS, OUT, RAW, BPE directory
-for i in OBS OUT RAW BPE
-do
-    rm ${P}/${CAMPAIGN}/${i}/* 2>/dev/null
-done
+#for i in OBS OUT RAW BPE
+#do
+#    rm ${P}/${CAMPAIGN}/${i}/* 2>/dev/null
+#done

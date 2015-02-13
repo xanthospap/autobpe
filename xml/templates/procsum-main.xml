@@ -9,6 +9,7 @@
 <!ENTITY chap5 SYSTEM 'ambiguities.xml'>
 <!ENTITY chap6 SYSTEM 'crddifs.xml'>
 <!ENTITY chap7 SYSTEM 'chksum.xml'>
+<!ENTITY chap8 SYSTEM 'savedfiles.xml'>
 ]>
 
 <book>
@@ -111,4 +112,5 @@
   &chap5;
   &chap6;
   &chap7;
+  &chap8;
 </book>
