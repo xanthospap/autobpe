@@ -22,9 +22,8 @@ else
   fi
 fi
 
-SENTENCE=`cat ${ORB_META}`
-
-sed -i "s|V_ORBIT_META|${SENTENCE}|g" ${tmpd}/xml/options.xml
+#SENTENCE=`cat ${ORB_META}`
+sed -i "s|V_ORBIT_META|`cat ${ORB_META} | tr '\n' ' '`|g" ${tmpd}/xml/options.xml
 
 ## ERP META
 ###########################################################
@@ -40,9 +39,8 @@ else
   fi
 fi
 
-SENTENCE=`cat ${ERP_META}`
-
-sed -i "s|V_ERP_META|${SENTENCE}|g" ${tmpd}/xml/options.xml
+#SENTENCE=`cat ${ERP_META}`
+sed -i "s|V_ERP_META|`cat ${ERP_META} | tr '\n' ' '`|g" ${tmpd}/xml/options.xml
 
 ## ION META
 ###########################################################
@@ -58,9 +56,8 @@ else
   fi
 fi
 
-SENTENCE=`cat ${ION_META}`
-
-sed -i "s|V_ION_META|${SENTENCE}|g" ${tmpd}/xml/options.xml
+#SENTENCE=`cat ${ION_META}`
+sed -i "s|V_ION_META|`cat ${ION_META} | tr '\n' ' '`|g" ${tmpd}/xml/options.xml
 
 ## DCB META
 ###########################################################
@@ -94,8 +91,8 @@ else
   fi
 fi
 
-ATX_REV=`cat ${V_ATX}.info`
-sed -i "s|V_PCV_META|${ATX_REV}|g" ${tmpd}/xml/options.xml
+#ATX_REV=`cat ${V_ATX}.info`
+sed -i "s|V_PCV_META|`cat ${V_ATX}.info | tr '\n' ' '`|g" ${tmpd}/xml/options.xml
 
 ## TRO META
 ###########################################################
@@ -112,6 +109,21 @@ else
   fi
 fi
 
-SENTENCE=`cat ${TRO_META}`
+sed -i "s|V_TRO_META|`cat ${TRO_META} | tr '\n' ' '`|g" ${tmpd}/xml/options.xml
 
-sed -i "s|V_TRO_META|${SENTENCE}|g" ${tmpd}/xml/options.xml
+## CRD META
+###########################################################
+
+if test -z ${CRD_META}
+then
+  echo "CRD_META not set! Refusing to make options.xml"
+  exit 1
+else 
+  if ! test -f ${CRD_META}
+  then
+    echo "CRD_META file ($CRD_META) not found! Refusing to make options.xml"
+    exit 1
+  fi
+fi
+
+sed -i "s|V_CRD_META|`cat ${CRD_META} | tr '\n' ' '`|g" ${tmpd}/xml/options.xml

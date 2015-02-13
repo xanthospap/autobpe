@@ -86,6 +86,8 @@ function help {
   echo "            See Note 6 for this option"
   echo "           -y --year= specify year (4-digit)"
   echo "           -x --xml-output produce an xml (actually docbook) output summary"
+  echo "           --force-remove-previous remove any files from the specified save directory (-r --save-dir=)"
+  echo "            prior to start of processing."
   echo "           --debug set debugging mode"
   echo "           -h --help display (this) help message and exit"
   echo "           -v --version dsiplay version and exit"
@@ -208,6 +210,7 @@ UPD_STA=NO               ## update station time-series
 UPD_NTW=NO               ## update netowrk file/records
 UPD_CRD=NO               ## update network's default crd file
 SAVE_DIR=                ## where to save this solution
+FORCE_REMOVE_PREV=NO     ## Remove previous solution files from save directory
 XML_OUT=NO               ## xml output
 XML_SENTENCE="<command>$NAME" ## the command issued as xml
 
@@ -229,6 +232,11 @@ AVEPN=()
 AVREG=()
 
 # //////////////////////////////////////////////////////////////////////////////
+# START TIMING
+# //////////////////////////////////////////////////////////////////////////////
+START_PROCESS_SECONDS=$(date +"%s")
+
+# //////////////////////////////////////////////////////////////////////////////
 # GET COMMAND LINE ARGUMENTS
 # //////////////////////////////////////////////////////////////////////////////
 if [ "$#" == "0" ]; then help; fi
@@ -237,7 +245,7 @@ getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   ## GNU enhanced getopt is available
   ARGS=`getopt -o hvc:b:a:i:p:s:e:y:d:l:t:f:m:u:r:x \
-  -l  help,version,campaign:,bernese-loadvar:,analysis-center:,solution-id:,pcv-file:,satellite-system:,elevation-angle:,year:,doy:,stations-per-cluster:,solution-type:,ion-products:,debug,calibration-model:,update:,save-dir:,xml-output \
+  -l  help,version,campaign:,bernese-loadvar:,analysis-center:,solution-id:,pcv-file:,satellite-system:,elevation-angle:,year:,doy:,stations-per-cluster:,solution-type:,ion-products:,debug,calibration-model:,update:,save-dir:,xml-output,force-remove-previous \
   -n 'ddprocess' -- "$@"`
 else
   ## Original getopt is available (no long option names, no whitespace, no sorting)
@@ -301,6 +309,9 @@ while true ; do
     -x|--xml-output)
       XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       XML_OUT=YES;;
+    --force-remove-previous)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
+      FORCE_REMOVE_PREV=YES;;
     -h|--help)
       help; exit 0;;
     -v|--version)
@@ -486,6 +497,7 @@ if test -z $SAVE_DIR ; then
   echo "***ERROR! Need to specify save directory name"
   exit 1
 fi
+
 if ! test -d $SAVE_DIR
 then
   if ! mkdir -p ${SAVE_DIR}
@@ -494,8 +506,10 @@ then
     exit 1
   fi
 else
-  :
-  #rm -rf ${SAVE_DIR}/*
+  if test "${FORCE_REMOVE_PREV}" == "YES"
+  then
+    rm -rf ${SAVE_DIR}/*
+  fi
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -1013,41 +1027,49 @@ rm ${tmpd}/.tmp
 
 echo "" >> $LOGFILE
 echo "Choosing apropriate crd fle" >> $LOGFILE
+>${tmpd}/crd.meta
 
 for i in ${SOL_ID} ${SOL_ID%?}P ${SOL_ID%?}R; do
   TMP=${PRODUCT_AREA}/${YEAR}/${DOY}/${i}${YR2}${DOY}0.CRD.Z
   printf "\nChecking $TMP ..." >> $LOGFILE
-  if test -f ${PRODUCT_AREA}/${YEAR}/${DOY}/${i}${YR2}${DOY}0.CRD.Z ; then
+  if test -f ${PRODUCT_AREA}/${YEAR}/${DOY}/${i}${YR2}${DOY}0.CRD.Z
+  then
     cp ${PRODUCT_AREA}/${YEAR}/${DOY}/${i}${YR2}${DOY}0.CRD.Z ${P}/${CAMPAIGN}/STA/APRIORI.CRD.Z
     /bin/uncompress -f ${P}/${CAMPAIGN}/STA/APRIORI.CRD.Z
     for j in ${RINEX_AV[@]}; do
       j=${j:0:4}
-      if ! /bin/egrep " ${j^^} " ${P}/${CAMPAIGN}/STA/APRIORI.CRD &>/dev/null; then
+      if ! /bin/egrep " ${j^^} " ${P}/${CAMPAIGN}/STA/APRIORI.CRD &>/dev/null
+      then
         rm ${P}/${CAMPAIGN}/STA/APRIORI.CRD
         TMP=
         printf "station $j missing; file skipped" >> $LOGFILE
         break
       fi
     done
+    echo "<para>Chose a-priori coordinate file <filename>${TMP}</filename>." >> ${tmpd}/crd.meta
     printf "ok! using a a-priori" >> $LOGFILE
   else
     printf "not available !" >> $LOGFILE
   fi
 done
 
-if ! test -f ${P}/${CAMPAIGN}/STA/APRIORI.CRD; then
+if ! test -f ${P}/${CAMPAIGN}/STA/APRIORI.CRD
+then
   TMP=${TABLES}/crd/${CAMPAIGN}.CRD
-  if ! cp ${TABLES}/crd/${CAMPAIGN}.CRD ${P}/${CAMPAIGN}/STA/APRIORI.CRD; then
+  if ! cp ${TABLES}/crd/${CAMPAIGN}.CRD ${P}/${CAMPAIGN}/STA/APRIORI.CRD
+  then
     echo "*** Failed to copy a-priori coordinate file ${TABLES}/crd/${CAMPAIGN}.CRD"
     TMP=
     exit 1
   else
     echo "Copying default crd file ${TABLES}/crd/${CAMPAIGN}.CRD to \
       ${P}/${CAMPAIGN}/STA/APRIORI.CRD" >> $LOGFILE
+    echo "<para>Chose default a-priori coordinate for the network, i.e. <filename>${TMP}</filename>." >> ${tmpd}/crd.meta
   fi
 fi
 
 mv ${P}/${CAMPAIGN}/STA/APRIORI.CRD ${P}/${CAMPAIGN}/STA/REG${YR2}${DOY}0.CRD
+echo "File renamed to <filename>${P}/${CAMPAIGN}/STA/REG${YR2}${DOY}0.CRD$</filename>.</para>" >> ${tmpd}/crd.meta
 
 # //////////////////////////////////////////////////////////////////////////////
 # SET OPTIONS IN THE PCF FILE
@@ -1131,14 +1153,16 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 
 ## (skip processing)
-##KOKO=A
-##if test "$KOKO" == "LALA"
-##then
+#KOKO=A
+#if test "$KOKO" == "LALA"
+#then
 
 ## empty the BPE directory
-rm ${P}/${CAMPAIGN^^}/BPE/*
+rm ${P}/${CAMPAIGN^^}/BPE/* 2>/dev/null
 
+START_BPE_SECONDS=$(date +"%s")
 ${U}/SCRIPT/${PL_FILE} ${YEAR} ${DOY}0 &>>$LOGFILE
+STOP_BPE_SECONDS=$(date +"%s")
 
 ##  Check for errors in the SYSOUT file and set the status
 if /bin/grep ERROR ${P}/${CAMPAIGN^^}/BPE/${SYSOUT}.OUT ##&>/dev/null
@@ -1175,7 +1199,8 @@ if test "${STATUS}" == "ERROR"; then
   done
   exit 1
 fi
-
+## (skip processing)
+# fi
 # //////////////////////////////////////////////////////////////////////////////
 # SAVE THE FILES WE WANT
 # //////////////////////////////////////////////////////////////////////////////
@@ -1184,6 +1209,7 @@ for i in ATM/${SOL_ID}${YR2}${DOY}0.TRO \
          ATM/${SOL_ID}${YR2}${DOY}0.TRP \
          OUT/AMB${YR2}${DOY}0.SUM \
          OUT/${SOL_ID}${YR2}${DOY}0.OUT \
+         STA/${SOL_ID}${YR2}${DOY}0.CRD \
          SOL/${SOL_ID}${YR2}${DOY}0.NQ0 \
          SOL/${SOL_ID}${YR2}${DOY}0.SNX \
          SOL/${SOL_ID%?}P${YR2}${DOY}0.NQ0 \
@@ -1234,7 +1260,7 @@ then
    echo "<warning><para>Updated station time-series do not add up to the sum of available EPN and REGIONAL stations.</para></warning>" >> ${tmpd}/ts.update
  fi
 else
-  echo "<important><para>No time-series files were updated, no such command given! see <xref linkend='general_options' /></para></important>" >> ${tmpd}/ts.update
+  echo "<important><para>No time-series files were updated, no such command given! see <xref linkend='options' /></para></important>" >> ${tmpd}/ts.update
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -1267,15 +1293,18 @@ then
     echo "Default file updated : <filename>${TABLES}/crd/${CAMPAIGN}.CRD</filename> using the reference file <filename>${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD</filename>" >> ${tmpd}/crd.update
   fi
 else
-  echo "<important><para>No coordinate files were updated, no such command given! see <xref linkend='general_options' /></para></important>" >> ${tmpd}/crd.update
+  echo "<important><para>No coordinate files were updated, no such command given! see <xref linkend='options' /></para></important>" >> ${tmpd}/crd.update
 fi
+
+# //////////////////////////////////////////////////////////////////////////////
+# STOP TIMER
+# //////////////////////////////////////////////////////////////////////////////
+STOP_PROCESS_SECONDS=$(date +"%s")
 
 # //////////////////////////////////////////////////////////////////////////////
 # MAKE XML SUMMARY
 # //////////////////////////////////////////////////////////////////////////////
 
-## (skip processing)
-#fi
 if test "${XML_OUT}" == "YES"
 then
 ## TODO check that the script /usr/local/bin/plot-amb-sum is available
@@ -1369,8 +1398,17 @@ export ERP_META
 export ION_META
 export TRO_META
 export DCB_META
+CRD_META=${tmpd}/crd.meta
+export CRD_META
 export tmpd
 export XML_TEMPLATES
+
+SCRIPT_SECONDS=$(($STOP_PROCESS_SECONDS-$START_PROCESS_SECONDS))
+SCRIPT_SECONDS=`echo $SCRIPT_SECONDS | awk '{printf "%10i seconds (or %5i min and %2i sec)",$1,$1/60.0,$1%60}'`
+BPE_SECONDS=$(($STOP_BPE_SECONDS-$START_BPE_SECONDS))
+BPE_SECONDS=`echo $BPE_SECONDS | awk '{printf "%10i seconds (or %5i min and %2i sec)",$1,$1/60.0,$1%60}'`
+export SCRIPT_SECONDS
+export BPE_SECONDS
 
 ##  note that here we are interested in all stations NOT just the ones
 ##+ to be updated
@@ -1425,7 +1463,6 @@ echo "Creating chksum.xml"
 echo "Creating savedfiles.xml"
 /home/bpe2/src/autobpe/xml/src/savedfiles.sh ${tmpd}/saved.files ${tmpd}/ts.update ${tmpd}/crd.update
 mkdir ${tmpd}/xml/html
-## cd ${tmpd}/xml/ && xmlto --skip-validation -o html html main.xml
 cd ${tmpd}/xml/ && xsltproc /usr/share/xml/docbook/stylesheet/nwalsh/xhtml/chunk.xsl main.xml
 mv ${tmpd}/xml/*.html ${tmpd}/xml/html/
 mkdir ${tmpd}/xml/html/figures
@@ -1435,21 +1472,23 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # CLEAR CAMPAIGN DIRECTORIES
 # //////////////////////////////////////////////////////////////////////////////
-#for i in ATM \
-#         BPE \
-#         GRD \
-#         LOG \
-#         OBS \
-#         ORB \
-#         ORX \
-#         OUT \
-#         RAW \
-#         SOL ; do
-#    rm -rf ${P}/${CAMPAIGN}/${i}/*${YR2}${DOY}* 2>/dev/null
-#done
+for i in ATM \
+         BPE \
+         GRD \
+         LOG \
+         OBS \
+         ORB \
+         ORX \
+         OUT \
+         RAW \
+         SOL ; do
+    rm -rf ${P}/${CAMPAIGN}/${i}/*${YR2}${DOY}* 2>/dev/null
+done
 
 ## Remove everything from OBS, OUT, RAW, BPE directory
-#for i in OBS OUT RAW BPE
-#do
-#    rm ${P}/${CAMPAIGN}/${i}/* 2>/dev/null
-#done
+for i in OBS OUT RAW BPE
+do
+    rm ${P}/${CAMPAIGN}/${i}/* 2>/dev/null
+done
+
+exit 0

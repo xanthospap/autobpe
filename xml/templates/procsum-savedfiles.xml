@@ -13,7 +13,7 @@
 <chapter id='chap_sav_fil'><title>List of Saved Files</title>
   
   <section id='file_explanation'><title>File Extensions</title>
-    <para>Following a successeful run od <program>ddprocess</program> a list of files should be saved
+    <para>Following a successeful run od <application>ddprocess</application> a list of files should be saved
       and/or updated. The following table summarizes information about the format and scope of these
       files.
       <table><title>File Extensions</title>
@@ -36,7 +36,7 @@
     </section>
     
     <section id='saved_files'><title>Files Saved</title>
-      <para><program>ddprocess</process> has compiled a report of all saved files for this solution. Here it is:
+      <para><application>ddprocess</application> has compiled a report of all saved files for this solution. Here it is:
         <itemizedlist mark='opencircle'>
         <!-- saved.files -->
         </itemizedlist>

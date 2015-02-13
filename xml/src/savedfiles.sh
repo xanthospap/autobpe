@@ -57,6 +57,6 @@ cat ${XML_TEMPLATES}/procsum-savedfiles.xml > ${tmpd}/xml/savedfiles.xml
 
 sed -ie "s|<\!\-\- saved.files \-\->|`cat ${1} | tr '\n' ' '`|g" ${tmpd}/xml/savedfiles.xml
 
-sed -ie "s|<\!\-\- ts.update \-\->|`cat ${1} | tr '\n' ' '`|g" ${tmpd}/xml/savedfiles.xml
+sed -ie "s|<\!\-\- ts.update \-\->|`cat ${2} | tr '\n' ' '`|g" ${tmpd}/xml/savedfiles.xml
 
 sed -ie "s|<\!\-\- crd.update \-\->|`cat ${3} | tr '\n' ' '`|g" ${tmpd}/xml/savedfiles.xml

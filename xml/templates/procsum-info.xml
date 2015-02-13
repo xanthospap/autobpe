@@ -38,6 +38,9 @@
   Contact           : <email>danast@mail.ntua.gr</email>,<email>xanthos@mail.ntua.gr</email>
 </screen></para>
 
+<para>The script run lasted about ${SCRIPT_SECONDS} (ommiting the creation of xml output), out of which ${BPE_SECONDS} were consumed for the
+  actual processing of data (i.e. BPE process).</para>
+
 </section>
 
 </chapter>
