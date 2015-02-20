@@ -276,16 +276,16 @@ while true ; do
     -d|--doy)
       XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       DOY=`echo "${2}" | sed 's|^0||g'`; shift;;
-    -e|elevation-angle)
+    -e|--elevation-angle)
       XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       ELEV="${2}"; shift;;
-    -s|satellite-system)
+    -s|--satellite-system)
       XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       SAT_SYS="${2}"; shift;;
     -m|--calibration-model)
       XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       CLBR="${2}"; shift;;
-    -p|pcv-file)
+    -p|--pcv-file)
       XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       PCV="${2}"; shift;;
     -i|--solution-id)

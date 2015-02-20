@@ -173,10 +173,11 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 if [ "$ST_FILE" != "0" ]; then
   if [ -f "$ST_FILE" ]; then
-    TEMPARRAY=( $( cat "$ST_FILE" ) )
-    for j in ${TEMPARRAY[*]}; do
-      J=`echo $j | tr 'a-z' 'A-Z'`
-      STATIONS+=($J)
+    STATIONS2=()
+    IFS=' ' read -a STATIONS2 <<< `cat $ST_FILE | tr 'a-z' 'A-Z'`
+    for i in "${STATIONS2[@]}"
+    do
+      STATIONS+=(${i})
     done
   else
     echo "*** File ${ST_FILE} does not exist!"
@@ -199,11 +200,15 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 EXIT_STATUS=0
 awk '/TYPE 001:/{f=1;print;next}f&&/TYPE 003:/{exit}f' ${REFERENCE_STA} \
- | sed 's|EUREF.SNX||g' | sed 's|STN||g' > .rs.tmp
+ | sed 's|EUREF.SNX||g' | sed 's|STN||g' \
+ | sed 's|IGS.SNX||g' > .rs.tmp
 awk '/TYPE 001:/{f=1;print;next}f&&/TYPE 003:/{exit}f' ${LOCAL_STA} \
- | sed 's|EUREF.SNX||g' | sed 's|STN||g' > .ls.tmp
+ | sed 's|EUREF.SNX||g' | sed 's|STN||g' \
+ | sed 's|IGS.SNX||g' > .ls.tmp
+cat .rs.tmp | awk '{print substr($0,0,204)}' > .koko && mv .koko .rs.tmp
+cat .ls.tmp | awk '{print substr($0,0,204)}' > .koko && mv .koko .ls.tmp
 
-for station in ${STARRAY[*]}; do
+for station in ${STATIONS[*]}; do
   STATION=${station^^}
   if [ -z "$LOGS" ]; then
     STA_LOG=${STATION}.diff

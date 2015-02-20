@@ -277,10 +277,12 @@ import sys
 rtn = bpepy.products.orbits.getorb ($YEAR,$DOY,'"$AC"','"$ODIR"',${USE_STD_NAMES},${SKIP_GLONASS},'"$TYPE"',$FDEL,$CHECK_FOR_UNC)
 if rtn[0] != 0: sys.exit(1)
 print rtn
-sys.exit(0)" 2>/dev/null`
+sys.exit(0)"` ##2>/dev/null`
 
 if [ $? -ne 0 ]; then
   echo "*** Failed to run python script bpepy.products.orbits.getorb"
+  echo "*** Additional python output : ${P_LIST}"
+  echo "*** python: bpepy.products.orbits.getorb ($YEAR,$DOY,'"$AC"','"$ODIR"',${USE_STD_NAMES},${SKIP_GLONASS},'"$TYPE"',$FDEL,$CHECK_FOR_UNC)"
   exit 254
 fi
 

@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 export PATH="${PATH}:/usr/local/bin"
 
@@ -30,6 +30,9 @@ fi
   --xml-output \
   --force-remove-previous
 
+## synchronize the remote server
+/home/bpe2/cron/syncweb.sh
+
 M20DAYS_STR=`/bin/date -d "20 days ago" '+%Y-%m-%d-%j-%w'`
 M20DAYS=()
 IFS='-' read -a M20DAYS <<< "${M20DAYS_STR}"
@@ -56,3 +59,6 @@ fi
   --update=all \
   --year=${M20DAYS[0]} \
   --xml-output
+
+## synchronize the remote server
+/home/bpe2/cron/syncweb.sh

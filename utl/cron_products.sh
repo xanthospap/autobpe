@@ -1,5 +1,4 @@
-
-#! /bin/bash
+#!/bin/bash
 
 ################################################################################
 ## 
@@ -66,6 +65,9 @@ function help {
   exit 0
 }
 
+## Export the full PATH
+export PATH="${PATH}:/usr/local/bin"
+
 ##  Where is the DATAPOOL area?
 POOL=/home/bpe2/data/GPSDATA/DATAPOOL
 
@@ -107,6 +109,15 @@ fi
 ##  [YEAR(0),MONTH(1),DOM(2),DOY(3),DOW(4)]
 
 ##  Download orbits. First the ultra-rapid one (or rapid if we can find it)
+echo "Using command: /usr/local/bin/wgetorbit --analysis-center=cod \
+  --output-directory=${POOL} \
+  --standard-names \
+  --decompress \
+  --year=${YESTERDAY[0]} \
+  --doy=${YESTERDAY[3]} \
+  --force-remove \
+  --xml-output \
+  &>>${LOGF}" >> ${LOGF}
 if ! /usr/local/bin/wgetorbit --analysis-center=cod \
                               --output-directory=${POOL} \
                               --standard-names \
@@ -118,6 +129,10 @@ if ! /usr/local/bin/wgetorbit --analysis-center=cod \
                               &>>${LOGF}
 then
   echo "ERROR. FAILED TO DOWNLOAD YESTERDAY'S ORBIT"
+  if test -f python.bpepy.orbits.log
+  then
+    cat python.bpepy.orbits.log >> ${LOGF}
+  fi
   exit 1
 fi
 
@@ -228,4 +243,5 @@ then
 fi
 
 ##  Finaly !! All done for today
+rm python.bpepy.orbits.log 2>/dev/null
 exit 0

@@ -744,6 +744,13 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
          1    | nothing downloaded
   """
 
+  flog = open ("python.bpepy.orbits.log",'w')
+  print>>flog,'Translate     =',translate
+  print>>flog,'Force type    =',force_type
+  print>>flog,'Force remove  =',force_remove
+  print>>flog,'Check for .z  =',check_for_z
+  print>>flog,'Use Repro 2013=',use_repro_2013
+
   ## variables
   HOST = 'ftp.unibe.ch'
   DOWNLOADED    = 'no'
@@ -762,12 +769,16 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
   ## see that the product type is set correctly (if it is set)
   if force_type != 'x':
     if force_type != 'f' and force_type != 'r' and force_type != 'u':
+      print>>flog, 'Quick return, product type not valid'
+      flog.close()
       return [1,'','','']
 
+  status = 1
   ## ------------------------------------------------------------------------ ##
   ## if the user only wants a specific product type                           ##
   ## ------------------------------------------------------------------------ ##
   if force_type == 'f':  ## only final
+    print>>flog, 'Forcing type: final'
     identifier = 'COD'
     if use_repro_2013 == 'yes':
       DIRN = 'aiub/REPRO_2013/CODE/' + SYR + '/'
@@ -786,13 +797,21 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
         os.unlink (DFILE)
       else : 
         DOWNLOADED = 'yes'
+        print>>flog, 'Quick return; File exists'
+        flog.close()
         return [0,FILE,DFILE,'final']
     if check_for_z == True:
       p = re.compile ('.Z$')
       dfile = p.sub( '', DFILE)
       if os.path.isfile (dfile):
-        DOWNLOADED = 'yes'
-        return [0,FILE,dfile,'final']
+        if force_remove :
+          os.unlink (dfile)
+        else:
+          DOWNLOADED = 'yes'
+          print>>flog, 'Quick return; File exists'
+          flog.close()
+          return [0,FILE,dfile,'final']
+    print>>flog,'Downloading ...',HOST+'/'+DIRN,FILE[0],DFILE[0]
     status = bpepy.utils.ftpget (HOST+'/'+DIRN,[FILE],[DFILE])
     if status == 0:
       DOWNLOADED = 'yes'
@@ -801,12 +820,16 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
         SOLUTION_TYPE = SOLUTION_TYPE + ' (repro 2013)'
       FTP_FILENAME  = FILE
       SV_FILENAME   = DFILE
+      print>>flog,'Succeseful download'
     else:
       DOWNLOADED = 'no'
       try: os.unlink (DFILE)
       except: pass
+      print>>flog,'Failed to download!'
+      flog.close()
       return [1,'','','']
   elif force_type == 'r':  ## only rapid
+    print>>flog,'Forcing type: rapid'
     if use_repro_2013 == 'yes':
       DOWNLOADED = 'no'
     else:
@@ -823,19 +846,25 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
           os.unlink (DFILE)
         else : 
           DOWNLOADED = 'yes'
+          print>>flog, 'Quick return; File exists'
+          flog.close()
           return [0,FILE,DFILE,'rapid']
+      print>>flog,'Downloading ...',HOST+'/'+DIRN,FILE[0],DFILE[0]
       status = bpepy.utils.ftpget (HOST+'/'+DIRN,[FILE],[DFILE])
       if status == 0:
         DOWNLOADED = 'yes'
         SOLUTION_TYPE = 'rapid'
         FTP_FILENAME  = FILE
         SV_FILENAME   = DFILE
+        print>>flog,'Succeseful download'
       else:
         DOWNLOADED = 'no'
         try: os.unlink (DFILE)
         except: pass
+        print>>flog,'Failed to download!'
         return [1,'','','']
   elif force_type == 'u':  ## only ultra-rapid
+    print>>flog,'Forcing type: ultra-rapid'
     if use_repro_2013 == 'yes':
       DOWNLOADED = 'no'
     else:
@@ -851,6 +880,8 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
         FILE = 'COD' + SGW + SDOW + '.EPH_5D'
       else:
         DOWNLOADED = 'no'
+        print>>flog,'Failed! Big time lag'
+        flog.close()
         return [1,'','','']
       if translate == True:
         DFILE = ULTRA_
@@ -863,7 +894,8 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
           os.unlink (DFILE)
         else : 
           DOWNLOADED = 'yes'
-          ##print >> sys.stderr, 'File',dfile,'already available; skipping download'
+          print>>flog, 'Quick return; File exists'
+          flog.close()
           return [0,FILE,DFILE,'ultra-rapid']
       #if check_for_z == True:
       #  p = re.compile ('.Z$')
@@ -871,23 +903,35 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
       #  if os.path.isfile (dfile):
       #    DOWNLOADED = 'yes'
       #    return [0,FILE,dfile,'ultra-rapid']
+      print>>flog,'Downloading ...',HOST+'/'+DIRN,FILE[0],DFILE[0]
       status = bpepy.utils.ftpget (HOST+'/'+DIRN,[FILE],[DFILE])
       if status == 0:
         DOWNLOADED = 'yes'
         SOLUTION_TYPE = 'ultra-rapid'
         FTP_FILENAME  = FILE
         SV_FILENAME   = DFILE
+        print>>flog,'Succeseful download'
       else:
         DOWNLOADED = 'no'
         try: os.unlink (DFILE)
         except: pass
+        print>>flog,'Failed to download!'
+        flog.close()
         return [1,'','','']
+
+  ## did we succed ?
+  if status == 0:
+    print>>flog,'SUCESS; returning...'
+    flog.close ()
+    return [0,FTP_FILENAME,SV_FILENAME,SOLUTION_TYPE]
 
   ## ------------------------------------------------------------------------ ##
   ## Normal download; no specific product type asked for                      ##
   ## ------------------------------------------------------------------------ ##
 
+  print>>flog,'Trying different types'
   ## Final Solution
+  print>>flog,'Trying final orbit'
   identifier = 'COD'
   if use_repro_2013 == 'yes':
     DIRN = 'aiub/REPRO_2013/CODE/' + SYR + '/'
@@ -906,13 +950,21 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
       os.unlink (DFILE)
     else : 
       DOWNLOADED = 'yes'
+      print>>flog,'Quick return; File exists'
+      flog.close()
       return [0,FILE,DFILE,'final']
   if check_for_z == True:
     p = re.compile ('.Z$')
     dfile = p.sub( '', DFILE)
     if os.path.isfile (dfile):
-      DOWNLOADED = 'yes'
-      return [0,FILE,dfile,'final']
+      if fore_remove :
+        os.unlink (dfile)
+      else:
+        DOWNLOADED = 'yes'
+        print>>flog,'Quick return; File exists'
+        flog.close()
+        return [0,FILE,dfile,'final']
+  print>>flog,'Trying to download...',HOST+'/'+DIRN,FILE,DFILE
   status = bpepy.utils.ftpget (HOST+'/'+DIRN,[FILE],[DFILE])
   if status == 0:
     DOWNLOADED = 'yes'
@@ -921,13 +973,16 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
       SOLUTION_TYPE = SOLUTION_TYPE + ' (repro 2013)'
     FTP_FILENAME  = FILE
     SV_FILENAME   = DFILE
+    print>>flog,'Successeful download'
   else:
     DOWNLOADED = 'no'
     try: os.unlink (DFILE)
     except: pass
+    print>>flog,'Download failed'
 
   ## Rapid Solution
   if DOWNLOADED == 'no':
+    print>>flog,'Trying for rapid type'
     if use_repro_2013 == 'yes':
       DOWNLOADED = 'no'
     else:
@@ -944,20 +999,26 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
           os.unlink (DFILE)
         else : 
           DOWNLOADED = 'yes'
+          print>>flog,'Quick return; file exists'
+          flog.close()
           return [0,FILE,DFILE,'rapid']
+      print>>flog,'Trying to download...',HOST+'/'+DIRN,FILE,DFILE
       status = bpepy.utils.ftpget (HOST+'/'+DIRN,[FILE],[DFILE])
       if status == 0:
         DOWNLOADED = 'yes'
         SOLUTION_TYPE = 'rapid'
         FTP_FILENAME  = FILE
         SV_FILENAME   = DFILE
+        print>>flog,'Download successeful'
       else:
         DOWNLOADED = 'no'
         try: os.unlink (DFILE)
         except: pass
+        print>>flog,'Download failed'
 
   ## Ultra Rapid Solution
   if DOWNLOADED == 'no':
+    print>>flog,'Trying for type ultra-rapid'
     if use_repro_2013 == 'yes':
       DOWNLOADED = 'no'
     else:
@@ -973,6 +1034,8 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
         FILE = 'COD' + SGW + SDOW + '.EPH_5D'
       else:
         DOWNLOADED = 'no'
+        print>>flog,'Failed; too big time lag'
+        flog.close()
         return [1,'','','']
       if translate == True:
         DFILE = ULTRA_
@@ -985,20 +1048,27 @@ def getorb_cod (date,save_dir='',translate=False,force_type='x',force_remove=Fal
           os.unlink (DFILE)
         else : 
           DOWNLOADED = 'yes'
+          print>>flog,'Quick return; File exists'
           return [0,FILE,DFILE,'ultra-rapid']
+      status = bpepy.utils.ftpget (HOST+'/'+DIRN,[FILE],[DFILE])
       if status == 0:
         DOWNLOADED = 'yes'
         SOLUTION_TYPE = 'ultra-rapid'
         FTP_FILENAME  = FILE
         SV_FILENAME   = DFILE
+        print>>flog,'Successeful download'
       else:
         DOWNLOADED = 'no'
         try: os.unlink (DFILE)
         except: pass
+        print>>flog,'Download failed'
 
   ## No more solutions available; check the status
   if DOWNLOADED == 'no':
-    # print >> sys.stderr, 'ERROR: no orbit file found'
+    print>>flog,'FAILED; returning ...'
+    flog.close()
     return [1,'','','']
   else:
+    print>>flog,'SUCESS; returning ...'
+    flog.close()
     return [0,FTP_FILENAME,SV_FILENAME,SOLUTION_TYPE]

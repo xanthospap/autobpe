@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 ################################################################################
 ## 
@@ -66,6 +66,9 @@ function help {
   echo "/******************************************************************************************/"
   exit 0
 }
+
+## Export the full PATH
+export PATH="${PATH}:/usr/local/bin"
 
 ##  Where is the DATAPOOL area?
 POOL=/home/bpe2/data/GPSDATA/DATAPOOL
