@@ -72,8 +72,8 @@ function help {
 # //////////////////////////////////////////////////////////////////////////////
 # VARIABLES
 # //////////////////////////////////////////////////////////////////////////////
-SAV_DIR=/media/Seagate/solutions52
-CRD_FILE=/home/bpe2/crd
+SAV_DIR=/home/bpe2/maps
+CRD_FILE=/home/bpe2/tables/crd
 YEAR=5000
 DOY=500
 TYPE=final
@@ -133,9 +133,9 @@ done
 # //////////////////////////////////////////////////////////////////////////////
 # CHECK THAT YEAR IS SET AND VALID
 # //////////////////////////////////////////////////////////////////////////////
-if [ $YEAR -lt 1950 ] || [ $YEAR -gt 2014 ]
+if [ $YEAR -lt 1950 ] || [ $YEAR -gt 2015 ]
 then
-  echo "*** Need to provide a valid year [1950-2014]"
+  echo "*** Need to provide a valid year [1950-2015]"
   exit 1
 fi
 YR2=${YEAR:2:2}
@@ -152,7 +152,8 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # MAKE DOY A 3-DIGIT NUMBER
 # //////////////////////////////////////////////////////////////////////////////
-DOY=`truncate $DOY`
+#DOY=`truncate $DOY`
+#DOY=$(printf "%03d" $DOY)
 
 # //////////////////////////////////////////////////////////////////////////////
 # IF OUTPUT DIR GIVEN, SEE THAT IT EXISTS
@@ -231,7 +232,8 @@ fi
 # OUTFILE=${SAV_DIR}/${YEAR}/${DOY}/${NETC}${TYPC}_${YR2}${DOY}0.
 #fi
 
-OUTFILE=${SAV_DIR}/${YEAR}/${DOY}/${TYPC}${NETC}${YR2}${DOY}0.SUM
+#OUTFILE=${SAV_DIR}/${YEAR}/${DOY}/${TYPC}${NETC}${YR2}${DOY}0.SUM
+OUTFILE=${SAV_DIR}/FF${NETC}${YR2}${DOY}0.SUM
 
 if [ ! -f ${OUTFILE} ]; then
   echo "*** Output file: $OUTFILE does not exist!"
@@ -257,10 +259,38 @@ echo "##* **** ******* ******* ******* ****** ****** ****** ***  ********** ****
 ## First find where line starting with 'stat. ' is in the file
 ## Loop for 150 iterations or stop when an empty line is encountered
 ## Fir every non-empty line, print line to LOGFILE
-awk '/stat. / {for (i=1;i<150;i++) {getline; if (NF>0) print; else break;}}' $OUTFILE >> $LOGFILE
 
+# //////////////////////////////////////////////////////////////////////////////
+# WRITE TO OUTPUT THE PROCESSED STATIONS CRDs --- OLD SUMMARY FILE
+# //////////////////////////////////////////////////////////////////////////////
+#awk '/stat. / {for (i=1;i<150;i++) {getline; if (NF>0) print; else break;}}' $OUTFILE >> $LOGFILE
+#
+#ITERATOR=1
+#ARRAY=$(awk '{ printf "%4s ",$1 }' $LOGFILE)
+#for i in ${ARRAY[*]}; do
+#  grep -i $i $CRD_FILE &>/dev/null
+#  if [ "$?" -eq 0 ]; then
+#    iter=$ITERATOR
+#    if [ $ITERATOR -lt 100 ]; then iter=0$iter; fi
+#    if [ $ITERATOR -lt 10 ]; then iter=0$iter; fi
+#    xyz=`grep -i $i $CRD_FILE | awk '{ print $3,$4,$5}'`
+#    ## flh=`/home/bpe/car2ell.py $xyz`
+#    flh=`echo $xyz | xyz2flh -ud | awk '{print $6,$7,$8}'`
+#    line1=`grep $i $LOGFILE`
+#    echo $iter $line1 "EST" $flh
+#    let ITERATOR=ITERATOR+1
+# else
+#   echo "## WARNING : Station $i not found in crd file!"
+#  fi
+#done
+
+# //////////////////////////////////////////////////////////////////////////////
+# WRITE TO OUTPUT THE PROCESSED STATIONS CRDs --- NEW AMIGUITE SUMMERY FILE
+# //////////////////////////////////////////////////////////////////////////////
+
+testxs=${YEAR}${DOY}xs.diffs
 ITERATOR=1
-ARRAY=$(awk '{ printf "%4s ",$1 }' $LOGFILE)
+ARRAY=$(awk '{ printf "%4s ",$1 }' $testxs)
 for i in ${ARRAY[*]}; do
   grep -i $i $CRD_FILE &>/dev/null
   if [ "$?" -eq 0 ]; then
@@ -269,14 +299,21 @@ for i in ${ARRAY[*]}; do
     if [ $ITERATOR -lt 10 ]; then iter=0$iter; fi
     xyz=`grep -i $i $CRD_FILE | awk '{ print $3,$4,$5}'`
     ## flh=`/home/bpe/car2ell.py $xyz`
-    flh=`echo $xyz | /home/bpe2/unix-geo-tools/bin/xyz2flh -ud`
-    line1=`grep $i $LOGFILE`
-    echo "$iter $line1 EST $flh"
+    flh=`echo $xyz | xyz2flh -ud | awk '{print $6,$7,$8}'`
+#    line1=`grep $i $LOGFILE`
+    diffs=`grep $i  $testxs| awk '{print $3,$4,$5,$6,$7,$8, "EST"}'`
+    echo $iter $i $diffs $flh
     let ITERATOR=ITERATOR+1
-# else
-#   echo "## WARNING : Station $i not found in crd file!"
+ else
+   echo "## WARNING : Station $i not found in crd file!"
   fi
 done
+
+
+
+
+
+
 
 ## REMOVE LOGFILE
 rm $LOGFILE
@@ -310,10 +347,10 @@ ARRAY2=$(awk '{ printf "%4s ", $2 }' $LOGFILE)
 for i in ${ARRAY1[*]}; do
   grep -i $i $CRD_FILE &>/dev/null
   if [ "$?" -eq 0 ]; then
-    xyz=`grep -i $i $CRD_FILE | awk '{ print $3,$4,$5}'`
-    flh=`echo $xyz | /home/bpe2/unix-geo-tools/bin/xyz2flh -ud | awk '{print $1,$2}'`
+    xyz=`grep -i $i $CRD_FILE | awk '{ print $3,$4,$5 }'`
+    flh=`echo $xyz | xyz2flh -ud | awk '{ print $6,$7 }'`
     line1=`grep $i $LOGFILE`
-    echo "$i -> $flh" >> .tmp1
+    echo $flh >> .tmp1
   else
     echo "## WARNING(1) : Station $i not found in crd file!"
   fi
@@ -322,15 +359,15 @@ done
 for i in ${ARRAY2[*]}; do
         grep -i $i $CRD_FILE &>/dev/null
         if [ "$?" -eq 0 ]; then
-                xyz=`grep -i $i $CRD_FILE | awk '{ print $3,$4,$5}'`
-                flh=`echo $xyz | /home/bpe2/unix-geo-tools/bin/xyz2flh -ud | awk '{print $1,$2}'`
+                xyz=`grep -i $i $CRD_FILE | awk '{ print $3,$4,$5 }'`
+                flh=`echo $xyz | xyz2flh -ud | awk '{ print $6,$7 }'`
                 line1=`grep $i $LOGFILE`
-                echo "$i -> $flh" >> .tmp2
+                echo $flh >> .tmp2
         else
                 echo "## WARNING(2) : Station $i not found in crd file!"
         fi
 done
-paste .tmp1 .tmp2 $LOGFILE | awk '{print "BL",$3,$4,$7,$8,$11,"W/N"}'
+paste .tmp1 .tmp2 $LOGFILE | awk '{print "BL",$1,$2,$3,$4,$7,"W/N"}'
 
 >.tmp1
 >.tmp2
@@ -342,9 +379,9 @@ for i in ${ARRAY1[*]}; do
         grep -i $i $CRD_FILE &>/dev/null
         if [ "$?" -eq 0 ]; then
                 xyz=`grep -i $i $CRD_FILE | awk '{ print $3,$4,$5}'`
-                flh=`echo $xyz | /home/bpe2/unix-geo-tools/bin/xyz2flh -ud | awk '{print $1,$2}'`
+                flh=`echo $xyz | xyz2flh -ud | awk '{print $6,$7}'`
                 line1=`grep $i $LOGFILE`
-                echo "$i -> $flh" >> .tmp1
+                echo $flh >> .tmp1
         else
                 echo "## WARNING(1) : Station $i not found in crd file!"
         fi
@@ -354,14 +391,14 @@ for i in ${ARRAY2[*]}; do
         grep -i $i $CRD_FILE &>/dev/null
         if [ "$?" -eq 0 ]; then
                 xyz=`grep -i $i $CRD_FILE | awk '{ print $3,$4,$5}'`
-                flh=`echo $xyz | /home/bpe2/unix-geo-tools/bin/xyz2flh -ud | awk '{print $1,$2}'`
+                flh=`echo $xyz | xyz2flh -ud | awk '{print $6,$7}'`
                 line1=`grep $i $LOGFILE`
-                echo "$i -> $flh" >> .tmp2
+                echo $flh >> .tmp2
         else
                 echo "## WARNING(2) : Station $i not found in crd file!"
         fi
 done
-paste .tmp1 .tmp2 $LOGFILE | awk '{print "BL",$3,$4,$7,$8,$11,"QIF"}'
+paste .tmp1 .tmp2 $LOGFILE | awk '{print "BL",$1,$2,$3,$4,$7,"QIF"}'
 
 >.tmp1
 >.tmp2
@@ -373,9 +410,9 @@ for i in ${ARRAY1[*]}; do
         grep -i $i $CRD_FILE &>/dev/null
         if [ "$?" -eq 0 ]; then
                 xyz=`grep -i $i $CRD_FILE | awk '{ print $3,$4,$5}'`
-                flh=`echo $xyz | /home/bpe2/unix-geo-tools/bin/xyz2flh -ud | awk '{print $1,$2}'`
+                flh=`echo $xyz | xyz2flh -ud | awk '{print $6,$7}'`
                 line1=`grep $i $LOGFILE`
-                echo "$i -> $flh" >> .tmp1
+                echo $flh >> .tmp1
         else
                 echo "## WARNING(1) : Station $i not found in crd file!"
         fi
@@ -385,14 +422,14 @@ for i in ${ARRAY2[*]}; do
         grep -i $i $CRD_FILE &>/dev/null
         if [ "$?" -eq 0 ]; then
                 xyz=`grep -i $i $CRD_FILE | awk '{ print $3,$4,$5}'`
-                flh=`echo $xyz | /home/bpe2/unix-geo-tools/bin/xyz2flh -ud | awk '{print $1,$2}'`
+                flh=`echo $xyz | xyz2flh -ud | awk '{print $6,$7}'`
                 line1=`grep $i $LOGFILE`
-                echo "$i -> $flh" >> .tmp2
+                echo $flh >> .tmp2
         else
                 echo "## WARNING(2) : Station $i not found in crd file!"
         fi
 done
-paste .tmp1 .tmp2 $LOGFILE | awk '{print "BL",$3,$4,$7,$8,$11,"L12"}'
+paste .tmp1 .tmp2 $LOGFILE | awk '{print "BL",$1,$2,$3,$4,$7,"L12"}'
 
 ## Check the iterator to see how many baselines we translated
 if [ $ITERATOR -ne $NR_OF_BASELINES ]; then
@@ -402,8 +439,8 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 ## REMOVE LOGFILE AND TEMPORARIES
 # //////////////////////////////////////////////////////////////////////////////
-rm $LOGFILE
-rm .tmp1 .tmp2 .tcrd
+#rm $LOGFILE
+#rm .tmp1 .tmp2 .tcrd
 
 ## SECESSEFUL EXIT
 exit 0

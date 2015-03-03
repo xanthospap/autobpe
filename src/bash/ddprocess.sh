@@ -1219,9 +1219,14 @@ for i in ATM/${SOL_ID}${YR2}${DOY}0.TRO \
     echo "ERROR! Failed to locate file ${P}/${CAMPAIGN^^}/${i}"
     exit 1
   else
-    cp ${P}/${CAMPAIGN}/${i} ${SAVE_DIR}/${i#*/}
-    compress -f ${SAVE_DIR}/${i#*/}
-  echo "<listitem><para>Saved file <filename>${i}</filename> to <filename>${SAVE_DIR}/${i#*/}.Z</filename></para></listitem>" >> ${tmpd}/saved.files
+    sfn=${i#*/}
+    if test "${sfn}" == "AMB${YR2}${DOY}0.SUM"
+    then
+      sfn=${SOL_ID}${YR2}${DOY}0.SUM
+    fi
+    cp ${P}/${CAMPAIGN}/${i} ${SAVE_DIR}/${sfn}
+    compress -f ${SAVE_DIR}/${sfn}
+  echo "<listitem><para>Saved file <filename>${i}</filename> to <filename>${SAVE_DIR}/${sfn}.Z</filename></para></listitem>" >> ${tmpd}/saved.files
   fi
 done
 
@@ -1308,14 +1313,14 @@ STOP_PROCESS_SECONDS=$(date +"%s")
 if test "${XML_OUT}" == "YES"
 then
 ## TODO check that the script /usr/local/bin/plot-amb-sum is available
-/usr/local/bin/plot-amb-sum ${P}/${CAMPAIGN^^}/OUT/AMB${YR2}${DOY}0.SUM ${tmpd}/${CAMPAIGN,,}${YEAR}${DOY}-amb.ps
+/home/bpe2/gmt-src/plot-amb-sum.sh ${P}/${CAMPAIGN^^}/OUT/AMB${YR2}${DOY}0.SUM ${tmpd}/${CAMPAIGN,,}${YEAR}${DOY}-amb.ps
 
 echo "MAKING XML"
 mkdir -p ${tmpd}/xml/figures
 
 ## conver ps to png (ambiguity plot)
 amb_png=${tmpd}/xml/figures/ambiguity.png
-ps2raster ${tmpd}/${CAMPAIGN,,}${YEAR}${DOY}-amb.ps -Tg -P
+/usr/lib/gmt/bin/ps2raster ${tmpd}/${CAMPAIGN,,}${YEAR}${DOY}-amb.ps -Tg -P
 mv ${tmpd}/${CAMPAIGN,,}${YEAR}${DOY}-amb.png ${amb_png}
 
 #cp ${XML_TEMPLATES}/*.xml ${tmpd}/xml
