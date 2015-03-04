@@ -56,10 +56,10 @@ function help {
   echo "            default is /home/bpe2/data/GPSDATA/CAMPAIGN52/GREECE/STA/IGB08_R.CRD"
   echo "           -c --coordinate-file= coordinate file for all stations"
   echo "            or at least the non-igs ones."
-  echo "           -s --summary-file= specify the processing summary file"
+  echo "           -s --summary-file= specify the ambiguity summary file"
   echo "            This file can be compressed"
-  echo "           -x --xs-diffs= specify a file containing the processed stations"
-  echo "            and the corresponding coordinate differences. (Note 1)"
+  echo "           -o --output-summary= specify the processing summary file"
+  echo "            This file can be compressed"
   echo "           -f --estcrd-file= specify the final, estimated coordinates file"
   echo "            This file is used to check if the stations were fixed or estimated"
   echo "           -h --help display (this) help message and exit"
@@ -103,12 +103,12 @@ getopt -T > /dev/null
 if [ $? -eq 4 ]
 then
   # GNU enhanced getopt is available
-  ARGS=`getopt -o y:d:g:c:s:x:f:vh \
-  -l year:,doy:,igs-file:,coordinate-file:,summary-file:,xs-diffs:,estcrd-file:,help,version \
+  ARGS=`getopt -o y:d:g:c:s:x:f:o:vh \
+  -l year:,doy:,igs-file:,coordinate-file:,summary-file:,xs-diffs:,estcrd-file:,output-summary:,help,version \
   -n 'marksolsta' -- "$@"`
 else
   # Original getopt is available (no long option names, no whitespace, no sorting)
-  ARGS=`getopt y:d:g:c:s:x:f:vh "$@"`
+  ARGS=`getopt y:d:g:c:s:x:f:o:vh "$@"`
 fi
 
 # check for getopt error
@@ -138,11 +138,11 @@ while true ; do
     -s|--summary-file)
       SUM_FILE="${2}"
       shift;;
-    -x|--xs-diffs)
-      DIF_FILE="${2}"
-      shift;;
     -f|--estcrd-file)
       EST_FILE="${2}"
+      shift;;
+    -o|--output-summary)
+      OUT_FILE="${2}"
       shift;;
     -h|--help)
       help
@@ -189,19 +189,6 @@ then
     exit 1
 fi
 
-if test -z "$DIF_FILE"
-then
-    echo "ERROR. Must specify the diffs file"
-    exit 1
-else
-    if ! test -f "$DIF_FILE"
-    then
-        echo "if ! test -f $DIF_FILE"
-        echo "ERROR. Failed to locate diffs file: $DIF_FILE"
-        exit 1
-    fi
-fi
-
 RM_SUM_FILE=NO
 if ! test -f $SUM_FILE
 then
@@ -234,8 +221,51 @@ then
       uncompress -f ${EST_FILE##*/}
       EST_FILE=${EST_FILE##*/}
       EST_FILE=${EST_FILE/.Z/}
+      RM_EST_FILE=YES
     fi
   fi
+fi
+
+RM_OUT_FILE=NO
+if test -z "$OUT_FILE"
+then
+  echo "ERROR. Need to specify output summary file"
+  exit 1
+else
+  if ! test -f "$OUT_FILE"
+  then
+    echo "ERROR. Output summary file: $OUT_FILE does not exist"
+    exit 1
+  else
+    if test ${OUT_FILE:(-2)} == ".Z"
+    then
+      cp $OUT_FILE ${OUT_FILE##*/}
+      uncompress -f ${OUT_FILE##*/}
+      OUT_FILE=${OUT_FILE##*/}
+      OUT_FILE=${OUT_FILE/.Z/}
+      RM_OUT_FILE=YES
+    fi
+  fi
+fi
+
+if ! extractStations --use-all --solution-summary ${OUT_FILE} \
+  --only-report --ellipsoid 1>.essum
+then
+  echo "ERROR. Failed to run script 'extractStations'; Fatal"
+  exit 1
+fi
+DIF_FILE=.essum
+if test -z "$DIF_FILE"
+then
+    echo "ERROR. Must specify the diffs file"
+    exit 1
+else
+    if ! test -f "$DIF_FILE"
+    then
+        echo "if ! test -f $DIF_FILE"
+        echo "ERROR. Failed to locate diffs file: $DIF_FILE"
+        exit 1
+    fi
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -275,7 +305,7 @@ do
         iter=$ITERATOR
         xyz=`grep -i $i $CRD_FILE | awk '{ print $3,$4,$5}'`
         flh=`echo $xyz | xyz2flh -ud | awk '{print $6,$7,$8}'`
-        diffs=`grep $i $DIF_FILE | awk '{print $3,$4,$5,$6,$7,$8, "EST"}'`
+        diffs=`grep $i $DIF_FILE | awk '{print $3,$4,$5,$6,$7,$8,$9,$10,$11," EST"}'`
         iter=$(printf "%02d" $ITERATOR)
         if test "$USE_EST_FILE" == "YES"
         then
@@ -512,12 +542,16 @@ then
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
-## REMOVE LOGFILE AND TEMPORARIES
+# REMOVE LOGFILE AND TEMPORARIES
 # //////////////////////////////////////////////////////////////////////////////
-rm .logf .tmp1 .tmp2 .tcrd 2>/dev/null
+rm .logf .tmp1 .tmp2 .tcrd $DIF_FILE 2>/dev/null
 if test "$RM_SUM_FILE" == "YES"
 then
     rm $SUM_FILE
+fi
+if test "$RM_OUT_FILE" == "YES"
+then
+  rm $OUT_FILE
 fi
 if test "$USE_EST_FILE" == "YES"
 then

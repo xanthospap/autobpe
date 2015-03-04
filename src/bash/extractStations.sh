@@ -51,7 +51,8 @@ function help {
   echo ""
   echo " Usage   : extractStations.sh -y [YEAR] -d [DOY] -c [CAMPAIGN] -t [SOLUTION TYPE]"
   echo ""
-  echo " Switches:"
+  echo " Switches: -a --use-all specify no stations; just use every station found in the"
+  echo "            input file (see -o)"
   echo "           -s --stations specify stations to compare seperated by "
   echo "            whitespace (e.g -s penc pdel ...)"
   echo "           -f --station-file specify station file. File must have one line,"
@@ -65,6 +66,8 @@ function help {
   echo "           -u --ultra-rapid if this switch is specified, then the script will not"
   echo "            update files station].c.cts, [station].g.cts but instead [station].c.ctsR"
   echo "            and [station].g.ctsR"
+  echo "           -e --ellipsoid extract ellipsoid parameter (i.e. semi-major, semi-minor axis and"
+  echo "            angle (these parameters are only shown in the report)"
   echo "           -q --quiet do NOT report missing/unprocessed stations"
   echo "           -h --help print help message and exit"
   echo "           -v --version print version and exit"
@@ -99,6 +102,8 @@ ONLY_REPORT=NO                       ## only report, do not update
 USE_RAPID_FILES=NO                   ## update the rapid files ([station].[c|g].ctsR)
 NUM_OF_STA=0                         ## total number of stations to update
 QUIET=NO                             ## report missing stations
+XTR_ELL=NO                           ## extract ellipsoid parameters
+USE_ALL_STATIONS=NO                  ## no stations provided; use all existing in file
 
 # //////////////////////////////////////////////////////////////////////////////
 # GET COMMAND LINE ARGUMENTS
@@ -145,8 +150,14 @@ do
     -u|--ultra-rapid)
       USE_RAPID_FILES=YES
       shift;;
+    -e|--ellipsoid)
+      XTR_ELL=YES
+      shift;;
     -q|--quiet)
       QUIET=YES
+      shift;;
+    -a|--use-all)
+      USE_ALL_STATIONS=YES
       shift;;
     *)
       echo "Ignoring cmd: $1"
@@ -187,16 +198,26 @@ if [ "$STATION_FILE" != "0" ]; then
     echo "***(extractStations) File ${STATION_FILE} does not exist!"
   fi
 fi
-NUM_OF_STA=${#STATIONS[@]}
-if [ "$NUM_OF_STA" -eq 0 ]; then
-  #echo "No stations to update"
-  exit 0
+
+# //////////////////////////////////////////////////////////////////////////////
+# IF PROCESS ALL STATIONS FOUND IN FILE
+# //////////////////////////////////////////////////////////////////////////////$
+if test "$USE_ALL_STATIONS" == "YES"
+then
+    ARRAY=$(sed -n '/num  Station name     obs e\/f\/h        X (m)           Y (m)           Z (m)        Latitude       Longitude    Height (m)/,/^$/p' FFG150600.OUT | tail -n +3 | awk '{print $2}')
+    STATIONS=()
+    STATIONS=$ARRAY
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
 # PRE_SET STATUS
 # //////////////////////////////////////////////////////////////////////////////
 STATUS=0
+NUM_OF_STA=${#STATIONS[@]}
+if [ "$NUM_OF_STA" -eq 0 ]; then
+  #echo "No stations to update"
+  exit 0
+fi
 
 # //////////////////////////////////////////////////////////////////////////////
 # EXTRACT REFERENCE DATE FROM THE OUTPUT SUMMARY FILE
@@ -283,6 +304,9 @@ for j in ${STATIONS[*]}; do
     ecrd=`cat .tmp | sed -n '7p' | awk '{printf "%+09.5f\n",$3}'`
     erms=`cat .tmp | sed -n '7p' | awk '{printf "%+09.5f\n",$5}'`
     ecor=`cat .tmp | sed -n '7p' | awk '{printf "%+09.5f\n",$4}'`
+    smax=`cat .tmp | sed -n '6p' | awk '{printf "%+10.6f\n",$8}'`
+    smix=`cat .tmp | sed -n '7p' | awk '{printf "%+10.6f\n",$8}'`
+    sazi=`cat .tmp | sed -n '6p' | awk '{printf "%+07.2f\n",$9}'`
     if [ "$ONLY_REPORT" == "NO" ]; then            ## Update station files
       for i in $CRD_C_FILE $CRD_G_FILE $UPD_FILE; do
         if [ ! -f "${i}" ]; then
@@ -297,7 +321,12 @@ for j in ${STATIONS[*]}; do
       echo "$DATE_STAMP" > $UPD_FILE
       let COUNTER=COUNTER+1
     fi
-    echo "$j diff: $xcor $ycor $zcor $ncor $ecor $ucor"
+    if test "$XTR_ELL" == "YES"
+    then
+        echo "$j diff: $xcor $ycor $zcor $ncor $ecor $ucor $smax $smix $sazi"
+    else
+        echo "$j diff: $xcor $ycor $zcor $ncor $ecor $ucor"
+    fi
   fi ## if station information block is extracted
 done ## for every station in list
 rm .tmp 2>/dev/null
