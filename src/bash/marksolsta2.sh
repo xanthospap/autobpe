@@ -249,7 +249,7 @@ else
 fi
 
 if ! extractStations --use-all --solution-summary ${OUT_FILE} \
-  --only-report --ellipsoid 1>.essum
+  --only-report --ellipsoid 1>.essum ## 2>/dev/null
 then
   echo "ERROR. Failed to run script 'extractStations'; Fatal"
   exit 1

@@ -43,6 +43,11 @@ function dversion {
   exit 0
 }
 
+function cleanup {
+    rm .tmp.cwl .tmp.cnl .tmp.pwl .tmp.pnl .tmp.qif .tmp.dir \
+      2>/dev/null
+}
+
 # //////////////////////////////////////////////////////////////////////////////
 # WATCHOUT FOR THE -v OPTION
 # //////////////////////////////////////////////////////////////////////////////
@@ -61,36 +66,42 @@ fi
 ## read and write the Code-Based WL
 if ! /usr/local/bin/block_amb_read --summary-file=$AMBFILE --method=cbwl &>.tmp.cwl ; then
   echo "***ERROR! Failed to read Code-Based WL from file : $AMBFILE"
+  cleanup
   exit 254
 fi
 
 ## read and write the Code-Based NL
 if ! /usr/local/bin/block_amb_read --summary-file=$AMBFILE --method=cbnl &>.tmp.cnl ; then
   echo "***ERROR! Failed to read Code-Based NL from file : $AMBFILE"
+  cleanup
   exit 254
 fi
 
 ## read and write the Phase-Based WL
 if ! /usr/local/bin/block_amb_read --summary-file=$AMBFILE --method=pbwl &>.tmp.pwl ; then
   echo "***ERROR! Failed to read Phase-Based WL from file : $AMBFILE"
+  cleanup
   exit 254
 fi
 
 ## read and write the Phase-Based NL
 if ! /usr/local/bin/block_amb_read --summary-file=$AMBFILE --method=pbnl &>.tmp.pnl ; then
   echo "***ERROR! Failed to read Phase-Based NL from file : $AMBFILE"
+  cleanup
   exit 254
 fi
 
 ## read and write the QIF
 if ! /usr/local/bin/block_amb_read --summary-file=$AMBFILE --method=qif &>.tmp.qif ; then
   echo "***ERROR! Failed to read QIF from file : $AMBFILE"
+  cleanup
   exit 254
 fi
 
 ## read and write the DIRECT
 if ! /usr/local/bin/block_amb_read --summary-file=$AMBFILE --method=dir &>.tmp.dir ; then
   echo "***ERROR! Failed to read DIRECT L1/L2 from file : $AMBFILE"
+  cleanup
   exit 254
 fi
 
@@ -106,11 +117,13 @@ NO_DIR=`cat .tmp.dir | grep "<!-- ## Number of baselines" | awk '{print $7}'`
 
 if test ${NO_CWL} -ne ${NO_CNL} ; then
   echo "***ERROR! Code-Based ambiguites unequal"
+  cleanup
   exit 254
 fi
 
 if test ${NO_PWL} -ne ${NO_PNL} ; then
   echo "***ERROR! Phase-Based ambiguites unequal"
+  cleanup
   exit 254
 fi
 
@@ -234,5 +247,5 @@ echo "<!-- TABLE DONE -->"
 # //////////////////////////////////////////////////////////////////////////////
 # REMOVE TEMPORARY FILE AND EXIT
 # //////////////////////////////////////////////////////////////////////////////
-rm .tmp .tmp.??? 2>/dev/null
+cleanup
 exit 0

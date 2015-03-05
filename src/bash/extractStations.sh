@@ -204,7 +204,7 @@ fi
 # //////////////////////////////////////////////////////////////////////////////$
 if test "$USE_ALL_STATIONS" == "YES"
 then
-    ARRAY=$(sed -n '/num  Station name     obs e\/f\/h        X (m)           Y (m)           Z (m)        Latitude       Longitude    Height (m)/,/^$/p' FFG150600.OUT | tail -n +3 | awk '{print $2}')
+    ARRAY=$(sed -n '/num  Station name     obs e\/f\/h        X (m)           Y (m)           Z (m)        Latitude       Longitude    Height (m)/,/^$/p' ${OUTPUT_FILE} | tail -n +3 | awk '{print $2}')
     STATIONS=()
     STATIONS=$ARRAY
 fi
