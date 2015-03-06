@@ -262,6 +262,12 @@ then
         fi
     done
 fi
+if ! test -s ${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-cf2sky.ps
+then
+  echo "[WARNING] Plot file ${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-cf2sky.ps has zero size"
+  echo "[WARNING] Deleting plot file"
+  rm ${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-cf2sky.ps
+fi
 
 brdc=brdc${YESTERDAY[3]}0.${YESTERDAY[0]:2:2}n
 wget -q -O ${POOL}/${brdc}.Z ftp://cddis.gsfc.nasa.gov/gnss/data/daily/${YESTERDAY[0]}/${YESTERDAY[3]}/${YESTERDAY[0]:2:2}n/${brdc}.Z
@@ -280,9 +286,9 @@ then
         sta=${TRNX:0:4}
         if ! test -f /home/bpe2/tmp/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps
         then
-          /usr/local/bin/teqc +qc $rnx &>${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-qc
+          /usr/local/bin/teqc +qc $rnx &>${TMP}/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-qc
           /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} -o /home/bpe2/tmp &>>${LOG}
-          rnx_ne=${rnx/${M20DAYS[0]:2:2}o/}
+          rnx_ne=${rnx/${YESTERDAY[0]:2:2}o/}
           for k in iod ion mp1 mp2 sn1 sn2
           do
             mv ${rnx_ne}.${k} ${TMP} 2>/dev/null
@@ -290,4 +296,10 @@ then
           mv ${rnx/%o/S} ${TMP} 2>/dev/null
         fi
     done
+fi
+if ! test -s ${TMP}/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps
+then
+  echo "[WARNING] Plot file ${TMP}/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps has zero size"
+  echo "[WARNING] Deleting plot file"
+  rm ${TMP}/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps
 fi

@@ -1307,7 +1307,7 @@ fi
 STOP_PROCESS_SECONDS=$(date +"%s")
 
 # //////////////////////////////////////////////////////////////////////////////
-# MAKE XML SUMMARY
+# MAKE XML SUMMARY (DOCBOOK)
 # //////////////////////////////////////////////////////////////////////////////
 
 if test "${XML_OUT}" == "YES"
@@ -1449,6 +1449,14 @@ done
   ${DOM} \
   ${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD \
   1>/${tmpd}/rnx.xml
+
+/home/bpe2/utl/plotsolsta.sh ${YEAR} ${DOY} \
+  ${P}/${CAMPAIGN}/OUT/${SOL_ID}${YR2}${DOY}0.SUM \
+  ${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD \
+  ${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.OUT \
+  ${CAMPAIGN} \
+  ${SOL_TYPE} \
+  ${tmpd}
 
 eval "echo \"$(< ${XML_TEMPLATES}/procsum-main.xml)\"" > ${tmpd}/xml/main.xml
 eval "echo \"$(< ${XML_TEMPLATES}/procsum-info.xml)\"" > ${tmpd}/xml/info.xml
