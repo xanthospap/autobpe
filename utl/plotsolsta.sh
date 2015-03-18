@@ -36,7 +36,7 @@ else
   solt=urapid
 fi
 
-if ! marksolsta2.sh \
+marksolsta2 \
   -y $YEAR \
   -d $DOY \
   -c /home/bpe2/tables/crd/GREECE.CRD \

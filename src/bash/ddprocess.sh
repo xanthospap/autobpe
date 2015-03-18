@@ -1450,7 +1450,7 @@ done
   ${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD \
   1>/${tmpd}/rnx.xml
 
-/home/bpe2/utl/plotsolsta.sh ${YEAR} ${DOY} \
+/home/bpe2/src/autobpe/utl/plotsolsta.sh ${YEAR} ${DOY} \
   ${P}/${CAMPAIGN}/OUT/${SOL_ID}${YR2}${DOY}0.SUM \
   ${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD \
   ${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.OUT \
