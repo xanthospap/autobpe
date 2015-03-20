@@ -89,6 +89,7 @@ function help {
   echo "           --force-remove-previous remove any files from the specified save directory (-r --save-dir=)"
   echo "            prior to start of processing."
   echo "           --debug set debugging mode"
+  echo "           --add-suffix= add a suffix (e.g. _GPS) to saved products of the processing"
   echo "           -h --help display (this) help message and exit"
   echo "           -v --version dsiplay version and exit"
   echo ""
@@ -213,6 +214,7 @@ SAVE_DIR=                ## where to save this solution
 FORCE_REMOVE_PREV=NO     ## Remove previous solution files from save directory
 XML_OUT=NO               ## xml output
 XML_SENTENCE="<command>$NAME" ## the command issued as xml
+SUFFIX=                  ## suffix for saved products
 
 ## Variables that are set during the script ##
 GPSW=
@@ -245,7 +247,7 @@ getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   ## GNU enhanced getopt is available
   ARGS=`getopt -o hvc:b:a:i:p:s:e:y:d:l:t:f:m:u:r:x \
-  -l  help,version,campaign:,bernese-loadvar:,analysis-center:,solution-id:,pcv-file:,satellite-system:,elevation-angle:,year:,doy:,stations-per-cluster:,solution-type:,ion-products:,debug,calibration-model:,update:,save-dir:,xml-output,force-remove-previous \
+  -l  help,version,campaign:,bernese-loadvar:,analysis-center:,solution-id:,pcv-file:,satellite-system:,elevation-angle:,year:,doy:,stations-per-cluster:,solution-type:,ion-products:,debug,calibration-model:,update:,save-dir:,xml-output,force-remove-previous,add-suffix: \
   -n 'ddprocess' -- "$@"`
 else
   ## Original getopt is available (no long option names, no whitespace, no sorting)
@@ -261,6 +263,10 @@ while true ; do
     --debug)
       XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       DEBUG=YES;;
+    --add-suffix)
+      SUFFIX="$2"
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg> <replaceable>${2}</replaceable></arg>"
+      shift ;;
     -f|--ion-products)
       XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       ION_STRING="$2"; shift;;
@@ -664,7 +670,7 @@ else
     then
       ORB_META=${DATAPOOL}/${SP3}.meta
       echo "Linked orbit file ${DATAPOOL}/${SP3} to \
-        ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^}" >> $LOGFILE$
+        ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^}" >> $LOGFILE
       echo "Meta-file : $ORB_META" >> $LOGFILE
     else
       echo "*** Failed to link orbit file ${DATAPOOL}/${SP3}"
@@ -933,11 +939,19 @@ for i in ${STATIONS[@]}; do
   if test -f ${DATAPOOL}/${rinex_file}; then
     cp -f ${DATAPOOL}/${rinex_file} ${P}/${CAMPAIGN}/RAW/${rinex_file^^}
     RINEX_AV+=(${rinex_file})
-    if /bin/egrep "${i}" ${TABLES}/crd/${CAMPAIGN,,}.igs &>/dev/null; then AVIGS+=($i); fi
-    if /bin/egrep "${i}" ${TABLES}/crd/${CAMPAIGN,,}.epn &>/dev/null; then AVEPN+=($i); fi
-    if /bin/egrep "${i}" ${TABLES}/crd/${CAMPAIGN,,}.reg &>/dev/null; then AVREG+=($i); fi
+    if /bin/egrep -i "${i}" ${TABLES}/crd/${CAMPAIGN,,}.igs &>/dev/null; then AVIGS+=($i); fi
+    if /bin/egrep -i "${i}" ${TABLES}/crd/${CAMPAIGN,,}.epn &>/dev/null; then AVEPN+=($i); fi
+    if /bin/egrep -i "${i}" ${TABLES}/crd/${CAMPAIGN,,}.reg &>/dev/null; then AVREG+=($i); fi
   else
-    RINEX_MS+=(${rinex_file})
+    if test -f ${DATAPOOL}/${rinex_file^^}; then
+        cp -f ${DATAPOOL}/${rinex_file^^} ${P}/${CAMPAIGN}/RAW/${rinex_file^^}
+        RINEX_AV+=(${rinex_file^^})
+        if /bin/egrep -i "${i}" ${TABLES}/crd/${CAMPAIGN,,}.igs &>/dev/null; then AVIGS+=($i); fi
+        if /bin/egrep -i "${i}" ${TABLES}/crd/${CAMPAIGN,,}.epn &>/dev/null; then AVEPN+=($i); fi
+        if /bin/egrep -i "${i}" ${TABLES}/crd/${CAMPAIGN,,}.reg &>/dev/null; then AVREG+=($i); fi
+      else
+        RINEX_MS+=(${rinex_file})
+      fi
   fi
 done
 
@@ -994,7 +1008,8 @@ for i in "${RINEX_AV[@]}"; do echo ${i:0:4} >> ${tmpd}/.tmp; done
   --abbreviation-file=${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.ABB \
   --stations-per-cluster=${STA_PER_CLU} \
   --station-file=${tmpd}/.tmp \
-  1>${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.CLU
+  1>${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.CLU \
+  2>>$LOGFILE
 if test $? -ne 0 ; then
   echo "Failed to create the cluster file"
   exit 1
@@ -1219,10 +1234,14 @@ for i in ATM/${SOL_ID}${YR2}${DOY}0.TRO \
     echo "ERROR! Failed to locate file ${P}/${CAMPAIGN^^}/${i}"
     exit 1
   else
-    sfn=${i#*/}
+    sfn=${i##*/}
     if test "${sfn}" == "AMB${YR2}${DOY}0.SUM"
     then
-      sfn=${SOL_ID}${YR2}${DOY}0.SUM
+      sfn=${SOL_ID}${YR2}${DOY}0${SUFFIX}.SUM
+    else
+        EXTNS="${sfn##*.}"
+        BSNM="${sfn%%.*}"
+        sfn=${BSNM}${SUFFIX}.${EXTNS}
     fi
     cp ${P}/${CAMPAIGN}/${i} ${SAVE_DIR}/${sfn}
     compress -f ${SAVE_DIR}/${sfn}

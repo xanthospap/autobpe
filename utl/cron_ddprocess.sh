@@ -18,7 +18,7 @@ fi
   --doy="${YESTERDAY[3]}" \
   --elevation-angle=7 \
   --ion-products=FFG,FRG \
-  --solution-id=FFG \
+  --solution-id=UFG \
   --stations-per-cluster=4 \
   --calibration-model=I08 \
   --pcv-file=PCV_GRE \

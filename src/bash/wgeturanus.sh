@@ -82,6 +82,7 @@ function help {
   echo "           -x --fix-header fix header (MARKER NAME) to match the stations"
   echo "            4-char id"
   echo "           -n --upper-case rename (truncate) all downloaded files to capital letters"
+  echo "           -k --keys specify the ntua.keys file"
   echo "           -q --quiet supress all mesagges"
   echo "           -v --version dsiplay version and exit"
   echo ""
@@ -105,22 +106,11 @@ function help {
 }
 
 # //////////////////////////////////////////////////////////////////////////////
-# NEED FILE ntua.keys
-# //////////////////////////////////////////////////////////////////////////////
-if ! test -f ntua.keys ; then
-  echo "*** ERROR! Cannot find key file ntua.keys"
-  exit 254
-fi
-
-# //////////////////////////////////////////////////////////////////////////////
 # GLOBAL VARIABLES
 # //////////////////////////////////////////////////////////////////////////////
 MAX_URANUS_STA=  ## maximum number of Uranus stations in server
 MAX_2_DWNL=      ## maximum number of uranus stations to download
 URANUS_TBL=uranus.tbl  ## the Uranus table file
-URAURL=`egrep -w ^URAURL.* ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
-usern=`egrep -w ^URAUSR.* ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
-passw=`egrep -w ^URAPAS.* ntua.keys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
 FIX_RNX_NAME=0   ## fix the marker name (in header) to match the one in the tbl file
 YEAR=-1900       ## year
 YR2=00           ## last two digits of year
@@ -140,6 +130,7 @@ PRINT_STATIONS=0 ## print stations and exit
 USE_URA_NAME=0   ## use uranus 4-char id
 TRUNCATE=NO      ## truncate to upper case
 QUIET=NO         ## supress messages
+ntuakeys=ntua.keys
 
 # //////////////////////////////////////////////////////////////////////////////
 # GET COMMAND LINE ARGUMENTS
@@ -224,11 +215,28 @@ do
       TRUNCATE=YES
       shift
       ;;
+    -k|--keys)
+      ntuakeys=${2}
+      shift 2
+      ;;
     -v|--version)
       dversion
       ;;
   esac
 done
+
+
+# //////////////////////////////////////////////////////////////////////////////
+# NEED FILE ntua.keys
+# //////////////////////////////////////////////////////////////////////////////
+if ! test -f ${ntuakeys} ; then
+  echo "*** ERROR! Cannot find key file ntua.keys"
+  exit 254
+fi
+
+URAURL=`egrep -w ^URAURL.* $ntuakeys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
+usern=`egrep -w ^URAUSR.* $ntuakeys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
+passw=`egrep -w ^URAPAS.* $ntuakeys | awk '{print substr($0,20,31)}' | sed 's/[ \t]*$//'`
 
 # //////////////////////////////////////////////////////////////////////////////
 # CHECK THAT TBL FILE EXISTS
