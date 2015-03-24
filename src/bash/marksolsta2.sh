@@ -173,6 +173,8 @@ if test -z "$DOY"
 then
   echo "*** Need to provide a valid doy [1-366]"
   exit 1
+else
+    DOY=`echo $DOY | sed 's/^0*//g'`
 fi
 DOY=$(printf "%03d" $DOY)
 
