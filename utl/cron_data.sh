@@ -93,8 +93,10 @@ YESTERDAY=()
 IFS='-' read -a YESTERDAY <<< "${YESTERDAY_STR}"
 if test ${#YESTERDAY[@]} -ne 5
 then
-  echo "ERROR. FAILED TO RESOLVE YESTERDAY'S DATE"
-  exit 1
+    echo "ERROR. FAILED TO RESOLVE YESTERDAY'S DATE" >> ${LOG}
+    exit 1
+else
+    echo "YESTERDAY IS: $YESTERDAY_STR" >> ${LOG}
 fi
 
 M20DAYS_STR=`/bin/date -d "20 days ago" '+%Y-%m-%d-%j-%w'`
@@ -102,8 +104,10 @@ M20DAYS=()
 IFS='-' read -a M20DAYS <<< "${M20DAYS_STR}"
 if test ${#M20DAYS[@]} -ne 5
 then
-  echo "ERROR. FAILED TO RESOLVE -20 DAYS DATE"
-  exit 1
+    echo "ERROR. FAILED TO RESOLVE -20 DAYS DATE" >> ${LOG}
+    exit 1
+else
+    echo "FINAL (-20 DAYS) $M20DAYS_STR" >> ${LOG}
 fi
 
 ##  Now we have two arrays containing the dates we want as
@@ -113,6 +117,7 @@ fi
 ## ------------------------------------------------------------------
 NTW=greece
 NSG=0
+echo "DOWNLOADING IGS FROM FILE: ${TBL}/crd/${NTW}.igs" >> ${LOG}
 /usr/local/bin/wgetigsrnx --station-file ${TBL}/crd/${NTW}.igs \
                           --year ${YESTERDAY[0]} \
                           --doy ${YESTERDAY[3]} \
@@ -123,11 +128,12 @@ NSG=0
 STATUS=$?
 if test $STATUS -gt 250
 then
-  echo "ERROR DOWNLOADING GREECE IGS STATIONS"
+  echo "ERROR DOWNLOADING GREECE IGS STATIONS" >> ${LOG}
   exit 1
 fi
 NSG=$((NSG + STATUS))
 
+echo "DOWNLOADING EPN FROM FILE: ${TBL}/crd/${NTW}.epn" >> ${LOG}
 /usr/local/bin/wgetepnrnx --station-file ${TBL}/crd/${NTW}.epn \
                           --year ${YESTERDAY[0]} \
                           --doy ${YESTERDAY[3]} \
@@ -138,11 +144,12 @@ NSG=$((NSG + STATUS))
 STATUS=$?
 if test $STATUS -gt 250
 then
-  echo "ERROR DOWNLOADING GREECE EPN STATIONS"
+  echo "ERROR DOWNLOADING GREECE EPN STATIONS" >> ${LOG}
   exit 1
 fi
 NSG=$((NSG + STATUS))
 
+echo "DOWNLOADING REGIONAL FROM FILE: ${TBL}/crd/${NTW}.reg" >> ${LOG}
 /usr/local/bin/wgetregrnx --station-file ${TBL}/crd/${NTW}.reg \
                           --year ${YESTERDAY[0]} \
                           --doy ${YESTERDAY[3]} \
@@ -154,16 +161,38 @@ NSG=$((NSG + STATUS))
 STATUS=$?
 if test $STATUS -gt 250
 then
-  echo "ERROR DOWNLOADING GREECE REG STATIONS"
+  echo "ERROR DOWNLOADING GREECE REG STATIONS" >> ${LOG}
   exit 1
 fi
 NSG=$((NSG + STATUS))
 
-echo "DOWNLOADED $NSG STATIONS FOR NETWOK GREECE FOR YESTERDAY"
+echo "DOWNLOADING REGIONAL FROM FILE: ${TBL}/crd/uranus.reg" >> ${LOG}
+/usr/local/bin/wgeturanus \
+    --table-file /home/bpe2/src/autobpe/src/bash/uranus.tbl \
+    --station-file ${TBL}/crd/uranus.reg \
+    --year ${YESTERDAY[0]} \
+    --doy ${YESTERDAY[3]} \
+    --output-directory ${POOL} \
+    --force-remove \
+    --decompress \
+    --fix-header \
+    -k /home/bpe2/ntua.keys \
+    &>>${LOG}
+STATUS=$?
+if test $STATUS -gt 250
+then
+  echo "ERROR DOWNLOADING URANUS REG STATIONS" >> ${LOG}
+  exit 1
+fi
+NSU=${STATUS}
+
+echo "DOWNLOADED $NSG STATIONS FOR NETWOK GREECE FOR YESTERDAY" >> ${LOG}
+echo "DOWNLOADED $NSU STATIONS FOR NETWOK URANUS FOR YESTERDAY" >> ${LOG}
 
 ##  Download the data for -20 days; do not force remove old data, most
 ##+ should already be here.
 NSG=0
+echo "DOWNLOADING IGS FROM FILE: ${TBL}/crd/${NTW}.igs" >> ${LOG}
 /usr/local/bin/wgetigsrnx --station-file ${TBL}/crd/${NTW}.igs \
                           --year ${M20DAYS[0]} \
                           --doy ${M20DAYS[3]} \
@@ -173,11 +202,12 @@ NSG=0
 STATUS=$?
 if test $STATUS -gt 250
 then
-  echo "ERROR DOWNLOADING GREECE IGS STATIONS"
+  echo "ERROR DOWNLOADING GREECE IGS STATIONS" >> ${LOG}
   exit 1
 fi
 NSG=$((NSG + STATUS))
 
+echo "DOWNLOADING EPN FROM FILE: ${TBL}/crd/${NTW}.epn" >> ${LOG}
 /usr/local/bin/wgetepnrnx --station-file ${TBL}/crd/${NTW}.epn \
                           --year ${M20DAYS[0]} \
                           --doy ${M20DAYS[3]} \
@@ -187,11 +217,12 @@ NSG=$((NSG + STATUS))
 STATUS=$?
 if test $STATUS -gt 250
 then
-  echo "ERROR DOWNLOADING GREECE EPN STATIONS"
+  echo "ERROR DOWNLOADING GREECE EPN STATIONS" >> ${LOG}
   exit 1
 fi
 NSG=$((NSG + STATUS))
 
+echo "DOWNLOADING REGIONAL FROM FILE: ${TBL}/crd/${NTW}.reg" >> ${LOG}
 /usr/local/bin/wgetregrnx --station-file ${TBL}/crd/${NTW}.reg \
                           --year ${M20DAYS[0]} \
                           --doy ${M20DAYS[3]} \
@@ -202,20 +233,43 @@ NSG=$((NSG + STATUS))
 STATUS=$?
 if test $STATUS -gt 250
 then
-  echo "ERROR DOWNLOADING GREECE REG STATIONS"
+  echo "ERROR DOWNLOADING GREECE REG STATIONS" >> ${LOG}
   exit 1
 fi
 NSG=$((NSG + STATUS))
 
-echo "DOWNLOADED $NSG STATIONS FOR NETWOK GREECE FOR FINAL"
+echo "DOWNLOADING REGIONAL FROM FILE: ${TBL}/crd/uranus.reg" >> ${LOG}
+/usr/local/bin/wgeturanus \
+    --table-file /home/bpe2/src/autobpe/src/bash/uranus.tbl \
+    --station-file ${TBL}/crd/uranus.reg \
+    --year ${M20DAYS[0]} \
+    --doy ${M20DAYS[3]} \
+    --output-directory ${POOL} \
+    --force-remove \
+    --decompress \
+    --fix-header \
+    -k /home/bpe2/ntua.keys \
+    &>>${LOG}
+STATUS=$?
+if test $STATUS -gt 250
+then
+  echo "ERROR DOWNLOADING URANUS REG STATIONS" >> ${LOG}
+  exit 1
+fi
+NSU=${STATUS}
+
+echo "DOWNLOADED $NSG STATIONS FOR NETWOK GREECE FOR FINAL" >> ${LOG}
+echo "DOWNLOADED $NSU STATIONS FOR NETWOK URANUS FOR FINAL" >> ${LOG}
 
 ## DECOMPRESS THE RINEX : HATANAKA -> PLAIN RINEX
+echo "DECOMPRESSING HATANAKA RINEX" >> ${LOG}
 for crx in ${POOL}/????${M20DAYS[3]}0.${M20DAYS[0]:2:2}d
 do
   /usr/local/bin/crx2rnx $crx 2>/dev/null
   if test $? -eq 0
   then
     rm $crx
+    echo "Transformed $crx" >> ${LOG}
   else
     echo "Failed to decompress (Hatanaka) rinex $crx" >> ${LOG}
   fi
@@ -227,6 +281,7 @@ do
   if test $? -eq 0
   then
     rm $crx
+    echo "Transformed $crx" >> ${LOG}
   else
     echo "Failed to decompress (Hatanaka) rinex $crx" >> ${LOG}
   fi
@@ -238,8 +293,10 @@ brdc=brdc${M20DAYS[3]}0.${M20DAYS[0]:2:2}n
 wget -q -O ${POOL}/${brdc}.Z ftp://cddis.gsfc.nasa.gov/gnss/data/daily/${M20DAYS[0]}/${M20DAYS[3]}/${M20DAYS[0]:2:2}n/${brdc}.Z
 if test $? -ne 0
 then
-  brdc=NO
-  echo "Failed to get brdc file ftp://cddis.gsfc.nasa.gov/gnss/data/daily/${M20DAYS[0]}/${M20DAYS[3]}/${M20DAYS[0]:2:2}n/${brdc}.Z" >> ${LOG}
+    brdc=NO
+    echo "Failed to get brdc file ftp://cddis.gsfc.nasa.gov/gnss/data/daily/${M20DAYS[0]}/${M20DAYS[3]}/${M20DAYS[0]:2:2}n/${brdc}.Z" >> ${LOG}
+else
+    echo "Downloaded Broadcast orbit file $brdc" >> ${LOG}
 fi
 
 if test "${brdc}" != "NO"
@@ -251,21 +308,30 @@ then
         sta=${TRNX:0:4}
         if ! test -f /home/bpe2/tmp/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-cf2sky.ps
         then
-          /usr/local/bin/teqc +qc $rnx &>${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-qc
-          /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} -o /home/bpe2/tmp &>>${LOG}
-          rnx_ne=${rnx/${M20DAYS[0]:2:2}o/}
-          for k in iod ion mp1 mp2 sn1 sn2
-          do
-            mv ${rnx_ne}.${k} ${TMP} 2>/dev/null
-          done
-          mv ${rnx/%o/S} ${TMP} 2>/dev/null
+            echo "Compiling Skyplot for rinex $rnx" >> ${LOG}
+            
+            /usr/local/bin/teqc +qc $rnx \
+                &>${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-qc
+            
+            if ! /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 \
+                -x ${rnx} -o /home/bpe2/tmp &>>${LOG}
+            then
+                echo "Failed to make skyplot for station: $sta"
+            fi
+            
+            rnx_ne=${rnx/${M20DAYS[0]:2:2}o/}
+            for k in iod ion mp1 mp2 sn1 sn2
+            do
+                mv ${rnx_ne}.${k} ${TMP} 2>/dev/null
+            done
+            mv ${rnx/%o/S} ${TMP} 2>/dev/null
         fi
     done
 fi
 if ! test -s ${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-cf2sky.ps
 then
-  echo "[WARNING] Plot file ${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-cf2sky.ps has zero size"
-  echo "[WARNING] Deleting plot file"
+  echo "[WARNING] Plot file ${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-cf2sky.ps has zero size" >> ${LOG}
+  echo "[WARNING] Deleting plot file" >> ${LOG}
   rm ${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-cf2sky.ps
 fi
 
@@ -273,8 +339,10 @@ brdc=brdc${YESTERDAY[3]}0.${YESTERDAY[0]:2:2}n
 wget -q -O ${POOL}/${brdc}.Z ftp://cddis.gsfc.nasa.gov/gnss/data/daily/${YESTERDAY[0]}/${YESTERDAY[3]}/${YESTERDAY[0]:2:2}n/${brdc}.Z
 if test $? -ne 0
 then
-  brdc=NO
-  echo "Failed to get brdc file ftp://cddis.gsfc.nasa.gov/gnss/data/daily/${YESTERDAY[0]}/${YESTERDAY[3]}/${YESTERDAY[0]:2:2}n/${brdc}.Z" >> ${LOG}
+    brdc=NO
+    echo "Failed to get brdc file ftp://cddis.gsfc.nasa.gov/gnss/data/daily/${YESTERDAY[0]}/${YESTERDAY[3]}/${YESTERDAY[0]:2:2}n/${brdc}.Z" >> ${LOG}
+else
+    echo "Downloaded Broadcast orbit file $brdc" >> ${LOG}
 fi
 
 if test "${brdc}" != "NO"
@@ -286,20 +354,29 @@ then
         sta=${TRNX:0:4}
         if ! test -f /home/bpe2/tmp/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps
         then
-          /usr/local/bin/teqc +qc $rnx &>${TMP}/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-qc
-          /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} -o /home/bpe2/tmp &>>${LOG}
-          rnx_ne=${rnx/${YESTERDAY[0]:2:2}o/}
-          for k in iod ion mp1 mp2 sn1 sn2
-          do
-            mv ${rnx_ne}.${k} ${TMP} 2>/dev/null
-          done
-          mv ${rnx/%o/S} ${TMP} 2>/dev/null
+            echo "Compiling Skyplot for rinex $rnx" >> ${LOG}
+            
+            /usr/local/bin/teqc +qc $rnx \
+                &>${TMP}/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-qc
+            
+            if ! /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} \
+                -o /home/bpe2/tmp &>>${LOG}
+            then
+                echo "Failed to make skyplot for station: $sta"
+            fi
+            
+            rnx_ne=${rnx/${YESTERDAY[0]:2:2}o/}
+            for k in iod ion mp1 mp2 sn1 sn2
+            do
+                mv ${rnx_ne}.${k} ${TMP} 2>/dev/null
+            done
+            mv ${rnx/%o/S} ${TMP} 2>/dev/null
         fi
     done
 fi
 if ! test -s ${TMP}/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps
 then
-  echo "[WARNING] Plot file ${TMP}/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps has zero size"
-  echo "[WARNING] Deleting plot file"
+  echo "[WARNING] Plot file ${TMP}/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps has zero size" >> ${LOG}
+  echo "[WARNING] Deleting plot file" >> ${LOG}
   rm ${TMP}/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps
 fi

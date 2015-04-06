@@ -37,6 +37,11 @@ function dversion {
   exit 0
 }
 
+function echoerr
+{
+    echo "$@" 1>&2
+}
+
 # //////////////////////////////////////////////////////////////////////////////
 # HELP FUNCTION
 # //////////////////////////////////////////////////////////////////////////////
@@ -114,7 +119,7 @@ fi
 # check for getopt error
 if [ $? -ne 0 ]
 then 
-    echo "getopt error code : $status ;Terminating..." >&2
+    echoerr "getopt error code : $status ;Terminating..." >&2
     exit 1
 fi
 
@@ -154,7 +159,7 @@ while true ; do
       shift
       break;;
      *) 
-      echo "*** Invalid argument $1 ; fatal" ; exit 254 ;;
+      echoerr "*** Invalid argument $1 ; fatal" ; exit 254 ;;
   esac
   shift 
 done
@@ -164,14 +169,14 @@ done
 # //////////////////////////////////////////////////////////////////////////////
 if test -z "$YEAR"
 then
-  echo "*** Need to provide a valid year [1950-2015]"
+  echoerr "*** Need to provide a valid year [1950-2015]"
   exit 1
 fi
 YR2=${YEAR:2:2}
 
 if test -z "$DOY"
 then
-  echo "*** Need to provide a valid doy [1-366]"
+  echoerr "*** Need to provide a valid doy [1-366]"
   exit 1
 else
     DOY=`echo $DOY | sed 's/^0*//g'`
@@ -181,20 +186,20 @@ DOY=$(printf "%03d" $DOY)
 IGS_FILE=${IGS_FILE:-/home/bpe2/data/GPSDATA/CAMPAIGN52/GREECE/STA/IGB08_R.CRD}
 if ! test -f $IGS_FILE
 then
-    echo "ERROR. Failed to locate igs coordinate file: $IGS_FILE"
+    echoerr "ERROR. Failed to locate igs coordinate file: $IGS_FILE"
     exit 1
 fi
 
 if ! test -f $CRD_FILE
 then
-    echo "ERROR. Failed to locate coordinate file: $CRD_FILE"
+    echoerr "ERROR. Failed to locate coordinate file: $CRD_FILE"
     exit 1
 fi
 
 RM_SUM_FILE=NO
 if ! test -f $SUM_FILE
 then
-    echo "ERROR. Failed to locate summary file: $SUM_FILE"
+    echoerr "ERROR. Failed to locate summary file: $SUM_FILE"
     exit 1
 fi
 if test ${SUM_FILE:(-2)} == ".Z"
@@ -207,12 +212,12 @@ then
 fi
 
 USE_EST_FILE=NO
-RM_EST_FILE=YES
+RM_EST_FILE=NO
 if ! test -z "$EST_FILE"
 then
   if ! test -f "$EST_FILE"
   then
-    echo "ERROR. Cannot locate estimated coordinates file $EST_FILE"
+    echoerr "ERROR. Cannot locate estimated coordinates file $EST_FILE"
     exit 1
   else
     echo "## Using file $EST_FILE for crd flags"
@@ -231,12 +236,12 @@ fi
 RM_OUT_FILE=NO
 if test -z "$OUT_FILE"
 then
-  echo "ERROR. Need to specify output summary file"
+  echoerr "ERROR. Need to specify output summary file"
   exit 1
 else
   if ! test -f "$OUT_FILE"
   then
-    echo "ERROR. Output summary file: $OUT_FILE does not exist"
+    echoerr "ERROR. Output summary file: $OUT_FILE does not exist"
     exit 1
   else
     if test ${OUT_FILE:(-2)} == ".Z"
@@ -253,19 +258,19 @@ fi
 if ! extractStations --use-all --solution-summary ${OUT_FILE} \
   --only-report --ellipsoid 1>.essum ## 2>/dev/null
 then
-  echo "ERROR. Failed to run script 'extractStations'; Fatal"
+  echoerr "ERROR. Failed to run script 'extractStations'; Fatal"
   exit 1
 fi
 DIF_FILE=.essum
 if test -z "$DIF_FILE"
 then
-    echo "ERROR. Must specify the diffs file"
+    echoerr "ERROR. Must specify the diffs file"
     exit 1
 else
     if ! test -f "$DIF_FILE"
     then
-        echo "if ! test -f $DIF_FILE"
-        echo "ERROR. Failed to locate diffs file: $DIF_FILE"
+        echoerr "if ! test -f $DIF_FILE"
+        echoerr "ERROR. Failed to locate diffs file: $DIF_FILE"
         exit 1
     fi
 fi
@@ -299,13 +304,14 @@ CRD_FILE=.tcrd
 STATUS=0
 
 ITERATOR=1
-ARRAY=$(awk '{ printf "%4s ",$1 }' $DIF_FILE)
+ARRAY=$(awk '{ if ( length($1)==4 ) {printf "%4s ",$1} }' $DIF_FILE)
 for i in ${ARRAY[@]}
 do
     if grep -i $i $CRD_FILE &>/dev/null
     then
         iter=$ITERATOR
-        xyz=`grep -i $i $CRD_FILE | awk '{ print $3,$4,$5}'`
+        # xyz=`grep -i $i $CRD_FILE | awk '{ print $3,$4,$5}'`
+        xyz=`awk -v pat="${i^^}" '$2 ~ pat {print $3,$4,$5}' $CRD_FILE`
         flh=`echo $xyz | xyz2flh -ud | awk '{print $6,$7,$8}'`
         diffs=`grep $i $DIF_FILE | awk '{print $3,$4,$5,$6,$7,$8,$9,$10,$11," EST"}'`
         iter=$(printf "%02d" $ITERATOR)
@@ -325,7 +331,7 @@ do
         echo $iter $i $diffs $flh
         let ITERATOR=ITERATOR+1
     else
-        echo "## WARNING : Station $i not found in crd file!"
+        echoerr "## WARNING : Station $i not found in crd file ($CRD_FILE)"
         STATUS=2
     fi
 done
@@ -349,8 +355,8 @@ do
   then
     let NR_OF_BASELINES=NR_OF_BASELINES+$MORE
   else
-    echo "ERROR. Cannot extract number of baselines!"
-    echo "Found string [$MORE] instead of integer"
+    echoerr "ERROR. Cannot extract number of baselines!"
+    echoerr "Found string [$MORE] instead of integer"
     exit 1
   fi
   LENGTH=`grep "Tot:" $SUM_FILE | grep ${i} | awk '{print $3}'`
@@ -360,8 +366,8 @@ do
     NUM_B=$(awk -v num=$NUM_B -v l=$LENGTH -v m=$MORE 'BEGIN { print num + (l*m) }')
     let DEN_B=DEN_B+$MORE
   else
-    echo "ERROR. Cannot extract mean baseline length!"
-    echo "Found string [$LENGTH] instead of float"
+    echoerr "ERROR. Cannot extract mean baseline length!"
+    echoerr "Found string [$LENGTH] instead of float"
     exit 1
   fi
   PERC=`grep "Tot:" $SUM_FILE | grep ${i} | awk '{print $8}'`
@@ -371,13 +377,28 @@ do
     NUM_P=$(awk -v num=$NUM_P -v p=$PERC -v m=$MORE 'BEGIN { print num + (p*m) }')
     let DEN_P=DEN_P+$MORE
   else
-    echo "ERROR. Cannot extract mean baseline percent!"
-    echo "Found string [$PERC] instead of float"
+    echoerr "ERROR. Cannot extract mean baseline percent!"
+    echoerr "Found string [$PERC] instead of float"
     exit 1
   fi
 done
-MEAN_BSL_LENGTH=$(echo "${NUM_B}/${DEN_B}" | bc)
-MEAN_AMB_RESOLVED=$(echo "${NUM_P}/${DEN_P}" | bc)
+
+if test $DEN_B -eq 0
+then
+    echoerr "ERROR. Denominator is 0. Cannot resolve mean baseline length"
+    MEAN_BSL_LENGTH=0
+    exit 1
+else
+    MEAN_BSL_LENGTH=$(echo "${NUM_B}/${DEN_B}" | bc)
+fi
+if test $DEN_P -eq 0
+then
+    echoerr "ERROR. Denominator is 0. Cannot resolve mean ambiguities resolved"
+    MEAN_AMB_RESOLVED=0
+    exit 1
+else
+    MEAN_AMB_RESOLVED=$(echo "${NUM_P}/${DEN_P}" | bc)
+fi
 echo "## NUMBER OF BASELINES : $NR_OF_BASELINES"
 echo "## MEAN BASELINE LENGTH: $MEAN_BSL_LENGTH"
 echo "## MEAN AMB. RESOLVED  : $MEAN_AMB_RESOLVED"
@@ -404,7 +425,7 @@ do
         #line1=`grep $i .logf`
         echo $flh >> .tmp1
     else
-        echo "## WARNING(1) : Station $i not found in crd file!"
+        echoerr "## WARNING(1) : Station $i not found in crd file!"
         STATUS=2
     fi
     let ITERATOR=ITERATOR+1
@@ -419,7 +440,7 @@ do
         #line1=`grep $i .logf`
         echo $flh >> .tmp2
     else
-        echo "## WARNING(2) : Station $i not found in crd file!"
+        echoerr "## WARNING(2) : Station $i not found in crd file!"
         STATUS=2
     fi
 done
@@ -441,7 +462,7 @@ do
         #line1=`grep $i .logf`
         echo $flh >> .tmp1
     else
-        echo "## WARNING(1) : Station $i not found in crd file!"
+        echoerr "## WARNING(1) : Station $i not found in crd file!"
         STATUS=2
     fi
     let ITERATOR=ITERATOR+1
@@ -456,7 +477,7 @@ do
         #line1=`grep $i .logf`
         echo $flh >> .tmp2
     else
-        echo "## WARNING(2) : Station $i not found in crd file!"
+        echoerr "## WARNING(2) : Station $i not found in crd file!"
         STATUS=2
     fi
 done
@@ -478,7 +499,7 @@ do
         #line1=`grep $i .logf`
         echo $flh >> .tmp1
     else
-        echo "## WARNING(1) : Station $i not found in crd file!"
+        echoerr "## WARNING(1) : Station $i not found in crd file!"
         STATUS=2
     fi
     let ITERATOR=ITERATOR+1
@@ -493,7 +514,7 @@ do
         #line1=`grep $i .logf`
         echo $flh >> .tmp2
     else
-        echo "## WARNING(2) : Station $i not found in crd file!"
+        echoerr "## WARNING(2) : Station $i not found in crd file!"
         STATUS=2
     fi
 done
@@ -515,7 +536,7 @@ do
         #line1=`grep $i .logf`
         echo $flh >> .tmp1
     else
-        echo "## WARNING(1) : Station $i not found in crd file!"
+        echoerr "## WARNING(1) : Station $i not found in crd file!"
         STATUS=2
     fi
     let ITERATOR=ITERATOR+1
@@ -530,7 +551,7 @@ do
         #line1=`grep $i .logf`
         echo $flh >> .tmp2
     else
-        echo "## WARNING(2) : Station $i not found in crd file!"
+        echoerr "## WARNING(2) : Station $i not found in crd file!"
         STATUS=2
     fi
 done
@@ -539,7 +560,7 @@ paste .tmp1 .tmp2 .logf | awk '{print "BL",$1,$2,$3,$4,$7,"CNL"}'
 ## Check the iterator to see how many baselines we translated
 if test "$ITERATOR" -ne "$NR_OF_BASELINES"
 then
-  echo "## !! WARNING: $ITERATOR out of $NR_OF_BASELINES baselines translated!"
+  echoerr "## !! WARNING: $ITERATOR out of $NR_OF_BASELINES baselines translated!"
   STATUS=2
 fi
 

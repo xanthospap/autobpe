@@ -35,6 +35,10 @@ function dversion {
   exit 0
 }
 
+function echoerr {
+    echo "$@" 1>&2
+}
+
 # //////////////////////////////////////////////////////////////////////////////
 # HELP FUNCTION
 # //////////////////////////////////////////////////////////////////////////////
@@ -121,7 +125,12 @@ else
   ARGS=`getopt s:e:n:r:c:x:hvgo: "$@"`
 fi
 # check for getopt error
-if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 1 ; fi
+if [ $? -ne 0 ]
+then 
+    echoerr "getopt error code : $status ;Terminating..." >&2 
+    exit 1
+fi
+
 eval set -- $ARGS
 
 # extract options and their arguments into variables.
@@ -152,7 +161,7 @@ while true ; do
     --) # end of options
       shift; break;;
      *) 
-      echo "*** Invalid argument $1 ; fatal" ; exit 1 ;;
+      echoerr "*** Invalid argument $1 ; fatal" ; exit 1 ;;
   esac
   shift 
 done
@@ -161,16 +170,16 @@ done
 # RESOLVE VARIABLES
 # //////////////////////////////////////////////////////////////////////////////
 if test -z $ORBIT_FILE ; then
-  echo "ERROR. You must specify the orbit filename"
+  echoerr "ERROR. You must specify the orbit filename"
   exit 1
 fi
 
 if test -z $RINEX ; then
-  echo "ERROR. You must at least specify the RINEX name"
+  echoerr "ERROR. You must at least specify the RINEX name"
   exit 1
 else
   if ! test -f $RINEX ; then
-    echo "ERROR. Could not find rinex file $RINEX"
+    echoerr "ERROR. Could not find rinex file $RINEX"
     exit 1
   fi
 fi
@@ -179,10 +188,10 @@ fi
 I=${RINEX:(-3)}
 if test -z $MP1 ; then
   MP1=${RINEX%%${I}}mp1
-  echo "## MP1 filename missing; Set from rinex file, as: $MP1"
+  echoerr "## MP1 filename missing; Set from rinex file, as: $MP1"
 fi
 if ! test -f ${MP1} ; then
-  echo "ERROR. Failed to locate mp1 file : $MP1 rinex: $RINEX"
+  echoerr "ERROR. Failed to locate mp1 file : $MP1 rinex: $RINEX"
   exit 1
 fi
 
@@ -190,26 +199,26 @@ fi
 if test -z $STA_NAME ; then
 ##STA_NAME=${RINEX:0:4}
   STA_NAME=`head -n 500 $RINEX | egrep "MARKER NAME$" | awk '{print $1}' 2>/dev/null`
-  echo "## Station name missing; Set from rinex file, as: $STA_NAME"
+  echoerr "## Station name missing; Set from rinex file, as: $STA_NAME"
 fi
 
 ## if start date not defined, set its name from rinex
 if test -z $START_DATE_STR ; then
   START_DATE_STR=`head -n 500 $RINEX | egrep "TIME OF FIRST OBS$" | \
                 awk '{printf "%4i-%02i-%02i:%02i-%02i-%02i",$1,$2,$3,$4,$5,$6}' 2>/dev/null`
-  echo "## Starting date missing; Set from rinex file, as: $START_DATE_STR"
+  echoerr "## Starting date missing; Set from rinex file, as: $START_DATE_STR"
 fi
 
 ## if end date not defined, set its name from rinex
 if test -z $END_DATE_STR ; then
-  END_DATE_STR=`tail -n 150 $RINEX | egrep [0-9]G | tail -n 1 | \
+  END_DATE_STR=`tail -n 150 $RINEX | egrep [0-9]G | tail -n 2 | awk 'NF > 7' | \
                 awk '{printf "%02i-%02i-%02i:%02i-%02i-%02i",$1,$2,$3,$4,$5,$6}' 2>/dev/null`
   if test ${END_DATE_STR:0:2} -lt 50 ; then
     END_DATE_STR=20${END_DATE_STR}
   else
     END_DATE_STR=19${END_DATE_STR}
   fi
-  echo "## Ending date missing; Set from rinex file, as: $END_DATE_STR"
+  echoerr "## Ending date missing; Set from rinex file, as: $END_DATE_STR"
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -225,7 +234,7 @@ fi
 
 if test ${HAS_TIME} -eq 0 ; then
   if ! date -d $START_DATE_STR '+%Y %m %d %H %M %S' 1>${INP} ; then
-    echo "ERROR! Invalid start date: $START_DATE_STR rinex: $RINEX"
+    echoerr "ERROR! Invalid start date: $START_DATE_STR rinex: $RINEX"
     exit 1
   fi
 else
@@ -233,7 +242,7 @@ else
   HMS=${START_DATE_STR##[0-9]*:}
   HMS=`echo $HMS | sed 's|-|:|g'`
   if ! date -d "$SDS $HMS" '+%Y %m %d %H %M %S' 1>>${INP} ; then
-    echo "ERROR! Invalid start date: $START_DATE_STR rinex: $RINEX"
+    echoerr "ERROR! Invalid start date: $START_DATE_STR rinex: $RINEX"
     exit 1
   fi
 fi
@@ -246,7 +255,7 @@ fi
 
 if test ${HAS_TIME} -eq 0 ; then
   if ! date -d $END_DATE_STR '+%Y %m %d %H %M %S' 1>>${INP} ; then
-    echo "ERROR! Invalid end date: $END_DATE_STR rinex: $RINEX"
+    echoerr "ERROR! Invalid end date: $END_DATE_STR rinex: $RINEX"
     exit 1
   fi
 else
@@ -254,7 +263,7 @@ else
   HMS=${END_DATE_STR##[0-9]*:}
   HMS=`echo $HMS | sed 's|-|:|g'`
   if ! date -d "$SDS $HMS" '+%Y %m %d %H %M %S' 1>>${INP} ; then
-    echo "ERROR! Invalid end date: $END_DATE_STR rinex: $RINEX"
+    echoerr "ERROR! Invalid end date: $END_DATE_STR rinex: $RINEX"
     exit 1
   fi
 fi
@@ -263,7 +272,7 @@ fi
 # ORBIT INFORMATION FILE
 # //////////////////////////////////////////////////////////////////////////////
 if ! test -f $ORBIT_FILE ; then
-  echo "ERROR! Orbit file $ORBIT_FILE not found!"
+  echoerr "ERROR! Orbit file $ORBIT_FILE not found!"
   exit 1
 else
   echo $ORBIT_FILE 1>>${INP}
@@ -280,7 +289,7 @@ echo "P1 Pseudorange Multipath at $STA_NAME" 1>>${INP}
 if [[ $ELEVATION =~ ^[0-9]+$ ]]; then
     echo $ELEVATION 1>>${INP}
 else
-   echo "ERROR. Invalid elevation angle $ELEVATION rinex: $RINEX"
+   echoerr "ERROR. Invalid elevation angle $ELEVATION rinex: $RINEX"
    exit 1
 fi
 
@@ -300,7 +309,7 @@ echo $MP1 1>>${INP}
 rm cf2sky.log 2>/dev/null
 /usr/local/bin/cf2sky &>/dev/null
 if ! cat cf2sky.log | grep "^Normal Termination" &>/dev/null ; then
-  echo "ERROR. Failed run of cf2sky.e rinex: $RINEX"
+  echoerr "ERROR. Failed run of cf2sky.e rinex: $RINEX"
   exit 1
 fi
 
@@ -316,7 +325,7 @@ fi
 ./skyplot.bat &>/dev/null
 mv skyplot.ps ${STA_NAME}-${STAMP}-cf2sky.ps &>/dev/null
 if test $? -ne 0 ; then
-  echo "ERROR. PostScript file seems to be missing. rinex: $RINEX"
+  echoerr "ERROR. PostScript file seems to be missing. rinex: $RINEX"
   rm cf2sky.inp cf2sky.log rm.me skyplot.inp skyplot.bat 2>/dev/null
   exit 1
 fi
@@ -330,7 +339,7 @@ then
   then
     mv ${STA_NAME}-${STAMP}-cf2sky.ps ${OUT_DIR}/${STA_NAME}-${STAMP}-cf2sky.ps
   else
-    echo "ERROR. Failed to move plot; direcoty $OUT_DIR does not exist rinex: $RINEX"
+    echoerr "ERROR. Failed to move plot; direcoty $OUT_DIR does not exist rinex: $RINEX"
   fi
 fi
 

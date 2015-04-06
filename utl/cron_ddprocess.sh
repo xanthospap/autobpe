@@ -11,17 +11,36 @@ then
   exit 1
 fi
 
+#/usr/local/bin/ddprocess \
+#  --analysis-center=cod \
+#  --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
+#  --campaign=GREECE \
+#  --doy="${YESTERDAY[3]}" \
+#  --elevation-angle=7 \
+#  --ion-products=FFG,FRG \
+#  --solution-id=UFG \
+#  --stations-per-cluster=4 \
+#  --calibration-model=I08 \
+#  --pcv-file=PCV_GRE \
+#  --save-dir=/media/Seagate/solutions52/${YESTERDAY[0]}/${YESTERDAY[3]} \
+#  --satellite-system=gps \
+#  --solution-type=urapid \
+#  --update=all \
+#  --year=${YESTERDAY[0]} \
+#  --xml-output \
+#  --force-remove-previous
+
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
-  --campaign=GREECE \
+  --campaign=URANUS \
   --doy="${YESTERDAY[3]}" \
   --elevation-angle=7 \
-  --ion-products=FFG,FRG \
-  --solution-id=UFG \
+  --ion-products=FFU,FRU \
+  --solution-id=UFU \
   --stations-per-cluster=4 \
   --calibration-model=I08 \
-  --pcv-file=PCV_GRE \
+  --pcv-file=PCV_URA \
   --save-dir=/media/Seagate/solutions52/${YESTERDAY[0]}/${YESTERDAY[3]} \
   --satellite-system=gps \
   --solution-type=urapid \
@@ -29,6 +48,27 @@ fi
   --year=${YESTERDAY[0]} \
   --xml-output \
   --force-remove-previous
+
+exit 500
+
+/usr/local/bin/ddprocess \
+  --analysis-center=cod \
+  --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
+  --campaign=URANUS \
+  --doy="${YESTERDAY[3]}" \
+  --elevation-angle=7 \
+  --ion-products=FFU,FRU \
+  --solution-id=UFU \
+  --stations-per-cluster=4 \
+  --calibration-model=I08 \
+  --pcv-file=PCV_URA \
+  --save-dir=/media/Seagate/solutions52/${YESTERDAY[0]}/${YESTERDAY[3]} \
+  --satellite-system=mixed \
+  --solution-type=urapid \
+  --year=${YESTERDAY[0]} \
+  --xml-output \
+  --force-remove-previous \
+  --add-suffix=_GNSS
 
 ## synchronize the remote server
 /home/bpe2/cron/syncweb.sh
@@ -60,5 +100,40 @@ fi
   --year=${M20DAYS[0]} \
   --xml-output
 
+/usr/local/bin/ddprocess \
+  --analysis-center=cod \
+  --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
+  --campaign=URANUS \
+  --doy="${M20DAYS[3]}" \
+  --elevation-angle=7 \
+  --ion-products=FFU,FRU \
+  --solution-id=FFU \
+  --stations-per-cluster=4 \
+  --calibration-model=I08 \
+  --pcv-file=PCV_URA \
+  --save-dir=/media/Seagate/solutions52/${M20DAYS[0]}/${M20DAYS[3]} \
+  --satellite-system=gps \
+  --solution-type=final \
+  --update=all \
+  --year=${M20DAYS[0]} \
+  --xml-output
+
+/usr/local/bin/ddprocess \
+  --analysis-center=cod \
+  --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
+  --campaign=URANUS \
+  --doy="${M20DAYS[3]}" \
+  --elevation-angle=7 \
+  --ion-products=FFU,FRU \
+  --solution-id=FFU \
+  --stations-per-cluster=4 \
+  --calibration-model=I08 \
+  --pcv-file=PCV_URA \
+  --save-dir=/media/Seagate/solutions52/${M20DAYS[0]}/${M20DAYS[3]} \
+  --satellite-system=mixed \
+  --solution-type=final \
+  --year=${M20DAYS[0]} \
+  --xml-output \
+  --add-suffix=_GNSS
 ## synchronize the remote server
 /home/bpe2/cron/syncweb.sh

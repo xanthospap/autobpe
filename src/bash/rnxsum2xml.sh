@@ -14,16 +14,16 @@
                            VERSION=v-1.0
                            RELEASE=beta
 ## created               : JAN-2015
-## usage                 : 
+## usage                 :
 ## exit code(s)          : 0 -> sucess
 ##                         1 -> failure
-## discription           : 
+## discription           :
 ## uses                  : sed, head, read, awk
-## needs                 : 
-## notes                 : 
-## TODO                  : 
+## needs                 :
+## notes                 :
+## TODO                  :
 ## WARNING               : No help message provided.
-## detailed update list  : 
+## detailed update list  :
                            LAST_UPDATE=JAN-20015
 ##
 ################################################################################
@@ -34,6 +34,11 @@
 function dversion {
   echo "${NAME} ${VERSION} (${RELEASE}) ${LAST_UPDATE}"
   exit 0
+}
+
+function echoerr
+{
+    echo "$@" 1>&2
 }
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -77,19 +82,19 @@ TMP=/home/bpe2/tmp                     ## QC PLOTS
 
 if ! test -f "$AVLB"
 then
-  echo "(rnxsum2xml) ERROR! Failed to locate file $AVLB"
+  echoerr "(rnxsum2xml) ERROR! Failed to locate file $AVLB"
   exit 1
 fi
 
 if ! test -f "$XSTA"
 then
-  echo "(rnxsum2xml) ERROR! Failed to locate file $XSTA"
+  echoerr "(rnxsum2xml) ERROR! Failed to locate file $XSTA"
   exit 1
 fi
 
 if ! test -f "$FCF"
 then
-  echo "(rnxsum2xml) ERROR! Failed to locate file $FCF (coordinate file)"
+  echoerr "(rnxsum2xml) ERROR! Failed to locate file $FCF (coordinate file)"
   exit 1
 fi
 
@@ -101,7 +106,7 @@ do
   ## Check that the network files exist
   if ! test -f ${TABLES}/crd/${NETWORK}.${i}
   then
-    echo "(rnxsum2xml) ERROR! Failed to locate file ${TABLES}/crd/${NETWORK}.${i}"
+    echoerr "(rnxsum2xml) ERROR! Failed to locate file ${TABLES}/crd/${NETWORK}.${i}"
     exit 1
   fi
 
@@ -133,9 +138,9 @@ do
     if test $prc == "yes"
     then
         FLAG=`grep -i ${j} ${FCF} | awk '{print substr ($0,70,10)}' | sed 's/ //g'`
-        if test ${FLAG} == "A"; then flag="A (free)"; fi
-        if test ${FLAG} == "W"; then flag="W (used for allignment)"; fi
-        if test ${FLAG} == "F"; then flag="F (fixed)"; fi
+        if test "${FLAG}" == "A"; then flag="A (free)"; fi
+        if test "${FLAG}" == "W"; then flag="W (used for allignment)"; fi
+        if test "${FLAG}" == "F"; then flag="F (fixed)"; fi
     fi
 
     ## Search for the rinex file in the datapool area
@@ -176,3 +181,5 @@ do
   done
 done
 
+echo "Exiting rnxsum2xml; xml output should be ok"
+exit 0

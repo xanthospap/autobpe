@@ -15,19 +15,17 @@
 export PATH="${PATH}:/usr/local/bin"
 export PATH="$PATH:/usr/lib/gmt/bin"
 
-echo "START plot MAPS"
-
 # ///////////// READ ARGV ////////////////////////
-YEAR=${1}
-YR=${YEAR:(-2)}
-DOY=${2}
-SUM_FILE=${3}
-CRD_FILE=${4}
-OUT_FILE=${5}
+YEAR="${1}"
+YR=${YEAR:2:2}
+DOY="${2}"
+SUM_FILE="${3}"
+CRD_FILE="${4}"
+OUT_FILE="${5}"
 NETN=${6^^}
 netn=${6,,}
-SOL_TYPE=${7}
-TMP_DIR=${8}
+SOL_TYPE="${7}"
+TMP_DIR="${8}"
 
 if test "$SOL_TYPE" == "f"
 then 
@@ -36,37 +34,67 @@ else
   solt=urapid
 fi
 
-marksolsta2 \
+if ! /usr/local/bin/marksolsta2 \
   -y $YEAR \
   -d $DOY \
-  -c /home/bpe2/tables/crd/GREECE.CRD \
+  -c /home/bpe2/tables/crd/${NETN}.CRD \
   -s ${SUM_FILE}  \
   -f ${CRD_FILE} \
   -o ${OUT_FILE} \
-  > ${TMP_DIR}/${netn}-${YR}${DOY}-${SOL_TYPE}.proc
+  1> ${TMP_DIR}/${netn}-${YR}${DOY}-${SOL_TYPE}.proc
+then
+    echo "ERROR. Failed to run marksolsta2."
+    echo "Issued command [/usr/local/bin/marksolsta2 \
+        -y $YEAR \
+        -d $DOY \
+        -c /home/bpe2/tables/crd/GREECE.CRD \
+        -s ${SUM_FILE}  \
+        -f ${CRD_FILE} \
+        -o ${OUT_FILE} \
+        1> ${TMP_DIR}/${netn}-${YR}${DOY}-${SOL_TYPE}.proc]"
+    exit 1
+fi
 
-/home/bpe2/maps/plot_proc.sh -y ${YEAR} \
-  -d ${DOY} \
-  -n ${netn} \
-  -r europe \
-  -t ${solt}  \
-  -jpg \
-  -bl \
-  -hlmell \
-  -i ${TMP_DIR}/${netn}-${YR}${DOY}-${SOL_TYPE}.proc \
-  -o ${TMP_DIR}/${netn}-${YR}${DOY}-${SOL_TYPE}-europe.ps
+if ! /home/bpe2/maps/plot_proc.sh \
+    -y ${YEAR} \
+    -d ${DOY} \
+    -n ${netn} \
+    -r europe \
+    -t ${solt}  \
+    -jpg \
+    -bl \
+    -hlmell \
+    -i ${TMP_DIR}/${netn}-${YR}${DOY}-${SOL_TYPE}.proc \
+    -o ${TMP_DIR}/${netn}-${YR}${DOY}-${SOL_TYPE}-europe.ps
+then
+    echo "ERROR. Failed to run plot_proc."
+    echo "Issued command [/home/bpe2/maps/plot_proc.sh \
+        -y ${YEAR} \
+        -d ${DOY} \
+        -n ${netn} \
+        -r europe \
+        -t ${solt}  \
+        -jpg \
+        -bl \
+        -hlmell \
+        -i ${TMP_DIR}/${netn}-${YR}${DOY}-${SOL_TYPE}.proc \
+        -o ${TMP_DIR}/${netn}-${YR}${DOY}-${SOL_TYPE}-europe.ps]"
+    exit 1
+fi
 
-/home/bpe2/maps/plot_proc.sh -y ${YEAR} \
-  -d ${DOY} \
-  -n ${netn} \
-  -r greece \
-  -t ${solt} \
-  -jpg \
-  -bl \
-  -staall \
-  -staproc \
-  -l \
-  -i ${TMP_DIR}/${netn}-${YR}${DOY}-${SOL_TYPE}.proc \
-  -o ${TMP_DIR}/${netn}-${YR}${DOY}-${SOL_TYPE}-greece.ps
+/home/bpe2/maps/plot_proc.sh \
+    -y ${YEAR} \
+    -d ${DOY} \
+    -n ${netn} \
+    -r greece \
+    -t ${solt} \
+    -jpg \
+    -bl \
+    -staall \
+    -staproc \
+    -l \
+    -i ${TMP_DIR}/${netn}-${YR}${DOY}-${SOL_TYPE}.proc \
+    -o ${TMP_DIR}/${netn}-${YR}${DOY}-${SOL_TYPE}-greece.ps
 
-echo "Finished succesful"
+# echo "Finished succesful"
+exit 0

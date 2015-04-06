@@ -125,9 +125,9 @@ do
   sta=`sed -n "${i}p" ${II} | awk '{print $1}'`
   flag=
   FLAG=`grep -i ${sta} ${FCF} | awk '{print substr ($0,70,10)}' | sed 's/ //g'`
-  if test ${FLAG} == "A"; then flag="A (free)"; fi
-  if test ${FLAG} == "W"; then flag="W (used for allignment)"; fi
-  if test ${FLAG} == "F"; then flag="F (fixed)"; fi
+  if test "${FLAG}" = "A"; then flag="A (free)"; fi
+  if test "${FLAG}" = "W"; then flag="W (used for allignment)"; fi
+  if test "${FLAG}" = "F"; then flag="F (fixed)"; fi
   sed -n "${i}p" ${II} | awk -v f="$flag" '{print "<row><entry>"$1"_rh_"$2"_rh_"$3"_rh_"$4"_rh_"$5"_rh_"$6"_rh_"$7"_rh_"f"</entry></row>"}' \
     | sed 's|_rh_|</entry><entry>|g' >> ${tmpd}/xml/crddifs.xml
 done

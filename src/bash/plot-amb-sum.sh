@@ -41,6 +41,11 @@ function dversion ()
     echo "${NAME} ${VERSION} (${RELEASE}) ${LAST_UPDATE}"
 }
 
+echoerr () 
+{
+    echo "$@" 1>&2
+}
+
 # ////////////////////////////////////////////////////////////////////////////
 # VARIABLES
 # ////////////////////////////////////////////////////////////////////////////
@@ -76,7 +81,7 @@ fi
 
 if test $? -ne 0
 then 
-  echo "getopt error code : $status ;Terminating..." >&2 
+  echoerr "getopt error code : $status ;Terminating..." >&2 
   exit 1 
 fi
 
@@ -93,7 +98,7 @@ while true ; do
       DOY="$2"
       shift
       ;;
-    -a|ambiguity-file)
+    -a|--ambiguity-file)
       AMB_SUM="$2"
       shift
       ;;
@@ -117,7 +122,7 @@ while true ; do
       shift
       break;;
     *)
-      echo "*** Invalid argument $1 ; fatal"
+      echoerr "*** Invalid argument $1 ; fatal"
       exit 1
       ;;
   esac
@@ -129,7 +134,7 @@ done
 # ////////////////////////////////////////////////////////////////////////////
 if ! test -s $AMB_SUM
 then
-  echo "ERROR! Cannot find input file: $AMB_SUM"
+  echoerr "ERROR! Cannot find input file: $AMB_SUM"
   exit 1
 fi
 
@@ -137,7 +142,7 @@ if test -z $PSFILE
 then
   CAMB_FILE=${AMB_SUM^^}
   PSFILE=${CAMB_FILE/.SUM/.ps}
-  echo "## No output file given; set from input file as: $PSFILE"
+  echoerr "## No output file given; set from input file as: $PSFILE"
 fi
 
 if test -z $YEAR
@@ -150,19 +155,19 @@ then
   else
     YEAR=20${YR2}
   fi
-  echo "## Year not provided; set from input file as: $YEAR"
+  echoerr "## Year not provided; set from input file as: $YEAR"
 fi
 
 if test -z $DOY
 then
   CAMB_FILE=`basename $AMB_SUM`
   DOY=${CAMB_FILE:5:3}
-  echo "## Doy not provided; set from input file as: $DOY"
+  echoerr "## Doy not provided; set from input file as: $DOY"
 fi
 
 if test -z $SATELLITE_SYSTEM_STR
 then
-    echo "## No satellite systems to plot provided. Using default=gps"
+    echoerr "## No satellite systems to plot provided. Using default=gps"
     USE_GPS=YES
 else
     IFS=',' read -a ARRAY <<< "$SATELLITE_SYSTEM_STR"
@@ -179,7 +184,7 @@ else
                 USE_MXD=YES
                 ;;
             *)
-                echo "## Invalid satellite system: $s; skipping"
+                echoerr "## Invalid satellite system: $s; skipping"
                 ;;
         esac
     done
@@ -202,7 +207,7 @@ cat $AMB_SUM | awk '/#AR_((NL)|(L3)|(QIF)|(L12))/ {if( $10=="G" && $1!="Tot:")\
 ## Se that the data are extracted correctly
 if [ "$?" -ne 0 ] || [ ! -s .input.g.dat ]
 then
-  echo "*** ERROR! Unable to extract data from file $AMB_SUM (GPS)"
+  echoerr "*** ERROR! Unable to extract data from file $AMB_SUM (GPS)"
   PLOT_GPS=NO
   GPS_NR=0
 else
@@ -214,9 +219,9 @@ then
     RECORDS=`cat .input.g.dat | wc -l`
     if test $RECORDS -ne $NUM_OF_GPS_BSL
     then
-      echo "## Failed to collect correct number of baselines records\
+      echoerr "## Failed to collect correct number of baselines records\
         from file $AMB_SUM (GPS)"
-      echo "## GPS baselines will not be plotted"
+      echoerr "## GPS baselines will not be plotted"
       PLOT_GPS=NO
       GPS_NR=0
     else
@@ -238,7 +243,7 @@ cat $AMB_SUM | awk '/#AR_((NL)|(L3)|(QIF)|(L12))/ {if($10=="R" && $1!="Tot:")\
 ## Se that the data are extracted correctly
 if [ "$?" -ne 0 ] || [ ! -s .input.r.dat ]
 then
-  echo "*** ERROR! Unable to extract data from file $AMB_SUM (GLONASS)"
+  echoerr "*** ERROR! Unable to extract data from file $AMB_SUM (GLONASS)"
   PLOT_GLO=NO
   GLO_NR=0
 else
@@ -250,9 +255,9 @@ then
     RECORDS=`cat .input.r.dat | wc -l`
     if test $RECORDS -ne $NUM_OF_GLO_BSL
     then
-      echo "## Failed to collect correct number of baselines records\
+      echoerr "## Failed to collect correct number of baselines records\
         from file $AMB_SUM (GLO)"
-      echo "## GLONASS baselines will not be plotted"
+      echoerr "## GLONASS baselines will not be plotted"
       PLOT_GLO=NO
       GLO_NR=0
     else
@@ -277,7 +282,7 @@ cat $AMB_SUM | awk '/#AR_((NL)|(L3)|(QIF)|(L12))/ { if($10=="GR" && $1!="Tot:")\
 ## See that the data are extracted correctly
 if [ "$?" -ne 0 ] || [ ! -s .input.gr.dat ]
 then
-  echo "*** ERROR! Unable to extract data from file $AMB_SUM (MIXED)"
+  echoerr "*** ERROR! Unable to extract data from file $AMB_SUM (MIXED)"
   PLOT_MXD=NO
   MXD_NR=0
 else
@@ -289,11 +294,11 @@ then
     RECORDS=`cat .input.gr.dat | wc -l`
     if test $RECORDS -ne $NUM_OF_MXD_BSL
     then
-      echo "## Failed to collect correct number of baselines records\
+      echoerr "## Failed to collect correct number of baselines records\
         from file $AMB_SUM (MIXED)"
-      echo "## Number of records in file: $RECORDS, number of baselines counted: \
+      echoerr "## Number of records in file: $RECORDS, number of baselines counted: \
           $NUM_OF_MXD_BSL"
-      echo "## MIXED baselines will not be plotted"
+      echoerr "## MIXED baselines will not be plotted"
       PLOT_MXD=NO
       MXD_NR=0
     else
@@ -346,7 +351,7 @@ do
     OLD_LINES=`cat $i | wc -l`
     if test $NEW_LINES -ne $OLD_LINES
     then
-        echo "Failed to resolve unique baselines for file $i"
+        echoerr "Failed to resolve unique baselines for file $i"
         exit 1
     fi
     mv .tmp $i
@@ -475,7 +480,7 @@ then
     XCRD=`echo - | awk -v tot=${NUM_OF_BSL} '{print tot/5.0}'`
     AVG_GPS=`awk 'BEGIN{avg=0} {avg+=$5} END{printf ("%5.1f",avg/NR)}' .input.g.dat`
     echo "$XCRD $AVG_GPS 15 0 9 BL SatelliteSystem=GPS mean=$AVG_GPS" \
-        | pstext "${PSTEXT}" -R -J -O -Gblue -N -Sthin,black >> $OUTPUT_FILE
+        | pstext -R -J -O -Gblue -N -Sthin,black >> $OUTPUT_FILE
 fi
 
 if [ "$PLOT_GLO" == "YES" ] && [ "$USE_GLO" == "YES" ]
@@ -509,6 +514,10 @@ then
     echo "$XCRD $AVG_MXD 15 0 9 BL SatelliteSystem=MIXED mean=$AVG_MXD" \
         | pstext -R -J -O -Gbrown -N -Sthin,black >> $OUTPUT_FILE
 fi
+
+## Just close the file
+psxy -J -R -T -O >> $OUTPUT_FILE
+
 # //////////////////////////////////////////////////////////////////////////////
 # DELETE TEMPORARY FILES
 # //////////////////////////////////////////////////////////////////////////////
