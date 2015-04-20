@@ -380,3 +380,5 @@ then
   echo "[WARNING] Deleting plot file" >> ${LOG}
   rm ${TMP}/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps
 fi
+
+rm ${POOL}/arta* ${POOL}/ARTA* 2>/dev/null

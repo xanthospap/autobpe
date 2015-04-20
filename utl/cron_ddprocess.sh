@@ -11,25 +11,28 @@ then
   exit 1
 fi
 
-#/usr/local/bin/ddprocess \
-#  --analysis-center=cod \
-#  --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
-#  --campaign=GREECE \
-#  --doy="${YESTERDAY[3]}" \
-#  --elevation-angle=7 \
-#  --ion-products=FFG,FRG \
-#  --solution-id=UFG \
-#  --stations-per-cluster=4 \
-#  --calibration-model=I08 \
-#  --pcv-file=PCV_GRE \
-#  --save-dir=/media/Seagate/solutions52/${YESTERDAY[0]}/${YESTERDAY[3]} \
-#  --satellite-system=gps \
-#  --solution-type=urapid \
-#  --update=all \
-#  --year=${YESTERDAY[0]} \
-#  --xml-output \
-#  --force-remove-previous
+if test 1 -eq 0; then
+/usr/local/bin/ddprocess \
+  --analysis-center=cod \
+  --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
+  --campaign=GREECE \
+  --doy="${YESTERDAY[3]}" \
+  --elevation-angle=7 \
+  --ion-products=FFG,FRG \
+  --solution-id=UFG \
+  --stations-per-cluster=4 \
+  --calibration-model=I08 \
+  --pcv-file=PCV_GRE \
+  --save-dir=/media/Seagate/solutions52/${YESTERDAY[0]}/${YESTERDAY[3]} \
+  --satellite-system=gps \
+  --solution-type=urapid \
+  --update=all \
+  --year=${YESTERDAY[0]} \
+  --xml-output \
+  --force-remove-previous
+fi
 
+if test 1 -eq 0; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
@@ -48,9 +51,9 @@ fi
   --year=${YESTERDAY[0]} \
   --xml-output \
   --force-remove-previous
+fi
 
-exit 500
-
+if test 1 -eq 0; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
@@ -69,6 +72,7 @@ exit 500
   --xml-output \
   --force-remove-previous \
   --add-suffix=_GNSS
+fi
 
 ## synchronize the remote server
 /home/bpe2/cron/syncweb.sh
@@ -82,6 +86,7 @@ then
   exit 1
 fi
 
+if test 1 -eq 0; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
@@ -99,7 +104,9 @@ fi
   --update=all \
   --year=${M20DAYS[0]} \
   --xml-output
+fi
 
+if test 1 -eq 0; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
@@ -117,7 +124,9 @@ fi
   --update=all \
   --year=${M20DAYS[0]} \
   --xml-output
+fi
 
+if test 1 -eq 1; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
@@ -135,5 +144,7 @@ fi
   --year=${M20DAYS[0]} \
   --xml-output \
   --add-suffix=_GNSS
+fi
+
 ## synchronize the remote server
 /home/bpe2/cron/syncweb.sh

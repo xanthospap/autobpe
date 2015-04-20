@@ -340,10 +340,10 @@ function get_station {
 
       ## STATION ZKRO
       if [ "$st" = "zkro" ]; then
-        echo "Downloading station: zkro" >> koko
+        ## echo "Downloading station: zkro" >> koko
         filename=ZKRO${yr}${MONTH}${DAY_OF_MONTH}0000a.T00
         wget --user="${NOA2USR}" --password="${NOA2PAS}" -O ${od}/${filename} -q --tries=2 ${NOA2URL}/ZKR/${yr}/${dy}/${filename}
-        # echo "wget --user=${NOA2USR} --password=${NOA2PAS} -O ${od}/${filename} -q --tries=2 ${NOA2URL}/ZKR/${yr}/${dy}/${filename}" >> koko
+        ## echo "wget --user=${NOA2USR} --password=${NOA2PAS} -O ${od}/${filename} -q --tries=2 ${NOA2URL}/ZKR/${yr}/${dy}/${filename}" >> koko
         if test -s ${od}/${filename}; then
           runpkr00 -d ${od}/${filename}
           fn=`echo $filename | sed 's|T00|dat|'`
@@ -352,7 +352,7 @@ function get_station {
           rm ${od}/${filename} ${od}/${fn} 2>/dev/null
           echo 0
         else
-          # echo "empty" >> koko
+          ## echo "empty" >> koko
           rm ${od}/${filename} 2>/dev/null
           echo 1
         fi

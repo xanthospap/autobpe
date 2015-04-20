@@ -370,6 +370,12 @@ LOGFILE=${LOG_DIR}/ddproc-${YEAR:2:2}${DOY}.log
 WARFILE=${LOG_DIR}/ddproc-${YEAR:2:2}${DOY}.wrn
 >$LOGFILE
 >$WARFILE
+echo "#############################################################"
+echo "#                                          Routine Processing"
+echo "# date     : ${YEAR} ${DOY}"
+echo "# logfile  : ${LOGFILE}"
+echo "# warnings : ${WARFILE}"
+echo "#############################################################"
 echo "$*" >> $LOGFILE
 START_T_STAMP=`/bin/date`
 tmpd=${TMP}/${YEAR}${DOY}-ddprocess-${CAMPAIGN,,}-${SOL_TYPE}
@@ -1213,7 +1219,8 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # CREATE A LOG MESSAGE FOR PROCESS ERROR
 # //////////////////////////////////////////////////////////////////////////////
-if test "${STATUS}" == "ERROR"; then
+if test "${STATUS}" == "ERROR"
+then
 
   echo "***********************************************************************" >> $LOGFILE
   echo "-------------------- PROCESS ERROR ------------------------------------" >> $LOGFILE
@@ -1232,7 +1239,7 @@ if test "${STATUS}" == "ERROR"; then
   echo "***********************************************************************" >> $LOGFILE
 
   for i in `ls ${P}/${CAMPAIGN^^}/BPE/${TASKID}${YR2}${DOY}0*.LOG`
-  do 
+  do
     cat $i >> $LOGFILE
   done
   exit 1
@@ -1321,14 +1328,23 @@ fi
 # UPDATE DEFAULT CRD FILE
 # //////////////////////////////////////////////////////////////////////////////$
 >${tmpd}/crd.update
+##
+## TODO :: Should updatecrd use the '--limit' option ?
+##
 if test "${UPD_CRD}" == "YES"
 then
-  /usr/local/bin/updatecrd \
+    if test "${CAMPAIGN,,}" == "uranus"
+    then
+        CMDS="/usr/local/bin/updatecrd"
+    else
+        CMDS="/usr/local/bin/updatecrd --limit"
+    fi
+##  /usr/local/bin/updatecrd \
+    ${CMDS} \
     --update-file=${TABLES}/crd/${CAMPAIGN}.CRD \
     --reference-file=${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD \
     --station-file=${TABLES}/crd/${CAMPAIGN,,}.update \
     --flags=W,A,P,C \
-    --limit \
     &>>$LOGFILE
   if test $? -gt 250
   then
@@ -1337,7 +1353,7 @@ then
   else
     echo ""
     echo "Default crd file updated" >> $LOGFILE
-    echo "  /usr/local/bin/updatecrd \
+    echo " ${CMDS} \
       --update-file=${TABLES}/crd/${CAMPAIGN}.CRD \
       --reference-file=${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD \
       --station-file=${TABLES}/crd/${CAMPAIGN,,}.update \
@@ -1484,6 +1500,9 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # CLEAR CAMPAIGN DIRECTORIES
 # //////////////////////////////////////////////////////////////////////////////
+FORCE_CLEAN=NO
+if test "${FORCE_CLEAN}" == "YES"
+then
 for i in ATM \
          BPE \
          GRD \
@@ -1502,5 +1521,6 @@ for i in OBS OUT RAW BPE
 do
     rm ${P}/${CAMPAIGN}/${i}/* 2>/dev/null
 done
+fi
 
 exit 0

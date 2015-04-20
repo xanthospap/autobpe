@@ -356,7 +356,7 @@ do
     let NR_OF_BASELINES=NR_OF_BASELINES+$MORE
   else
     echoerr "ERROR. Cannot extract number of baselines!"
-    echoerr "Found string [$MORE] instead of integer"
+    echoerr "Found string [$MORE] instead of integer when searching for $i ambs."
     exit 1
   fi
   LENGTH=`grep "Tot:" $SUM_FILE | grep ${i} | awk '{print $3}'`
@@ -367,7 +367,7 @@ do
     let DEN_B=DEN_B+$MORE
   else
     echoerr "ERROR. Cannot extract mean baseline length!"
-    echoerr "Found string [$LENGTH] instead of float"
+    echoerr "Found string [$LENGTH] instead of float when searching for $i ambs"
     exit 1
   fi
   PERC=`grep "Tot:" $SUM_FILE | grep ${i} | awk '{print $8}'`
@@ -378,7 +378,7 @@ do
     let DEN_P=DEN_P+$MORE
   else
     echoerr "ERROR. Cannot extract mean baseline percent!"
-    echoerr "Found string [$PERC] instead of float"
+    echoerr "Found string [$PERC] instead of float when searching for $i ambs"
     exit 1
   fi
 done
