@@ -11,7 +11,7 @@ then
   exit 1
 fi
 
-if test 1 -eq 0; then
+if test 0 -eq 1; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
@@ -32,7 +32,7 @@ if test 1 -eq 0; then
   --force-remove-previous
 fi
 
-if test 1 -eq 0; then
+if test 0 -eq 1; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
@@ -53,7 +53,7 @@ if test 1 -eq 0; then
   --force-remove-previous
 fi
 
-if test 1 -eq 0; then
+if test 0 -eq 1; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
@@ -86,7 +86,7 @@ then
   exit 1
 fi
 
-if test 1 -eq 0; then
+if test 0 -eq 1; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
@@ -106,7 +106,7 @@ if test 1 -eq 0; then
   --xml-output
 fi
 
-if test 1 -eq 0; then
+if test 0 -eq 1; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \

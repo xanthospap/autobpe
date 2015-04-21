@@ -34,7 +34,7 @@ else
   solt=urapid
 fi
 
-if ! /usr/local/bin/marksolsta2 \
+if ! /usr/local/bin/marksolsta3 \
   -y $YEAR \
   -d $DOY \
   -c /home/bpe2/tables/crd/${NETN}.CRD \

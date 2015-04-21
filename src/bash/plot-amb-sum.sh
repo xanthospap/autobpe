@@ -463,13 +463,13 @@ if [ "$PLOT_GPS" == "YES" ] && [ "$USE_GPS" == "YES" ]
 then
     if [ "$PLOT_GLO" == "YES" ] && [ "$USE_GLO" == "YES" ]
     then
-        PSTEXT="-K"
+        PSTEXT=K
     else
         if [ "$PLOT_MXD" == "YES" ] && [ "$USE_MXD" == "YES" ]
         then
-            PSTEXT="-K"
+            PSTEXT=K
         else
-            PSTEXT=""
+            PSTEXT=
         fi
     fi
     echo "## Ploting GPS data points"
@@ -479,17 +479,26 @@ then
         psxy -R -J -O -K -Gblue -Sc0.1 >> $OUTPUT_FILE
     XCRD=`echo - | awk -v tot=${NUM_OF_BSL} '{print tot/5.0}'`
     AVG_GPS=`awk 'BEGIN{avg=0} {avg+=$5} END{printf ("%5.1f",avg/NR)}' .input.g.dat`
-    echo "$XCRD $AVG_GPS 15 0 9 BL SatelliteSystem=GPS mean=$AVG_GPS" \
-        | pstext -R -J -O -Gblue -N -Sthin,black >> $OUTPUT_FILE
+
+    ## use continuation (-K) or not ?
+    if test "${PSTEXT}" == "K"
+    then
+        echo "$XCRD $AVG_GPS 15 0 9 BL SatelliteSystem=GPS mean=$AVG_GPS" \
+            | pstext -K -R -J -O -Gblue -N -Sthin,black >> $OUTPUT_FILE
+    else
+        echo "$XCRD $AVG_GPS 15 0 9 BL SatelliteSystem=GPS mean=$AVG_GPS" \
+            | pstext -R -J -O -Gblue -N -Sthin,black >> $OUTPUT_FILE
+    fi
+
 fi
 
 if [ "$PLOT_GLO" == "YES" ] && [ "$USE_GLO" == "YES" ]
 then
     if [ "$PLOT_MXD" == "YES" ] && [ "$USE_MXD" == "YES" ]
     then
-        PSTEXT="-K"
+        PSTEXT=K
     else
-        PSTEXT=""
+        PSTEXT=
     fi
     echo "## Ploting GLONASS data points"
     cat .input.r.dat | awk '{print $1,$5}' | \
@@ -498,8 +507,16 @@ then
         psxy -R -J -O -K -Ggreen -Sc0.1 >> $OUTPUT_FILE
     XCRD=`echo - | awk -v tot=${NUM_OF_BSL} '{print tot/5.0}'`
     AVG_GLO=`awk 'BEGIN{avg=0} {avg+=$5} END{printf ("%5.1f",avg/NR)}' .input.r.dat`
-    echo "$XCRD $AVG_GLO 15 0 9 BL SatelliteSystem=GLONASS mean=$AVG_GLO" \
-        | pstext "${PSTEXT}" -R -J -O -Ggreen -N -Sthin,black >> $OUTPUT_FILE
+
+    ## use continuation (-K) or not ?
+    if test "${PSTEXT}" == "K"
+    then
+        echo "$XCRD $AVG_GLO 15 0 9 BL SatelliteSystem=GLONASS mean=$AVG_GLO" \
+            | pstext -K -R -J -O -Ggreen -N -Sthin,black >> $OUTPUT_FILE
+    else
+        echo "$XCRD $AVG_GLO 15 0 9 BL SatelliteSystem=GLONASS mean=$AVG_GLO" \
+            | pstext -R -J -O -Ggreen -N -Sthin,black >> $OUTPUT_FILE
+    fi
 fi
 
 if [ "$PLOT_MXD" == "YES" ] && [ "$USE_MXD" == "YES" ]
@@ -516,7 +533,7 @@ then
 fi
 
 ## Just close the file
-psxy -J -R -T -O >> $OUTPUT_FILE
+## psxy -J -R -T -O >> $OUTPUT_FILE
 
 # //////////////////////////////////////////////////////////////////////////////
 # DELETE TEMPORARY FILES

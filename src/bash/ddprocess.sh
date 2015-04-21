@@ -677,7 +677,7 @@ then
   echo "Meta-file : $ORB_META" >> $LOGFILE
 else 
   # failed to find/link rapid sp3; try for ultra-rapid
-  echo "Failed to find/link file ${DATAPOOL}/${SP3}"
+  echo "Failed to find/link sp3 file ${DATAPOOL}/${SP3}" >> $LOGFILE
   if test "$SOL_TYPE" == "u"
   then
     SP3=${SP3/R/U}
@@ -690,7 +690,7 @@ else
         ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^}" >> $LOGFILE
       echo "Meta-file : $ORB_META" >> $LOGFILE
     else
-      echo "*** Failed to link orbit file ${DATAPOOL}/${SP3}"
+      echo "*** Failed to link sp3 file ${DATAPOOL}/${SP3}"
       exit 1
     fi
   else
@@ -1197,9 +1197,9 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 
 ## (skip processing)
-##KOKO=A
-##if test "$KOKO" == "LALA"
-##then
+## KOKO=A
+## if test "$KOKO" == "LALA"
+## then
 
 ## empty the BPE directory
 rm ${P}/${CAMPAIGN^^}/BPE/* 2>/dev/null
@@ -1245,7 +1245,7 @@ then
   exit 1
 fi
 ## (skip processing)
-##fi
+## fi
 # //////////////////////////////////////////////////////////////////////////////
 # SAVE THE FILES WE WANT
 # //////////////////////////////////////////////////////////////////////////////
@@ -1421,7 +1421,8 @@ CRD_META=${tmpd}/crd.meta
 SCRIPT_SECONDS=$(($STOP_PROCESS_SECONDS-$START_PROCESS_SECONDS))
 SCRIPT_SECONDS=`echo $SCRIPT_SECONDS | \
     awk '{printf "%10i seconds (or %5i min and %2i sec)",$1,$1/60.0,$1%60}'`
-BPE_SECONDS=$(($STOP_BPE_SECONDS-$START_BPE_SECONDS))
+# BPE_SECONDS=$(($STOP_BPE_SECONDS-$START_BPE_SECONDS))
+BPE_SECONDS=500
 BPE_SECONDS=`echo $BPE_SECONDS | \
     awk '{printf "%10i seconds (or %5i min and %2i sec)",$1,$1/60.0,$1%60}'`
 {

@@ -136,6 +136,8 @@ fi
     --quiet \
     --only-report \
     1>${tmpd}/xs.diffs
+cat ${tmpd}/xs.diffs | grep -v "##" > ${tmpd}/xs.diffs.tmp
+mv ${tmpd}/xs.diffs.tmp ${tmpd}/xs.diffs
 
 ## Create xml table for the ambiguity resolution info
 echo "  Creating ambiguity resolution xml table (ambsum2xml)"
