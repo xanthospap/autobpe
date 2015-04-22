@@ -30,6 +30,12 @@ if test 0 -eq 1; then
   --year=${YESTERDAY[0]} \
   --xml-output \
   --force-remove-previous
+
+## mv the log file
+YR2=${YESTERDAY[0]}
+YR2=${YR2:2:2}
+DOY=${YESTERDAY[3]}
+mv /home/bpe2/log/ddproc-${YR2}${DOY}.log /home/bpe2/log/dd${YR2}${DOY}GRU.log
 fi
 
 if test 0 -eq 1; then
@@ -51,6 +57,12 @@ if test 0 -eq 1; then
   --year=${YESTERDAY[0]} \
   --xml-output \
   --force-remove-previous
+
+## mv the log file
+YR2=${YESTERDAY[0]}
+YR2=${YR2:2:2}
+DOY=${YESTERDAY[3]}
+mv /home/bpe2/log/ddproc-${YR2}${DOY}.log /home/bpe2/log/dd${YR2}${DOY}URU.log
 fi
 
 if test 0 -eq 1; then
@@ -72,6 +84,12 @@ if test 0 -eq 1; then
   --xml-output \
   --force-remove-previous \
   --add-suffix=_GNSS
+
+## mv the log file
+YR2=${YESTERDAY[0]}
+YR2=${YR2:2:2}
+DOY=${YESTERDAY[3]}
+mv /home/bpe2/log/ddproc-${YR2}${DOY}.log /home/bpe2/log/dd${YR2}${DOY}URU-MIXED.log
 fi
 
 ## synchronize the remote server
@@ -86,7 +104,7 @@ then
   exit 1
 fi
 
-if test 0 -eq 1; then
+if test 1 -eq 1; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
@@ -104,9 +122,15 @@ if test 0 -eq 1; then
   --update=all \
   --year=${M20DAYS[0]} \
   --xml-output
-fi
 
-if test 0 -eq 1; then
+## mv the log file
+YR2=${M20DAYS[0]}
+YR2=${YR2:2:2}
+DOY=${M20DAYS[3]}
+mv /home/bpe2/log/ddproc-${YR2}${DOY}.log /home/bpe2/log/dd${YR2}${DOY}GRF.log
+fi
+exit 500
+if test 1 -eq 1; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
@@ -124,6 +148,12 @@ if test 0 -eq 1; then
   --update=all \
   --year=${M20DAYS[0]} \
   --xml-output
+
+## mv the log file
+YR2=${M20DAYS[0]}
+YR2=${YR2:2:2}
+DOY=${M20DAYS[3]}
+mv /home/bpe2/log/ddproc-${YR2}${DOY}.log /home/bpe2/log/dd${YR2}${DOY}URF.log
 fi
 
 if test 1 -eq 1; then
@@ -144,6 +174,12 @@ if test 1 -eq 1; then
   --year=${M20DAYS[0]} \
   --xml-output \
   --add-suffix=_GNSS
+
+## mv the log file
+YR2=${M20DAYS[0]}
+YR2=${YR2:2:2}
+DOY=${M20DAYS[3]}
+mv /home/bpe2/log/ddproc-${YR2}${DOY}.log /home/bpe2/log/dd${YR2}${DOY}URF-MIXED.log
 fi
 
 ## synchronize the remote server
