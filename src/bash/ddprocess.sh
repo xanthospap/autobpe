@@ -1090,8 +1090,12 @@ for i in ${SOL_ID} ${SOL_ID%?}P ${SOL_ID%?}R; do
         break
       fi
     done
-    echo "<para>Chose a-priori coordinate file <filename>${TMP}</filename>." >> ${tmpd}/crd.meta
-    printf "ok! using a a-priori" >> $LOGFILE
+    if ! test -z "$TMP"
+    then
+        echo "<para>Chose a-priori coordinate file <filename>${TMP}</filename>.</para>" >> ${tmpd}/crd.meta
+        printf "ok! using as a-priori" >> $LOGFILE
+        break
+    fi
   else
     printf "not available !" >> $LOGFILE
   fi
@@ -1108,12 +1112,12 @@ then
   else
     echo "Copying default crd file ${TABLES}/crd/${CAMPAIGN}.CRD to \
       ${P}/${CAMPAIGN}/STA/APRIORI.CRD" >> $LOGFILE
-    echo "<para>Chose default a-priori coordinate for the network, i.e. <filename>${TMP}</filename>." >> ${tmpd}/crd.meta
+    echo "<para>Chose default a-priori coordinate for the network, i.e. <filename>${TMP}</filename>.</para>" >> ${tmpd}/crd.meta
   fi
 fi
 
 mv ${P}/${CAMPAIGN}/STA/APRIORI.CRD ${P}/${CAMPAIGN}/STA/REG${YR2}${DOY}0.CRD
-echo "File renamed to <filename>${P}/${CAMPAIGN}/STA/REG${YR2}${DOY}0.CRD$</filename>.</para>" >> ${tmpd}/crd.meta
+echo "<para>File renamed to <filename>${P}/${CAMPAIGN}/STA/REG${YR2}${DOY}0.CRD$</filename>.</para>" >> ${tmpd}/crd.meta
 
 # //////////////////////////////////////////////////////////////////////////////
 # SET OPTIONS IN THE PCF FILE
@@ -1337,7 +1341,8 @@ then
     then
         CMDS="/usr/local/bin/updatecrd"
     else
-        CMDS="/usr/local/bin/updatecrd --limit"
+    ##    CMDS="/usr/local/bin/updatecrd --limit"
+        CMDS="/usr/local/bin/updatecrd"
     fi
 ##  /usr/local/bin/updatecrd \
     ${CMDS} \
@@ -1501,7 +1506,7 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # CLEAR CAMPAIGN DIRECTORIES
 # //////////////////////////////////////////////////////////////////////////////
-FORCE_CLEAN=NO
+FORCE_CLEAN=YES
 if test "${FORCE_CLEAN}" == "YES"
 then
 for i in ATM \

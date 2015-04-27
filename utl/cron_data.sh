@@ -166,6 +166,12 @@ then
 fi
 NSG=$((NSG + STATUS))
 
+## GET YESTERDAY'S CRL (RAW) DATA AND TRANSLATE TO RINEX
+/home/bpe2/src/autobpe/src/bash/get_crl_data.sh ${YESTERDAY[0]} ${YESTERDAY[3]}
+/home/bpe2/src/autobpe/src/bash/crl2rnx.sh -y ${YESTERDAY[0]} -d ${YESTERDAY[3]}
+rm *.tps
+mv *.15o /home/bpe2/data/GPSDATA/DATAPOOL/
+
 echo "DOWNLOADING REGIONAL FROM FILE: ${TBL}/crd/uranus.reg" >> ${LOG}
 /usr/local/bin/wgeturanus \
     --table-file /home/bpe2/src/autobpe/src/bash/uranus.tbl \
@@ -238,6 +244,12 @@ then
 fi
 NSG=$((NSG + STATUS))
 
+## GET YESTERDAY'S CRL (RAW) DATA AND TRANSLATE TO RINEX
+/home/bpe2/src/autobpe/src/bash/get_crl_data.sh ${M20DAYS[0]} ${M20DAYS[3]}
+/home/bpe2/src/autobpe/src/bash/crl2rnx.sh -y ${M20DAYS[0]} -d ${M20DAYS[3]}
+rm *.tps
+mv *.15o /home/bpe2/data/GPSDATA/DATAPOOL/
+
 echo "DOWNLOADING REGIONAL FROM FILE: ${TBL}/crd/uranus.reg" >> ${LOG}
 /usr/local/bin/wgeturanus \
     --table-file /home/bpe2/src/autobpe/src/bash/uranus.tbl \
@@ -306,17 +318,22 @@ then
     do
         TRNX=`basename $rnx`
         sta=${TRNX:0:4}
-        if ! test -f /home/bpe2/tmp/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-cf2sky.ps
+        echo "Processing rinex file: $rnx , statio : $sta" >> ${LOG}
+        if test -s /home/bpe2/tmp/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-cf2sky.ps
         then
             echo "Compiling Skyplot for rinex $rnx" >> ${LOG}
             
-            /usr/local/bin/teqc +qc $rnx \
+            /usr/local/bin/teqc +qc $rnx -O.int 30 \
                 &>${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-qc
+            
+            echo "teqc command [/usr/local/bin/teqc +qc $rnx &>${TMP}/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-qc]" >> ${LOG}
             
             if ! /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 \
                 -x ${rnx} -o /home/bpe2/tmp &>>${LOG}
             then
                 echo "Failed to make skyplot for station: $sta"
+            else
+                echo "run skyplot [/usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} -o /home/bpe2/tmp &>>${LOG}]" >>${LOG}
             fi
             
             rnx_ne=${rnx/${M20DAYS[0]:2:2}o/}
@@ -325,6 +342,9 @@ then
                 mv ${rnx_ne}.${k} ${TMP} 2>/dev/null
             done
             mv ${rnx/%o/S} ${TMP} 2>/dev/null
+            echo "Moved file ${rnx/%o/S} to ${TMP}" >> $LOG
+        else
+            echo "Skyplot (.ps) already exists : /home/bpe2/tmp/${sta^^}-${M20DAYS[0]}${M20DAYS[1]}${M20DAYS[2]}-cf2sky.ps" >> ${LOG}
         fi
     done
 fi
@@ -350,19 +370,24 @@ then
     uncompress -f ${POOL}/${brdc}.Z
     for rnx in ${POOL}/????${YESTERDAY[3]}0.${YESTERDAY[0]:2:2}o
     do
+        echo "Compiling Skyplot for rinex $rnx" >> ${LOG}
         TRNX=`basename $rnx`
         sta=${TRNX:0:4}
-        if ! test -f /home/bpe2/tmp/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps
+        if test -s /home/bpe2/tmp/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps
         then
             echo "Compiling Skyplot for rinex $rnx" >> ${LOG}
             
-            /usr/local/bin/teqc +qc $rnx \
+            /usr/local/bin/teqc +qc $rnx -O.int 30 \
                 &>${TMP}/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-qc
+
+            echo "teqc command [/usr/local/bin/teqc +qc $rnx &>${TMP}/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-qc]">>$LOG
             
             if ! /usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} \
                 -o /home/bpe2/tmp &>>${LOG}
             then
                 echo "Failed to make skyplot for station: $sta"
+            else
+                echo "run skyplot [/usr/local/bin/skyplot -r ${POOL}/${brdc} -c 3 -x ${rnx} -o /home/bpe2/tmp &>>${LOG}]">>$LOG
             fi
             
             rnx_ne=${rnx/${YESTERDAY[0]:2:2}o/}
@@ -371,6 +396,9 @@ then
                 mv ${rnx_ne}.${k} ${TMP} 2>/dev/null
             done
             mv ${rnx/%o/S} ${TMP} 2>/dev/null
+            echo "Moved file ${rnx/%o/S} to ${TMP}" >> $LOG
+        else
+            echo "Skyplot (.ps) already exists : /home/bpe2/tmp/${sta^^}-${YESTERDAY[0]}${YESTERDAY[1]}${YESTERDAY[2]}-cf2sky.ps">>$LOG
         fi
     done
 fi

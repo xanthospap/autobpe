@@ -11,7 +11,7 @@ then
   exit 1
 fi
 
-if test 0 -eq 1; then
+if test 1 -eq 1; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
@@ -38,7 +38,7 @@ DOY=${YESTERDAY[3]}
 mv /home/bpe2/log/ddproc-${YR2}${DOY}.log /home/bpe2/log/dd${YR2}${DOY}GRU.log
 fi
 
-if test 0 -eq 1; then
+if test 1 -eq 1; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
@@ -65,7 +65,7 @@ DOY=${YESTERDAY[3]}
 mv /home/bpe2/log/ddproc-${YR2}${DOY}.log /home/bpe2/log/dd${YR2}${DOY}URU.log
 fi
 
-if test 0 -eq 1; then
+if test 1 -eq 1; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
   --bernese-loadvar=/home/bpe2/bern52/BERN52/GPS/EXE/LOADGPS.setvar \
@@ -129,7 +129,7 @@ YR2=${YR2:2:2}
 DOY=${M20DAYS[3]}
 mv /home/bpe2/log/ddproc-${YR2}${DOY}.log /home/bpe2/log/dd${YR2}${DOY}GRF.log
 fi
-exit 500
+
 if test 1 -eq 1; then
 /usr/local/bin/ddprocess \
   --analysis-center=cod \
