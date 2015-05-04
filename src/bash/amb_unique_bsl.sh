@@ -61,21 +61,21 @@
 ## ---------------------------------------------------------------------------
 ##
 
-function help ()
+function help
 {
     echo "Usage : amb_unique_bsl <AMByyddd0.SUM> [<>]"
 }
-function dversion ()
+function dversion
 {
     echo "${NAME} ${VERSION} (${RELEASE}) ${LAST_UPDATE}"
 }
 
-echoerr () 
+function echoerr
 {
     echo "$@" 1>&2
 }
 
-clear_temp ()
+function clear_temp
 {
     rm .bsl.g.dat .bsl.r.dat .bsl.m.dat .bsl.grm.dat 2>/dev/null
 }

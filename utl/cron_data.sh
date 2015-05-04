@@ -167,10 +167,10 @@ fi
 NSG=$((NSG + STATUS))
 
 ## GET YESTERDAY'S CRL (RAW) DATA AND TRANSLATE TO RINEX
-/home/bpe2/src/autobpe/src/bash/get_crl_data.sh ${YESTERDAY[0]} ${YESTERDAY[3]}
-/home/bpe2/src/autobpe/src/bash/crl2rnx.sh -y ${YESTERDAY[0]} -d ${YESTERDAY[3]}
-rm *.tps
-mv *.15o /home/bpe2/data/GPSDATA/DATAPOOL/
+## /home/bpe2/src/autobpe/src/bash/get_crl_data.sh ${YESTERDAY[0]} ${YESTERDAY[3]}
+## /home/bpe2/src/autobpe/src/bash/crl2rnx.sh -y ${YESTERDAY[0]} -d ${YESTERDAY[3]}
+## rm *.tps
+## mv *.15o /home/bpe2/data/GPSDATA/DATAPOOL/
 
 echo "DOWNLOADING REGIONAL FROM FILE: ${TBL}/crd/uranus.reg" >> ${LOG}
 /usr/local/bin/wgeturanus \
@@ -245,10 +245,10 @@ fi
 NSG=$((NSG + STATUS))
 
 ## GET YESTERDAY'S CRL (RAW) DATA AND TRANSLATE TO RINEX
-/home/bpe2/src/autobpe/src/bash/get_crl_data.sh ${M20DAYS[0]} ${M20DAYS[3]}
-/home/bpe2/src/autobpe/src/bash/crl2rnx.sh -y ${M20DAYS[0]} -d ${M20DAYS[3]}
-rm *.tps
-mv *.15o /home/bpe2/data/GPSDATA/DATAPOOL/
+## /home/bpe2/src/autobpe/src/bash/get_crl_data.sh ${M20DAYS[0]} ${M20DAYS[3]}
+## /home/bpe2/src/autobpe/src/bash/crl2rnx.sh -y ${M20DAYS[0]} -d ${M20DAYS[3]}
+## rm *.tps
+## mv *.15o /home/bpe2/data/GPSDATA/DATAPOOL/
 
 echo "DOWNLOADING REGIONAL FROM FILE: ${TBL}/crd/uranus.reg" >> ${LOG}
 /usr/local/bin/wgeturanus \

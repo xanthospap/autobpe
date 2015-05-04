@@ -267,13 +267,15 @@ then
     IFS=',' read -a STATIONS <<<"$STATIONS_STRING"
 
 ##  Else, search through the specified path, for files matching
-##+ the pattern 'path/ssssmmdd0.tps', where 'ssss' must match one
+##+ the pattern 'path/ssssmmdd?.tps', where 'ssss' must match one
 ##+ of the valid stations.
 else
     for sta in "${VALID_STATIONS[@]}"
     do
-        ## echo "searching for ${DIR}${sta}${MONTH}${DOM}0.tps"
-        if test -f ${DIR}${sta}${MONTH}${DOM}0.tps
+        ## echo "searching for ${DIR}${sta}${MONTH}${DOM}?.tps"
+        TMP_STA=()
+        IFS=',' read -a TMP_STA <<< `ls ${DIR}${sta}${MONTH}${DOM}?.tps 2>/dev/null`
+        if test "${#TMP_STA}" -gt 0
         then
             STATIONS+=("${sta}")
         fi
@@ -294,12 +296,16 @@ fi
 # ////////////////////////////////////////////////////////////////////////////
 
 ## teqc translation options
-teqc_opt='-top tps -O.r CRLAB -O.obs l1+l2+ca+p1+p2 -O.ag CRL -O.o CRL -O.dec 30'
+# teqc_opt='-top tps -O.r CRLAB -O.obs l1+l2+ca+p1+p2 -O.ag CRL -O.o CRL -O.dec 30'
+teqc_opt='-top tps -O.r DSO-HGL/NTUA -O.obs l1+l2+ca+p1+p2+s1+s2 -O.ag CRL -O.o CRL'
 
 for i in "${STATIONS[@]}"
 do
-    ## raw data file is
+    ## raw data file is ( for session = 0 )
     raw=${DIR}${i}${MONTH}${DOM}0.tps
+
+    ## get a list of raw data files, of the same date, depending on session
+    session_files=(`ls ${DIR}${i}${MONTH}${DOM}?.tps`)
 
     ## get station information
     line=`station_sentence $i`
@@ -318,16 +324,41 @@ do
     receiver=`echo $line | awk -F',' '{print $6}'`
     xyz=`echo $line | awk -F',' '{print $7,$8,$9}'`
 
-    ## how should the rinex be named ?
-    rinex=${DIR}${i}${DOY}0.${YR2}o
+    ## loop through all data files for all sessions
+    rinex_files=()
+    for raw in "${session_files[@]}"
+    do
 
-    ## run the command
-    if ! teqc ${teqc_opt} -O.mo "${i^^}" -O.mn "${name}" -O.an "${antenna_nr}" \
-    -O.at "${antenna}" -O.px ${xyz} ${raw} 1>${rinex} 2>/dev/null
+        ## extract session identifier
+        SESSION=${raw:(-5):1}
+
+        ## how should the rinex be named ?
+        rinex=${DIR}${i}${DOY}${SESSION}.${YR2}o
+
+        ## run the command
+        if ! teqc ${teqc_opt} -O.mo "${i^^}" -O.mn "${name}" -O.an "${antenna_nr}" \
+            -O.at "${antenna}" -O.px ${xyz} ${raw} 1>${rinex} 2>/dev/null
+        then
+            echo "ERROR. Failed to translate raw data file : $raw (error code ${?})"
+        else
+            echo "Translated raw data file $raw to $rinex"
+            rinex_files+=(${rinex})
+        fi
+
+    done
+
+    ##  Handle 1sec rinex
+    ##  In loop only if more than 5 sessions exist
+    if test "${#rinex_files[@]}" -gt 5
     then
-        echo "ERROR. Failed to translate raw data file : $raw (error code ${?})"
-    else
-        echo "Translated raw data file $raw to $rinex"
+        echo "Merging rinex data (sampling rate = 30sec) for station ${i}"
+        merge_w_teqc="teqc -O.dec 30 "
+        for j in "${rinex_files[@]}"
+        do
+            merge_w_teqc="${merge_w_teqc} ${j}"
+        done
+        $merge_w_teqc > ${DIR}${i}.tmp
+        mv ${DIR}${i}.tmp ${DIR}${i}${DOY}0.${YR2}o
     fi
 
 done

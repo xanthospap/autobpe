@@ -16,7 +16,7 @@
 ## created               : MAY-2013
 ## usage                 : extractStations.sh
 ## exit code(s)          : 0 -> success
-##                        -1 -> error
+##                         1 -> error
 ## discription           : 
 ## uses                  :
 ## needs                 : 
@@ -36,6 +36,10 @@
 function dversion {
   echo "${NAME} ${VERSION} (${RELEASE}) ${LAST_UPDATE}"
   exit 0
+}
+
+function echoerr {
+    echo "$@" 1>&2
 }
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -160,7 +164,7 @@ do
       USE_ALL_STATIONS=YES
       shift;;
     *)
-      echo "Ignoring cmd: $1"
+      echoerr "Ignoring cmd: $1"
       shift
       ;;
   esac
@@ -170,7 +174,7 @@ done
 # CHECK THAT SUMMARY FILE EXISTS
 # //////////////////////////////////////////////////////////////////////////////
 if [ ! -s "$OUTPUT_FILE" ]; then
-  echo "***(extractStations) Processing summary file $OUTPUT_FILE does not exist"
+  echoerr "***(extractStations) Processing summary file $OUTPUT_FILE does not exist"
   exit 254
 fi
 
@@ -179,7 +183,7 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 if [ "$ONLY_REPORT" == "NO" ]; then
   if [ ! -d "$STA_DIR" ]; then
-    echo "***(extractStations) Directory $STA_DIR does not exist!"
+    echoerr "***(extractStations) Directory $STA_DIR does not exist!"
     exit 254
   fi
 fi
@@ -195,7 +199,7 @@ if [ "$STATION_FILE" != "0" ]; then
       STATIONS+=($J)
     done
   else
-    echo "***(extractStations) File ${STATION_FILE} does not exist!"
+    echoerr "***(extractStations) File ${STATION_FILE} does not exist!"
   fi
 fi
 
@@ -230,7 +234,7 @@ fi
 # as MJD
 MJD=`egrep -A2 \
 " Sol Station name         Typ Correction  Estimated value  RMS error   A priori value Unit    From                To                  MJD           Num Abb  " \
-/media/Seagate/solutions52/2014/200/FFG142000.OUT | tail -1 | awk '{print $13}' 2>/dev/null`
+${OUTPUT_FILE} | tail -1 | awk '{print $13}' 2>/dev/null`
 imjd=${MJD%%.*}
 fmjd=${MJD/*./0.}
 
@@ -239,13 +243,25 @@ import bpepy.gpstime
 import sys
 s,d = bpepy.gpstime.jd2gd ('$imjd','$fmjd')
 if s != 0 : sys.exit (1)
-d.strftime ('%Y %j %m %d')
+print d.strftime ('%Y %j %m %d')
 sys.exit (0)"` ##2>/dev/null`
-    
+
 # check for error
 if test $? -ne 0 ; then
-  echo "***ERROR! Failed to resolve MJD $MJD ($DATE_STR)"
+  echoerr "***ERROR! Failed to resolve MJD $MJD ($DATE_STR)"
+  echoerr "*** imjd=$imjd fmjd=$fmjd"
   exit 254
+fi
+
+## double-check DATE_STR
+WORDS=`echo $DATE_STR | wc -w`
+if test "$WORDS" -ne 4
+then
+    echoerr "***ERROR! Failed to resolve MJD $MJD ($DATE_STR)"
+    exit 254
+else
+    echoerr "(extractStations) date string=$DATE_STR from MJD=$MJD ($imjd + $fmjd)"
+    echoerr ""
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -283,7 +299,7 @@ for j in ${STATIONS[*]}; do
   if [ "${LNS}" -eq 0 ]; then   ## station not found in the processing summary
     MISSING+=(${STATION})
   elif [ "${LNS}" -ne 7 ]; then ## invalid station record in summary file
-    echo "***(extractStations) Error extracting information for station ${STATION} (skipped)"
+    echoerr "***(extractStations) Error extracting information for station ${STATION} (skipped)"
     STATUS=253
   else
     xcrd=`cat .tmp | sed -n '1p' | awk '{printf "%+09.5f\n",$4}'`
@@ -310,12 +326,13 @@ for j in ${STATIONS[*]}; do
     if [ "$ONLY_REPORT" == "NO" ]; then            ## Update station files
       for i in $CRD_C_FILE $CRD_G_FILE $UPD_FILE; do
         if [ ! -f "${i}" ]; then
-          echo "***(extractStations) Error missing file ${i}; cannot update station $j (fatal)"
+          echoerr "***(extractStations) Error missing file ${i}; cannot update station $j (fatal)"
           exit 254
         fi
       done
       sed -i "s|^${DATE_STR}|#${DATE_STR}|g" $CRD_C_FILE 2>/dev/null
       sed -i "s|^${DATE_STR}|#${DATE_STR}|g" $CRD_G_FILE 2>/dev/null
+      echoerr "this is what i echo for $j: $DATE_STR $xcrd $ycrd $zcrd $xrms $yrms $zrms $TIME_STAMP (to $CRD_C_FILE)"
       echo "$DATE_STR $xcrd $ycrd $zcrd $xrms $yrms $zrms $TIME_STAMP" >> $CRD_C_FILE
       echo "$DATE_STR $ncrd $ecrd $ucrd $nrms $erms $urms $TIME_STAMP" >> $CRD_G_FILE
       echo "$DATE_STAMP" > $UPD_FILE
@@ -337,7 +354,7 @@ rm .tmp 2>/dev/null
 if [ "$QUIET" == "NO" ]; then
   if test ${#MISSING[@]} -ne 0 ; then
     for i in "${MISSING[@]}"; do
-      echo "## Station $i not processed"
+      echoerr "## Station $i not processed"
     done
   fi
 fi

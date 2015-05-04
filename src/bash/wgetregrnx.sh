@@ -41,7 +41,8 @@
 ##                        JUL-2014 : added station voli for NOA-GEIN
 ##                        NOV-2014 : major update
 ##                        DEC-2014 : added stations krin, psat, pat1, rod3, xili for ipgp
-                          LAST_UPDATE=DEC-2014
+##                        APR-2015 : ipgp (crl) stations are now placed at ntua's server
+                          LAST_UPDATE=APR-2015
 ##
 ################################################################################
 
@@ -251,11 +252,19 @@ function get_station {
       ;;
 
     3) # IPGP SERVER
-      wget --no-check-certificate -q --timeout=90 --tries=2 -O ${od}/${st}${dy}0.${y2}d.Z https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/${yr}/${dy}/${st}${dy}0.${y2}d.Z
-      if test -s ${od}/${st}${dy}0.${y2}d.Z; then
-        echo 0
+      ## wget --no-check-certificate -q --timeout=90 --tries=2 -O ${od}/${st}${dy}0.${y2}d.Z https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/${yr}/${dy}/${st}${dy}0.${y2}d.Z
+      ## if test -s ${od}/${st}${dy}0.${y2}d.Z; then
+      ##   echo 0
+      ## else
+      ##   rm ${od}/${st}${dy}0.${y2}d.Z 2>/dev/null
+      ##   echo 1
+      ## fi
+      ## ;;
+      ## ---------------------IPGP DATA NOW TRANSFERED FROM NTUA'S SERVER
+      if [ -f "/media/WD/data/COMET/${yr}/${dy}/${st}${dy}0.${y2}d.Z" ]; then
+        cp "/media/WD/data/COMET/${yr}/${dy}/${st}${dy}0.${y2}d.Z" ${od}/${st}${dy}0.${y2}d.Z
+        echo $?
       else
-        rm ${od}/${st}${dy}0.${y2}d.Z 2>/dev/null
         echo 1
       fi
       ;;
