@@ -42,7 +42,7 @@
 ##                        NOV-2014 : major update
 ##                        DEC-2014 : added stations krin, psat, pat1, rod3, xili for ipgp
 ##                        APR-2015 : ipgp (crl) stations are now placed at ntua's server
-                          LAST_UPDATE=APR-2015
+                          LAST_UPDATE=MAY-2015
 ##
 ################################################################################
 
@@ -124,7 +124,7 @@ function help {
 
 ## RINEX FROM NTUA SERVER (1)
 ## ********************************
-NTUA_RNX_LIST=(akyr anop ark2 arki atrs dion diop dsln gvds katc kery kith kryo mena meth mkmn mlos neap poly sntr sprt tilo vass wnry xrso)
+NTUA_RNX_LIST=(akyr anop ark2 arki atrs dion diop dsln gvds katc kery kith kryo mena meth mkmn mlos neap poly sntr sprt tilo vass wnry xrso anoc alis arsa koun eypa lamb lido triz krin meso rod3 xili psar psat)
 
 ## RINEX FROM NOA-GEIN SERVER (2)
 ## ********************************
@@ -137,7 +137,7 @@ NOA_RNX_LIST=(atal kasi katc kipo klok krps lemn neab nvrk pont prkv pyl2 rlso s
 
 ## RINEX FROM IPGP SERVER (3)
 ## ********************************
-IPGP_RNX_LIST=(eypa koun krin lamb lido pat1 psar psat pylo rod3 triz xili)
+IPGP_RNX_LIST=()
 
 ## RINEX FROM UNAVCO SERVER (4)
 ## ********************************
@@ -391,7 +391,7 @@ function list_station {
   echo "| dion | dion | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| diop | diop | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| dsln | dsln | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
-  echo "| eypa | eypa | https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/YYYY/DDDD | crl      |"
+  echo "| eypa | eypa | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| gvds | gvds | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| idi1 | idi1 | ftp://194.177.194.102/idi/YYYY/DDDD                                       | noa-2    |"
   echo "| kasi | kasi | http://www.gein.noa.gr/services/GPSData/YYYY/DDDD                         | noa-gein |"
@@ -403,13 +403,13 @@ function list_station {
   echo "| kipo | kipo | http://www.gein.noa.gr/services/GPSData/YYYY/DDDD                         | noa-gein |"
   echo "| kith | kith | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| klok | klok | http://www.gein.noa.gr/services/GPSData/YYYY/DDDD                         | noa-gein |"
-  echo "| koun | koun | https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/YYYY/DDDD | crl      |"
-  echo "| krin | krin | https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/YYYY/DDDD | crl      |"
+  echo "| koun | koun | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
+  echo "| krin | krin | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| krps | krps | http://www.gein.noa.gr/services/GPSData/YYYY/DDDD                         | noa-gein |"
   echo "| kryo | kryo | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
-  echo "| lamb | lamb | https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/YYYY/DDDD | crl      |"
+  echo "| lamb | lamb | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| lemn | lemn | http://www.gein.noa.gr/services/GPSData/YYYY/DDDD                         | noa-gein |"
-  echo "| lido | lido | https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/YYYY/DDDD | crl      |"
+  echo "| lido | lido | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| mena | mena | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| meth | meth | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| mkmn | mkmn | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
@@ -419,18 +419,18 @@ function list_station {
   echo "| neap | neap | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| nomi | nomi | ftp://data-out.unavco.org/pub/rinex/obs/YYYY/DDDD                         | unavco   |"
   echo "| nvrk | nvrk | http://www.gein.noa.gr/services/GPSData/YYYY/DDDD                         | noa-gein |"
-  echo "| pat1 | pat1 | https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/YYYY/DDDD | crl      |"
+  echo "| pat1 | pat1 |                                                                           | ntua     |"
   echo "| pkmn | pkmn | ftp://data-out.unavco.org/pub/rinex/obs/YYYY/DDDD                         | unavco   |"
   echo "| poly | poly | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| pont | pont | http://www.gein.noa.gr/services/GPSData/YYYY/DDDD                         | noa-gein |"
   echo "| prkv | prkv | http://www.gein.noa.gr/services/GPSData/YYYY/DDDD                         | noa-gein |"
-  echo "| psar | psar | https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/YYYY/DDDD | crl      |"
-  echo "| psat | psat | https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/YYYY/DDDD | crl      |"
+  echo "| psar | psar | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
+  echo "| psat | psat | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| pylo | pyl2 | http://www.gein.noa.gr/services/GPSData/YYYY/DDDD                         | noa-gein |"
-  echo "| pylo | pylo | https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/YYYY/DDDD | crl      |"
+## echo "| pylo | pylo | https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/YYYY/DDDD | crl      |" ##########################
   echo "| riba | riba | ftp://data-out.unavco.org/pub/rinex/obs/YYYY/DDDD                         | unavco   |"
   echo "| rlso | rlso | http://www.gein.noa.gr/services/GPSData/YYYY/DDDD                         | noa-gein |"
-  echo "| rod3 | rod3 | https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/YYYY/DDDD | crl      |"
+  echo "| rod3 | rod3 | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| sant | sant | http://www.gein.noa.gr/services/GPSData/YYYY/DDDD                         | noa-gein |"
   echo "| siva | siva | ftp://194.177.194.102/siva/YYYY/DDDD                                      | noa-2    |"
   echo "| sntr | sntr | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
@@ -440,13 +440,13 @@ function list_station {
   echo "| thir | thir | http://www.gein.noa.gr/services/GPSData/YYYY/DDDD                         | noa-gein |"
   echo "| tilo | tilo | ftp://data-out.unavco.org/pub/rinex/obs/YYYY/DDDD                         | unavco   |"
   echo "| tilo | tilo | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
-  echo "| triz | triz | https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/YYYY/DDDD | crl      |"
+  echo "| triz | triz | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| vam1 | vam1 | ftp://194.177.194.102/vam/YYYY/DDDD                                       | noa-2    |"
   echo "| vass | vass | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| vlsm | vlsm | http://www.gein.noa.gr/services/GPSData/YYYY/DDDD                         | noa-gein |"
   echo "| voli | voli | http://www.gein.noa.gr/services/GPSData/YYYY/DDDD                         | noa-gein |"
   echo "| wnry | wnry | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
-  echo "| xili | xili | https://gpscope.dt.insu.cnrs.fr/chantiers/corinthe/data_by_date/YYYY/DDDD | crl      |"
+  echo "| xili | xili | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| xrso | xrso | gpsdata@147.102.110.69:/media/WD/data/COMET/YYYY/DDD                      | ntua     |"
   echo "| zkro | zkro | ftp://194.177.194.102/zkr/YYYY/DDDD                                       | noa-2    |"
   echo "+------+------+---------------------------------------------------------------------------+----------+"
