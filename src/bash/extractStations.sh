@@ -260,8 +260,9 @@ then
     echoerr "***ERROR! Failed to resolve MJD $MJD ($DATE_STR)"
     exit 254
 else
-    echoerr "(extractStations) date string=$DATE_STR from MJD=$MJD ($imjd + $fmjd)"
-    echoerr ""
+    ## echoerr "(extractStations) date string=$DATE_STR from MJD=$MJD ($imjd + $fmjd)"
+    ## echoerr ""
+    :
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -332,7 +333,7 @@ for j in ${STATIONS[*]}; do
       done
       sed -i "s|^${DATE_STR}|#${DATE_STR}|g" $CRD_C_FILE 2>/dev/null
       sed -i "s|^${DATE_STR}|#${DATE_STR}|g" $CRD_G_FILE 2>/dev/null
-      echoerr "this is what i echo for $j: $DATE_STR $xcrd $ycrd $zcrd $xrms $yrms $zrms $TIME_STAMP (to $CRD_C_FILE)"
+      ## echoerr "this is what i echo for $j: $DATE_STR $xcrd $ycrd $zcrd $xrms $yrms $zrms $TIME_STAMP (to $CRD_C_FILE)"
       echo "$DATE_STR $xcrd $ycrd $zcrd $xrms $yrms $zrms $TIME_STAMP" >> $CRD_C_FILE
       echo "$DATE_STR $ncrd $ecrd $ucrd $nrms $erms $urms $TIME_STAMP" >> $CRD_G_FILE
       echo "$DATE_STAMP" > $UPD_FILE

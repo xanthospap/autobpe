@@ -87,8 +87,8 @@ def help (i):
 
 # global variables / default values
 rootdir = ""
-startdate = datetime.date (1980, 1, 1);
-stopdate  = datetime.datetime.now().date();
+startdate = datetime.datetime(1980, 1, 1);
+stopdate  = datetime.datetime.now();
 delta     = datetime.timedelta(days=1)
 access_permission_id = 3
 file_sample = 30.0
@@ -137,7 +137,7 @@ def main (argv):
       global stopdate
       try:
         stopdate = datetime.datetime.strptime(arg,"%Y-%m-%d")
-        stopdate = stopdate.date ()
+        ## stopdate = stopdate.date ()
       except:
         try:
           if arg == "today":

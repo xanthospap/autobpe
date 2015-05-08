@@ -378,7 +378,7 @@ echo "# warnings : ${WARFILE}"
 echo "#############################################################"
 echo "$*" >> $LOGFILE
 START_T_STAMP=`/bin/date`
-tmpd=${TMP}/${YEAR}${DOY}-ddprocess-${CAMPAIGN,,}-${SOL_TYPE}
+tmpd=${TMP}/${YEAR}${DOY}-ddprocess-${CAMPAIGN,,}-${SOL_TYPE}${SAT_SYS}
 if test -d $tmpd
 then
   rm -rf $tmpd/*
@@ -948,7 +948,7 @@ echo "Checking / transfering Rinex files" >> $LOGFILE
 for i in igs epn reg; do
   file=${TABLES}/crd/${CAMPAIGN,,}.${i}
   if ! test -f ${file}
-  then 
+  then
       echo "*** Missing file $file" >> $LOGFILE
       exit 1
   fi
@@ -1278,6 +1278,7 @@ for i in ATM/${SOL_ID}${YR2}${DOY}0.TRO \
         sfn=${BSNM}${SUFFIX}.${EXTNS}
     fi
     cp ${P}/${CAMPAIGN}/${i} ${SAVE_DIR}/${sfn}
+    echo "*** Copying ${P}/${CAMPAIGN}/${i} to ${SAVE_DIR}/${sfn}" >>$LOGFILE
     compress -f ${SAVE_DIR}/${sfn}
   echo "<listitem><para>Saved file <filename>${i}</filename> to <filename>${SAVE_DIR}/${sfn}.Z</filename></para></listitem>" >> ${tmpd}/saved.files
   fi
