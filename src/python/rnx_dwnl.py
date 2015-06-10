@@ -49,15 +49,18 @@ def help (i):
     sys.exit(i)
 
 ## Global variables / default values
-HOST_NAME = '147.102.110.73'
-USER_NAME = 'bpe2'
-PASSWORD  = 'webadmin'
-DB_NAME   = 'procsta'
-stations  = []
-networks  = []
+HOST_NAME   = '147.102.110.73'
+USER_NAME   = 'bpe2'
+PASSWORD    = 'webadmin'
+DB_NAME     = 'procsta'
+stations    = []
+networks    = []
 rename_marker = False
-year      = 0
-doy       = 0
+year        = 0
+doy         = 0
+outputdir   = ''
+touppercase = False
+uncompressZ = False
 
 # a dictionary to hold start time (hours) for every session character
 ses_identifiers = {
@@ -77,6 +80,8 @@ def executeShellCmd(command):
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, err = p.communicate()
         returncode  = p.returncode
+        # print >> sys.stderr, output
+        # print >> sys.stderr, err
     except:
         raise ValueError('ERROR. Cannot execute command: ['+command+']')
     if returncode:
@@ -86,9 +91,9 @@ def UnixUncompress(inputf, outputf = '0'):
     '''Uncompress the UNIX-compressed file inputf to outputf'''
 
     if outputf == '0':
-        sys_command = 'uncompress ' + inputf
+        sys_command = 'uncompress -f ' + inputf
     else:
-        sys_command = 'uncompress -c ' + inputf + ' > ' + outputf
+        sys_command = 'uncompress -f -c ' + inputf + ' > ' + outputf
 
     try:
         p = subprocess.Popen(sys_command, shell=True,
@@ -144,11 +149,15 @@ def getRinexMarkerName(filename):
     fin.close()
     raise ValueError('ERROR. No MARKER NAME in Rinex file:'+ufilename)
 
-def setDownloadCommand(infolist,year='',doy='',month='',dom='',hour=''):
+def setDownloadCommand(infolist,year='',doy='',month='',dom='',hour='',
+        odir='',toUpperCase=False):
     '''
     Given a list (of information) as returned by the database query (for one
     station), this function will examine the fields and compile the
-    download command.
+    download command and the file to be saved. I.e the return type is
+    [download_command, saved_file], both string elements.
+    The saved file is included in the command (as argument in the '-O' switch,
+    but it is also returned as the second element of the list for ease of use.
 
     Input params :
     year = 4-digit year (string)
@@ -156,6 +165,8 @@ def setDownloadCommand(infolist,year='',doy='',month='',dom='',hour=''):
     month= 3-digit month (string), e.g. 'Jan'
     dom  = 2-digit day of month
     hour = 2-digit hour of day
+    odir = path to where the file is to be saved (string) e.g. /home/bpe/foo/bar
+    toUpperCase = truncate the saved file to uppercase characters
 
     The input array, must have the following fields:
     [0]  station_id (long int)
@@ -221,10 +232,21 @@ def setDownloadCommand(infolist,year='',doy='',month='',dom='',hour=''):
             raise ValueError('ERROR. Invalid hour of day:', hour)
         else:
             session_identifier = ses_identifiers[hour];
-    filename_ = infolist[2] + doy + session_identifier + '.' + year[2:2] + 'd.Z'
+    filename_ = infolist[2] + doy + session_identifier + '.' + year[2:] + 'd.Z'
+
+    ## set the filename (to save)
+    savef_ = filename_;
+    if toUpperCase:
+        savef_ = savef_.upper()
+    if odir != '':
+        if odir[-1] == '/': odir = odir[:-1]
+        savef_ = odir + '/' + savef_
 
     ## return the command as string
-    return ( command_ + ' ' + host_ + path_ + filename_ )
+    if infolist[5] == "ssh": ## scp -> saved file at the end (no -O switch)
+        return (command_ + ' ' + host_ + path_ + filename_ + ' ' + savef_), savef_
+    else:
+        return (command_ + ' -O' + savef_ + ' ' + host_ + path_ + filename_), savef_
 
 ## Resolve command line arguments
 def main (argv):
@@ -233,8 +255,9 @@ def main (argv):
         help(1)
 
     try:
-        opts, args = getopt.getopt(argv,'hs:n:ry:d:',[
-            'help','stations=','networks=','rename-marker','year','doy'])
+        opts, args = getopt.getopt(argv,'hs:n:ry:d:p:uz',[
+            'help','stations=','networks=','rename-marker','year=','doy=',
+            'path=','uppercase','uncompress'])
     except getopt.GetoptError:
         help(1)
 
@@ -266,6 +289,15 @@ def main (argv):
             except:
                 print >> sys.stderr, 'Invalid day of year: ', str(arg)
                 sys.exit(1)
+        elif opt in ('-u', '--uppercase'):
+            global touppercase
+            touppercase = True
+        elif opt in ('-p', '--path'):
+            global outputdir
+            outputdir = arg
+        elif opt in ('-z', '--uncompress'):
+            global uncompressZ
+            uncompressZ = True
         else:
             print >> sys.stderr, "Invalid command line argument:",opt
 
@@ -293,7 +325,6 @@ if __name__ == "__main__":
 
     ## try connecting to the database server
     try:
-        print 'CONNECT',HOST_NAME,USER_NAME,PASSWORD,DB_NAME
         db = MySQLdb.connect(host=HOST_NAME,user=USER_NAME,passwd=PASSWORD,db=DB_NAME);
         cur = db.cursor()
 
@@ -325,31 +356,68 @@ if __name__ == "__main__":
                   print >> sys.stderr, 'No matching station name in database for',s
 
     except:
+        db.close()
         print >> sys.stderr, '***ERROR ! Cannot connect to database server'
         exc_type, exc_value, exc_traceback = sys.exc_info ()
         lines = traceback.format_exception (exc_type, exc_value, exc_traceback)
         print ''.join('!!#' + line for line in lines)
         sys.exit (2)
 
-    ## All station specific information all stacked in the station_info array
+    ## Goodbye database
+    db.close()
+
+    ## All station specific information are stacked in the station_info array
     ## get the command to be executed for each (including variables, e.g. _YYYY_)
+    ## and the list of the corresponding files to be saved.
     commands = []
+    svfiles  = []
     for row in station_info:
         try:
-            commands.append( setDownloadCommand(row,Year,DoY,sMon,DoM) )
+            cmd, svfl = setDownloadCommand(row,
+                Year,
+                DoY,
+                sMon,
+                DoM,
+                '',
+                outputdir,
+                touppercase)
+            commands.append(cmd)
+            svfiles.append(svfl)
         except ValueError as e:
-            print >> stderr, e.message
+            print >> sys.stderr, e.message
 
-    for cmd in commands:
+    ## Now, execute each command in the commands array to actually download
+    ## the data.
+    for cmd, sf in zip(commands,svfiles):
         ## replace variables (_YYYY_, _DDD_ )
         cmd = cmd.replace('_YYYY_', Year)
         cmd = cmd.replace('_DDD_', DoY);
 
         ## Execute the command
-        try:
-            executeShellCommand(cmd)
-        except:
-            print >> stderr, 'Failed ->',cmd
+        ## WAIT !! do not download the file exists AND has size > 0
+        if os.path.isfile(sf) and os.path.getsize(sf):
+            print '## File',sf,'already exists. Skipping download.'
+        else:
+            ## print 'Command = [',cmd,']'
+            try:
+                executeShellCmd(cmd)
+            except ValueError as e:
+                print >> sys.stderr, 'Failed to download file:',sf
 
-    db.close()
+        ## check for empty file
+        if os.path.isfile(sf) and not os.path.getsize(sf):
+            print >> sys.stderr, '## Removing empty file:',sf
+            os.remove(sf)
+
+    ## If specified, uncompress the downloaded files
+    print svfiles
+    if uncompressZ:
+        for fl in svfiles:
+            if os.path.isfile(fl) and (fl[-2:] == '.Z') :
+                try:
+                    UnixUncompress(fl)
+                except:
+                    print >> sys.stderr, 'ERROR. Failed to uncompress file:',fl
+
+    ## db.close()
     sys.exit(0)
