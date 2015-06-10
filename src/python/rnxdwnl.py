@@ -61,6 +61,7 @@ doy         = 0
 outputdir   = ''
 touppercase = False
 uncompressZ = False
+forceRemove = False
 
 # a dictionary to hold start time (hours) for every session character
 ses_identifiers = {
@@ -255,9 +256,9 @@ def main (argv):
         help(1)
 
     try:
-        opts, args = getopt.getopt(argv,'hs:n:ry:d:p:uz',[
+        opts, args = getopt.getopt(argv,'hs:n:ry:d:p:uzf',[
             'help','stations=','networks=','rename-marker','year=','doy=',
-            'path=','uppercase','uncompress'])
+            'path=','uppercase','uncompress','fore-remove'])
     except getopt.GetoptError:
         help(1)
 
@@ -275,6 +276,9 @@ def main (argv):
         elif opt in ('-r', '--rename-marker'):
             global rename_marker
             rename_marker = True
+        elif opt in ('-f', '--force-remove'):
+            global forceRemove
+            forceRemove = True
         elif opt in ('-y', '--year'):
             global year
             try:
@@ -295,6 +299,9 @@ def main (argv):
         elif opt in ('-p', '--path'):
             global outputdir
             outputdir = arg
+            if not os.path.exists(outputdir):
+                print >> sys.stderr, 'ERROR. Directory does not exist:',arg
+                sys.exit(2)
         elif opt in ('-z', '--uncompress'):
             global uncompressZ
             uncompressZ = True
@@ -394,15 +401,19 @@ if __name__ == "__main__":
         cmd = cmd.replace('_DDD_', DoY);
 
         ## Execute the command
-        ## WAIT !! do not download the file exists AND has size > 0
+        ## WAIT !! do not download the file if it already exists AND has
+        ## size > 0. Or just delete!
         if os.path.isfile(sf) and os.path.getsize(sf):
-            print '## File',sf,'already exists. Skipping download.'
+            if forceRemove:
+                os.remove(sf)
+            else:
+                print '## File',sf,'already exists. Skipping download.'
         else:
             ## print 'Command = [',cmd,']'
             try:
                 executeShellCmd(cmd)
             except ValueError as e:
-                print >> sys.stderr, 'Failed to download file:',sf
+                print >> sys.stderr, 'ERROR. Failed to download file:',sf
 
         ## check for empty file
         if os.path.isfile(sf) and not os.path.getsize(sf):
@@ -410,7 +421,6 @@ if __name__ == "__main__":
             os.remove(sf)
 
     ## If specified, uncompress the downloaded files
-    print svfiles
     if uncompressZ:
         for fl in svfiles:
             if os.path.isfile(fl) and (fl[-2:] == '.Z') :
