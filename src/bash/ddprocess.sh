@@ -237,6 +237,7 @@ AVREG=()
 # START TIMING
 # //////////////////////////////////////////////////////////////////////////////
 START_PROCESS_SECONDS=$(date +"%s")
+DTM_HHMMSS=`date +"%H:%M:%S"` ## this will change later on
 
 # //////////////////////////////////////////////////////////////////////////////
 # GET COMMAND LINE ARGUMENTS
@@ -368,15 +369,23 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 LOGFILE=${LOG_DIR}/ddproc-${YEAR:2:2}${DOY}.log
 WARFILE=${LOG_DIR}/ddproc-${YEAR:2:2}${DOY}.wrn
+SOLSUMASC=${LOG_DIR}/ddproc-${YEAR:2:2}${DOY}.ssa
 >$LOGFILE
 >$WARFILE
+>$SOLSUMASC
+
+{
 echo "#############################################################"
 echo "#                                          Routine Processing"
 echo "# date     : ${YEAR} ${DOY}"
 echo "# logfile  : ${LOGFILE}"
 echo "# warnings : ${WARFILE}"
+echo "# solution : ${SOLSUMASC}"
+echo "# started  : ${DTM_HHMMSS}"
 echo "#############################################################"
-echo "$*" >> $LOGFILE
+echo "$*"
+} | tee -a $LOGFILE $SOLSUMASC
+
 START_T_STAMP=`/bin/date`
 tmpd=${TMP}/${YEAR}${DOY}-ddprocess-${CAMPAIGN,,}-${SOL_TYPE}${SAT_SYS}
 if test -d $tmpd
@@ -385,25 +394,28 @@ then
 else
   mkdir ${tmpd}
 fi
-echo "Temporary directory : ${tmpd}"        >> $LOGFILE
-echo "Log File            : ${LOGFILE}"     >> $LOGFILE
-echo "Warnings            : ${WARFILE}"     >> $LOGFILE
-echo "Process started at  : $START_T_STAMP" >> $LOGFILE
+
+{
+echo "Temporary directory : ${tmpd}"
+echo "Log File            : ${LOGFILE}"
+echo "Warnings            : ${WARFILE}"
+echo "Process started at  : $START_T_STAMP"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
 
 # //////////////////////////////////////////////////////////////////////////////
 # CHECK REMAINING CMD; SOURCE LOADVAR
 # //////////////////////////////////////////////////////////////////////////////
 
-# 
+#
 # CHECK THAT LOADVAR FILE EXISTS AND SOURCE IT
 #
 if ! test -f $LOADVAR ; then
-  echo "*** Variable file $LOADVAR does not exist"
+  echo "*** Variable file $LOADVAR does not exist" >> $LOGFILE
   exit 1
 fi
 . $LOADVAR
 if [ "$VERSION" != "52" ] ; then
-  echo "***ERROR! Cannot load the source file: $LOADVAR"
+  echo "***ERROR! Cannot load the source file: $LOADVAR" >> $SOLSUMASC
   exit 1
 fi
 
@@ -411,7 +423,7 @@ fi
 # CHECK THAT THE PCF FILE EXISTS
 #
 if ! test -f ${U}/PCF/${PCF_FILE}.PCF ; then
-  echo "*** Cannot find pcf file: ${U}/PCF/${PCF_FILE}.PCF"
+  echo "*** Cannot find pcf file: ${U}/PCF/${PCF_FILE}.PCF" >> $LOGFILE
   exit 1
 fi
 
@@ -419,11 +431,11 @@ fi
 # CHECK THAT THE CAMPAIGN EXISTS
 #
 if test -z $CAMPAIGN ; then
-  echo "***ERROR! Need to specify campaign name"
+  echo "***ERROR! Need to specify campaign name" >> $LOGFILE
   exit 1
 fi
 if ! test -d ${P}/${CAMPAIGN} ; then
-  echo "***ERROR! Cannot locate campaign ${P}/${CAMPAIGN}"
+  echo "***ERROR! Cannot locate campaign ${P}/${CAMPAIGN}" >> $LOGFILE
   exit 1
 fi
 
@@ -431,7 +443,7 @@ fi
 # CHECK THAT THE ANALYSIS CENTER IS VALID
 #
 if [ ${AC^^} != "IGS" -a ${AC^^} != "COD" ]; then
-  echo "*** Need to provide a valid analysis center"
+  echo "*** Need to provide a valid analysis center" >> $LOGFILE
   exit 1
 fi
 
@@ -439,7 +451,7 @@ fi
 # CHECK THE SATELLITE SYSTEM
 #
 if [ "${SAT_SYS^^}" != "GPS" -a "${SAT_SYS^^}" != "MIXED" ]; then
-  echo "*** Invalid satellite system"
+  echo "*** Invalid satellite system" >> $LOGFILE
   exit 1
 fi
 
@@ -449,11 +461,11 @@ fi
 if [[ $ELEV =~ ^[0-9]+$ ]]; then
   if [ $ELEV -lt 3 -o $ELEV -gt 15 ]
   then
-    echo "*** Elevation angle must be in the range [3-15]"
+    echo "*** Elevation angle must be in the range [3-15]" >> $LOGFILE
     exit 1
   fi
 else
-  echo "*** Invalid elevation angle"
+  echo "*** Invalid elevation angle" >> $LOGFILE
   exit 1
 fi
 
@@ -463,7 +475,7 @@ fi
 if [[ $STA_PER_CLU =~ ^[0-9]+$ ]]; then
     :
 else
-   echo "*** Invalid stations per cluster"
+   echo "*** Invalid stations per cluster" >> $LOGFILE
    exit 1
 fi
 
@@ -478,7 +490,7 @@ fi
 # CHECK THE SOLUTION TYPE IDENTIFIER
 #
 if [ "$SOL_TYPE" != "f" -a "$SOL_TYPE" != "u" ]; then
-  echo "*** Invalid solution type"
+  echo "*** Invalid solution type" >> $LOGFILE
   exit 1
 fi
 
@@ -507,7 +519,7 @@ then
       UPD_NTW=YES
       ;;
     *)
-      echo "Invalid option for update! See help"
+      echo "Invalid option for update! See help" >> $LOGFILE
       exit 1
       ;;
     esac
@@ -517,7 +529,7 @@ fi
 # CHECK THAT THE SAVE DIRECTORY EXISTS OR CREATE IT
 #
 if test -z $SAVE_DIR ; then
-  echo "***ERROR! Need to specify save directory name"
+  echo "***ERROR! Need to specify save directory name" >> $LOGFILE
   exit 1
 fi
 
@@ -525,7 +537,7 @@ if ! test -d $SAVE_DIR
 then
   if ! mkdir -p ${SAVE_DIR}
   then
-    echo "Failed to create save directory: $SAVE_DIR"
+    echo "Failed to create save directory: $SAVE_DIR" >> $LOGFILE
     exit 1
   fi
 else
@@ -539,17 +551,22 @@ fi
 # CHECK & LINK (IF NEEDED) THE TABLE FILES
 # //////////////////////////////////////////////////////////////////////////////
 
-echo "" >> $LOGFILE
-echo "Linking required tables from ${TABLES}" >> $LOGFILE
+{
+echo ""
+echo "Linking required tables from ${TABLES}"
+echo "-------------------------------------------------------------------------"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
 
 # 
 # CHECK THAT THE PCV FILE EXISTS AND LINK IT
 #
 if $( test -f ${TABLES}/pcv/${PCV}.${CLBR} ) && 
-  $( /bin/ln -sf ${TABLES}/pcv/${PCV}.${CLBR} ${X}/GEN/${PCV}.${CLBR} ); then 
-  echo "Linked  ${TABLES}/pcv/${PCV}.${CLBR} to ${X}/GEN/${PCV}.${CLBR}" >> $LOGFILE
+  $( /bin/ln -sf ${TABLES}/pcv/${PCV}.${CLBR} ${X}/GEN/${PCV}.${CLBR} )
+then 
+  echo "Linked  ${TABLES}/pcv/${PCV}.${CLBR} to ${X}/GEN/${PCV}.${CLBR}" \
+      | tee -a $LOGFILE $SOLSUMASC >/dev/null
 else 
-  echo "*** Failed to link pcv file ${TABLES}/pcv/${PCV}.${CLBR} "
+  echo "*** Failed to link pcv file ${TABLES}/pcv/${PCV}.${CLBR} " >>$LOGFILE
   exit 1
 fi
 
@@ -557,24 +574,26 @@ fi
 # LINK THE .STA FILE (MUST BE NAMED AS THE CAMPAIGN)
 #
 if $( test -f ${TABLES}/sta/${CAMPAIGN}52.STA ) && \
-   $( /bin/ln -sf ${TABLES}/sta/${CAMPAIGN}52.STA ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.STA ); then 
-  echo "Linked ${TABLES}/sta/${CAMPAIGN}52.STA to \
-    ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.STA" >> $LOGFILE
+   $( /bin/ln -sf ${TABLES}/sta/${CAMPAIGN}52.STA ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.STA )
+then 
+    echo "Linked ${TABLES}/sta/${CAMPAIGN}52.STA to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.STA" \
+        | tee -a $LOGFILE $SOLSUMASC >/dev/null
 else 
-  echo "*** Failed to link sta file ${TABLES}/sta/${CAMPAIGN}52.STA"
-  exit 1
+    echo "*** Failed to link sta file ${TABLES}/sta/${CAMPAIGN}52.STA" >> $LOGFILE
+    exit 1
 fi
 
 # 
 # LINK THE .BLQ FILE (MUST BE NAMED AS THE CAMPAIGN)
 #
 if $( test -f ${TABLES}/blq/${CAMPAIGN}.BLQ ) && \
-   $( /bin/ln -sf ${TABLES}/blq/${CAMPAIGN}.BLQ ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ ); then 
-  echo "Linked ${TABLES}/blq/${CAMPAIGN}.BLQ to \
-    ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ" >> $LOGFILE
+   $( /bin/ln -sf ${TABLES}/blq/${CAMPAIGN}.BLQ ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ )
+then 
+    echo "Linked ${TABLES}/blq/${CAMPAIGN}.BLQ to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ" \
+        | tee -a $LOGFILE $SOLSUMASC >/dev/null
 else 
-  echo "*** Failed to link blq file ${TABLES}/blq/${CAMPAIGN}.BLQ"
-  exit 1
+    echo "*** Failed to link blq file ${TABLES}/blq/${CAMPAIGN}.BLQ" >> $LOGFILE
+    exit 1
 fi
 
 # 
@@ -582,10 +601,10 @@ fi
 #
 if $( test -f ${TABLES}/atl/${CAMPAIGN}.ATL ) && \
    $( /bin/ln -sf ${TABLES}/atl/${CAMPAIGN}.ATL ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.ATL ); then 
-  echo "Linked ${TABLES}/atl/${CAMPAIGN}.ATL to \
-    ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.ATL" >> $LOGFILE
+  echo "Linked ${TABLES}/atl/${CAMPAIGN}.ATL to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.ATL" \
+      | tee -a $LOGFILE $SOLSUMASC >/dev/null
 else 
-  echo "*** Failed to link atl file ${TABLES}/atl/${CAMPAIGN}.ATL"
+  echo "*** Failed to link atl file ${TABLES}/atl/${CAMPAIGN}.ATL" >> $LOGFILE
   exit 1
 fi
 
@@ -599,10 +618,10 @@ month,dom = bpepy.gpstime.yd2month ($YEAR,'"$DOY"')
 if month == -999 : sys.exit (1)
 print '%04i %1i %02i %02i' %(gpsweek,dow,month,dom)
 sys.exit (0);" 2>${LOGFILE}`
-    
+
 ## check for error
 if test $? -ne 0 ; then
-  echo "***ERROR! Failed to resolve the date (got $DATES_STR)"
+  echo "***ERROR! Failed to resolve the date (got $DATES_STR)" >> $LOGFILE
   exit 1
 fi
 
@@ -629,8 +648,11 @@ DCB_META=
 # WHERE IS DATAPOOL
 DATAPOOL=${D}
 
-echo "" >> $LOGFILE
-echo "Linking required products from ${DATAPOOL}" >> $LOGFILE
+{
+echo ""
+echo "Linking required products from ${DATAPOOL} to campaign area"
+echo "-------------------------------------------------------------------------"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
 
 #
 # ORBITS
@@ -655,7 +677,7 @@ sp3=`/bin/grep --ignore-case "| ${AC} | ${SOL_TYPE}    | ${SAT_SYS} " <<EOF | aw
  +---- +------+-------+-----------------------+
 EOF`
 if test ${#sp3} -ne 12  ; then
-  echo "*** Failed to resolve sp3 file"
+  echo "*** Failed to resolve sp3 file" >> $LOGFILE
   exit 1
 fi
 
@@ -672,8 +694,7 @@ if $( test -f ${DATAPOOL}/${SP3} ) && \
    $( /bin/ln -sf ${DATAPOOL}/${SP3} ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^} )
 then
   ORB_META=${DATAPOOL}/${SP3}.meta
-  echo "Linked orbit file ${DATAPOOL}/${SP3} to \
-    ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^}" >> $LOGFILE
+  echo "Linked orbit file ${DATAPOOL}/${SP3} to ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^}" | tee -a $LOGFILE $SOLSUMASC >/dev/null
   echo "Meta-file : $ORB_META" >> $LOGFILE
 else 
   # failed to find/link rapid sp3; try for ultra-rapid
@@ -686,11 +707,10 @@ else
       $( /bin/ln -sf ${DATAPOOL}/${SP3} ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^} )
     then
       ORB_META=${DATAPOOL}/${SP3}.meta
-      echo "Linked orbit file ${DATAPOOL}/${SP3} to \
-        ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^}" >> $LOGFILE
+      echo "Linked orbit file ${DATAPOOL}/${SP3} to ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^}" | tee -a $LOGFILE $SOLSUMASC >/dev/null
       echo "Meta-file : $ORB_META" >> $LOGFILE
     else
-      echo "*** Failed to link sp3 file ${DATAPOOL}/${SP3}"
+      echo "*** Failed to link sp3 file ${DATAPOOL}/${SP3}" >> $LOGFILE
       exit 1
     fi
   else
@@ -719,7 +739,7 @@ erp=`/bin/grep --ignore-case "| ${AC} | ${SOL_TYPE}    |" <<EOF | awk '{print $7
 EOF`
 
 if test ${#erp} -ne 12 ; then
-  echo "*** Failed to resolve erp file"
+  echo "*** Failed to resolve erp file" >> $LOGFILE
   exit 1
 fi
 
@@ -739,8 +759,8 @@ fi
 if $( test -f ${DATAPOOL}/${ERP} ) && \
    $( /bin/ln -sf ${DATAPOOL}/${ERP} ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^} ); then 
   ERP_META=${DATAPOOL}/${ERP}.meta
-  echo "Linked erp file ${DATAPOOL}/${ERP} to \
-    ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^}" >> $LOGFILE
+  echo "Linked erp file ${DATAPOOL}/${ERP} to ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^}" \
+      | tee -a $LOGFILE $SOLSUMASC >/dev/null
   echo "Meta-File $ERP_META" >> $LOGFILE
 else
   echo "Failed to link erp ${DATAPOOL}/${ERP}" >> $LOGFILE
@@ -752,11 +772,11 @@ else
       $( /bin/ln -sf ${DATAPOOL}/${ERP} ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^} ) 
     then
       ERP_META=${DATAPOOL}/${ERP}.meta
-      echo "Linked erp file ${DATAPOOL}/${ERP} to \
-        ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^}" >> $LOGFILE
+      echo "Linked erp file ${DATAPOOL}/${ERP} to ${P}/${CAMPAIGN}/ORB/${TRG_ERP^^}" \
+          | tee -a $LOGFILE $SOLSUMASC >/dev/null
       echo "Meta-File $ERP_META" >> $LOGFILE
     else
-      echo "*** Failed to link erp file ${DATAPOOL}/${ERP}"
+      echo "*** Failed to link erp file ${DATAPOOL}/${ERP}" >> $LOGFILE
       exit 1
     fi
   else
@@ -771,7 +791,7 @@ fi
 
 LNS=`/bin/grep POLUPDH ${U}/PCF/${PCF_FILE}.PCF | /bin/grep -v "#" | wc -l`
 if [ $LNS -ne 1 ]; then
-  echo "Non-unique line for POLUPDH in the PCF file; Don't know what to do! "
+  echo "Non-unique line for POLUPDH in the PCF file; Don't know what to do! " >> $LOGFILE
   exit 1
 fi
 PAN=`/bin/grep POLUPDH ${U}/PCF/${PCF_FILE}.PCF | /bin/grep -v "#" | awk '{print $3}'`
@@ -782,11 +802,7 @@ if ! /usr/local/bin/setpolupdh \
 then
   exit 1
 else
-  echo "Setting right the POLUPD.INP:" >> $LOGFILE
-  echo "/usr/local/bin/setpolupdh \
-    --bernese-loadvar=${LOADVAR} \
-    --analysis-center=${AC^^} \
-    --pan=${PAN}" >> $LOGFILE
+  echo "Setting right the POLUPD.INP for the AC." | tee -a $LOGFILE $SOLSUMASC >/dev/null
 fi
 
 #
@@ -798,36 +814,40 @@ DCB_META=${DATAPOOL}/P1C1_RINEX.DCB.meta ## we'll see about that ...
 
 if test "${MONTH}" == "${CUR_MONTH}"
 then
-	if ! /bin/ln -sf ${DATAPOOL}/P1C1_RINEX.DCB ${P}/${CAMPAIGN}/ORB/${DCB}
-	then
-		echo "*** Failed to transfer dcb file ${DATAPOOL}/P1C1_RINEX.DCB from datapool"
-		exit 1
-	else
-        echo "Linked dcb file ${DATAPOOL}/P1C1_RINEX.DCB to ${P}/${CAMPAIGN}/ORB/${DCB}" >> $LOGFILE
+    if ! /bin/ln -sf ${DATAPOOL}/P1C1_RINEX.DCB ${P}/${CAMPAIGN}/ORB/${DCB}
+    then
+        echo "*** Failed to transfer dcb file ${DATAPOOL}/P1C1_RINEX.DCB from datapool" \
+            >> $LOGFILE
+        exit 1
+    else
+        echo "Linked dcb file ${DATAPOOL}/P1C1_RINEX.DCB to ${P}/${CAMPAIGN}/ORB/${DCB}" \
+            | tee -a $LOGFILE $SOLSUMASC >/dev/null
         echo "Meta-File $DCB_META" >> $LOGFILE
-	fi
+    fi
 else
-	if test -f ${DATAPOOL}/${DCB}
-	then
-		if ! /bin/ln -sf ${DATAPOOL}/${DCB} ${P}/${CAMPAIGN}/ORB/${DCB}
-		then
-			echo "*** Failed to transfer dcb file ${DATAPOOL}/${DCB}"
-			exit 1
-		else
-			DCB_META=${DATAPOOL}/${DCB}.meta
-			echo "Linked dcb file ${DATAPOOL}/${DCB} to ${P}/${CAMPAIGN}/ORB/${DCB}" >> $LOGFILE
+    if test -f ${DATAPOOL}/${DCB}
+    then
+        if ! /bin/ln -sf ${DATAPOOL}/${DCB} ${P}/${CAMPAIGN}/ORB/${DCB}
+        then
+            echo "*** Failed to transfer dcb file ${DATAPOOL}/${DCB}" >> $LOGFILE
+            exit 1
+        else
+            DCB_META=${DATAPOOL}/${DCB}.meta
+            echo "Linked dcb file ${DATAPOOL}/${DCB} to ${P}/${CAMPAIGN}/ORB/${DCB}" \
+                | tee -a $LOGFILE $SOLSUMASC >/dev/null
             echo "Meta-File $DCB_META" >> $LOGFILE
-		fi
-	else
-		if ! /bin/ln -sf ${DATAPOOL}/P1C1_RINEX.DCB ${P}/${CAMPAIGN}/ORB/${DCB}
-		then
-			echo "*** Failed to transfer dcb file ${DATAPOOL}/P1C1_RINEX.DCB from datapool"
-			exit 1
-		else
-            echo "Linked dcb file ${DATAPOOL}/P1C1_RINEX.DCB to ${P}/${CAMPAIGN}/ORB/${DCB}" >> $LOGFILE
+        fi
+    else
+        if ! /bin/ln -sf ${DATAPOOL}/P1C1_RINEX.DCB ${P}/${CAMPAIGN}/ORB/${DCB}
+        then
+            echo "*** Failed to transfer dcb file ${DATAPOOL}/P1C1_RINEX.DCB from datapool" >> $LOGFILE
+            exit 1
+        else
+            echo "Linked dcb file ${DATAPOOL}/P1C1_RINEX.DCB to ${P}/${CAMPAIGN}/ORB/${DCB}" \
+                | tee -a $LOGFILE $SOLSUMASC >/dev/null
             echo "Meta-File $DCB_META" >> $LOGFILE
-		fi
-	fi
+        fi
+    fi
 fi
 
 #
@@ -835,8 +855,6 @@ fi
 # ------------------------------------------------------------------------------
 
 # TODO if the ionospheric file is copied from ntua's products, it doesn't have a meta file
-echo "" >> $LOGFILE
-echo "Ionospheric Corrections" >> $LOGFILE
 
 ##  Create a .meta file in the TMP directory. We will write info later on.
 ION_META=${TMP}/ion.meta
@@ -853,8 +871,8 @@ for i in $ION_PRODS_ID; do
     echo "(ddprocess) Ionospheric correction file (ion) : \
       ${PRODUCT_AREA}/${YEAR}/${DOY}/${ion} from AC: ntua" >> ${ION_META}
     break
-    echo "Copying ion file ${PRODUCT_AREA}/${YEAR}/${DOY}/${ion} \
-      to ${P}/${CAMPAIGN}/ATM/" >> $LOGFILE
+    echo "Copying ion file ${PRODUCT_AREA}/${YEAR}/${DOY}/${ion} to ${P}/${CAMPAIGN}/ATM/" \
+        | tee -a $LOGFILE $SOLSUMASC >/dev/null
     echo "Meta-File ${ION_META}" >> $LOGFILE
   else 
     ion=
@@ -887,7 +905,7 @@ if test -z $ion ; then
     # ion=${P}/${CAMPAIGN}/ATM/COD${GPSW}${DOW}.ION
     if ! test -f ${ion}
     then
-      echo "Error! Failed to download ion file $ion"
+      echo "Error! Failed to download ion file $ion" >> $LOGFILE
       exit 1
     else
       ION_META=${ion}.meta
@@ -897,18 +915,10 @@ if test -z $ion ; then
       mv $ion ${ion/COU/COD} 2>/dev/null
       mv $ion ${ion/COR/COD} 2>/dev/null
     fi
-    echo "/usr/local/bin/wgetion \
-      --output-directory=${P}/${CAMPAIGN}/ATM \
-      --force-remove \
-      --standard-names \
-      --decompress \
-      --year=${YEAR} \
-      --doy=${DOY} \
-      1>${tmpd}/.tmp 2>/dev/null" >> $LOGFILE
-    echo "Downloaded CODE's ION file $ion" >> $LOGFILE
+    echo "Downloaded CODE's ION file $ion" | tee -a $LOGFILE $SOLSUMASC >/dev/null
     echo "Meta-File ${ION_META}" >> $LOGFILE
   else
-    echo "*** Failed to download / locate ion file"
+    echo "*** Failed to download / locate ion file" >> $LOGFILE
     exit 1
   fi
 fi
@@ -923,21 +933,23 @@ rm ${tmpd}/.tmp 2>/dev/null
 if $( test -f ${D}/VMFG_${YEAR}${DOY} ) && \
    $( /bin/ln -sf ${D}/VMFG_${YEAR}${DOY} ${P}/${CAMPAIGN}/GRD/VMF${YR2}${DOY}0.GRD )
 then 
-  echo "Linked VMF grid file ${D}/VMFG_${YEAR}${DOY} \
-    ${P}/${CAMPAIGN}/GRD/VMF${YR2}${DOY}0.GRD" >> $LOGFILE
+  echo "Linked VMF grid file ${D}/VMFG_${YEAR}${DOY} ${P}/${CAMPAIGN}/GRD/VMF${YR2}${DOY}0.GRD" \
+      | tee -a $LOGFILE $SOLSUMASC >/dev/null
   echo "Meta-File ??" >> $LOGFILE
   TRO_META=${D}/VMFG_${YEAR}${DOY}.meta
 else 
-  echo "*** Failed to link VMF1 grid file ${D}/VMFG_${YEAR}${DOY}"
+  echo "*** Failed to link VMF1 grid file ${D}/VMFG_${YEAR}${DOY}" >> $LOGFILE
   exit 1
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
 # TRANSFER THE RINEX FILES FROM DATAPOOL
 # //////////////////////////////////////////////////////////////////////////////
-
-echo "" >> $LOGFILE
-echo "Checking / transfering Rinex files" >> $LOGFILE
+{
+echo ""
+echo "Checking / Transfering Rinex files"
+echo "-------------------------------------------------------------------------"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
 
 ##  Three arrays will be created/filled: the RINEX_AV including all available rinex files
 ##+ found in the datapool area; RINEX_MS listing all missing rinex files and finaly
@@ -985,15 +997,17 @@ if test ${#AVIGS[@]} -lt 4; then
 fi
 
 if test ${#AVREG[@]} -lt 1; then
-  echo "*** Too few regional stations to process! Only found ${#AVREG[@]} rinex" >> $LOGFILE
+  echo "*** Too few regional stations to process! Only found ${#AVREG[@]} rinex" \
+      >> $LOGFILE
   exit 1
 fi
-
-echo "Transfered Rinex files: "  >> $LOGFILE
-echo "igs -> ${#AVIGS[@]}"       >> $LOGFILE
-echo "epn -> ${#AVEPN[@]}"       >> $LOGFILE
-echo "reg -> ${#AVREG[@]}"       >> $LOGFILE
-echo "missing : ${#RINEX_MS[@]}" >> $LOGFILE
+{
+echo "Transfered Rinex files: "
+echo "igs -> ${#AVIGS[@]}"
+echo "epn -> ${#AVEPN[@]}"
+echo "reg -> ${#AVREG[@]}"
+echo "missing : ${#RINEX_MS[@]}"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
 
 # //////////////////////////////////////////////////////////////////////////////
 # CHECK THAT ALL STATIONS (TO BE PROCESSED) ARE IN THE BLQ FILE
@@ -1025,6 +1039,12 @@ done
 # CREATE THE CLUSTER FILE
 # //////////////////////////////////////////////////////////////////////////////
 
+{
+echo ""
+echo "Creating a cluster file"
+echo "-------------------------------------------------------------------------"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
+
 ##  dump all available rinex files (station names) on a temporary file;
 ##+ then use the makecluster program to create a cluster file
 >${tmpd}/.tmp
@@ -1043,13 +1063,10 @@ if test $? -ne 0 ; then
   echo "Failed to create the cluster file" >> $LOGFILE
   exit 1
 else
-  echo "" >> $LOGFILE
-  echo "Cluster file created as ${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.CLU" >> $LOGFILE
-  echo "/usr/local/bin/makecluster \
-    --abbreviation-file=${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.ABB \
-    --stations-per-cluster=${STA_PER_CLU} \
-    --station-file=${tmpd}/.tmp \
-    1>${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.CLU" >> $LOGFILE
+    {
+    echo "Cluster file created as ${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.CLU"
+    echo "Baselines per Cluster : ${STA_PER_CLU}"
+    } | tee -a $LOGFILE $SOLSUMASC >/dev/null
 fi
 rm ${tmpd}/.tmp
 
@@ -1069,8 +1086,12 @@ rm ${tmpd}/.tmp
 ##+ At the end, we should have a file named REGYYDDD0.CRD listing coordinates
 ##+ for all stations to be processed.
 
-echo "" >> $LOGFILE
-echo "Choosing apropriate crd fle" >> $LOGFILE
+{
+echo ""
+echo "Choosing apropriate a-priori crd fle"
+echo "-------------------------------------------------------------------------"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
+
 >${tmpd}/crd.meta
 
 for i in ${SOL_ID} ${SOL_ID%?}P ${SOL_ID%?}R; do
@@ -1092,7 +1113,8 @@ for i in ${SOL_ID} ${SOL_ID%?}P ${SOL_ID%?}R; do
     done
     if ! test -z "$TMP"
     then
-        echo "<para>Chose a-priori coordinate file <filename>${TMP}</filename>.</para>" >> ${tmpd}/crd.meta
+        echo   "<para>Chose a-priori coordinate file <filename>${TMP}</filename>.</para>" >> ${tmpd}/crd.meta
+        echo   "File ${TMP} seems to fit; chossing this as a-priori" >> $SOLSUMASC
         printf "ok! using as a-priori" >> $LOGFILE
         break
     fi
@@ -1106,12 +1128,12 @@ then
   TMP=${TABLES}/crd/${CAMPAIGN}.CRD
   if ! cp ${TABLES}/crd/${CAMPAIGN}.CRD ${P}/${CAMPAIGN}/STA/APRIORI.CRD
   then
-    echo "*** Failed to copy a-priori coordinate file ${TABLES}/crd/${CAMPAIGN}.CRD"
+    echo "*** Failed to copy a-priori coordinate file ${TABLES}/crd/${CAMPAIGN}.CRD" >> $LOGFILE
     TMP=
     exit 1
   else
-    echo "Copying default crd file ${TABLES}/crd/${CAMPAIGN}.CRD to \
-      ${P}/${CAMPAIGN}/STA/APRIORI.CRD" >> $LOGFILE
+    echo "Copying default crd file ${TABLES}/crd/${CAMPAIGN}.CRD to ${P}/${CAMPAIGN}/STA/APRIORI.CRD" \
+        | tee -a $LOGFILE $SOLSUMASC >/dev/null
     echo "<para>Chose default a-priori coordinate for the network, i.e. <filename>${TMP}</filename>.</para>" >> ${tmpd}/crd.meta
   fi
 fi
@@ -1127,6 +1149,12 @@ echo "<para>File renamed to <filename>${P}/${CAMPAIGN}/STA/REG${YR2}${DOY}0.CRD$
 # TMP_PCF=${PCF_FILE##*/}
 # TMP_PCF=${TMP_PCF%%.*}
 
+{
+echo ""
+echo "Setting Options in the PCF file"
+echo "-------------------------------------------------------------------------"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
+
 if ! /usr/local/bin/setpcf \
   --analysis-center=${AC^^} \
   --bernese-loadvar=${LOADVAR} \
@@ -1140,28 +1168,34 @@ if ! /usr/local/bin/setpcf \
   --atl=${CAMPAIGN^^} \
   --calibration-model=${CLBR}
 then
-  echo "*** Failed to set variables in the PCF file"
+  echo "*** Failed to set variables in the PCF file" >> $LOGFILE
   exit 1
 else
-  echo "" >> $LOGFILE
-  echo "Options set a pcf file:" >> $LOGFILE
-  echo "/usr/local/bin/setpcf \
-    --analysis-center=${AC^^} \
-    --bernese-loadvar=${LOADVAR} \
-    --campaign=${CAMPAIGN} \
-    --solution-id=${SOL_ID} \
-    --pcf-file=${PCF_FILE} \
-    --pcv-file=${PCV} \
-    --satellite-system=${SAT_SYS,,} \
-    --elevation-angle=${ELEV} \
-    --blq=${CAMPAIGN^^} \
-    --atl=${CAMPAIGN^^} \
-    --calibration-model=${CLBR}" >> $LOGFILE
+    {
+    echo "Options set a pcf file:"
+    echo "Analysis Center   = ${AC^^} "
+    echo "Bernese Loadvar   = ${LOADVAR}"
+    echo "Campaign Name     = ${CAMPAIGN}"
+    echo "Solution Id       = ${SOL_ID}"
+    echo "PCF file          = ${PCF_FILE}"
+    echo "PCV file          = ${PCV}"
+    echo "Satellite System  = ${SAT_SYS,,}"
+    echo "Elevation Angle   = ${ELEV} (degrees)"
+    echo "BLQ file          = ${CAMPAIGN^^}"
+    echo "ATL file          = ${CAMPAIGN^^}"
+    echo "Calibration Model = ${CLBR}"
+    } | tee -a $LOGFILE $SOLSUMASC >/dev/null
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
 # SET OPTIONS IN THE PL FILE
 # //////////////////////////////////////////////////////////////////////////////
+
+{
+echo ""
+echo "Setting Options in the Perl script"
+echo "-------------------------------------------------------------------------"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
 
 ##  The identifiers for the process are taken from the campaign name (first three
 ##+ characters) and pcf filename (3 more characters. These files will be used later 
@@ -1180,20 +1214,20 @@ if ! /usr/local/bin/setpcl \
   --task-id=${TASKID} \
   --bernese-loadvar=${LOADVAR}
 then
-  echo "*** Failed to set variables in the PL file"
+  echo "*** Failed to set variables in the PL file" >> $LOGFILE
   exit 1
 else
-  echo "" >> $LOGFILE
-  echo "Options set in the perl script" >> $LOGFILE
-  echo "/usr/local/bin/setpcl \
-    --pcf-file=${PCF_FILE} \
-    --campaign=${CAMPAIGN} \
-    --pl-file=${PL_FILE%%.*} \
-    --campaign=${CAMPAIGN^^} \
-    --sys-out=${SYSOUT} \
-    --sys-run=${SYSRUN} \
-    --task-id=${TASKID} \
-    --bernese-loadvar=${LOADVAR}" >> $LOGFILE
+    {
+    echo "Options set in the perl script:"
+    echo "PCF file       = ${PCF_FILE}"
+    echo "Campaign       = ${CAMPAIGN}"
+    echo "pl-file        = ${PL_FILE%%.*}"
+    echo "Campaign       = ${CAMPAIGN^^}"
+    echo "SYSOUT         = ${SYSOUT}"
+    echo "SYSRUN         = ${SYSRUN}"
+    echo "TASKID         = ${TASKID}"
+    echo "Bernese Loadvar= ${LOADVAR}"
+    } | tee -a $LOGFILE $SOLSUMASC >/dev/null
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -1205,20 +1239,35 @@ fi
 ## if test "$KOKO" == "LALA"
 ## then
 
+{
+echo ""
+echo "Processing Data"
+echo "-------------------------------------------------------------------------"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
+
 ## empty the BPE directory
 rm ${P}/${CAMPAIGN^^}/BPE/* 2>/dev/null
 
 START_BPE_SECONDS=$(date +"%s")
+DTM_HHMMSS=`date +"%H:%M:%S"`
+echo "Start at : $DTM_HHMMSS ($START_BPE_SECONDS sec)" \
+    | tee -a $LOGFILE $SOLSUMASC >/dev/null
+
 ${U}/SCRIPT/${PL_FILE} ${YEAR} ${DOY}0 &>>$LOGFILE
+
 STOP_BPE_SECONDS=$(date +"%s")
+DTM_HHMMSS=`date +"%H:%M:%S"`
+echo "Finished at : $DTM_HHMMSS ($STOP_BPE_SECONDS sec)" \
+    | tee -a $LOGFILE $SOLSUMASC >/dev/null
 
 ##  Check for errors in the SYSOUT file and set the status
 if /bin/grep ERROR ${P}/${CAMPAIGN^^}/BPE/${SYSOUT}.OUT ##&>/dev/null
 then
-	STATUS=ERROR
+    STATUS=ERROR
 else
-	STATUS=SUCCESS
+    STATUS=SUCCESS
 fi
+echo "STATUS : $STATUS" | tee -a $LOGFILE $SOLSUMASC >/dev/null
 
 # //////////////////////////////////////////////////////////////////////////////
 # CREATE A LOG MESSAGE FOR PROCESS ERROR
@@ -1245,6 +1294,7 @@ then
   for i in `ls ${P}/${CAMPAIGN^^}/BPE/${TASKID}${YR2}${DOY}0*.LOG`
   do
     cat $i >> $LOGFILE
+    echo "PROCESS ERROR. SEE LOG FILE $LOGFILE" >> $SOLSUMASC
   done
   exit 1
 fi
@@ -1253,6 +1303,13 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # SAVE THE FILES WE WANT
 # //////////////////////////////////////////////////////////////////////////////
+
+{
+echo ""
+echo "Saving Products/Results"
+echo "-------------------------------------------------------------------------"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
+
 >${tmpd}/saved.files
 for i in ATM/${SOL_ID}${YR2}${DOY}0.TRO \
          ATM/${SOL_ID}${YR2}${DOY}0.TRP \
@@ -1265,7 +1322,8 @@ for i in ATM/${SOL_ID}${YR2}${DOY}0.TRO \
          SOL/${SOL_ID%?}R${YR2}${DOY}0.NQ0 ; do
   if ! test -f ${P}/${CAMPAIGN}/${i}
   then
-    echo "ERROR! Failed to locate file ${P}/${CAMPAIGN^^}/${i}"
+    echo "ERROR! Failed to locate file ${P}/${CAMPAIGN^^}/${i}" \
+        | tee -a $LOGFILE $SOLSUMASC >/dev/null
     exit 1
   else
     sfn=${i##*/}
@@ -1278,7 +1336,8 @@ for i in ATM/${SOL_ID}${YR2}${DOY}0.TRO \
         sfn=${BSNM}${SUFFIX}.${EXTNS}
     fi
     cp ${P}/${CAMPAIGN}/${i} ${SAVE_DIR}/${sfn}
-    echo "*** Copying ${P}/${CAMPAIGN}/${i} to ${SAVE_DIR}/${sfn}" >>$LOGFILE
+    echo "Copying ${P}/${CAMPAIGN}/${i} to ${SAVE_DIR}/${sfn}.Z" \
+        | tee -a $LOGFILE $SOLSUMASC >/dev/null
     compress -f ${SAVE_DIR}/${sfn}
   echo "<listitem><para>Saved file <filename>${i}</filename> to <filename>${SAVE_DIR}/${sfn}.Z</filename></para></listitem>" >> ${tmpd}/saved.files
   fi
@@ -1287,14 +1346,24 @@ done
 # //////////////////////////////////////////////////////////////////////////////
 # UPDATE STATION TIME-SERIES
 # //////////////////////////////////////////////////////////////////////////////
+{
+echo ""
+echo "Updating Station Time-Series Files"
+echo "-------------------------------------------------------------------------"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
+
 >${tmpd}/ts.update
 if test "${UPD_STA}" == "YES"
 then
   if test "${SOL_TYPE}" == "u"
   then
     SET_U="--ultra-rapid"
+    echo "Updating Ultra-Rapid time-series files" \
+        | tee -a $LOGFILE $SOLSUMASC >/dev/null
   else
     SET_U=
+    echo "Updating Final time-series files" \
+        | tee -a $LOGFILE $SOLSUMASC >/dev/null
   fi
   /usr/local/bin/extractStations \
     --station-file ${TABLES}/crd/${CAMPAIGN,,}.update \
@@ -1305,17 +1374,15 @@ then
  TS_UPDATED=$?
  if test ${TS_UPDATED} -gt 250
  then
-   echo "Script extractStations seems to have failed! Exit status: ${TS_UPDATED}" >> $LOGFILE
-   echo "/usr/local/bin/extractStations \
-       --station-file ${TABLES}/crd/${CAMPAIGN,,}.update \
-       --solution-summary ${P}/${CAMPAIGN^^}/OUT/${SOL_ID}${YR2}${DOY}0.OUT \
-       --save-dir ${STA_TS_DIR} \
-       --quiet \
-       ${SET_U} 1>${tmpd}/xs.diffs" >> $LOGFILE
-   echo "Status = $TS_UPDATED" >> $LOGFILE
+   echo "Script extractStations seems to have failed! Exit status: ${TS_UPDATED}" \
+       | tee -a $LOGFILE $SOLSUMASC >/dev/null
+   echo "Status = $TS_UPDATED" | tee -a $LOGFILE $SOLSUMASC >/dev/null
    exit 1
  fi
- echo "(extractStations) Updated ${TS_UPDATED} time-series files" >> $LOGFILE
+ echo "Updated ${TS_UPDATED} time-series files" | tee -a $LOGFILE $SOLSUMASC >/dev/null
+ cat ${tmpd}/xs.diffs | sed '$ d' | sort -k1 | \
+     awk '{printf "%03i %4s %10s %10s %10s %10s %10s %10s\n",a++,tolower($1),$2,$4,$5,$6,$7,$8}' \
+     >> $SOLSUMASC
  echo "<program>extractStations</program> successefuly updated records for ${TS_UPDATED} time-series files" >> ${tmpd}/ts.update
  ## check to see if the updated stations match the sum of available reg + epn stations
  tmp_nreg=${#AVREG[@]}
@@ -1324,14 +1391,24 @@ then
  if test ${should} != ${TS_UPDATED}
  then
    echo "<warning><para>Updated station time-series do not add up to the sum of available EPN and REGIONAL stations.</para></warning>" >> ${tmpd}/ts.update
+   echo "WARNING !! Updated station time-series do not add up to the sum of available EPN and REGIONAL stations." \
+       | tee -a $LOGFILE $SOLSUMASC >/dev/null
  fi
-else
+else ## User said no update !
   echo "<important><para>No time-series files were updated, no such command given! see <xref linkend='options' /></para></important>" >> ${tmpd}/ts.update
+  echo "Nothing to do;" | tee -a $LOGFILE $SOLSUMASC >/dev/null
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
 # UPDATE DEFAULT CRD FILE
 # //////////////////////////////////////////////////////////////////////////////$
+
+{
+echo ""
+echo "Updating Default Coordinate File"
+echo "-------------------------------------------------------------------------"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
+
 >${tmpd}/crd.update
 ##
 ## TODO :: Should updatecrd use the '--limit' option ?
@@ -1342,7 +1419,7 @@ then
     then
         CMDS="/usr/local/bin/updatecrd"
     else
-    ##    CMDS="/usr/local/bin/updatecrd --limit"
+    ##  CMDS="/usr/local/bin/updatecrd --limit"
         CMDS="/usr/local/bin/updatecrd"
     fi
 ##  /usr/local/bin/updatecrd \
@@ -1354,22 +1431,20 @@ then
     &>>$LOGFILE
   if test $? -gt 250
   then
-    echo "Error updating default crd file; see log"
+    echo "Error updating default crd file; see log" \
+        | tee -a $LOGFILE $SOLSUMASC >/dev/null
     exit 1
   else
-    echo ""
-    echo "Default crd file updated" >> $LOGFILE
-    echo " ${CMDS} \
-      --update-file=${TABLES}/crd/${CAMPAIGN}.CRD \
-      --reference-file=${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD \
-      --station-file=${TABLES}/crd/${CAMPAIGN,,}.update \
-      --flags=W,A,P,C \
-      --limit" >> $LOGFILE
+    {
+    echo "Default crd file :${TABLES}/crd/${CAMPAIGN}.CRD updated"
+    echo "Reference crd file : ${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD"
+    } | tee -a $LOGFILE $SOLSUMASC >/dev/null
     echo "<program>updatecrd</program> successefuly updated coordinate records regional sites." >> ${tmpd}/crd.update
     echo "Default file updated : <filename>${TABLES}/crd/${CAMPAIGN}.CRD</filename> using the reference file <filename>${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD</filename>" >> ${tmpd}/crd.update
   fi
-else
+else ## User said NO !!
   echo "<important><para>No coordinate files were updated, no such command given! see <xref linkend='options' /></para></important>" >> ${tmpd}/crd.update
+  echo "Nothing to do." | tee -a $LOGFILE $SOLSUMASC >/dev/null
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -1380,6 +1455,12 @@ STOP_PROCESS_SECONDS=$(date +"%s")
 # //////////////////////////////////////////////////////////////////////////////
 # MAKE XML SUMMARY (DOCBOOK)
 # //////////////////////////////////////////////////////////////////////////////
+
+{
+echo ""
+echo "Compiling DocBook report"
+echo "-------------------------------------------------------------------------"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
 
 if test "$XML_OUT" == "YES"
 then
@@ -1507,6 +1588,13 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # CLEAR CAMPAIGN DIRECTORIES
 # //////////////////////////////////////////////////////////////////////////////
+
+{
+echo ""
+echo "Clearing Campaign Directories"
+echo "-------------------------------------------------------------------------"
+} | tee -a $LOGFILE $SOLSUMASC >/dev/null
+
 FORCE_CLEAN=YES
 if test "${FORCE_CLEAN}" == "YES"
 then
@@ -1529,5 +1617,11 @@ do
     rm ${P}/${CAMPAIGN}/${i}/* 2>/dev/null
 done
 fi
+
+DTM_HHMMSS=`date +"%H:%M:%S"`
+{
+echo "All done!"
+echo "Finished at : $DTM_HHMMSS"
+} | tee -a $LOGFILE $SOLSUMASC ## >/dev/null
 
 exit 0

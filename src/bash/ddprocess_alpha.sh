@@ -241,10 +241,15 @@ START_PROCESS_SECONDS=$(date +"%s")
 # //////////////////////////////////////////////////////////////////////////////
 # GET COMMAND LINE ARGUMENTS
 # //////////////////////////////////////////////////////////////////////////////
-if [ "$#" == "0" ]; then help; fi
+if [ "$#" == "0" ]
+then
+    help
+fi
+
 ## Call getopt to validate the provided input. This depends on the getopt version available
 getopt -T > /dev/null
-if [ $? -eq 4 ]; then
+if [ $? -eq 4 ]
+then
   ## GNU enhanced getopt is available
   ARGS=`getopt -o hvc:b:a:i:p:s:e:y:d:l:t:f:m:u:r:x \
   -l  help,version,campaign:,bernese-loadvar:,analysis-center:,solution-id:,pcv-file:,satellite-system:,elevation-angle:,year:,doy:,stations-per-cluster:,solution-type:,ion-products:,debug,calibration-model:,update:,save-dir:,xml-output,force-remove-previous,add-suffix: \
@@ -253,8 +258,14 @@ else
   ## Original getopt is available (no long option names, no whitespace, no sorting)
   ARGS=`getopt hvc:b:a:i:p:s:e:y:d:l:t:f:m:u:r:x "$@"`
 fi
+
 ## check for getopt error
-if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 254 ; fi
+if [ $? -ne 0 ]
+then 
+    echo "getopt error code : $status ;Terminating..." >&2 
+    exit 254 
+fi
+
 eval set -- $ARGS
 
 ## extract options and their arguments into variables.
@@ -264,8 +275,8 @@ while true ; do
       XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg>"
       DEBUG=YES;;
     --add-suffix)
+      XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
       SUFFIX="$2"
-      XML_SENTENCE="${XML_SENTENCE} <arg>${1}</arg> <replaceable>${2}</replaceable></arg>"
       shift ;;
     -f|--ion-products)
       XML_SENTENCE="${XML_SENTENCE} <arg>${1} <replaceable>${2}</replaceable></arg>"
@@ -359,9 +370,15 @@ LOGFILE=${LOG_DIR}/ddproc-${YEAR:2:2}${DOY}.log
 WARFILE=${LOG_DIR}/ddproc-${YEAR:2:2}${DOY}.wrn
 >$LOGFILE
 >$WARFILE
+echo "#############################################################"
+echo "#                                          Routine Processing"
+echo "# date     : ${YEAR} ${DOY}"
+echo "# logfile  : ${LOGFILE}"
+echo "# warnings : ${WARFILE}"
+echo "#############################################################"
 echo "$*" >> $LOGFILE
 START_T_STAMP=`/bin/date`
-tmpd=${TMP}/${YEAR}${DOY}-ddprocess-${CAMPAIGN,,}-${SOL_TYPE}
+tmpd=${TMP}/${YEAR}${DOY}-ddprocess-${CAMPAIGN,,}-${SOL_TYPE}${SAT_SYS}
 if test -d $tmpd
 then
   rm -rf $tmpd/*
@@ -660,7 +677,7 @@ then
   echo "Meta-file : $ORB_META" >> $LOGFILE
 else 
   # failed to find/link rapid sp3; try for ultra-rapid
-  echo "Failed to find/link file ${DATAPOOL}/${SP3}"
+  echo "Failed to find/link sp3 file ${DATAPOOL}/${SP3}" >> $LOGFILE
   if test "$SOL_TYPE" == "u"
   then
     SP3=${SP3/R/U}
@@ -673,7 +690,7 @@ else
         ${P}/${CAMPAIGN}/ORB/${TRG_SP3^^}" >> $LOGFILE
       echo "Meta-file : $ORB_META" >> $LOGFILE
     else
-      echo "*** Failed to link orbit file ${DATAPOOL}/${SP3}"
+      echo "*** Failed to link sp3 file ${DATAPOOL}/${SP3}"
       exit 1
     fi
   else
@@ -930,20 +947,27 @@ echo "Checking / transfering Rinex files" >> $LOGFILE
 
 for i in igs epn reg; do
   file=${TABLES}/crd/${CAMPAIGN,,}.${i}
-  if ! test -f ${file}; then echo "*** Missing file $file"; exit 1; fi
+  if ! test -f ${file}
+  then
+      echo "*** Missing file $file" >> $LOGFILE
+      exit 1
+  fi
   STATIONS+=( $( /bin/cat "$file" ) )
 done
 
-for i in ${STATIONS[@]}; do
+for i in ${STATIONS[@]}
+do
   rinex_file=${i}${DOY}0.${YR2}o
-  if test -f ${DATAPOOL}/${rinex_file}; then
+  if test -f ${DATAPOOL}/${rinex_file}
+  then
     cp -f ${DATAPOOL}/${rinex_file} ${P}/${CAMPAIGN}/RAW/${rinex_file^^}
     RINEX_AV+=(${rinex_file})
     if /bin/egrep -i "${i}" ${TABLES}/crd/${CAMPAIGN,,}.igs &>/dev/null; then AVIGS+=($i); fi
     if /bin/egrep -i "${i}" ${TABLES}/crd/${CAMPAIGN,,}.epn &>/dev/null; then AVEPN+=($i); fi
     if /bin/egrep -i "${i}" ${TABLES}/crd/${CAMPAIGN,,}.reg &>/dev/null; then AVREG+=($i); fi
   else
-    if test -f ${DATAPOOL}/${rinex_file^^}; then
+    if test -f ${DATAPOOL}/${rinex_file^^}
+    then
         cp -f ${DATAPOOL}/${rinex_file^^} ${P}/${CAMPAIGN}/RAW/${rinex_file^^}
         RINEX_AV+=(${rinex_file^^})
         if /bin/egrep -i "${i}" ${TABLES}/crd/${CAMPAIGN,,}.igs &>/dev/null; then AVIGS+=($i); fi
@@ -956,12 +980,12 @@ for i in ${STATIONS[@]}; do
 done
 
 if test ${#AVIGS[@]} -lt 4; then
-  echo "*** Too few igs stations to process! Only found ${#AVIGS[@]} rinex"
+  echo "*** Too few igs stations to process! Only found ${#AVIGS[@]} rinex" >> $LOGFILE
   exit 1
 fi
 
 if test ${#AVREG[@]} -lt 1; then
-  echo "*** Too few regional stations to process! Only found ${#AVREG[@]} rinex"
+  echo "*** Too few regional stations to process! Only found ${#AVREG[@]} rinex" >> $LOGFILE
   exit 1
 fi
 
@@ -974,9 +998,10 @@ echo "missing : ${#RINEX_MS[@]}" >> $LOGFILE
 # //////////////////////////////////////////////////////////////////////////////
 # CHECK THAT ALL STATIONS (TO BE PROCESSED) ARE IN THE BLQ FILE
 # //////////////////////////////////////////////////////////////////////////////
-for i in ${RINEX_AV[@]}; do
+for i in ${RINEX_AV[@]}
+do
   sta_name=`echo ${i:0:4} | tr 'a-z' 'A-Z'`
-  if ! /bin/egrep "^  ${sta_name} *" ${TABLES}/blq/${CAMPAIGN}.BLQ
+  if ! /bin/egrep "^  ${sta_name} *" ${TABLES}/blq/${CAMPAIGN}.BLQ &>/dev/null
   then
     echo "Warning -- station ${sta_name} missing ocean loading corrections; \
       file ${TABLES}/blq/${CAMPAIGN}.BLQ" >> $WARFILE
@@ -986,9 +1011,10 @@ done
 # //////////////////////////////////////////////////////////////////////////////
 # CHECK THAT ALL STATIONS (TO BE PROCESSED) ARE IN THE ATL FILE
 # //////////////////////////////////////////////////////////////////////////////
-for i in ${RINEX_AV[@]}; do
+for i in ${RINEX_AV[@]}
+do
   sta_name=`echo ${i:0:4} | tr 'a-z' 'A-Z'`
-  if ! /bin/egrep "^  ${sta_name} *" ${TABLES}/atl/${CAMPAIGN}.ATL
+  if ! /bin/egrep "^  ${sta_name} *" ${TABLES}/atl/${CAMPAIGN}.ATL &>/dev/null
   then
     echo "Warning -- station ${sta_name} missing atmospheric loading corrections; \
       file ${TABLES}/atl/${CAMPAIGN}.ATL" >> $WARFILE
@@ -1002,7 +1028,10 @@ done
 ##  dump all available rinex files (station names) on a temporary file;
 ##+ then use the makecluster program to create a cluster file
 >${tmpd}/.tmp
-for i in "${RINEX_AV[@]}"; do echo ${i:0:4} >> ${tmpd}/.tmp; done
+for i in "${RINEX_AV[@]}"
+do 
+    echo ${i:0:4} >> ${tmpd}/.tmp
+done
 
 /usr/local/bin/makecluster \
   --abbreviation-file=${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.ABB \
@@ -1011,7 +1040,7 @@ for i in "${RINEX_AV[@]}"; do echo ${i:0:4} >> ${tmpd}/.tmp; done
   1>${P}/${CAMPAIGN^^}/STA/${CAMPAIGN^^}.CLU \
   2>>$LOGFILE
 if test $? -ne 0 ; then
-  echo "Failed to create the cluster file"
+  echo "Failed to create the cluster file" >> $LOGFILE
   exit 1
 else
   echo "" >> $LOGFILE
@@ -1061,8 +1090,12 @@ for i in ${SOL_ID} ${SOL_ID%?}P ${SOL_ID%?}R; do
         break
       fi
     done
-    echo "<para>Chose a-priori coordinate file <filename>${TMP}</filename>." >> ${tmpd}/crd.meta
-    printf "ok! using a a-priori" >> $LOGFILE
+    if ! test -z "$TMP"
+    then
+        echo "<para>Chose a-priori coordinate file <filename>${TMP}</filename>.</para>" >> ${tmpd}/crd.meta
+        printf "ok! using as a-priori" >> $LOGFILE
+        break
+    fi
   else
     printf "not available !" >> $LOGFILE
   fi
@@ -1079,12 +1112,12 @@ then
   else
     echo "Copying default crd file ${TABLES}/crd/${CAMPAIGN}.CRD to \
       ${P}/${CAMPAIGN}/STA/APRIORI.CRD" >> $LOGFILE
-    echo "<para>Chose default a-priori coordinate for the network, i.e. <filename>${TMP}</filename>." >> ${tmpd}/crd.meta
+    echo "<para>Chose default a-priori coordinate for the network, i.e. <filename>${TMP}</filename>.</para>" >> ${tmpd}/crd.meta
   fi
 fi
 
 mv ${P}/${CAMPAIGN}/STA/APRIORI.CRD ${P}/${CAMPAIGN}/STA/REG${YR2}${DOY}0.CRD
-echo "File renamed to <filename>${P}/${CAMPAIGN}/STA/REG${YR2}${DOY}0.CRD$</filename>.</para>" >> ${tmpd}/crd.meta
+echo "<para>File renamed to <filename>${P}/${CAMPAIGN}/STA/REG${YR2}${DOY}0.CRD$</filename>.</para>" >> ${tmpd}/crd.meta
 
 # //////////////////////////////////////////////////////////////////////////////
 # SET OPTIONS IN THE PCF FILE
@@ -1168,9 +1201,9 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 
 ## (skip processing)
-#KOKO=A
-#if test "$KOKO" == "LALA"
-#then
+## KOKO=A
+## if test "$KOKO" == "LALA"
+## then
 
 ## empty the BPE directory
 rm ${P}/${CAMPAIGN^^}/BPE/* 2>/dev/null
@@ -1190,7 +1223,8 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # CREATE A LOG MESSAGE FOR PROCESS ERROR
 # //////////////////////////////////////////////////////////////////////////////
-if test "${STATUS}" == "ERROR"; then
+if test "${STATUS}" == "ERROR"
+then
 
   echo "***********************************************************************" >> $LOGFILE
   echo "-------------------- PROCESS ERROR ------------------------------------" >> $LOGFILE
@@ -1209,13 +1243,13 @@ if test "${STATUS}" == "ERROR"; then
   echo "***********************************************************************" >> $LOGFILE
 
   for i in `ls ${P}/${CAMPAIGN^^}/BPE/${TASKID}${YR2}${DOY}0*.LOG`
-  do 
+  do
     cat $i >> $LOGFILE
   done
   exit 1
 fi
 ## (skip processing)
-# fi
+## fi
 # //////////////////////////////////////////////////////////////////////////////
 # SAVE THE FILES WE WANT
 # //////////////////////////////////////////////////////////////////////////////
@@ -1244,6 +1278,7 @@ for i in ATM/${SOL_ID}${YR2}${DOY}0.TRO \
         sfn=${BSNM}${SUFFIX}.${EXTNS}
     fi
     cp ${P}/${CAMPAIGN}/${i} ${SAVE_DIR}/${sfn}
+    echo "*** Copying ${P}/${CAMPAIGN}/${i} to ${SAVE_DIR}/${sfn}" >>$LOGFILE
     compress -f ${SAVE_DIR}/${sfn}
   echo "<listitem><para>Saved file <filename>${i}</filename> to <filename>${SAVE_DIR}/${sfn}.Z</filename></para></listitem>" >> ${tmpd}/saved.files
   fi
@@ -1270,7 +1305,14 @@ then
  TS_UPDATED=$?
  if test ${TS_UPDATED} -gt 250
  then
-   echo "Script extractStations seems to have failed! Exit status: ${TS_UPDATED}"
+   echo "Script extractStations seems to have failed! Exit status: ${TS_UPDATED}" >> $LOGFILE
+   echo "/usr/local/bin/extractStations \
+       --station-file ${TABLES}/crd/${CAMPAIGN,,}.update \
+       --solution-summary ${P}/${CAMPAIGN^^}/OUT/${SOL_ID}${YR2}${DOY}0.OUT \
+       --save-dir ${STA_TS_DIR} \
+       --quiet \
+       ${SET_U} 1>${tmpd}/xs.diffs" >> $LOGFILE
+   echo "Status = $TS_UPDATED" >> $LOGFILE
    exit 1
  fi
  echo "(extractStations) Updated ${TS_UPDATED} time-series files" >> $LOGFILE
@@ -1291,14 +1333,24 @@ fi
 # UPDATE DEFAULT CRD FILE
 # //////////////////////////////////////////////////////////////////////////////$
 >${tmpd}/crd.update
+##
+## TODO :: Should updatecrd use the '--limit' option ?
+##
 if test "${UPD_CRD}" == "YES"
 then
-  /usr/local/bin/updatecrd \
+    if test "${CAMPAIGN,,}" == "uranus"
+    then
+        CMDS="/usr/local/bin/updatecrd"
+    else
+    ##    CMDS="/usr/local/bin/updatecrd --limit"
+        CMDS="/usr/local/bin/updatecrd"
+    fi
+##  /usr/local/bin/updatecrd \
+    ${CMDS} \
     --update-file=${TABLES}/crd/${CAMPAIGN}.CRD \
     --reference-file=${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD \
     --station-file=${TABLES}/crd/${CAMPAIGN,,}.update \
     --flags=W,A,P,C \
-    --limit \
     &>>$LOGFILE
   if test $? -gt 250
   then
@@ -1307,7 +1359,7 @@ then
   else
     echo ""
     echo "Default crd file updated" >> $LOGFILE
-    echo "  /usr/local/bin/updatecrd \
+    echo " ${CMDS} \
       --update-file=${TABLES}/crd/${CAMPAIGN}.CRD \
       --reference-file=${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD \
       --station-file=${TABLES}/crd/${CAMPAIGN,,}.update \
@@ -1329,190 +1381,135 @@ STOP_PROCESS_SECONDS=$(date +"%s")
 # MAKE XML SUMMARY (DOCBOOK)
 # //////////////////////////////////////////////////////////////////////////////
 
-if test "${XML_OUT}" == "YES"
+if test "$XML_OUT" == "YES"
 then
-    if test "$SAT_SYS" == "gps"
-    then
-        sats=gps
-    else
-        sats="gps,glo,mixed"
-    fi
-/usr/local/bin/plot-amb-sum \
-    --ambiguity-file=${P}/${CAMPAIGN^^}/OUT/AMB${YR2}${DOY}0.SUM \
-    --output-file=${tmpd}/${CAMPAIGN,,}${YEAR}${DOY}-amb.ps \
-    --satellite-system="${sats}"
-#/home/bpe2/gmt-src/plot-amb-sum.sh ${P}/${CAMPAIGN^^}/OUT/AMB${YR2}${DOY}0.SUM ${tmpd}/${CAMPAIGN,,}${YEAR}${DOY}-amb.ps
-
-echo "MAKING XML"
-mkdir -p ${tmpd}/xml/figures
-
-## conver ps to png (ambiguity plot)
-amb_png=${tmpd}/xml/figures/ambiguity.png
-/usr/lib/gmt/bin/ps2raster ${tmpd}/${CAMPAIGN,,}${YEAR}${DOY}-amb.ps -Tg -P
-mv ${tmpd}/${CAMPAIGN,,}${YEAR}${DOY}-amb.png ${amb_png}
-
-#cp ${XML_TEMPLATES}/*.xml ${tmpd}/xml
-
+##  We need to write all related variables to a file, which can the be
+##+ sourced by following scripts.
 V_TODAY=`date`
-export V_TODAY
 V_DATE_PROCCESSED=`echo "${YEAR}-${MONTH}-${DOM} (DOY: ${DOY})"`
-export V_DATE_PROCCESSED
 V_NETWORK=${CAMPAIGN}
-export V_NETWORK
 V_USER_N=`echo $USER`
-export V_USER_N
 V_HOST_N=`echo $HOSTNAME`
-export V_HOST_N
 V_SYSTEM_INFO=`uname -a`
-export V_SYSTEM_INFO
 V_SCRIPT="${NAME} ${VERSION} (${RELEASE}) ${LAST_UPDATE}"
-export V_SCRIPT
 V_COMMAND=${XML_SENTENCE}
-export V_COMMAND
 V_BERN_INFO=`cat /home/bpe2/bern52/info/bern52_release. | tail -1`
-export V_BERN_INFO
 V_GEN_UPD=`cat /home/bpe2/bern52/info/bern52_GEN_upd. | tail -1`
-export V_GEN_UPD
 V_ID="${SOL_ID} (preliminery: ${SOL_ID%?}P, size-reduced: ${SOL_ID%?}R)"
-export V_ID
 PCF_FILE=${PCF_FILE}
-export PCF_FILE
 V_ELEVATION=${ELEV}
-export V_ELEVATION
 V_TROPO=VMF1
-export V_TROPO
 if test "${SOL_TYPE}" == "f"
 then
     V_SOL_TYPE=FINAL
 else
     V_SOL_TYPE="RAPID/ULTRA_RAPID"
 fi
-export V_SOL_TYPE
 V_AC_CENTER=${AC^^}
-export V_AC_CENTER
 V_SAT_SYS=${SAT_SYS}
-export V_SAT_SYS
 V_STA_PER_CLU=${STA_PER_CLU}
-export V_STA_PER_CLU
 V_UPDATE_CRD=${UPD_CRD}
-export V_UPDATE_CRD
 V_UPDATE_STA=${UPD_STA}
-export V_UPDATE_STA
 V_UPDATE_NET=${UPD_NTW}
-export V_UPDATE_NET
 V_MAKE_PLOTS=${MAKE_PLOTS}
-export V_MAKE_PLOTS
 V_SAVE_DIR=${SAVE_DIR}
-export V_SAVE_DIR
 V_ATX=${TABLES}/pcv/${PCV}.${CLBR}
-export V_ATX
 V_LOG=${LOGFILE}
-export V_LOG
 V_YEAR=${YEAR}
-export V_YEAR
 V_DOY=${DOY}
-export V_DOY
-
 AVAIL_RNX="${#RINEX_AV[@]}"
 V_IGS_RNX="${#AVIGS[@]}"
 V_EPN_RNX="${#AVEPN[@]}"
 V_REG_RNX="${#AVREG[@]}"
 V_RNX_MIS="${#RINEX_MS[@]}"
 V_RNX_TOT="${#STATIONS[@]}"
-export AVAIL_RNX
-export V_IGS_RNX
-export V_EPN_RNX
-export V_REG_RNX
-export V_RNX_MIS
-export V_RNX_TOT
-
-export ORB_META
-export ERP_META
-export ION_META
-export TRO_META
-export DCB_META
 CRD_META=${tmpd}/crd.meta
-export CRD_META
-export tmpd
-export XML_TEMPLATES
-
 SCRIPT_SECONDS=$(($STOP_PROCESS_SECONDS-$START_PROCESS_SECONDS))
-SCRIPT_SECONDS=`echo $SCRIPT_SECONDS | awk '{printf "%10i seconds (or %5i min and %2i sec)",$1,$1/60.0,$1%60}'`
-BPE_SECONDS=$(($STOP_BPE_SECONDS-$START_BPE_SECONDS))
-BPE_SECONDS=`echo $BPE_SECONDS | awk '{printf "%10i seconds (or %5i min and %2i sec)",$1,$1/60.0,$1%60}'`
-export SCRIPT_SECONDS
-export BPE_SECONDS
+SCRIPT_SECONDS=`echo $SCRIPT_SECONDS | \
+    awk '{printf "%10i seconds (or %5i min and %2i sec)",$1,$1/60.0,$1%60}'`
+# BPE_SECONDS=$(($STOP_BPE_SECONDS-$START_BPE_SECONDS))
+BPE_SECONDS=500
+BPE_SECONDS=`echo $BPE_SECONDS | \
+    awk '{printf "%10i seconds (or %5i min and %2i sec)",$1,$1/60.0,$1%60}'`
+{
+echo "CRD_META=${CRD_META}"
+echo "tmpd=${tmpd}"
+echo "XML_TEMPLATES=${XML_TEMPLATES}"
+echo "V_DOY=${V_DOY}"
+echo "V_TROPO=${V_TROPO}"
+echo "V_TODAY=${V_TODAY}"
+echo "V_DATE_PROCCESSED=${V_DATE_PROCCESSED}"
+echo "V_NETWORK=${V_NETWORK}"
+echo "V_USER_N=${V_USER_N}"
+echo "V_HOST_N=${V_HOST_N}"
+echo "V_SYSTEM_INFO=${V_SYSTEM_INFO}"
+echo "V_COMMAND=${V_COMMAND}"
+echo "V_SCRIPT=${V_SCRIPT}"
+echo "V_BERN_INFO=${V_BERN_INFO}"
+echo "V_GEN_UPD=${V_GEN_UPD}"
+echo "V_ID=${V_ID}"
+echo "PCF_FILE=${PCF_FILE}"
+echo "V_ELEVATION=${V_ELEVATION}"
+echo "V_SOL_TYPE=${V_SOL_TYPE}"
+echo "V_AC_CENTER=${V_AC_CENTER}"
+echo "V_SAT_SYS=${V_SAT_SYS}"
+echo "V_STA_PER_CLU=${V_STA_PER_CLU}"
+echo "V_UPDATE_CRD=${V_UPDATE_CRD}"
+echo "V_UPDATE_STA=${V_UPDATE_STA}"
+echo "V_UPDATE_NET=${V_UPDATE_NET}"
+echo "V_MAKE_PLOTS=${V_MAKE_PLOTS}"
+echo "V_SAVE_DIR=${V_SAVE_DIR}"
+echo "V_ATX=${V_ATX}"
+echo "V_LOG=${V_LOG}"
+echo "V_YEAR=${V_YEAR}"
+echo "AVAIL_RNX=${AVAIL_RNX}"
+echo "V_IGS_RNX=${V_IGS_RNX}"
+echo "V_EPN_RNX=${V_EPN_RNX}"
+echo "V_REG_RNX=${V_REG_RNX}"
+echo "V_RNX_MIS=${V_RNX_MIS}"
+echo "V_RNX_TOT=${V_RNX_TOT}"
+echo "ORB_META=${ORB_META}"
+echo "ERP_META=${ERP_META}"
+echo "ION_META=${ION_META}"
+echo "TRO_META=${TRO_META}"
+echo "DCB_META=${DCB_META}"
+echo "SCRIPT_SECONDS=${SCRIPT_SECONDS}"
+echo "BPE_SECONDS=${BPE_SECONDS}"
+echo "V_MONTH=${MONTH}"
+echo "V_DAY_OF_MONTH=${DOM}"
+echo "V_SOL_ID=${SOL_ID}"
+} >> ${tmpd}/variables
 
-##  note that here we are interested in all stations NOT just the ones
-##+ to be updated
->${tmpd}/xml/all.stations
-for i in ${STATIONS[@]}
-do
-  echo -ne "$i " >> ${tmpd}/all.stations
-done
-/usr/local/bin/extractStations \
-    --station-file ${tmpd}/all.stations \
-    --solution-summary ${P}/${CAMPAIGN^^}/OUT/${SOL_ID}${YR2}${DOY}0.OUT \
-    --save-dir ${STA_TS_DIR} \
-    --quiet \
-    --only-report \
-    1>${tmpd}/xs.diffs
+    ## Also, we need a file recording all stations
+    >${tmpd}/all.stations
+    for i in ${STATIONS[@]}
+    do
+      echo -ne "$i " >> ${tmpd}/all.stations
+    done
 
-/usr/local/bin/ambsum2xml \
-  ${P}/${CAMPAIGN}/OUT/AMB${YR2}${DOY}0.SUM \
-  1>${tmpd}/amb.xml
+    ## We need a file with available rinex
+    >${tmpd}/rnx.av
+    for i in "${RINEX_AV[@]}"
+    do
+      echo -ne "${i} " >> ${tmpd}/rnx.av
+    done
+    if ! /usr/local/bin/makedocbook ${tmpd}/variables &>>${LOGFILE}
+    then
+        echo "Failed to make docbook report"
+    else
+        echo "XML output (docbook) created"
+    fi
 
->${tmpd}/rnx.av
-for i in "${RINEX_AV[@]}"
-do
-  echo -ne "${i} " >> ${tmpd}/rnx.av
-done
-/usr/local/bin/rnxsum2xml \
-  ${CAMPAIGN} \
-  ${tmpd}/rnx.av \
-   ${tmpd}/xs.diffs \
-  ${YEAR} \
-  ${DOY} \
-  ${MONTH} \
-  ${DOM} \
-  ${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD \
-  1>/${tmpd}/rnx.xml
-
-/home/bpe2/src/autobpe/utl/plotsolsta.sh ${YEAR} ${DOY} \
-  ${P}/${CAMPAIGN}/OUT/${SOL_ID}${YR2}${DOY}0.SUM \
-  ${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD \
-  ${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.OUT \
-  ${CAMPAIGN} \
-  ${SOL_TYPE} \
-  ${tmpd}
-
-eval "echo \"$(< ${XML_TEMPLATES}/procsum-main.xml)\"" > ${tmpd}/xml/main.xml
-eval "echo \"$(< ${XML_TEMPLATES}/procsum-info.xml)\"" > ${tmpd}/xml/info.xml
-eval "echo \"$(< ${XML_TEMPLATES}/procsum-options.xml)\"" > ${tmpd}/xml/options.xml
-echo "Creating options.xml"
-/home/bpe2/src/autobpe/xml/src/makeoptionsxml.sh
-echo "Creating rinex.xml"
-/home/bpe2/src/autobpe/xml/src/makerinexxml.sh
-echo "Creating ambiguities.xml"
-/home/bpe2/src/autobpe/xml/src/makeambxml.sh
-echo "Creating mauprp.xml"
-/home/bpe2/src/autobpe/xml/src/mauprpxml.sh ${P}/${CAMPAIGN^^}/OUT/MPR${YR2}${DOY}0.SUM
-echo "Creating crddifs.xml"
-/home/bpe2/src/autobpe/xml/src/crddifs.sh ${tmpd}/xs.diffs ${P}/${CAMPAIGN}/STA/${SOL_ID}${YR2}${DOY}0.CRD
-echo "Creating chksum.xml"
-/home/bpe2/src/autobpe/xml/src/chksumxml.sh ${P}/${CAMPAIGN^^}/OUT/CHK${YR2}${DOY}0.OUT
-echo "Creating savedfiles.xml"
-/home/bpe2/src/autobpe/xml/src/savedfiles.sh ${tmpd}/saved.files ${tmpd}/ts.update ${tmpd}/crd.update
-mkdir ${tmpd}/xml/html
-cd ${tmpd}/xml/ && xsltproc /usr/share/xml/docbook/stylesheet/nwalsh/xhtml/chunk.xsl main.xml
-mv ${tmpd}/xml/*.html ${tmpd}/xml/html/
-mkdir ${tmpd}/xml/html/figures
-cp ${amb_png} ${tmpd}/xml/html/figures/ambiguity.png
+else
+    echo "No XML output specified."
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
 # CLEAR CAMPAIGN DIRECTORIES
 # //////////////////////////////////////////////////////////////////////////////
+FORCE_CLEAN=YES
+if test "${FORCE_CLEAN}" == "YES"
+then
 for i in ATM \
          BPE \
          GRD \
@@ -1531,5 +1528,6 @@ for i in OBS OUT RAW BPE
 do
     rm ${P}/${CAMPAIGN}/${i}/* 2>/dev/null
 done
+fi
 
 exit 0
