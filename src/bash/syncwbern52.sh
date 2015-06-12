@@ -1,6 +1,6 @@
 #! /bin/bash
 
-################################################################################
+##############################################################################
 ## 
 ## |===========================================|
 ## |** Higher Geodesy Laboratory             **|
@@ -8,8 +8,8 @@
 ## |** National Tecnical University of Athens**|
 ## |===========================================|
 ##
-## filename              : syncwbern_52.sh
-                           NAME=syncwbern_52
+## filename              : syncwbern52.sh
+                           NAME=syncwbern52
 ## version               : v-1.0
                            VERSION=v-1.0
                            RELEASE=beta
@@ -17,9 +17,9 @@
 ## usage                 : syncwbern_52.sh
 ## exit code(s)          : 0 -> success
 ##                         1 -> error
-## discription           : update the local GEN directory with the remote one on CODE.
-##                         (i.e. from aiub/BSWUSER52/GEN/ remote directory). If successeful,
-##                         the timestamp will be written in file: ${HOME}/bern52_GEN_upd.
+## discription           : update the local GEN directory with the remote one
+##                         on CODE. (i.e. from aiub/BSWUSER52/GEN/ remote 
+##                         directory).
 ## uses                  : getopt, lftp
 ## notes                 : 
 ## TODO                  :
@@ -27,19 +27,20 @@
 ##                       : MAY-2013 Fixed silent mode
 ##                         DEC-2013 Added header
 ##                         NOV-2014 Major revision
-                           LAST_UPDATE=NOV-2014
+##                         JUN-2015 Added better variable check
+                           LAST_UPDATE=JUN-2015
 ##
 ################################################################################
 
-# //////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////
 # DISPLAY VERSION
-# //////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////
 function dversion {
   echo "${NAME} ${VERSION} (${RELEASE}) ${LAST_UPDATE}"
   exit 0
 }
 
-# //////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////
 # HELP FUNCTION
 # //////////////////////////////////////////////////////////////////////////////
 function help {
@@ -50,7 +51,7 @@ function help {
   echo ""
   echo " Purpose : mirror the aiub/BSWUSER52/GEN/ remote directory"
   echo ""
-  echo " Usage   : syncwbern.sh -t -l"
+  echo " Usage   : syncwbern52.sh -t -l"
   echo ""
   echo " Switches: "
   echo "           -t --target-directory= specify target directory in local host"
@@ -100,8 +101,13 @@ STAMP_FILE=/dev/null
 # //////////////////////////////////////////////////////////////////////////////
 # GET COMMAND LINE ARGUMENTS
 # //////////////////////////////////////////////////////////////////////////////
-if [ "$#" == "0" ]; then help; fi
-# Call getopt to validate the provided input. This depends on the getopt version available
+if [ "$#" == "0" ]
+then 
+    help
+fi
+
+## Call getopt to validate the provided input. 
+## This depends on the getopt version available
 getopt -T > /dev/null
 if [ $? -eq 4 ]; then
   # GNU enhanced getopt is available
@@ -112,40 +118,56 @@ else
   # Original getopt is available (no long option names, no whitespace, no sorting)
   ARGS=`getopt t:b:o:qs:hv "$@"`
 fi
+
 # check for getopt error
-if [ $? -ne 0 ] ; then echo "getopt error code : $status ;Terminating..." >&2 ; exit 1 ; fi
+if [ $? -ne 0 ]
+then 
+    echo "getopt error code : $status ;Terminating..." >&2 
+    exit 1
+fi
+
 eval set -- $ARGS
 
 # extract options and their arguments into variables.
 while true ; do
   case "$1" in
     -t|--target-directory)
-      TARGET="$2";     shift;;
+      TARGET="$2"
+      shift;;
     -b|--bernese-loadvar)
-      LOADVAR="$2";    shift;;
+      LOADVAR="$2"
+      shift;;
     -o|--logfile)
-      LOGFILE="$2";    shift;;
+      LOGFILE="$2"
+      shift;;
     -q|--quite)
       QUITE_MODE=YES;;
     -s|--stamp-file)
-      STAMP_FILE="$2"; shift;;
+      STAMP_FILE="$2"
+      shift;;
     -h|--help)
-      help;            exit 0;;
+      help
+      exit 0;;
     -v|--version)
-      dversion;        exit 0;;
+      dversion
+      exit 0;;
     --) # end of options
-      shift; break;;
-     *) 
-      echo "*** Invalid argument $1 ; fatal" ; exit 1 ;;
+      shift
+      break;;
+     *)
+      echo "*** Invalid argument $1 ; fatal"
+      exit 1 ;;
   esac
-  shift 
+  shift
 done
 
 # //////////////////////////////////////////////////////////////////////////////
 # IF LOADVAR IS SET, TRY SOURCING THE FILE
 # //////////////////////////////////////////////////////////////////////////////
-if [ ! -z "$LOADVAR" ]; then
-  if [ ! -f "$LOADVAR" ]; then
+if test "${LOADVAR:-koko}" != "koko" ## LOADVAR set and not null
+then
+  if ! test -f "$LOADVAR" ## check that the LOADVAR file exists
+  then
     echo "*** Error sourcing the Bernese LOADVAR file: $LOADVAR ; fatal"
     exit 1
   else
@@ -153,7 +175,8 @@ if [ ! -z "$LOADVAR" ]; then
     TARGET=${X}/GEN
   fi
 fi
-if [ ! -d $TARGET ]; then
+if ! test -d $TARGET
+then
   echo "*** Target directory $TARGET does not exist; fatal"
   exit 1
 fi
@@ -164,20 +187,25 @@ fi
 hash lftp 2>/dev/null || { echo "*** Routine lftp not available; fatal"; exit 1; }
 
 # //////////////////////////////////////////////////////////////////////////////
-# CHECK LOG FILE; IF DEFINED CREATE, ELSE SET TO /dev/null
+# CHECK LOG FILE; IF DEFINED CREATE IT, ELSE SET TO /dev/null
 # //////////////////////////////////////////////////////////////////////////////
-if [ ! -z "$LOGFILE" ]; then
-  if [ ! -f $LOG_FILE ]; then
+#if [ ! -z "$LOGFILE" ]; then
+if test "${LOGFILE:-koko}" != "koko"
+then
+  if ! test -f $LOG_FILE
+  then
     > $LOGFILE 2>/dev/null
-    if [ "$?" -ne 0 ]; then
-      if [ "$QUITE_MODE" == "NO" ]; then echo "Warning! Could not create log file: $LOGFILE"; fi
+    if test "$?" -ne 0
+    then
+      # if [ "$QUITE_MODE" == "NO" ]; then echo "Warning! Could not create log file: $LOGFILE"; fi
       LOGFILE=/dev/null
     fi
   fi
 else
   LOGFILE=/dev/null
 fi
-if [ "${LOGFILE}" == "/dev/null" ]; then
+if test "${LOGFILE}" == "/dev/null"
+then
   LOG=
 else
   LOG="--log="; LOG=${LOG}${LOGFILE}
@@ -186,15 +214,18 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # MIRROR SOURCE TO TARGET
 # //////////////////////////////////////////////////////////////////////////////
-if [ "$QUITE_MODE" == "NO" ]; then echo "Synchronizing $TARGET WITH ${SOURCE_DIR} @ ${SOURCE_FTP}"; fi
+if test "$QUITE_MODE" == "NO"
+then
+    echo "Synchronizing $TARGET WITH ${SOURCE_DIR} @ ${SOURCE_FTP}"
+fi
 
-if [ "$QUITE_MODE" = "NO" ]; then
+if test "$QUITE_MODE" = "NO"
+then
   lftp $SOURCE_FTP << EOF
 cd ${SOURCE_DIR}
 mirror --only-newer --exclude DE200.EPH $LOG ./ ${TARGET}
 EOF
   STATUS=`echo $?`
-
 else
     lftp $SOURCE_FTP << EOF > /dev/null
 cd $SOURCE_DIR
@@ -206,7 +237,8 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # WRITE THE DATE OF LAST UPDATE
 # //////////////////////////////////////////////////////////////////////////////
-if [ $STATUS -eq 0 ]; then
+if test $STATUS -eq 0
+then
   TODAY=`date +%d-%b-%Y`
   echo "$TODAY (syncwbern_52.sh)" > $STAMP_FILE
 fi
@@ -214,4 +246,8 @@ fi
 # //////////////////////////////////////////////////////////////////////////////
 # RETURN THE STATUS (OF mirror)
 # //////////////////////////////////////////////////////////////////////////////
+if test $STATUS -ne 0
+then
+    echo "***ERROR. Failed to synchronize remote/local dirs"
+fi
 exit $STATUS
