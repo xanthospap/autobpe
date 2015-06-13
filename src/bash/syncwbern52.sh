@@ -113,7 +113,7 @@ if [ $? -eq 4 ]; then
   # GNU enhanced getopt is available
   ARGS=`getopt -o t:b:o:qs:hv \
   -l target-directory:,bernese-loadvar:,logfile:,quite,stamp-file:,help,version \
-  -n 'syncwbern_52.sh' -- "$@"`
+  -n 'syncwbern52.sh' -- "$@"`
 else
   # Original getopt is available (no long option names, no whitespace, no sorting)
   ARGS=`getopt t:b:o:qs:hv "$@"`
@@ -121,8 +121,8 @@ fi
 
 # check for getopt error
 if [ $? -ne 0 ]
-then 
-    echo "getopt error code : $status ;Terminating..." >&2 
+then
+    echo "getopt error code : $status ;Terminating..." >&2
     exit 1
 fi
 
@@ -223,13 +223,13 @@ if test "$QUITE_MODE" = "NO"
 then
   lftp $SOURCE_FTP << EOF
 cd ${SOURCE_DIR}
-mirror --only-newer --exclude DE200.EPH $LOG ./ ${TARGET}
+mirror --only-newer --exclude-glob *.EPH $LOG ./ ${TARGET}
 EOF
   STATUS=`echo $?`
 else
     lftp $SOURCE_FTP << EOF > /dev/null
 cd $SOURCE_DIR
-mirror --only-newer --exclude DE200.EPH $LOG ./ $TARGET
+mirror --only-newer --exclude-glob *.EPH $LOG ./ $TARGET
 EOF
   STATUS=`echo $?`
 fi
