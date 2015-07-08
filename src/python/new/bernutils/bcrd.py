@@ -45,16 +45,19 @@ ZCOMP_LENGTH         = 15
 FLAG_INDEX           = 67
 
 class crdpoint:
-    """ Class to represent a (GNSS/geodetic) Point """
-    name_   = ''
-    number_ = ''
-    xcmp_   = .0
-    ycmp_   = .0
-    zcmp_   = .0
-    flag_   = ''
+    """ Class to represent a (GNSS/geodetic) Point as recorded in a Bernese
+        format .CRD file.
+    """
+    name_   = ''    #: Station name (4-digit); e.g. 'ANKR'
+    number_ = ''    #: Station number; e.g. '20805M002'
+    xcmp_   = .0    #: x-component
+    ycmp_   = .0    #: y-component
+    zcmp_   = .0    #: z-component
+    flag_   = ''    #: flag
 
     def __init__(self,name='',number='',xcmp='.0',ycmp='.0',zcmp='.0',flag=''):
-        """ Constructor; all initialized to empty strings and/or .0 """
+        """ Constructor; all initialized to empty strings and/or .0 
+        """
         self.name_   = name
         self.number_ = number
         try:
@@ -67,7 +70,15 @@ class crdpoint:
         self.flag_ = flag
 
     def setFromCrdLine(self,line):
-        """ Set a CrdPoint from a .CRD data line """
+        """ Set (re-initialize) a crdpoint from a .CRD data line. Bernese v5.2
+            .CRD files have a strict format and this function expects such a
+            format to be followed.
+
+            :param line: A line containing coordinate information, as extracted
+                         (read) from a .CRD file
+
+            :returns:    Nothing
+        """
 
         if len(line) < 65:
             raise BufferError('Error reading point from crd file ['+
@@ -91,8 +102,10 @@ class crdpoint:
             self.flag_ = ''
 
     def name(self,use_marker_number=True):
-        '''
-        ## Return the full name of a station, i.e. marker_name + marker_number.
+        ''' Return the full name of a station, i.e. 
+            ``marker_name`` + ``marker_number``.
+            If ``use_marker_number`` is set to ``False`` then the instance's
+            ``marker number`` will not be included in the name returned.
         '''
         if len(self.name_) < MARKER_NAME_LENGTH:
             while len(self.name_) < MARKER_NAME_LENGTH:
@@ -107,10 +120,12 @@ class crdpoint:
 
         return ( self.name_[0:4] + ' ' + self.number_[0:10] )
 
-    def asString(self,aa):
-        '''
-        ## Describe a station as a .CRD data line string
-        WRITE(line,'(I3,2X,A16,3F15.5,4X,A5)')
+    def asString(self,aa=1):
+        ''' Compile a Bernese v5.2 .CRD file record line, using the instance's
+            attributes. ``aa`` is the number of station (can be any positive 
+            integer), written at the begining of the returned line.
+
+            :returns: A .CRD record line.
         '''
         try:
             iaa = int(aa)
@@ -120,26 +135,28 @@ class crdpoint:
                 self.xcmp_,self.ycmp_,self.zcmp_,self.flag_)
 
 class crdfile:
-    """ DLJKFLKSDJFLKJSDLFKJSLDKFJLSDKJF """
-    filename_ = ''
+    """ A class to hold a Bernese v5.2 format .CRD file. """
+    filename_ = '' #: the name of the file
     
-    ## Constructor
     def __init__(self,filename):
+        """ Contructor; checks whether the file exists or not """
         if not os.path.isfile(filename):
             raise Exception('Invalid initilization of .CRD file' + filename)
         self.filename_ = filename
 
     def getListOfPoints(self,stalst=None,disregard_number=False):
-        '''
-        ## Read points off from a .CRD file; return all points as list.
-        ## If the optional argument 'stalst' is given, (which is supposed
-        ## to hold a list of station names), then only stations matched
-        ## in the stalst list will be returned. By matched, i mean that
-        ## the tuple (marker_name, marker_number) is the same for both
-        ## stations.
-        ## If 'disregard_number' is set to True and 'stalst' is other than
-        ## None, then the comparisson of station names, will only be performed
-        ## using the 4char station id (i.e. self.name_) and NOT the marker number.
+        ''' Read points off from a .CRD file; return all points as list.
+            If the optional argument ``stalst`` is given, (which is supposed
+            to hold a list of station names), then only stations matched
+            in the ``stalst`` list will be returned. By matched, i mean that
+            the tuple ``(marker_name, marker_number)`` is the same for both
+            stations.
+            If ``disregard_number`` is set to ``True`` and ``stalst`` is other 
+            than ``None``, then the comparisson of station names, will only 
+            be performed using the 4char station id (i.e. ``self.name_``) and 
+            *NOT* the marker number.
+
+            :returns: A list of points (i.e. ``crdpoint`` s)
         '''
 
         points = []
@@ -182,13 +199,13 @@ class crdfile:
         fin.close()
 
         ## Return the list of points
-        ## print 'returning :',len(points)
         return points
 
     def getFileHeader(self):
-        '''
-        ## Return the header of a .CRD file as a list of lines,
-        ## with no triling newline chars
+        ''' Return the header of a .CRD file as a list of lines,
+            with no trailing newline chars.
+
+            :returns: A list of lines included in the file header.
         '''
         try:
             fin = open(self.filename_,'r')

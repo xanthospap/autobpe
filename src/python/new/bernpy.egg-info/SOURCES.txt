@@ -5,5 +5,8 @@ bernpy.egg-info/dependency_links.txt
 bernpy.egg-info/requires.txt
 bernpy.egg-info/top_level.txt
 bernutils/__init__.py
-bernutils/berncrd.py
-bernutils/berngpsest.py
+bernutils/bcrd.py
+bernutils/bgps.py
+bernutils/bsta.py
+test/test_gps.py
+test/test_sta.py

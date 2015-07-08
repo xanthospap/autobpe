@@ -39,13 +39,13 @@ import bernutils.berncrd
 DDEBUG = True
 
 ## Global variables
-stations = []
-flags = []
+stations            = []
+flags               = []
 drop_marker_numbers = False
-update_file = ''
-reference_file = ''
-include_unmatched = False
-delete_unmatched = False
+update_file         = ''
+reference_file      = ''
+include_unmatched   = False
+delete_unmatched    = False
 
 ## help function
 def help (i):
@@ -198,4 +198,5 @@ os.rename('.tmp.CRD',update_file)
 ## Print the number of stations update and exit
 if DDEBUG: print 'Wrote',len(updlst),'stations in file',update_file,'.'
 if DDEBUG: print 'Updated ',matched_stations,'stations.'
+
 sys.exit(0)

@@ -11,12 +11,10 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-.. autoclass:: crdpoint
-    :members:
-
-.. autoclass:: crdfile
-
-    intro.rst
+   intro.rst
+   bcrd.rst
+   bgps.rst
+   bsta.rst
 
 Indices and tables
 ==================

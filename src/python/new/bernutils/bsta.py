@@ -4,14 +4,13 @@ import os
 import datetime
 import re
 
-class StaFile:
-    ''' A station information Class, to represent Bernese v5.2 format .STA 
+class stafile:
+    ''' A station information class, to represent Bernese v5.2 format .STA 
         files.
     '''
-    ## the filename
-    filename_  = ''
-    ## a dictionary to map a type to a header
-    type_names = ['RENAMING OF STATIONS',
+    __filename  = '' #: The filename
+    ##: a dictionary to map a type to a header
+    __type_names = ['RENAMING OF STATIONS',
             'STATION INFORMATION',
             'HANDLING OF STATION PROBLEMS', 
             'STATION COORDINATES AND VELOCITIES (ADDNEQ)',
@@ -23,26 +22,35 @@ class StaFile:
         '''
         if not os.path.isfile(filename):
             raise IOError('No such file '+filename)
-        self.filename_ = filename
+        self.__filename = filename
 
     def findTypeStart(self,stream,type,max_lines=1000):
         ''' Given a (sta) input file stream, go to the line where a specific
-            type starts. E.g. if the type specified is '1', then this function
-            will search for the line: 'TYPE 001: RENAMING OF STATIONS'.
-            The line to search for, is compiled using the type and the 
-            type_names dictionary. If the line is not found after max_lines are
-            read, then an exception is thrown.
+            type starts. E.g. if the type specified is *'1'*, then this function
+            will search for the line: *'TYPE 001: RENAMING OF STATIONS'*.
+            The line to search for, is compiled using the ``type`` and the 
+            ``__type_names`` dictionary. If the line is not found after 
+            ``max_lines`` are read, then an exception is thrown.
             In case of sucess, the (header) line is returned, and the stream
             buffer is placed at the end of the header line.
+            Note that the ``type`` parameter must be a positive integer in the
+            range ``[1, len(___type_names)]``.
+
+            :param stream:    The input stream for this istance.
+            :param type:      The number of type to search for.
+            :param max_lines: Max lines to read before quiting.
+
+            :returns:         On sucess, the matched line; the input stream is 
+                              left at the end of the matched line.
         '''
         try:
             itype = int(type)
-            if itype > len(self.type_names) + 1:
+            if itype > len(self.__type_names) + 1:
                 raise RuntimeError('Invalid TYPE to search for : ['+ type + ']')
         except:
             raise RuntimeError('Invalid TYPE to search for.')
 
-        line_str = 'TYPE %03i: %s' %(itype,self.type_names[itype-1])
+        line_str = 'TYPE %03i: %s' %(itype,self.__type_names[itype-1])
 
         dummy_it = 0
         line = stream.readline()
@@ -59,25 +67,32 @@ class StaFile:
 
     def findStationType01(self,station,epoch=None):
         ''' This function will search for the station information (concerning
-            a specific station) included in the 'TYPE 01' block.
+            a specific station) included in the *'TYPE 01'* block.
             Given a station name (e.g. 'ANKR' or 'ANKR 20805M002'), it will
-            try to match the information line provided in the 'TYPE 01' block,
-            with a flag of '001' and NOT '003'. The station matching is NOT
-            performed with the column 'STATION NAME', but with 'OLD STATION NAME'
+            try to match the information line provided in the *'TYPE 01'* block,
+            with a flag of *'001'* and **NOT** *'003'*. The station matching is **NOT**
+            performed with the column *'STATION NAME'*, but with *'OLD STATION NAME'*
             In some cases, it might be necessary to also suply the epoch for
             which the info is needed (some times the stations are renamed and
             different names are adopted previous before and after a certain
             epoch).
 
-            TODO : If a renaming line (flag 003) is encountered it is skipped.
+            :param station: The name of the station to match.
+            :param epoch:   A ``datetime`` object, epoch for which the info is
+                            wanted.
+
+            :returns:       The *'TYPE 01'* block record for this station (for
+                            this epoch).
+
+            *TODO* : If a renaming line (flag 003) is encountered it is skipped.
                    What should i do with this line ??
         '''
 
         try:
-            fin = open(self.filename_,'r')
+            fin = open(self.__filename,'r')
         except:
             fin.close()
-            raise IOError('No such file '+filename)
+            raise IOError('No such file '+self.__filename)
 
         try:
             self.findTypeStart(fin,1,max_lines=100)
@@ -101,7 +116,7 @@ class StaFile:
         ## WDC1 40451S005        001                       2006 07 16 23 59 59  S071*                 NGA
         ## WDC3 40451S008        001  2006 07 17 00 00 00                       S071*                 NGA
         station_found = False
-        line = fin.readline()
+        line          = fin.readline()
         while (True):
             if len(line) < 5:
                 fin.close()
@@ -151,7 +166,7 @@ class StaFile:
                     break
                 #else:
                 #    print 'Skiping line -> ['+line.strip()+']'
-            
+
             line = fin.readline()
 
         fin.close()
@@ -162,25 +177,33 @@ class StaFile:
             return []
 
     def findStationType02(self,station,epoch=None):
-        ''' This function will search for station info recorded in 'TYPE 002'
+        ''' This function will search for station info recorded in *'TYPE 002'*
             and return it.
-            The station name provided, will be resolved using the 'TYPE 001'
-            block using the function findStationType01. Hence, the name used to
-            match info in the 'TYPE 002' block will be the column 'STATION NAME'
+            The station name provided, will be resolved using the *'TYPE 001'*
+            block using the function ``findStationType01``. Hence, the name used to
+            match info in the *'TYPE 002'* block will be the column *'STATION NAME'*
             E.g., given station name 'ANKR' and using the CODE.STA file, we
             will get the name 'ANKR 20805M002' and we will search the block
             'TYPE 002' for this name. Note that in case of renaming, a specific
-            date may be needed (see findStationType01).
+            date may be needed (see ``findStationType01``).
             If no date is provided, all entried for the station will be matched
             and returned; else, only the one withing the specified interval
-            will be returned
+            will be returned.
+
+            :param station: The name of the station to match.
+            :param epoch:   A ``datetime`` object, epoch for which the info is
+                            wanted.
+
+            :returns:       A list of *'TYPE 02'* block records for this station
+                            (for this epoch).
+
         '''
-        
+
         try:
-            fin = open(self.filename_,'r')
+            fin = open(self.__filename,'r')
         except:
             fin.close()
-            raise IOError('No such file '+filename)
+            raise IOError('No such file '+self.__filename)
 
         try:
             type1 = self.findStationType01(station,epoch)
@@ -252,12 +275,18 @@ class StaFile:
         return station_info_lines
 
     def getStationName(self,station,epoch=None):
+        ''' Find and return the station name, as recorded in the *'TYPE 001'*
+            block
+        '''
         try:
             return self.findStationType01(station,epoch)[0:20].strip()
         except:
             raise RuntimeError('Cannot find type 001 station info')
 
     def getStationAntenna(self,station,epoch=None):
+        ''' Find and return the antenna type, as recorded in the *'TYPE 002'*
+            block
+        '''
         try:
             info_list = self.findStationType02(station,epoch)
             if len(info_list) > 1:
@@ -265,8 +294,11 @@ class StaFile:
             return info_list[0][121:141].strip()
         except:
             raise RuntimeError('Cannot find type 002 station info')
-    
+
     def getStationReceiver(self,station,epoch=None):
+        ''' Find and return the receiver type, as recorded in the *'TYPE 002'*
+            block
+        '''
         try:
             info_list = self.findStationType02(station,epoch)
             if len(info_list) > 1:
@@ -274,44 +306,3 @@ class StaFile:
             return info_list[0][69:89].strip()
         except:
             raise RuntimeError('Cannot find type 002 station info')
-##
-## Test Program
-x = StaFile('CODE.STA')
-
-## a renaming takes place, so this will fail if no epoch is given
-ln1 = x.findStationType01('S071',datetime.datetime(2008,01,01,01,00,00))
-print ln1
-
-## a renaming takes place, so this will fail if no epoch is given
-ln1 = x.findStationType01('S071',datetime.datetime(2005,01,01,01,00,00))
-print ln1
-
-## following two should be the same
-ln1 = x.findStationType01('OSN1 23904S001',datetime.datetime(2005,01,01,01,00,00))
-print ln1
-ln1 = x.findStationType01('OSN1 23904S001')
-print ln1
-
-## a renaming takes place, so this will fail if no epoch is given
-ln2 = x.findStationType02('S071',datetime.datetime(2005,01,01,01,00,00))
-print ln2
-
-## return all entries, for all epochs
-ln2 = x.findStationType02('ANKR')
-print ln2
-
-## return entry for a specific interval
-ln2 = x.findStationType02('ANKR',datetime.datetime(2015,07,01,01,00,00))
-print ln2
-
-print x.getStationName('S071',datetime.datetime(2008,01,01,01,00,00))
-print x.getStationName('S071',datetime.datetime(2005,01,01,01,00,00))
-print x.getStationName('ANKR')
-
-print x.getStationAntenna('S071',datetime.datetime(2008,01,01,01,00,00))
-print x.getStationAntenna('S071',datetime.datetime(2005,01,01,01,00,00))
-print x.getStationAntenna('ANKR',datetime.datetime(2005,01,01,01,00,00))
-
-print x.getStationReceiver('S071',datetime.datetime(2008,01,01,01,00,00))
-print x.getStationReceiver('S071',datetime.datetime(2005,01,01,01,00,00))
-print x.getStationReceiver('ANKR',datetime.datetime(2005,01,01,01,00,00))

@@ -2,29 +2,40 @@
 
 import os
 
-class GpsestOut:
-    filename_ = ''
-    program_ = ''
-    campaign_ = ''
-    doy_ = ''
-    ses_ = ''
-    yr = ''
-    stations = []
+class gpsoutfile:
+    ''' A class to hold a Bernese v5.2 GPSEST output file '''
+    __filename  = ''  #: The filename of the output file
+    __program   = ''  #: The program that created (this) file
+    __campaign  = ''  #: Name of the campaign
+    __doy       = ''  #: Day Of Year (processed)
+    __ses       = ''  #: Session (processed)
+    __yr        = ''  #: Year (processed)
+    __stations  = []  #: List of stations included in the processing/output file
 
     def __init__(self,filename):
+        ''' Constructor; check for file existance '''
         if not os.path.isfile(filename):
             raise IOError('No such file '+filename)
-        self.filename_ = filename
+        self.__filename = filename
 
     def findFirstLine(self,stream,line,eof_line='>>>',max_lines=1000):
-        '''
-        Given a GPSEST output file, try to match the line passed as
-        'line', until 'eof_line' is not matched and no more than
-        'max_lines' are read.
-        If the line is found, the stream input position, will be returned
-        at the end of the matched line.
-        WARNING Note that the search will start from the current get position
-        of the stream and **NOT** from the begining of the file.
+        ''' Given a GPSEST output file, try to match the line passed as
+            ``line``, until ``eof_line`` is not matched and no more than
+            ``max_lines`` are read.
+            If the line is found, the stream input position, will be returned
+            at the end of the matched line.
+
+            :param stream:    The (calling) instance's input stream.
+            :param line:      The prototype line to match.
+            :param eof_line:  EOF record.
+            :param max_lines: Max lines to be read befor quiting.
+
+            :returns:         On success, the matched line; input buffer is set
+                              at the end of the matched line.
+            
+            :warning: Note that the search will start from the current get 
+                      position of the stream and *NOT* from the begining of 
+                      the file.
         '''
 
         try:
@@ -43,17 +54,16 @@ class GpsestOut:
             ln = stream.readline()
 
     def getHeaderInfo(self):
-        '''
-        Given a GPSEST output file, try to read the header
-        information and return in in a list:
-        [campaign_name, doy, session, year, date_run, username, # of stations]
+        ''' Given a GPSEST output file, try to read the header
+            information and return in in a list as:
+            campaign_name, doy, session, year, date_run, username, # of stations
         '''
 
         try:
-            fin = open(self.filename_,'r')
+            fin = open(self.__filename,'r')
         except:
             fin.close()
-            raise IOError('No such file '+filename)
+            raise IOError('No such file '+self.__filename)
 
         ## first line is empty
         line = fin.readline()
@@ -80,7 +90,7 @@ class GpsestOut:
         if not (len(line) == 3 and line[2] == 'GPSEST'):
             fin.close()
             raise RuntimeError('Invalid GPSEST format: line 5')
-        self.program_ = line[2]
+        self.__program = line[2]
 
         ## Sixth line
         ## Purpose        : Parameter estimation
@@ -96,7 +106,7 @@ class GpsestOut:
         if not len(line) == 3:
             fin.close()
             raise RuntimeError('Invalid GPSEST format: line 8')
-        self.campaign_ = line[2].split('/')[-1]
+        self.__campaign = line[2].split('/')[-1]
 
         ## Ninth line
         ## Default session: 1190 year 2015
@@ -104,9 +114,9 @@ class GpsestOut:
         if not len(line) == 5:
             fin.close()
             raise RuntimeError('Invalid GPSEST format: line 9')
-        self.doy_ = line[2][0:-1]
-        self.ses_ = line[2][-1]
-        self.yr_  = line[4]
+        self.__doy = line[2][0:-1]
+        self.__ses = line[2][-1]
+        self.__yr  = line[4]
 
         ## Tenth line
         ## Date           : 15-Jun-2015 15:16:49
@@ -125,14 +135,14 @@ class GpsestOut:
         user = line[3]
 
         ## go to the second occurance of '4. STATIONS'
-        self.stations = []
+        self.__stations = []
         lstr = '4. STATIONS'
         try:
             self.findFirstLine(fin,lstr)
         except:
             fin.close()
             raise RuntimeError('Station list not found until EOF!')
-        self.stations = []
+        self.__stations = []
         lstr = '4. STATIONS'
         try:
             self.findFirstLine(fin,lstr)
@@ -152,7 +162,7 @@ class GpsestOut:
             if len(line) < 5:
                 break;
             try:
-                self.stations.append(line[6:21].strip())
+                self.__stations.append(line[6:21].strip())
                 feh = line[27:34].strip()
                 x = float(line[34:50])
                 y = float(line[50:66])
@@ -163,26 +173,25 @@ class GpsestOut:
 
         fin.close()
 
-        return self.campaign_, self.doy_, self.ses_, self.yr_, dtrun, user
+        return self.__campaign, self.__doy, self.__ses, self.__yr, dtrun, user
 
     def getBaselineList(self):
-        '''
-        Given a GPSEST output file, this function will try to read all
-        baselines processed in the run, and report their information.
-        The baselines are read from the section:
-        2. OBSERVATION FILES, MAIN CHARACTERISTICS
-        Two tables are read, namely:
-        [FILE  OBSERVATION FILE HEADER          OBSERVATION FILE                  SESS     RECEIVER 1            RECEIVER 2]
-        and
-        [FILE TYP FREQ.  STATION 1        STATION 2        SESS  FIRST OBSERV.TIME  #EPO  DT #EF #CLK ARC #SAT  W 12    #AMB  L1  L2  L5  RM]
-        and the concatenated list is returned, i.e.:
-        [aa, baseline_name, type, frequency, station1, station2, first_observation, # of epochs]
+        ''' This function will try to read all baselines processed in the run, 
+            and report their information. The baselines are read from the 
+            section:
+            *2. OBSERVATION FILES, MAIN CHARACTERISTICS*
+            Two tables are read, namely:
+            [FILE  OBSERVATION FILE HEADER          OBSERVATION FILE                  SESS     RECEIVER 1            RECEIVER 2]
+            and
+            [FILE TYP FREQ.  STATION 1        STATION 2        SESS  FIRST OBSERV.TIME  #EPO  DT #EF #CLK ARC #SAT  W 12    #AMB  L1  L2  L5  RM]
+            and the concatenated list is returned, i.e.:
+            [aa, baseline_name, type, frequency, station1, station2, first_observation, # of epochs]
         '''
 
         try:
-            fin = open(self.filename_,'r')
+            fin = open(self.__filename,'r')
         except:
-            raise IOError('No such file '+filename)
+            raise IOError('No such file '+self.__filename)
 
         num_of_bsl = 0
         dummy_it   = 0
@@ -235,7 +244,7 @@ class GpsestOut:
             except:
                 fin.close()
                 raise RuntimeError('Failed reading baselines!')
-            if _ses != self.doy_ + self.ses_:
+            if _ses != self.__doy + self.__ses:
                 fin.close()
                 raise RuntimeError('Failed reading baselines! Invalid session')
             line = fin.readline()
@@ -255,8 +264,8 @@ class GpsestOut:
             line = fin.readline()
 
         ## read baselines
-        bsl_lst_2 = []
-        dummy_it = 0
+        bsl_lst_2   = []
+        dummy_it    = 0
         num_of_bsl2 = 0
         line = fin.readline()
         while len(line) > 5:
@@ -278,7 +287,7 @@ class GpsestOut:
             except:
                 fin.close()
                 raise RuntimeError('Failed reading baselines!')
-            if _ses != self.doy_ + self.ses_:
+            if _ses != self.__doy + self.__ses:
                 fin.close()
                 raise RuntimeError('Failed reading baselines! Invalid session')
             line = fin.readline()
@@ -296,23 +305,22 @@ class GpsestOut:
         return baseline_list
 
     def getCrdSolInfo(self):
-        '''
-        Given a GPSEST output file, this function will try to read information regarding the
-        (solution) coordinate results. The information is collected from the table:
-        'NUM  STATION NAME     PARAMETER    A PRIORI VALUE       NEW VALUE     NEW- A PRIORI  RMS ERROR   3-D ELLIPSOID       2-D ELLIPSE'
-        for every stations already mentioned in the instances station list. So make sure,
-        the instances station list is already filled. The return list, contains
-        a list for every station, in the following format:
-        [name,3x(a-priori,estimated,new-old,rms),3x(new-old,rms)]
-        for   X, Y, Z                            HGT, LAT, LON
-        TODO A same block of information maybe available in the section 'RESULTS PART 2'. Try reading that
-        before reading the blok from 'RESULTS PART 1'.
+        ''' Given a GPSEST output file, this function will try to read information regarding the
+            (solution) coordinate results. The information is collected from the table:
+            'NUM  STATION NAME     PARAMETER    A PRIORI VALUE       NEW VALUE     NEW- A PRIORI  RMS ERROR   3-D ELLIPSOID       2-D ELLIPSE'
+            for every stations already mentioned in the instances station list. So make sure,
+            the instances station list is already filled. The return list, contains
+            a list for every station, in the following format:
+            [name,3x(a-priori,estimated,new-old,rms),3x(new-old,rms)]
+            for   X, Y, Z                            HGT, LAT, LON
+            TODO A same block of information maybe available in the section 'RESULTS PART 2'. Try reading that
+            before reading the blok from 'RESULTS PART 1'.
         '''
 
         try:
-            fin = open(self.filename_,'r')
+            fin = open(self.__filename,'r')
         except:
-            raise IOError('No such file '+filename)
+            raise IOError('No such file '+self.__filename)
 
         ## skip everything until '13. RESULTS (PART 1)' line
         lstr = '13. RESULTS (PART 1)'
@@ -335,7 +343,7 @@ class GpsestOut:
 
         station_info = []
         it = 0
-        while (it < len(self.stations)):
+        while (it < len(self.__stations)):
             tmp_info = []
             for i in range(0,3):
                 line = fin.readline()
@@ -343,7 +351,7 @@ class GpsestOut:
                     if i == 0:
                         station_ = line[6:21]
                         tmp_info.append(station_)
-                    cflag    = line[23:25].strip()
+                    cflag = line[23:25].strip()
                     if (i == 0 and cflag != 'X') or (i == 1 and cflag != 'Y') or (i == 2 and cflag != 'Z'):
                         fin.close()
                         raise RuntimeError('Error reading parameter' + str(i))
@@ -372,21 +380,21 @@ class GpsestOut:
             it += 1
             line = fin.readline()
 
-        if it != len(self.stations):
+        if it != len(self.__stations):
             fin.close()
             raise RuntimeError('Error collecting station parameters')
 
         fin.close()
         return station_info
 
-##x = GpsestOut('FFG140460.OUT')
-x = GpsestOut('GPSEST.L80')
-lst1 = x.getHeaderInfo()
-lst2 = x.getBaselineList()
-lst3 = x.getCrdSolInfo()
-print '--------------------------------------------------------------------------------------------'
-print lst1
-print '--------------------------------------------------------------------------------------------'
-print lst2
-print '--------------------------------------------------------------------------------------------'
-print lst3
+## EXAMPLE USAGE ##
+##x = GpsestOut('GPSEST.L80')
+##lst1 = x.getHeaderInfo()
+##lst2 = x.getBaselineList()
+##lst3 = x.getCrdSolInfo()
+##print '--------------------------------------------------------------------------------------------'
+##print lst1
+##print '--------------------------------------------------------------------------------------------'
+##print lst2
+##print '--------------------------------------------------------------------------------------------'
+##print lst3
