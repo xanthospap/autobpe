@@ -44,7 +44,7 @@ ZCOMP_INDEX          = 52
 ZCOMP_LENGTH         = 15
 FLAG_INDEX           = 67
 
-class crdpoint:
+class CrdPoint:
     """ Class to represent a (GNSS/geodetic) Point """
     name_   = ''
     number_ = ''
@@ -119,7 +119,7 @@ class crdpoint:
         return "%03i  %-17s%15.5f%15.5f%15.5f   %-5s" %(iaa,self.name(),
                 self.xcmp_,self.ycmp_,self.zcmp_,self.flag_)
 
-class crdfile:
+class CrdFile:
     """ DLJKFLKSDJFLKJSDLFKJSLDKFJLSDKJF """
     filename_ = ''
     
@@ -153,7 +153,7 @@ class crdfile:
         for i in range(0,6):
             line = fin.readline()
 
-        pt  = crdpoint()
+        pt  = CrdPoint()
         pts = 1
         ## Read off all the points and add them to the points list
         while (True):
@@ -161,7 +161,7 @@ class crdfile:
             if not line or len(line) < 10:
                 break
             try:
-                pt = crdpoint()
+                pt = CrdPoint()
                 pt.setFromCrdLine(line)
                 if stalst is not None:
                     if disregard_number:
