@@ -386,15 +386,3 @@ class gpsoutfile:
 
         fin.close()
         return station_info
-
-## EXAMPLE USAGE ##
-##x = GpsestOut('GPSEST.L80')
-##lst1 = x.getHeaderInfo()
-##lst2 = x.getBaselineList()
-##lst3 = x.getCrdSolInfo()
-##print '--------------------------------------------------------------------------------------------'
-##print lst1
-##print '--------------------------------------------------------------------------------------------'
-##print lst2
-##print '--------------------------------------------------------------------------------------------'
-##print lst3
