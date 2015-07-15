@@ -2,6 +2,12 @@
 
 import os
 
+class ambline:
+    __line = ''
+
+    def __init__(self,line):
+        self.__line = line
+
 class ambfile:
     ''' A class to hold a Bernese ambiguity summary file (.SUM)
     '''
@@ -28,6 +34,11 @@ class ambfile:
     ''' Satellite System id-names '''
     __satsys     = {'GPS': 'G', 'GLONASS': 'R', 'MIXED': 'GR'}
 
+    ''' Number of LC's for every method (i.e. columns of type: Max/RMS L5' '''
+    __amb_lcs   = {'cbwl': 1, 'cbnl': 1, 'pbwl': 1, 'pbnl': 1, 'qif': 2,
+            'l12': 1}
+
+
     def __init__(self,filename):
         ''' Initialize a sta object given its filename;
             try locating the file
@@ -35,6 +46,47 @@ class ambfile:
         if not os.path.isfile(filename):
             raise IOError('No such file '+filename)
         self.__filename = filename
+
+    def collectMethodBsls(self,method):
+
+        fin = open(self.__filename)
+
+        try:
+            self.goToMethod(fin,method)
+        except:
+            raise
+
+        ## skip 5 lines
+        for i in range(1,6): line = fin.readline()
+
+        # read next line; if it is full of '=' no baselines to follow
+        line = fin.readline()
+        if not line:
+            fin.close()
+            raise RuntimeError('Cannot collect baselines for resolution method '+method)
+        elif line[0:3] == '===':
+            return
+
+        smeth1 = self.__amb_keys[method]
+        smeth2 = self.__amb_method[smeth1]
+
+        bsl_info = []
+
+        while (line):
+            if line.rstrip()[-7:] != smeth2:
+                break
+            if len(line) < 5:
+                fin.close()
+                raise RuntimeError('Error collecting baselines for resolution method '+method)
+            elif line[0:3] == '---': ## normal termination
+                break
+            else:
+                bsl_info.append(line)
+            line = fin.readline()
+            print line.strip()
+
+        fin.close()
+        return bsl_info
 
     def goToMethod(self,istream,method,max_lines=1000):
         ''' Position the input stream ``istream`` at the start of results
@@ -93,4 +145,7 @@ fin.seek(0)
 print x.goToMethod(fin,'qif')
 #print x.goToMethod(fin,'lol')
 
-fin.close()
+print x.collectMethodBsls('l12')
+print x.collectMethodBsls('cbnl')
+print x.collectMethodBsls('pbwl')
+print x.collectMethodBsls('qif')
