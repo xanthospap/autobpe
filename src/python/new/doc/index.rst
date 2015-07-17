@@ -15,6 +15,7 @@ Contents:
    bcrd.rst
    bgps.rst
    bsta.rst
+   bamb.rst
 
 Indices and tables
 ==================

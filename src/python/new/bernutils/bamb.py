@@ -220,6 +220,7 @@ class ambfile:
                               string denoting a resolution method, as represented
                               in the ``__amb_keys`` dictionary.
             :param max_lines: Maximum number of lines to read before quiting.
+
         '''
 
         try:
@@ -251,25 +252,25 @@ class ambfile:
             return line
         else:
             raise RuntimeError('Failed to find entry for method '+smeth1)
-
+#
 ## EXAMPLE USAGE
-x = ambfile('FFU151000_GNSS.SUM')
-fin = open('FFU151000_GNSS.SUM','r')
-print x.goToMethod(fin,'l12')
-fin.seek(0)
-print x.goToMethod(fin,'cbnl')
-fin.seek(0)
-print x.goToMethod(fin,'pbwl')
-fin.seek(0)
-print x.goToMethod(fin,'qif')
+#x = ambfile('FFU151000_GNSS.SUM')
+#fin = open('FFU151000_GNSS.SUM','r')
+#print x.goToMethod(fin,'l12')
+#fin.seek(0)
+#print x.goToMethod(fin,'cbnl')
+#fin.seek(0)
+#print x.goToMethod(fin,'pbwl')
+#fin.seek(0)
+#print x.goToMethod(fin,'qif')
 #print x.goToMethod(fin,'lol')
-
-print x.collectMethodBsls('l12')
-print x.collectMethodBsls('cbnl')
-print x.collectMethodBsls('pbwl')
-print x.collectMethodBsls('qif')
-
-print x.collectBsls('l12','gps')
-print x.collectBsls('cbnl','glonass')
-print x.collectBsls('pbwl','gps')
-print x.collectBsls('qif')
+#
+#print x.collectMethodBsls('l12')
+#print x.collectMethodBsls('cbnl')
+#print x.collectMethodBsls('pbwl')
+#print x.collectMethodBsls('qif')
+#
+#print x.collectBsls('l12','gps')
+#print x.collectBsls('cbnl','glonass')
+#print x.collectBsls('pbwl','gps')
+#print x.collectBsls('qif')

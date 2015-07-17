@@ -23,9 +23,17 @@ Documentation
 
 .. currentmodule:: bcrd
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Class crdpoint
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. autoclass:: crdpoint
    :members:
    :undoc-members:
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Class crdfile
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: crdfile
    :members:
