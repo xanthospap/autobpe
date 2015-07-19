@@ -10,7 +10,6 @@ config = {
     'download_url': '',
     'author_email': 'xanthos@mail.ntua.gr, danast@mail.ntua.gr',
     'version': '0.1',
-    'install_requires': ['nose'],
     'packages': ['bernutils'],
     'scripts': [],
     'name': 'bernpy'

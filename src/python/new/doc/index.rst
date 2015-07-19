@@ -12,6 +12,9 @@ Contents:
    :maxdepth: 2
 
    intro.rst
+   gpstime.rst
+   webutils.rst
+   products.rst
    bcrd.rst
    bgps.rst
    bsta.rst
