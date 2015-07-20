@@ -46,8 +46,12 @@ def grabFtpFile(host,dirn,filen,saveas=None,username=None,password=None):
         ftp.retrbinary('RETR %s' %filen, localfile.write, 1024)
     except:
         ftp.quit()
-        ## remove corrupt file TODO
-        ## if os.path.isfile(localfile): os.remove(localfile)
+        ## remove corrupt file
+        try: 
+            if os.path.isfile(localfile):
+                os.remove(localfile)
+        except:
+            pass
         raise RuntimeError('Failed to download file: ' + host + dirn + filen)
     
     ftp.quit()

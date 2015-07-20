@@ -2,11 +2,15 @@ setup.py
 bernpy.egg-info/PKG-INFO
 bernpy.egg-info/SOURCES.txt
 bernpy.egg-info/dependency_links.txt
-bernpy.egg-info/requires.txt
 bernpy.egg-info/top_level.txt
 bernutils/__init__.py
+bernutils/bamb.py
 bernutils/bcrd.py
 bernutils/bgps.py
 bernutils/bsta.py
+bernutils/gpstime.py
+bernutils/products.py
+bernutils/webutils.py
 test/test_gps.py
+test/test_products.py
 test/test_sta.py
