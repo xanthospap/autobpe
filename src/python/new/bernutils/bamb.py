@@ -2,36 +2,39 @@
 
 import os
 
-''' Ambiguity resolution methods and their id-codes '''
 amb_method = {'Code-Based Widelane': '#AR_WL',
     'Code-Based Narrowlane': '#AR_NL',
     'Phase-Based Widelane': '#AR_L5',
     'Phase-Based Narrowlane': '#AR_L3',
     'Quasi-Ionosphere-Free': '#AR_QIF',
     'Direct L1/L2': '#AR_L12'
-    }
+}
+''' Ambiguity resolution methods and their id-codes 
+'''
 
-''' Ambiguity resolution method short names (id's) '''
 amb_keys   = {'cbwl': 'Code-Based Widelane',
     'cbnl': 'Code-Based Narrowlane',
     'pbwl': 'Phase-Based Widelane',
     'pbnl': 'Phase-Based Narrowlane',
     'qif': 'Quasi-Ionosphere-Free',
     'l12': 'Direct L1/L2'
-    }
+}
+''' Ambiguity resolution method short names (id's) '''
 
-''' Satellite System id-names '''
 satsys     = {'G': 'GPS', 'R': 'GLONASS', 'GR': 'MIXED'}
+''' Satellite System id-names 
+'''
 
-''' Number of LC's for every method (i.e. columns of type: Max/RMS L5' '''
 amb_lcs   = {'cbwl': 1, 'cbnl': 1, 'pbwl': 1, 'pbnl': 1, 'qif': 2, 'l12': 1}
+''' Number of LC's for every method (i.e. columns of type: Max/RMS L5' 
+'''
 
 def satsys2key(ss):
     ''' Match a satellite system name (e.g. 'gps') to its identifier (e.g. 'G')
-        This does the opposite of the dictionary 'satsys'. E.g. 
+        This does the opposite of the dictionary :py:data:`satsys`. E.g. 
         ``satsys['G'] = 'GPS'`` and ``satsys2key('gps') = 'G'``. The argument
         ``ss`` can be in lower or uppercase (i.e. ``satsys2key('gps') = 
-        satsys2key('GPS')``)
+        satsys2key('GPS')``).
     '''
     ss = ss.strip()
     if ss == 'GPS' or ss == 'gps':
@@ -45,10 +48,10 @@ def satsys2key(ss):
 
 def ambstr2key(ambs):
     ''' Match an ambiguity method string id (e.g. '#AR_QIF') to a method id
-        (e.g. 'qif'). The method string (i.e argument ``ambs`` should be passed
+        (e.g. 'qif'). The method string (i.e argument ``ambs``) should be passed
         as recorded in an ambiguity summary file. The output string, can then
-        be used as a key value in the ``amb_keys`` and later in the ``amb_method``
-        dictionary.
+        be used as a key value in the :py:data:`amb_keys` and later in the 
+        :py:data:`amb_method` dictionary.
         ``ambstr2key('#AR_QIF') = 'qif'``
         ``amb_keys[ambstr2key('#AR_QIF')] = 'Quasi-Ionosphere-Free'``
     '''
@@ -87,7 +90,7 @@ class ambline:
     def baseline(self):
         ''' Return the baseline name. '''
         return self.__lns[0][0:4]
-    
+
     def sta1(self):
         ''' Return the first (base) station. '''
         return self.__lns[1]

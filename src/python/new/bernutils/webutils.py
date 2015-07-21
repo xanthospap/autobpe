@@ -53,7 +53,7 @@ def grabFtpFile(host,dirn,filen,saveas=None,username=None,password=None):
         except:
             pass
         raise RuntimeError('Failed to download file: ' + host + dirn + filen)
-    
+
     ftp.quit()
     localfile.close()
 

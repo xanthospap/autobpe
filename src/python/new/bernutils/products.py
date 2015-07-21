@@ -6,10 +6,6 @@ import os
 import bernutils.gpstime
 import bernutils.webutils
 
-'''
-
-'''
-
 COD_HOST  = 'ftp.unibe.ch'
 IGS_HOST = 'cddis.gsfc.nasa.gov'
 
@@ -25,7 +21,10 @@ erp_type = {'d': 'CODwwww7.ERP.Z',
         'p': 'CODwwwwn.ERP_Pi',
         '2d': 'CO2wwww7.ERP.Z',
         '2f': 'cf2wwww7.erp.Z'
-        }
+}
+''' A dictionary to hold pairs of erp file types and corresponding
+    erp file names.
+'''
 
 sp3_type = {'d': 'CODwwwwn.EPH.Z',
         'f': 'cofwwwwn.eph.Z',
@@ -34,32 +33,66 @@ sp3_type = {'d': 'CODwwwwn.EPH.Z',
         'p': 'CODwwwwn.EPH_Pi',
         '2d': 'CO2wwwwn.EPH.Z',
         '2f': 'cf2wwwwn.eph.Z'
-        }
+}
+''' A dictionary to hold pairs of sp3 file types and corresponding
+    sp3 file names.
+'''
 
 dcb_type = {'p2': 'P1P2yymm.DCB',
             'c1': 'P1C1yymm.DCB',
             'c1_rnx': 'P1C1yymm_RINEX.DCB',
             'c2_rnx': 'P2C2yymm_RINEX.DCB'
-        }
+}
+''' A dictionary to hold pairs of dcb file types and corresponding
+    dcb file names.
+'''
 
-def getRunningDcb(filename,saveas):
+def _getRunningDcb_(filename,saveas):
+    ''' Utility function to assist :py:func:`getCodDcb`; do *NOT* use as standalone.
+        This function is used within the :py:func:`getCodDcb` to download a running
+        dcb file from CODE.
+    '''
     HOST = COD_HOST
     dirn = COD_DIR
     try:
-        localfile, webfile = bernutils.webutils.grabFtpFile(HOST,dirn,filename,saveas)
+        return bernutils.webutils.grabFtpFile(HOST,dirn,filename,saveas)
     except:
         raise
 
-def getFinalDcb(year,filename,saveas):
+def _getFinalDcb_(year,filename,saveas):
+    ''' Utility function to assist :py:func:`getCodDcb`; do *NOT* use as standalone.
+        This function is used within the :py:func:`getCodDcb` to download a final
+        dcb file from CODE.
+    '''
     HOST = COD_HOST
-    dirn = COD_DIR + ('/04i/'%year)
+    dirn = COD_DIR + ('/%04i/'%year)
     try:
-        localfile, webfile = bernutils.webutils.grabFtpFile(HOST,dirn,filename,saveas)
+        return bernutils.webutils.grabFtpFile(HOST,dirn,filename,saveas)
     except:
         raise
 
 def getCodDcb(stype,datetm,out_dir=None):
-    ''' Download .DCB file.
+    ''' Download .DCB file from CODE's ftp webserver.
+
+        :param stype: Can be one of:
+
+            * ``'p2'`` for P1P2 dcb, or
+            * ``'c1'`` for P1C1 dcb, or
+            * ``'c1_rnx'`` for P1C1_RINEX dcb, or
+            * ``'c2_rnx'`` for P1C2_RINEX dcb
+
+            The ``stype`` parameter is matched to a corresponding file, using the :py:data:`dcb_type` dictionary.
+
+        :param datetm: A python ``datetime`` object.
+        :param out_dir: Path to directory where the downloaded file shall
+                        be stored.
+
+        Depending on the input date (i.e. ``datetm``), one of the following will
+        happen:
+
+            * if today and ``datetm`` are the same year and same month, the the running dcb file will be downloaded,
+            * if deltadays between today and ``datetm`` is less than 30 days, then the final dcb file will first be checked. If it is not available, then the running dcb will be downloaded isntead,
+            * if deltadays between today and ``datetm`` is 30 or more, then the final dcb file file will be downloaded.
 
         .. note::
             Available Code Differential Bias files from CODE:
@@ -86,7 +119,11 @@ def getCodDcb(stype,datetm,out_dir=None):
     ## output dir must exist
     if out_dir and not os.path.isdir(out_dir):
         raise RuntimeError('Invalid directory: '+out_dir+' -> getCodDcb.')
-    
+
+    ## Only interested in the date part of datetm
+    if type(datetm) == datetime.datetime:
+        datetm = datetm.date()
+
     try:
         generic_file = dcb_type[stype]
     except:
@@ -95,21 +132,54 @@ def getCodDcb(stype,datetm,out_dir=None):
     # if the current month is the same as the month requested, then
     # download the running average.
     today = datetime.datetime.now()
-    dt    = today.date() - datetm.date()
+    dt    = today.date() - datetm ##.date()
+    iyear = int(datetm.strftime('%Y'))
+    iyr2  = int(datetm.strftime('%y'))
+    imonth= int(datetm.strftime('%m'))
 
     if today.year == datetm.year and today.month == datetm.month:
         filename = generic_file.replace('yymm','')
+        saveas   = filename
+        if out_dir:
+            saveas = os.path.join(out_dir, filename)
         try:
-            localfile, webfile = getRunningDcb(filename,saveas)
+            localfile, webfile = _getRunningDcb_(filename,saveas)
+            return localfile, webfile
         except:
             raise
-    elif dt.days < 15:
     elif dt.days < 30:
-        filename = generic_file.replace('yymm','')
+        ## try for final; if fail, try for running
+        filename = generic_file.replace('yy',('%02i'%iyr2))
+        filename = filename.replace('mm',('%02i'%imonth))
+        filename+= '.Z'
+        saveas   = filename
+        if out_dir:
+            saveas = os.path.join(out_dir, filename)
         try:
-            localfile, webfile = getRunningDcb(filename,saveas)
+            localfile, webfile = _getFinalDcb_(iyear,filename,saveas)
+            return localfile, webfile
+        except:
+            filename = generic_file.replace('yymm','')
+            saveas   = filename
+            if out_dir:
+                saveas = os.path.join(out_dir, filename)
+            try:
+                localfile, webfile = _getRunningDcb_(filename,saveas)
+                return localfile, webfile
+            except:
+                raise
+    elif dt.days >= 30:
+        filename = generic_file.replace('yy',('%02i'%iyr2))
+        filename = filename.replace('mm',('%02i'%imonth))
+        filename+= '.Z'
+        saveas   = filename
+        try:
+            localfile, webfile = _getFinalDcb_(iyear,filename,saveas)
+            return localfile, webfile
         except:
             raise
+    else:
+        raise RuntimeError('This date seems invalid (for dcb)')
 
 def erpTimeSpan(filen,as_mjd=True):
     ''' Given a ERP filename, this function will return the min
@@ -170,6 +240,8 @@ def getCodErp(stype,datetm=None,out_dir=None,use_repro_13=False,prd=0):
                      * 'r' rapid solution,
                      * 'u' ultra-rapid solution,
                      * 'p' prediction
+
+                     The ``stype`` parameter is matched to a corresponding file, using the :py:data:`erp_type` dictionary.
 
         :param datetm: A Python ``datetime`` object; not needed
                        if downloading an ultra-rapid product.
@@ -264,8 +336,9 @@ def getCodErp(stype,datetm=None,out_dir=None,use_repro_13=False,prd=0):
     if out_dir:
         if out_dir[-1] != '/':
             out_dir += '/'
-        saveas = out_dir + saveas
-    
+        #saveas = out_dir + saveas
+        saveas = os.path.join(out_dir,saveas)
+
     ## --- Download --- ##
     try:
         localfile, webfile = bernutils.webutils.grabFtpFile(HOST,dirn,dfile,saveas)
@@ -290,6 +363,8 @@ def getCodSp3(stype,datetm=None,out_dir=None,use_repro_13=False,prd=0):
                      * 'r' rapid solution,
                      * 'u' ultra-rapid solution,
                      * 'p' prediction
+
+                     The ``stype`` parameter is matched to a corresponding file, using the :py:data:`sp3_type` dictionary.
 
         :param datetm: A Python ``datetime`` object; not needed
                        if downloading an ultra-rapid product.
@@ -448,8 +523,9 @@ def getCodSp3(stype,datetm=None,out_dir=None,use_repro_13=False,prd=0):
     if out_dir:
         if out_dir[-1] != '/':
             out_dir += '/'
-        saveas = out_dir + saveas
-    
+        #saveas = out_dir + saveas
+        os.path.join(out_dir,saveas)
+
     ## --- Download --- ##
     try:
         localfile, webfile = bernutils.webutils.grabFtpFile(HOST,dirn,dfile,saveas)
