@@ -1,0 +1,148 @@
+\subsection{ddprocess}
+\label{ddprocess}
+
+\subsubsection{Purpose}
+\texttt{ddprocess.sh} is a bash (Shell) script to process a network in network mode, using the double-difference approach.\\
+\textbf{Location:} \texttt{src/bash/ddprocess.sh}
+
+\subsubsection{Usage}
+\texttt{ddprocess -y YYYY -d DDD [OPTIONS]}\\
+
+Switches:
+\begin{itemize}
+\item \texttt{-a --analysis-center=}[option]\\
+Specify the analysis center. This can be either
+\begin{enumerate}
+\item igs, or
+\item cod
+\end{enumerate}
+\underline{Default value: cod}.
+\item \texttt{-b --bernese-loadvar=} /foo/bar/LOADGPS.setvar\\
+Specify the Bernese LOADGPS.setvar file; this is needed to resolve the Bernese-related variables.
+\item \texttt{-c --campaign=}[option]\\
+Specify the campaign name. This name should be exactly the name of the campaign used within
+Bernese. Inside the script it is truncated to upper-case, so the options
+\texttt{--campaign=greece} and \texttt{--campaign=GREECE} are equivelant. For a list of all the files
+depending on this variable, see \autoref{sec:ddprocess_notes}, Note 1.
+Only specify the name of the campaign do \textbf{NOT} include the path.
+\item \texttt{-d --doy=}[option]\\
+Specify the day of year (as integer).
+\item \texttt{-e --elevation-angle=}\\
+Specify the elevation cut-off angle. The angle is expressed as integer in degrees.
+\underline{Default value: 3}.
+\item \texttt{-f --ion-products=}[option]\\
+Specify (a-priori) ionospheric correction file identifier. If more than one, use a comma-seperated list 
+(e.g. \texttt{-f FFG,RFG}). See \autoref{sec:ddprocess_notes}, Note 2.
+\item \texttt{-i --solution-id=}[option]\\
+Specify solution id (e.g. \texttt{FFG}). See \autoref{sec:ddprocess_notes}, Note 3.
+\item \texttt{-l --stations-per-cluster=}[option]\\
+Specify the number of stations per cluster. Input should be apositive integer.
+\underline{Default value is 5}.
+\item \texttt{-m --calibration-model=}[option]\\
+The extension (model) used for antenna calibration files. This can be e.g. \texttt{I01, I05 or I08}. 
+What you enter here, will be appended to the pcv filename (provided via the \texttt{-p} switch) and all 
+calibration-dependent Bernese processing files (e.g. \texttt{SATELLITE.XXX}). 
+See \autoref{sec:ddprocess_notes}, Note 4.
+\item \texttt{-p --pcv-file=}[option]\\
+Specify the PCV file to be used. Do not provide the extension (this is
+automatically appended using the \texttt{-m} switch). See \autoref{sec:ddprocess_notes}, Note 4.
+\item \texttt{-r --save-dir=}[option]\\
+Specify directory where the solution will be saved; note that if the directory does not exist, 
+it will be created.
+\item \texttt{-s --satellite-system=}[option]\\
+Specify the satellite system; this can be:
+\begin{enumerate}
+\item gps, or
+\item mixed (i.e. gps+glonass)
+\end{enumerate}
+\underline{Default value is gps}.
+\item \texttt{-t --solution-type=}[option]\\
+Specify the solution type; this can be:
+\begin{enumerate}
+\item final, or
+\item urapid
+\end{enumerate}
+\item \texttt{-u --update=}[option]\\
+Specify which records/files should be updated; valid values are:
+\begin{enumerate}
+\item \texttt{crd} : update the default network crd file.
+\item \texttt{sta} : update station-specific files, i.e. time-series records for the stations.
+\item \texttt{ntw} : update update network-specific records.
+\item \texttt{all} : all both the above.
+\end{enumerate}
+More than one options can be provided, in a comma seperated string e.g.
+\texttt{--update=crd,sta}.
+\item \texttt{-y --year=}[option]\\
+Specify the year as a 4-digit integer.
+\item \texttt{-x --xml-output}\\
+Produce an xml (actually docbook) output summary report.
+\item \texttt{--force-remove-previous}\\
+Remove any files from the specified save directory (\texttt{-r --save-dir=}) prior to start 
+of processing.
+\item \texttt{--add-suffix=}[option]\\
+Add a suffix (e.g. \texttt{\_GPS}) to saved products of the processing.
+\item \texttt{-h --help}\\
+Display (this) help message and exit.
+\item \texttt{-v --version}\\
+Dsiplay version and exit.
+\end{itemize}
+
+
+\subsubsection{Prerequisites}
+
+
+\subsubsection{Exit Status}
+On sucess, the program returns \texttt{0}.
+
+\subsubsection{ToDo}
+%\begin{tabular}{l l l}
+%Date & What & Status\\
+%\hline \\
+%\end{tabular}
+
+\subsubsection{Bugs}
+Send reports to:\\
+Xanthos Papanikolaou \href{mailto:xanthos@mail.ntua.gr}{mailto:xanthos@mail.ntua.gr}\\
+Demitris Anastasiou  \href{mailto:danast@mail.ntua.gr}{mailto:danast@mail.ntua.gr}\\
+Vangelis Zacharis  \href{mailto:vanzach@survey.ntua.gr}{mailto:vanzach@survey.ntua.gr}\\
+\bigskip
+
+%\begin{tabular}{l l l}
+%Date & What & Status\\
+%\hline \\
+%\end{tabular}
+
+\subsubsection{Notes}\label{sec:ddprocess_notes}
+\begin{enumerate}[label=\arabic*]
+\item A list of files are expected to be present in the tables directory, specified by
+the campaign name. See \autoref{tab:ddprocess_notes}:
+
+\begin{tabular}{l | l}\label{tab:ddprocess_notes}
+Expected File & Linked to\\
+\hline
+ \$\{TABLES\}/pcv/\$\{PCV\_FILE\}       & \$\{X\}/GEN/\$\{PCV\_FILE\} \\
+ \$\{TABLES\}/sta/\$\{CAMPAIGN\}.STA    & \$\{P\}/STA/\$\{CAMPAIGN\}.STA\\
+ \$\{TABLES\}/blq/\$\{CAMPAIGN\}.BLQ    & \$\{P\}/STA/\$\{CAMPAIGN\}.BLQ\\
+ \$\{TABLES\}/atl/\$\{CAMPAIGN\}.ATL    & \$\{P\}/STA/\$\{CAMPAIGN\}.ATL\\
+ \$\{TABLES\}/crd/\$\{CAMPAIGN\}.igs    & \\
+ \$\{TABLES\}/crd/\$\{CAMPAIGN\}.epn    & \\
+ \$\{TABLES\}/crd/\$\{CAMPAIGN\}.reg    & \\
+\hline
+\end{tabular}
+\item The ionospheric correction file, must be in the Bernese-specific ION format.
+These files should reside in the product area, specified by the variable \$\{PRODUCT\_AREA\}
+stored as \$\{PRODUCT\_AREA\}/YYYY/DDD/XXXYYDDD0.ION.Z, where \texttt{XXX} is the solution identifier
+specified by the \texttt{-f} option.\\
+If none of these files are found (or if the \texttt{-f} switch is not used), then the script
+will try to download a Bernese-specific ION file from CODE's ftp, using the program
+wgetion. This downloaded files can be final, rapid or ultra-rapid.
+\item The solution id will have an effect on the naming of the Final, Preliminary
+and Size-Reduced solution files. If e.g. the solution-id is set to \texttt{NTA}, then
+the Final solution files will be named \texttt{NTA}, the preliminary \texttt{NTP} 
+and the size-reduced \texttt{NTR}.
+\item The pcv file must reside in the \texttt{tables/pcv} folder, and will be linked by the
+script to the \{\%GEN\} directory. Do not provide the extension; it will be automatically
+generated using the pcv file and the extension given via the calibration model (\texttt{-m}).
+E.g. using \texttt{-p GRE\_PCV} and \texttt{-m I08}, then the script will search for the pcv file
+\$\{TABLES\}/pcv/GRE\_PCV.I08.
+\end{enumerate}

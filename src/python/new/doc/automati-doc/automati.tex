@@ -1,0 +1,133 @@
+\documentclass{article}
+\usepackage{tikz}
+\usetikzlibrary{shapes,shapes.geometric, arrows}
+\usepackage{hyperref}
+\usepackage{fancyvrb}
+\usepackage{listings}
+\usepackage{graphicx} % Required for the inclusion of images
+\usepackage{natbib}   % Required to change bibliography style to APA
+\usepackage{amsmath}  % Required for some math elements
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{makeidx}
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+\renewcommand{\labelenumi}{\alph{enumi}.} % Make numbering in the enumerate environment by letter rather than number (e.g. section 6)
+
+% warning box
+\definecolor{warningbackground}{RGB}{252,226,158}
+%\usepackage{floatflt}
+\newcommand{\alertwarningbox}[1]{
+    \centering
+    \colorbox{warningbackground}{\parbox{400pt} {
+            \vskip 10pt
+            \begin{floatingfigure}[l]{50pt}
+                \includegraphics[scale=.05]{img/danger.pdf}
+            \end{floatingfigure}
+            #1
+            \vskip 10pt
+        }
+    }
+}
+
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30]
+\tikzstyle{textblock} = [rectangle, rounded corners, minimum width=5cm, minimum height=5cm, text centered]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30]
+\tikzstyle{decision} = [diamond, minimum width=2cm, minimum height=1cm, text centered, draw=black, fill=green!30]
+\tikzstyle{database} = [cylinder, minimum width=2cm, minimum height=3cm, text centered, draw=black, fill=green!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\tikzstyle{database} = [cylinder,fill=blue!30,shape border rotate=90,draw,minimum height=1.5cm,minimum width=2cm,shape aspect=.25,]
+
+\title{Routine GNSS Processing \\ Reference \& User Guide \\ Dionysos Satellite Observatory, NTUA} % Title
+\author{Xanthos \textsc{Papanikolaou} \and Demitris \textsc{Anastasiou} \and Vangelis \textsc{Zacharis}} % Author name
+\date{\today} % Date for the report
+
+\makeindex
+
+\begin{document}
+
+\maketitle % Insert the title, author and date
+
+\begin{center}
+\begin{tabular}{l r}
+First Revision: & June 10, 2015 \\
+Library Uri:    & \url{http://dionysos.survey.ntua.gr} \\
+Version:        & v1.0-0
+\end{tabular}
+\end{center}
+
+\begin{abstract}
+{\small 
+This document describes the routine processing of GNSS data as developed at Dionysos Satellite Observatory (DSO), of National Technical University
+of Athens (NTUA).
+}
+\end{abstract}
+\clearpage
+
+\tableofcontents
+\clearpage
+
+\scalebox{0.6}{
+\begin{tikzpicture}[node distance=2cm]
+%
+% Define nodes
+%
+\node (start) [startstop] {Start Process};
+\node (input_params) [textblock, right of=start, xshift=5cm] 
+{\textbf{Input Parameters}\\
+\begin{tabular}{l l l}
+Network & n, network & grece, ...\\
+Type    & t, type    & urapid | final\\
+ac      & a, analysis center & cod | igs\\
+\end{tabular}};
+\node (verify)  [decision, below of=start, yshift=-1.5cm] {Verify Input Params.};
+\node (dwnl_prd)  [process, below of=verify, xshift=-3cm, yshift=-2cm] {Download Products};
+\node (dwnl_rnx)  [process, below of=verify, xshift=3cm, yshift=-2cm] {Download RINEX};
+\node (datab) [database, below of=verify, xshift=8cm, yshift=-2cm] {DataBase};
+\node (more)  [decision, below of=dwnl_rnx, xshift=-6cm, yshift=-2cm, text width=3cm] {Make Cluster\\A-priori crd};
+\node (check) [process, right of=more, xshift=6cm] {Check and link .BLQ, .STA, .ATL};
+\node (options) [process, below of=more, xshift=6cm] {Set the .PCF and .pl files};
+\node (bpe)  [decision, below of=options, xshift=-6cm, yshift=-2cm, text width=3cm] {Process Data};
+\node (erreport) [process, below of=bpe, xshift=-3cm] {Create error report};
+\node (save) [process, below of=bpe, xshift=6cm] {Save/Archive files};
+\node (upd-ts) [process, below of=save] {Update station \& networks time-series};
+\node (upd-crd) [process, below of=upd-ts] {Update default coordinate file};
+\node (summary) [process, below of=upd-crd] {Make summary files (xml, ascii)};
+\node (clean) [process, below of=summary] {Creal campaign directories};
+%
+% Connect nodes
+%
+\draw [arrow] (start) -- (verify);
+\draw [arrow] (verify) -- node[anchor=east] {All Ok?} (dwnl_prd);
+\draw [arrow] (dwnl_prd) -- node[anchor=north] {All Ok?} (dwnl_rnx);
+\draw [arrow] (datab) -- node[anchor=north,text width=2cm] {info(stations, servers, etc)} (dwnl_rnx);
+\draw [arrow] (dwnl_rnx) -- node[anchor=north,text width=4cm] {igs $>$ 4\\ \&\& \\regional $>$ 1} (more);
+\draw [arrow] (more) -- node[anchor=north] {Warning} (check);
+\draw [arrow] (check) -- (options);
+\draw [arrow] (options) -- node[anchor=north] {start timer}(bpe);
+\draw [arrow] (bpe) -- node[anchor=east] {Error}(erreport);
+\draw [arrow] (erreport) |- (clean);
+\draw [arrow] (bpe) -- node[anchor=west] {Success}(save);
+\draw [arrow] (save) -- node[anchor=west] {OK ?}(upd-ts);
+\draw [arrow] (upd-ts) -- (upd-crd);
+\draw [arrow] (upd-crd) -- (summary);
+\draw [arrow] (summary) -- (clean);
+\end{tikzpicture}
+}
+
+\section{Programs}
+\input{ddprocess.tex}
+\input{rnxdwnl.tex}
+\input{syncwbern52.tex}
+\input{updatecrd.tex}
+\input{getvmf1.tex}
+
+\clearpage
+\addcontentsline{toc}{chapter}{Index}
+\printindex
+
+\end{document}

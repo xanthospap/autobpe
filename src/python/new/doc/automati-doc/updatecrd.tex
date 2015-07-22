@@ -1,0 +1,72 @@
+\subsection{updatecrd}
+\label{updatecrd}
+
+\subsubsection{Purpose}
+\texttt{updatecrd.py} is a Python script used to update the (cartesian) coordinates in a
+Bernese-formated \texttt{.CRD} file, using a second \texttt{.CRD} file as reference.\\
+\textbf{Location:} \texttt{src/python/updatecrd.py}
+
+\subsubsection{Usage}
+\texttt{updatecrd -r [.CRD-file] -u [.CRD-file] [OPTIONS]}\\
+at least \texttt{--update-file=} and \texttt{--reference-file=}
+must be specified as command line arguments.\\
+
+Switches:
+\begin{itemize}
+\item \texttt{-u --update-file=} [.CRD-file]\\
+The \texttt{.CRD} file to be updated.
+\item \texttt{-r --reference-file=} [.CRD-file]\\
+The \texttt{.CRD} file to be used as reference.
+\item \texttt{-s --stations=} [station1,station2]\\
+A comma-seperated list of stations, whose coordinates should be updated. 
+If not specified, then all stations found in the file-to-be-updated will be
+updated, if they are macthed in the reference .CRD file.
+\item \texttt{-f --flags=} [A,W]\\
+Only update stations flaged with specific characters in the 
+reference file. The flags should be specified using a comma-seperated list, 
+e.g. \texttt{--flags=W,A}. If this switch is not specified, 
+all matching stations will be updated regardless of their flags.
+\item \texttt{--include-unmatched}\\
+The final output CRD file, will contain all the stations recorded
+in the reference file (either matched or not).
+\item \texttt{--delete-unmatched}\\
+By default, all stations recorded in the file-to-be-updated will be included
+in the resulting file. If this (\texttt{--delete-unmatched}) switched is turned on,
+then stations that are not matched in the reference file will not be included in the
+resulting file.
+\item \texttt{--no-marker-number}\\
+If specified, the marker number will not be used when trying to match
+stations (i.e. \texttt{YEBE 13420M001} will be matched to \texttt{YEBE}).
+\item \texttt{-h --help}\\
+Display (this) help message and exit.
+\item \texttt{-v --version}\\
+Dsiplay version and exit.
+\end{itemize}
+
+\subsubsection{Prerequisites}
+\begin{itemize}
+\item \texttt{bernutils.berncrd} Python (library) module.
+\end{itemize}
+
+\subsubsection{Exit Status}
+On sucess, the program returns \texttt{0}.\\
+Else, the return status is $>$0.
+
+\subsubsection{ToDo}
+%\begin{tabular}{l l l}
+%Date & What & Status\\
+%\hline \\
+%\end{tabular}
+
+\subsubsection{Bugs}
+Send reports to:\\
+Xanthos Papanikolaou \href{mailto:xanthos@mail.ntua.gr}{mailto:xanthos@mail.ntua.gr}\\
+Demitris Anastasiou  \href{mailto:danast@mail.ntua.gr}{mailto:danast@mail.ntua.gr}\\
+Vangelis Zacharis  \href{mailto:vanzach@survey.ntua.gr}{mailto:vanzach@survey.ntua.gr}\\
+\bigskip
+
+\begin{tabular}{l l l}
+Date & What & Status\\
+\hline \\
+JUN, 2015 & help and version switch not working. Fix & Waiting ...\\
+\end{tabular}

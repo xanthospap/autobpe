@@ -1,0 +1,83 @@
+\subsection{getvmf1}
+\label{getvmf1}
+
+\subsubsection{Purpose}
+\texttt{getvmf1.py} is a Python script to download VMF1 (i.e. Vienna Mapping Function 1)
+grid files. These files are located on the web at \url{http://ggosatm.hg.tuwien.ac.at}.
+Grid files older than today are always placed in 
+\url{http://ggosatm.hg.tuwien.ac.at/DELAY/GRID/VMFG/YYYY} while prediction files (including
+today and forward) are placed in \url{http://ggosatm.hg.tuwien.ac.at/DELAY/GRID/VMFG_FC/YYYY}.
+
+The grid files hold values per 6 hours (so we have 4 files per day), at 00, 06, 12 and 18
+hours and they are named as \texttt{VMFG\_YYYYMMDD.HSS}, where:
+\begin{itemize}
+    \item \texttt{YYYY} is the year,
+    \item \texttt{MM} is the month,
+    \item \texttt{DD} is the day of month and
+    \item \texttt{SS} is the hour (00, 06, 12 or 18)
+\end{itemize}
+
+Note that the grid files previous than 01/01/2009 are compressed in \texttt{.gz} format;
+the routine will automatically uncompress these files.
+
+\subsubsection{Usage}
+\texttt{getvmf1 -y [year] -d [doy] [OPTIONS]}\\
+at least \texttt{--year=} and \texttt{--doy=}
+must be specified as command line arguments.\\
+
+Switches:
+\begin{itemize}
+\item \texttt{-y --year=}[YYYY]\\
+The \texttt{YEAR} for which the grid file is needed.
+\item \texttt{-d --doy=}[Day Of Year]\\
+The \texttt{day of year} for which the grid file is needed.
+\item \texttt{-r --hour=}[Hour]\\
+If we only want a single grid file to cover a certain time interval, then this switch
+can be used. The \texttt{hour} argument should be a valid integer of float in the range
+[0,24).
+\item \texttt{-o --outdir=}[output directory]\\
+Specify the directory where the downloaded file(s) will be saved.
+\item \texttt{-h --help}\\
+Display (this) help message and exit.
+\item \texttt{-v --version}\\
+Dsiplay version and exit.
+\end{itemize}
+
+\subsubsection{Prerequisites}
+\begin{itemize}
+\item \texttt{bernutils.berncrd} Python (library) module.
+\end{itemize}
+
+\subsubsection{Exit Status}
+On sucess, the program returns \texttt{0}.\\
+Else, the return status is $>$0.\\
+
+
+The routine will also report the list of downloaded and saved files to \texttt{stdout}, e.g.
+\begin{Verbatim}[fontsize=\scriptsize]
+$> getvmf1 -y 2007 -d 10 -o /foo/bar/data
+Downloaded http://ggosatm.hg.tuwien.ac.at/DELAY/GRID/VMFG/2007/VMFG_20070110.H00.gz to /foo/bar/data/VMFG_20070110.H00
+Downloaded http://ggosatm.hg.tuwien.ac.at/DELAY/GRID/VMFG/2007/VMFG_20070110.H06.gz to /foo/bar/data/VMFG_20070110.H06
+Downloaded http://ggosatm.hg.tuwien.ac.at/DELAY/GRID/VMFG/2007/VMFG_20070110.H12.gz to /foo/bar/data/VMFG_20070110.H12
+Downloaded http://ggosatm.hg.tuwien.ac.at/DELAY/GRID/VMFG/2007/VMFG_20070110.H18.gz to /foo/bar/data/VMFG_20070110.H18
+\end{Verbatim}
+
+\subsubsection{ToDo}
+\begin{tabular}{l l l}
+Date & What & Status\\
+\hline \\
+20,Jul,15  & add switch for help and version & Waiting ...\\
+\end{tabular}
+
+\subsubsection{Bugs}
+Send reports to:\\
+Xanthos Papanikolaou \href{mailto:xanthos@mail.ntua.gr}{mailto:xanthos@mail.ntua.gr}\\
+Demitris Anastasiou  \href{mailto:danast@mail.ntua.gr}{mailto:danast@mail.ntua.gr}\\
+Vangelis Zacharis  \href{mailto:vanzach@survey.ntua.gr}{mailto:vanzach@survey.ntua.gr}\\
+\bigskip
+
+\begin{tabular}{l l l}
+Date & What & Status\\
+\hline \\
+JUN, 2015 & help and version switch not working. Fix & Waiting ...\\
+\end{tabular}

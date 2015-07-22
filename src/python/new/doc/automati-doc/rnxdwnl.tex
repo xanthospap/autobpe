@@ -1,0 +1,84 @@
+\subsection{rnxdwnl}
+\label{rnxdwnl}
+
+\subsubsection{Purpose}
+\texttt{rnxdwnl.py} is a Python script to download RINEX files.\\
+\textbf{Location:} \texttt{src/python/rnxdwnl.py}
+
+\subsubsection{Usage}
+\texttt{rnxdwnl -y YYYY -d DDD [OPTIONS]}\\
+
+Switches:
+\begin{itemize}
+\item \texttt{-s, --stations=} station1,stations2,...\\
+Specify a comma-seperated list of stations to be downloaded. The stations specified here, 
+must be included in the database. The name of stations specified, must be the one
+used by DSO (a 4-char string). In some, rare cases, this may not match the 'official'
+4-char name of the station. When the rinex file is searched for on the web, the
+'official' name will be used.
+\item \texttt{-n, --networks=} network1,network2,...\\
+Specify a comma-seperated list of networks. Every station, belonging to these
+networks will (try to) be downloaded. The name of the network(s) specified, must 
+match valid networks in the database.
+\item \texttt{-y, --year=} YYYY\\
+Specify the year for which the RINEX are requested. This must be a (valid),
+4-digit integer.
+\item \texttt{-d, --doy=} DDD\\
+Specify the day of year for which the RINEX are requested. This must be a (valid), integer.
+\item \texttt{-f, --force-remove}\\
+By default, if the RINEX to be downloaded already exists, with size $>$ 0, then
+the downloading step is not performed (other steps -if specified- are perfored normaly).
+If this switch is turned on, then if a file exists,
+named exactly as the one to be downloaded, then this file is removed and a normal,
+download is performed.
+\item \texttt{-u, --uppercase}\\
+If turned on, the downloaded RINEX file(s) will be truncated to upper-case.
+\item \texttt{-p, --path=} /foo/bar\\
+Specify the directory (path) where the downloaded files will be downloaded to.
+\item \texttt{-z, --uncompress}\\
+Uncompress the downloaded RINEX file(s). Note that this will only work for UNIX compressed '.Z' files.
+\end{itemize}
+
+\subsubsection{Prerequisites}
+The Python library MySQLdb must be installed and available for importing.\\
+
+The program needs to connect to a (MySQL) database called \index{procsta}\texttt{procsta}, 
+and make various queries
+about the stations, networks, servers, etc. The structure of this database
+is strict, cause the queries are hardcoded in the source code of this program.\\
+
+For more information on the used database, ask \href{mailto:danast@mail.ntua.gr}{Mitsos}.\\
+
+The program is designed to work on UNIX-like systems. It will call the Shell to issue commands (like
+downloading, compressing, etc). Depending on the specific use, the following may be required:
+\begin{itemize}
+\item \texttt{compress} and/or \texttt{uncompress} utilities; needed to compress or uncompress
+UNIX-compressed files (i.e. \texttt{.Z}).
+\item \texttt{wget} needed to download remote files, when the protocol is \texttt{http}, \texttt{ftp}, or \texttt{https}.
+\item \texttt{scp} needed to download remote files, when the protocol is \texttt{ssh}. Note that if a non-standard port
+is used for \texttt{ssh}, then it must be hardcoded into the source code. Also, the remote and server sites, must be able to
+connect without using explicit passwords (they must hold the ssh keys).
+\end{itemize}
+
+\subsubsection{Exit Status}
+On sucess, the program returns \texttt{0}.
+
+\subsubsection{ToDo}
+\begin{tabular}{l l l}
+Date & What & Status\\
+\hline \\
+11,Jun,15  & add switch for excluding certain stations & Waiting ...\\
+\end{tabular}
+
+\subsubsection{Bugs}
+Send reports to:\\
+Xanthos Papanikolaou \href{mailto:xanthos@mail.ntua.gr}{mailto:xanthos@mail.ntua.gr}\\
+Demitris Anastasiou  \href{mailto:danast@mail.ntua.gr}{mailto:danast@mail.ntua.gr}\\
+Vangelis Zacharis  \href{mailto:vanzach@survey.ntua.gr}{mailto:vanzach@survey.ntua.gr}\\
+\bigskip
+
+\begin{tabular}{l l l}
+Date & What & Status\\
+\hline \\
+11,Jun,15  & Add help switch & Waiting ...\\
+\end{tabular}

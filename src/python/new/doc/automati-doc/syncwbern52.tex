@@ -1,0 +1,72 @@
+\subsection{syncwbern52}
+\label{syncwbern52}
+
+\subsubsection{Purpose}
+\texttt{syncwbern52.py} is a bash (Shell) script to synchronize (mirror) a local Bernese \texttt{GEN}
+directory, with the remote one, which can be found at AIUB's ftp server
+\url{fpt://ftp.unibe.ch/aiub/BSWUSER52/GEN/}.\\
+\textbf{Location:} \texttt{src/bash/syncwbern52.sh}
+
+\subsubsection{Usage}
+\texttt{syncwbern52 [OPTIONS]}\\
+at least either \texttt{--target-directory=} or \texttt{--bernese-loadvar=}
+must be specified as command line arguments.
+
+
+Switches:
+\begin{itemize}
+\item \texttt{-t --target-directory=} /foo/bar\\
+Specify the (local) target directory in localhost (See \autoref{sec:syncwbern52_notes}, Note 1).
+\item \texttt{-b --bernese-loadvar=} /foo/bar/LOADGPS.setvar\\
+Specify a Bernese source file (i.e. the file \texttt{BERN52/GPS/EXE/LOADGPS.setvar}) 
+which can be sourced; if such a file is set, then the local target 
+directory is defined by the variable \$X/GEN. (See \autoref{sec:syncwbern52_notes}, Note 1)
+\item \texttt{-o --logfile=} [logfile]\\
+Specify log file. \underline{Default value is /dev/null}.
+\item \texttt{-q --quite}\\
+Do not show progress on screen.
+\item \texttt{-s --stamp-file=} [stampfile]\\
+Specify a file where the time stamp of current run will be written, 
+so that the user can keep track of when the last mirroring was done.
+\item \texttt{-h --help}\\
+Display (this) help message and exit.
+\item \texttt{-v --version}\\
+Dsiplay version and exit.
+\end{itemize}
+
+\subsubsection{Prerequisites}
+\begin{itemize}
+\item \texttt{getopt},
+\item \texttt{lftp}, 
+\item \texttt{hash}
+\end{itemize}
+
+\subsubsection{Exit Status}
+On sucess, the program returns \texttt{0}.\\
+Else, the return status is $>$0.
+
+\subsubsection{ToDo}
+%\begin{tabular}{l l l}
+%Date & What & Status\\
+%\hline \\
+%\end{tabular}
+
+\subsubsection{Bugs}
+Send reports to:\\
+Xanthos Papanikolaou \href{mailto:xanthos@mail.ntua.gr}{mailto:xanthos@mail.ntua.gr}\\
+Demitris Anastasiou  \href{mailto:danast@mail.ntua.gr}{mailto:danast@mail.ntua.gr}\\
+Vangelis Zacharis  \href{mailto:vanzach@survey.ntua.gr}{mailto:vanzach@survey.ntua.gr}\\
+\bigskip
+
+%\begin{tabular}{l l l}
+%Date & What & Status\\
+%\hline \\
+%\end{tabular}
+
+\subsubsection{Notes}\label{sec:syncwbern52_notes}
+\begin{enumerate}[label=\arabic*]
+\item Note that if both \texttt{-t} and \texttt{-b} switches are used, 
+the target directory is the one specified by the \texttt{-b} option 
+(i.e. using the LOADGPS.setvar file).\\
+\item All files with \texttt{.EPH} extension will be excluded from synchronization.
+\end{enumerate}
