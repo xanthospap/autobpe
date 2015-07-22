@@ -1,7 +1,49 @@
 #! /usr/bin/python
 
 import ftplib
+import urllib2
 import os
+
+def grabHttpFile(url,files,saveas):
+    ''' Download file(s) from an http webserver.
+
+        :param url:    The server's address; do not append the
+                       the filename to be downloaded.
+        :param files:  A list of files to be downloaded from the
+                       given url.
+        :param saveas: The name(s) of the corresponding saved files.
+
+        :returns: A list of tuples, containing (each) the web file and
+                  the (absolute path of) the saved file.
+
+        .. code-block:: python
+            file_list  = ['file1.txt', 'file2.txt']
+            saved_list = ['/home/lol/sf1.txt', 'sf2.txt']
+            lst = grebHttpFile('http://my.server.org/foo/bar')
+
+        Will download the file 'http://my.server.org/foo/bar/file1.txt' and
+        save it to '/home/lol/sf1.txt' and also download 'http://my.server.org/foo/bar/file2.txt'
+        and save it to '$(PWD)/sf2.txt'.
+
+    '''
+    if len(files) != len(saveas):
+        raise RuntimeError('Download file list and save file list not equal')
+
+    if url[-1] == '/': url = url[:-1]
+
+    return_list = []
+
+    for i, j in zip(files,saveas):
+        webfile = url + ('/%s' %(i))
+        try:
+            response = urllib2.urlopen(webfile)
+        except:
+            raise RuntimeError('Failed to download file: '+webfile)
+        with open(j,'w') as f:
+            f.write(response.read())
+        return_list.append([webfile, os.path.abspath(j)])
+
+    return return_list
 
 def grabFtpFile(host,dirn,filen,saveas=None,username=None,password=None):
     ''' Download a file from an ftp server.
@@ -16,8 +58,8 @@ def grabFtpFile(host,dirn,filen,saveas=None,username=None,password=None):
         :param password: The password to connect to the ftp site (if any).
 
         :returns: In sucess, a tuple is returned; first element is the
-                  name of the saved file, the second element is the name
-                  of the file on web
+                  name of the saved file (absolute path), the second element
+                  is the name of the file on web.
 
     '''
     if host[-1] == '/' : host = host[:-1]
@@ -57,4 +99,4 @@ def grabFtpFile(host,dirn,filen,saveas=None,username=None,password=None):
     ftp.quit()
     localfile.close()
 
-    return saveas, '%s%s%s'%(host,dirn,filen)
+    return os.path.abspath(saveas), '%s%s%s'%(host,dirn,filen)
