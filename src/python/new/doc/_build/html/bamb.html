@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Module : bamb &mdash; bernutils 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="bernutils 0.1 documentation" href="index.html" />
+    <link rel="prev" title="Module : bsta" href="bsta.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="bsta.html" title="Module : bsta"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">bernutils 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-bamb">
+<h1>Module : bamb<a class="headerlink" href="#module-bamb" title="Permalink to this headline">¶</a></h1>
+<p>This module contains the classes:</p>
+<ul class="simple">
+<li>ambfile and</li>
+<li>ambline</li>
+</ul>
+<p><strong>ambfile</strong> represents a Bernese v5.2 ambiguity resolution summary file. This kind
+of files, contain ambiguity resolution information for a list of baselines.
+The default extension is .SUM (e.g. AMBYYDDDS.SUM).</p>
+<p>Ambiguity resolution summary file format format is very strict, and most of the
+functions/modules depend that this format is kept.</p>
+<p><strong>ambline</strong> is class holding ambiguity resolution record lines. Such instances are normally
+used to accomodate the reading of <strong>ambfile</strong> objects; they are not used as standalone.</p>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="class-ambline">
+<h3>Class ambline<a class="headerlink" href="#class-ambline" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="bamb.ambline">
+<em class="property">class </em><tt class="descclassname">bamb.</tt><tt class="descname">ambline</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="_modules/bamb.html#ambline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bamb.ambline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to hold an ambiguity record line for a specific baseline, as
+described in an ambiguity summary file.</p>
+<dl class="method">
+<dt id="bamb.ambline.ambsafter">
+<tt class="descname">ambsafter</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bamb.html#ambline.ambsafter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bamb.ambline.ambsafter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of ambiguities after the resolution and mm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bamb.ambline.ambsbefore">
+<tt class="descname">ambsbefore</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bamb.html#ambline.ambsbefore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bamb.ambline.ambsbefore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of ambiguities before the resolution and mm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bamb.ambline.baseline">
+<tt class="descname">baseline</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bamb.html#ambline.baseline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bamb.ambline.baseline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the baseline name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bamb.ambline.length">
+<tt class="descname">length</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bamb.html#ambline.length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bamb.ambline.length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the baseline length in km.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bamb.ambline.method">
+<tt class="descname">method</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bamb.html#ambline.method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bamb.ambline.method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the resolution method, as a method id (e.g. &#8216;qif&#8217;).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bamb.ambline.percent">
+<tt class="descname">percent</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bamb.html#ambline.percent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bamb.ambline.percent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the percentage of resolved ambiguities.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bamb.ambline.satsys">
+<tt class="descname">satsys</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bamb.html#ambline.satsys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bamb.ambline.satsys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the satellite system as string (e.g. &#8216;GPS&#8217;).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bamb.ambline.sta1">
+<tt class="descname">sta1</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bamb.html#ambline.sta1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bamb.ambline.sta1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the first (base) station.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bamb.ambline.sta2">
+<tt class="descname">sta2</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bamb.html#ambline.sta2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bamb.ambline.sta2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the second (rover) station name.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="class-ambfile">
+<h3>Class ambfile<a class="headerlink" href="#class-ambfile" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="bamb.ambfile">
+<em class="property">class </em><tt class="descclassname">bamb.</tt><tt class="descname">ambfile</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/bamb.html#ambfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bamb.ambfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to hold a Bernese ambiguity summary file (.SUM)</p>
+<dl class="method">
+<dt id="bamb.ambfile.collectBsls">
+<tt class="descname">collectBsls</tt><big>(</big><em>method</em>, <em>satsys='MIXED'</em><big>)</big><a class="reference internal" href="_modules/bamb.html#ambfile.collectBsls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bamb.ambfile.collectBsls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collect the baseline records resolved using a given resolution 
+method (i.e. <tt class="docutils literal"><span class="pre">method</span></tt>) with observations of a given satellite
+system (<tt class="docutils literal"><span class="pre">satsys</span></tt>). The baseline records are collected as 
+<strong>RAW lines</strong> and returned in a list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bamb.ambfile.collectMethodBsls">
+<tt class="descname">collectMethodBsls</tt><big>(</big><em>method</em><big>)</big><a class="reference internal" href="_modules/bamb.html#ambfile.collectMethodBsls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bamb.ambfile.collectMethodBsls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collect the baseline records resolved using a given resolution 
+method (i.e. <tt class="docutils literal"><span class="pre">method</span></tt>). The baseline records are collected as 
+<strong>RAW lines</strong> and returned in a list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bamb.ambfile.goToMethod">
+<tt class="descname">goToMethod</tt><big>(</big><em>istream</em>, <em>method</em>, <em>max_lines=1000</em><big>)</big><a class="reference internal" href="_modules/bamb.html#ambfile.goToMethod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bamb.ambfile.goToMethod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Position the input stream <tt class="docutils literal"><span class="pre">istream</span></tt> at the start of results
+for method <tt class="docutils literal"><span class="pre">method</span></tt> (actualy at the end of the header line).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Note:</th><td class="field-body">The file will be searched starting from the current</td>
+</tr>
+</tbody>
+</table>
+<p>position of the stream, and <strong>NOT</strong> from the begining of the
+file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>istream</strong> &#8211; The input stream (of an ambiguity summary file).</li>
+<li><strong>method</strong> &#8211; The method to search for; This must be a valid
+string denoting a resolution method, as represented
+in the <tt class="docutils literal"><span class="pre">__amb_keys</span></tt> dictionary.</li>
+<li><strong>max_lines</strong> &#8211; Maximum number of lines to read before quiting.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Module : bamb</a><ul>
+<li><a class="reference internal" href="#documentation">Documentation</a><ul>
+<li><a class="reference internal" href="#class-ambline">Class ambline</a></li>
+<li><a class="reference internal" href="#class-ambfile">Class ambfile</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="bsta.html"
+                        title="previous chapter">Module : bsta</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/bamb.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="bsta.html" title="Module : bsta"
+             >previous</a> |</li>
+        <li><a href="index.html">bernutils 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, xp,da.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

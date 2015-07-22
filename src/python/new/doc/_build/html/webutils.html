@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Module webutils &mdash; bernutils 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="bernutils 0.1 documentation" href="index.html" />
+    <link rel="next" title="Moduleproducts" href="products.html" />
+    <link rel="prev" title="Module : gpstimet" href="gpstime.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="products.html" title="Moduleproducts"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="gpstime.html" title="Module : gpstimet"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">bernutils 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-webutils">
+<h1>Module webutils<a class="headerlink" href="#module-webutils" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-webutils">
+<span id="documentation"></span><h2>Documentation<a class="headerlink" href="#module-webutils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="webutils.grabFtpFile">
+<tt class="descclassname">webutils.</tt><tt class="descname">grabFtpFile</tt><big>(</big><em>host</em>, <em>dirn</em>, <em>filen</em>, <em>saveas=None</em>, <em>username=None</em>, <em>password=None</em><big>)</big><a class="reference internal" href="_modules/webutils.html#grabFtpFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#webutils.grabFtpFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a file from an ftp server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>host</strong> &#8211; The host ip (e.g. <tt class="docutils literal"><span class="pre">ftp.unibe.ch</span></tt>).</li>
+<li><strong>dirn</strong> &#8211; The directory in the host server, where the file 
+is located (e.g. <tt class="docutils literal"><span class="pre">/aiub/CODE/</span></tt>).</li>
+<li><strong>filen</strong> &#8211; The name of the file to download (e.g. <tt class="docutils literal"><span class="pre">COD18650.EPH.Z</span></tt>).</li>
+<li><strong>saveas</strong> &#8211; How to save the file in localhost (e.g. <tt class="docutils literal"><span class="pre">copy.txt</span></tt>); 
+if not set, the name <tt class="docutils literal"><span class="pre">filen</span></tt> will be used.</li>
+<li><strong>username</strong> &#8211; The username to connect to the ftp site (if any).</li>
+<li><strong>password</strong> &#8211; The password to connect to the ftp site (if any).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">In sucess, a tuple is returned; first element is the
+name of the saved file (absolute path), the second element
+is the name of the file on web.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="webutils.grabHttpFile">
+<tt class="descclassname">webutils.</tt><tt class="descname">grabHttpFile</tt><big>(</big><em>url</em>, <em>files</em>, <em>saveas</em><big>)</big><a class="reference internal" href="_modules/webutils.html#grabHttpFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#webutils.grabHttpFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download file(s) from an http webserver.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> &#8211; The server&#8217;s address; do not append the
+the filename to be downloaded.</li>
+<li><strong>files</strong> &#8211; A list of files to be downloaded from the
+given url.</li>
+<li><strong>saveas</strong> &#8211; The name(s) of the corresponding saved files.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list of tuples, containing (each) the web file and
+the (absolute path of) the saved file.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Will download the file &#8216;<a class="reference external" href="http://my.server.org/foo/bar/file1.txt">http://my.server.org/foo/bar/file1.txt</a>&#8216; and
+save it to &#8216;/home/lol/sf1.txt&#8217; and also download &#8216;<a class="reference external" href="http://my.server.org/foo/bar/file2.txt">http://my.server.org/foo/bar/file2.txt</a>&#8216;
+and save it to &#8216;$(PWD)/sf2.txt&#8217;.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Module webutils</a><ul>
+<li><a class="reference internal" href="#module-webutils">Documentation</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gpstime.html"
+                        title="previous chapter">Module : gpstimet</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="products.html"
+                        title="next chapter">Moduleproducts</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/webutils.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="products.html" title="Moduleproducts"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="gpstime.html" title="Module : gpstimet"
+             >previous</a> |</li>
+        <li><a href="index.html">bernutils 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, xp,da.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>webutils &mdash; bernutils 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="bernutils 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">bernutils 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for webutils</h1><div class="highlight"><pre>
+<span class="c">#! /usr/bin/python</span>
+
+<span class="kn">import</span> <span class="nn">ftplib</span>
+<span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="grabHttpFile"><a class="viewcode-back" href="../webutils.html#webutils.grabHttpFile">[docs]</a><span class="k">def</span> <span class="nf">grabHttpFile</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="n">files</span><span class="p">,</span><span class="n">saveas</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Download file(s) from an http webserver.</span>
+
+<span class="sd">        :param url:    The server&#39;s address; do not append the</span>
+<span class="sd">                       the filename to be downloaded.</span>
+<span class="sd">        :param files:  A list of files to be downloaded from the</span>
+<span class="sd">                       given url.</span>
+<span class="sd">        :param saveas: The name(s) of the corresponding saved files.</span>
+
+<span class="sd">        :returns: A list of tuples, containing (each) the web file and</span>
+<span class="sd">                  the (absolute path of) the saved file.</span>
+
+<span class="sd">        .. code-block:: python</span>
+<span class="sd">            file_list  = [&#39;file1.txt&#39;, &#39;file2.txt&#39;]</span>
+<span class="sd">            saved_list = [&#39;/home/lol/sf1.txt&#39;, &#39;sf2.txt&#39;]</span>
+<span class="sd">            lst = grebHttpFile(&#39;http://my.server.org/foo/bar&#39;)</span>
+
+<span class="sd">        Will download the file &#39;http://my.server.org/foo/bar/file1.txt&#39; and</span>
+<span class="sd">        save it to &#39;/home/lol/sf1.txt&#39; and also download &#39;http://my.server.org/foo/bar/file2.txt&#39;</span>
+<span class="sd">        and save it to &#39;$(PWD)/sf2.txt&#39;.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">saveas</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Download file list and save file list not equal&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">url</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;/&#39;</span><span class="p">:</span> <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">return_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">files</span><span class="p">,</span><span class="n">saveas</span><span class="p">):</span>
+        <span class="n">webfile</span> <span class="o">=</span> <span class="n">url</span> <span class="o">+</span> <span class="p">(</span><span class="s">&#39;/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">webfile</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Failed to download file: &#39;</span><span class="o">+</span><span class="n">webfile</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="n">return_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">webfile</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">j</span><span class="p">)])</span>
+
+    <span class="k">return</span> <span class="n">return_list</span>
+</div>
+<div class="viewcode-block" id="grabFtpFile"><a class="viewcode-back" href="../webutils.html#webutils.grabFtpFile">[docs]</a><span class="k">def</span> <span class="nf">grabFtpFile</span><span class="p">(</span><span class="n">host</span><span class="p">,</span><span class="n">dirn</span><span class="p">,</span><span class="n">filen</span><span class="p">,</span><span class="n">saveas</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">username</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">password</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Download a file from an ftp server.</span>
+
+<span class="sd">        :param host:   The host ip (e.g. ``ftp.unibe.ch``).</span>
+<span class="sd">        :param dirn:   The directory in the host server, where the file </span>
+<span class="sd">                       is located (e.g. ``/aiub/CODE/``).</span>
+<span class="sd">        :param filen:  The name of the file to download (e.g. ``COD18650.EPH.Z``).</span>
+<span class="sd">        :param saveas: How to save the file in localhost (e.g. ``copy.txt``); </span>
+<span class="sd">                       if not set, the name ``filen`` will be used.</span>
+<span class="sd">        :param username: The username to connect to the ftp site (if any).</span>
+<span class="sd">        :param password: The password to connect to the ftp site (if any).</span>
+
+<span class="sd">        :returns: In sucess, a tuple is returned; first element is the</span>
+<span class="sd">                  name of the saved file (absolute path), the second element</span>
+<span class="sd">                  is the name of the file on web.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">host</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;/&#39;</span> <span class="p">:</span> <span class="n">host</span> <span class="o">=</span> <span class="n">host</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">dirn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="o">!=</span> <span class="s">&#39;/&#39;</span> <span class="p">:</span> <span class="n">dirn</span> <span class="o">=</span> <span class="s">&#39;/&#39;</span> <span class="o">+</span> <span class="n">dirn</span>
+    <span class="k">if</span> <span class="n">dirn</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;/&#39;</span> <span class="p">:</span> <span class="n">dirn</span> <span class="o">+=</span> <span class="s">&#39;/&#39;</span>
+    <span class="k">if</span> <span class="n">filen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;/&#39;</span> <span class="p">:</span> <span class="n">filen</span> <span class="o">=</span> <span class="n">filen</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">ftp</span> <span class="o">=</span> <span class="n">ftplib</span><span class="o">.</span><span class="n">FTP</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">username</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">password</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Given username but no password; error at webutils.grabFtpFile&#39;</span><span class="p">)</span>
+        <span class="n">ftp</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ftp</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ftp</span><span class="o">.</span><span class="n">cwd</span><span class="p">(</span><span class="n">dirn</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Failed to change dir in ftp [&#39;</span><span class="o">+</span><span class="n">host</span><span class="o">+</span><span class="s">&#39;] -&gt; &#39;</span><span class="o">+</span><span class="n">dirn</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">saveas</span><span class="p">:</span>
+        <span class="n">saveas</span> <span class="o">=</span> <span class="n">filen</span>
+    <span class="n">localfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">saveas</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span>
+ 
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ftp</span><span class="o">.</span><span class="n">retrbinary</span><span class="p">(</span><span class="s">&#39;RETR </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">filen</span><span class="p">,</span> <span class="n">localfile</span><span class="o">.</span><span class="n">write</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">ftp</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+        <span class="c">## remove corrupt file</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">localfile</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">localfile</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Failed to download file: &#39;</span> <span class="o">+</span> <span class="n">host</span> <span class="o">+</span> <span class="n">dirn</span> <span class="o">+</span> <span class="n">filen</span><span class="p">)</span>
+
+    <span class="n">ftp</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+    <span class="n">localfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">saveas</span><span class="p">),</span> <span class="s">&#39;</span><span class="si">%s%s%s</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">host</span><span class="p">,</span><span class="n">dirn</span><span class="p">,</span><span class="n">filen</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">bernutils 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, xp,da.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

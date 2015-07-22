@@ -1,0 +1,480 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bgps &mdash; bernutils 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="bernutils 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">bernutils 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for bgps</h1><div class="highlight"><pre>
+<span class="c">#! /usr/bin/python</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="gpsoutfile"><a class="viewcode-back" href="../bgps.html#bgps.gpsoutfile">[docs]</a><span class="k">class</span> <span class="nc">gpsoutfile</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39; A class to hold a Bernese v5.2 GPSEST output file &#39;&#39;&#39;</span>
+    <span class="n">__filename</span>  <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: The filename of the output file</span>
+    <span class="n">__program</span>   <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: The program that created (this) file</span>
+    <span class="n">__campaign</span>  <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: Name of the campaign</span>
+    <span class="n">__doy</span>       <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: Day Of Year (processed)</span>
+    <span class="n">__ses</span>       <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: Session (processed)</span>
+    <span class="n">__yr</span>        <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: Year (processed)</span>
+    <span class="n">__stations</span>  <span class="o">=</span> <span class="p">[]</span>  <span class="c">#: List of stations included in the processing/output file</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Constructor; check for file existance &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;No such file &#39;</span><span class="o">+</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__filename</span> <span class="o">=</span> <span class="n">filename</span>
+
+<div class="viewcode-block" id="gpsoutfile.findFirstLine"><a class="viewcode-back" href="../bgps.html#bgps.gpsoutfile.findFirstLine">[docs]</a>    <span class="k">def</span> <span class="nf">findFirstLine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">stream</span><span class="p">,</span><span class="n">line</span><span class="p">,</span><span class="n">eof_line</span><span class="o">=</span><span class="s">&#39;&gt;&gt;&gt;&#39;</span><span class="p">,</span><span class="n">max_lines</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Given a GPSEST output file, try to match the line passed as</span>
+<span class="sd">            ``line``, until ``eof_line`` is not matched and no more than</span>
+<span class="sd">            ``max_lines`` are read.</span>
+<span class="sd">            If the line is found, the stream input position, will be returned</span>
+<span class="sd">            at the end of the matched line.</span>
+
+<span class="sd">            :param stream:    The (calling) instance&#39;s input stream.</span>
+<span class="sd">            :param line:      The prototype line to match.</span>
+<span class="sd">            :param eof_line:  EOF record.</span>
+<span class="sd">            :param max_lines: Max lines to be read befor quiting.</span>
+
+<span class="sd">            :returns:         On success, the matched line; input buffer is set</span>
+<span class="sd">                              at the end of the matched line.</span>
+<span class="sd">            </span>
+<span class="sd">            :warning: Note that the search will start from the current get </span>
+<span class="sd">                      position of the stream and *NOT* from the begining of </span>
+<span class="sd">                      the file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ln</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;Stream closed&#39;</span><span class="p">)</span>
+
+        <span class="n">stop</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">eof_line</span><span class="p">)</span>
+        <span class="n">dummy_it</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">dummy_it</span> <span class="o">&lt;</span> <span class="n">max_lines</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ln</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ln</span>
+            <span class="k">elif</span> <span class="n">ln</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">==</span> <span class="n">eof_line</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot find line :&#39;</span><span class="o">+</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">dummy_it</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">ln</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="gpsoutfile.getHeaderInfo"><a class="viewcode-back" href="../bgps.html#bgps.gpsoutfile.getHeaderInfo">[docs]</a>    <span class="k">def</span> <span class="nf">getHeaderInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Given a GPSEST output file, try to read the header</span>
+<span class="sd">            information and return in in a list as:</span>
+<span class="sd">            campaign_name, doy, session, year, date_run, username, # of stations</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__filename</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;No such file &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">__filename</span><span class="p">)</span>
+
+        <span class="c">## first line is empty</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="c">## second line -&gt;</span>
+        <span class="c">## =====================</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="c">## Third line -&gt;</span>
+        <span class="c">##  Bernese GNSS Software, Version 5.2</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">line</span> <span class="o">!=</span> <span class="s">&#39;Bernese GNSS Software, Version 5.2&#39;</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid GPSEST format: line 3&#39;</span><span class="p">)</span>
+
+        <span class="c">## Forth line -&gt;</span>
+        <span class="c">## ------------------</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="c">## WARNING -&gt; This is different in GPSEST and ADNEQ2</span>
+        <span class="c">## Fifth line -&gt;</span>
+        <span class="c">## Program        : GPSEST</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;GPSEST&#39;</span><span class="p">):</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid GPSEST format: line 5&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__program</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="c">## Sixth line</span>
+        <span class="c">## Purpose        : Parameter estimation</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="c">## Seventh line</span>
+        <span class="c">## -------------------</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="c">## Eighth line</span>
+        <span class="c">## Campaign       : ${P}/LAVMO</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid GPSEST format: line 8&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__campaign</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c">## Ninth line</span>
+        <span class="c">## Default session: 1190 year 2015</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid GPSEST format: line 9&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doy</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ses</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__yr</span>  <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+
+        <span class="c">## Tenth line</span>
+        <span class="c">## Date           : 15-Jun-2015 15:16:49</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid GPSEST format: line 10&#39;</span><span class="p">)</span>
+        <span class="n">dtrun</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39; &#39;</span> <span class="o">+</span> <span class="n">line</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+        <span class="c">## Eleventh line</span>
+        <span class="c">## User name      : xanthos</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid GPSEST format: line 11&#39;</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+        <span class="c">## go to the second occurance of &#39;4. STATIONS&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">lstr</span> <span class="o">=</span> <span class="s">&#39;4. STATIONS&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">findFirstLine</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span><span class="n">lstr</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Station list not found until EOF!&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">lstr</span> <span class="o">=</span> <span class="s">&#39;4. STATIONS&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">findFirstLine</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span><span class="n">lstr</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Station list not found until EOF!&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">17</span><span class="p">):</span> <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&#39;num  Station name     obs e/f/h        X (m)           Y (m)           Z (m)        Latitude       Longitude    Height (m)&#39;</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Error matching station list!&#39;</span><span class="p">)</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">while</span> <span class="p">(</span><span class="bp">True</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__stations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">21</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="n">feh</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">27</span><span class="p">:</span><span class="mi">34</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">34</span><span class="p">:</span><span class="mi">50</span><span class="p">])</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">50</span><span class="p">:</span><span class="mi">66</span><span class="p">])</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">66</span><span class="p">:</span><span class="mi">83</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Error matching station list!&#39;</span><span class="p">)</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__campaign</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__doy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ses</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__yr</span><span class="p">,</span> <span class="n">dtrun</span><span class="p">,</span> <span class="n">user</span>
+</div>
+<div class="viewcode-block" id="gpsoutfile.getBaselineList"><a class="viewcode-back" href="../bgps.html#bgps.gpsoutfile.getBaselineList">[docs]</a>    <span class="k">def</span> <span class="nf">getBaselineList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; This function will try to read all baselines processed in the run, </span>
+<span class="sd">            and report their information. The baselines are read from the </span>
+<span class="sd">            section:</span>
+<span class="sd">            *2. OBSERVATION FILES, MAIN CHARACTERISTICS*</span>
+<span class="sd">            Two tables are read, namely:</span>
+<span class="sd">            [FILE  OBSERVATION FILE HEADER          OBSERVATION FILE                  SESS     RECEIVER 1            RECEIVER 2]</span>
+<span class="sd">            and</span>
+<span class="sd">            [FILE TYP FREQ.  STATION 1        STATION 2        SESS  FIRST OBSERV.TIME  #EPO  DT #EF #CLK ARC #SAT  W 12    #AMB  L1  L2  L5  RM]</span>
+<span class="sd">            and the concatenated list is returned, i.e.:</span>
+<span class="sd">            [aa, baseline_name, type, frequency, station1, station2, first_observation, # of epochs]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__filename</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;No such file &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">__filename</span><span class="p">)</span>
+
+        <span class="n">num_of_bsl</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">dummy_it</span>   <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c">## skip everything until &#39;INPUT AND OUTPUT FILENAMES&#39; line</span>
+        <span class="n">lstr</span> <span class="o">=</span> <span class="s">&#39;INPUT AND OUTPUT FILENAMES&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">findFirstLine</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span><span class="n">lstr</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Baseline list not found until EOF!&#39;</span><span class="p">)</span>
+
+        <span class="n">lstr</span> <span class="o">=</span> <span class="s">&#39;2. OBSERVATION FILES&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">findFirstLine</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span><span class="n">lstr</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;&quot;2. OBSERVATION FILES&quot; list not found until EOF!&#39;</span><span class="p">)</span>
+
+        <span class="c">## skip next 10 lines</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="c">## next line should be:</span>
+        <span class="c">## FILE  OBSERVATION FILE HEADER          OBSERVATION FILE                  SESS     RECEIVER 1            RECEIVER 2</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&#39;FILE  OBSERVATION FILE HEADER          OBSERVATION FILE                  SESS     RECEIVER 1            RECEIVER 2&#39;</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Unexpected line wile searching for baselines [1]!&#39;</span><span class="p">)</span>
+
+        <span class="c">## skip next 2 lines</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="n">dummy_it</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">bsl_lst_1</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c">## read baselines</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">_aa</span>   <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">_head</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">_obs</span>  <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">_ses</span>  <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                <span class="n">_rec1</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">83</span><span class="p">:</span><span class="mi">106</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">_rec2</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">106</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">bsl_lst_1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">_aa</span><span class="p">,</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">_head</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">]]</span> <span class="p">)</span>
+                <span class="c">## print &#39;added list element -&gt;&#39;,[_aa,os.path.basename(_head)[0:-3]]</span>
+                <span class="n">num_of_bsl</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Failed reading baselines!&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_ses</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__doy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ses</span><span class="p">:</span>
+                <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Failed reading baselines! Invalid session&#39;</span><span class="p">)</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">dummy_it</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">dummy_it</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Failed reading baselines!&#39;</span><span class="p">)</span>
+
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&#39;FILE TYP FREQ.  STATION 1        STATION 2        SESS  FIRST OBSERV.TIME  #EPO  DT #EF #CLK ARC #SAT  W 12    #AMB  L1  L2  L5  RM&#39;</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Unexpected line wile searching for baselines [2]!&#39;</span><span class="p">)</span>
+
+        <span class="c">## skip next 2 lines</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="c">## read baselines</span>
+        <span class="n">bsl_lst_2</span>   <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dummy_it</span>    <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">num_of_bsl2</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">num_of_bsl2</span> <span class="o">&gt;</span> <span class="n">num_of_bsl</span><span class="p">):</span>
+                <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Failed reading baselines!&#39;</span><span class="p">)</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">_aa</span>   <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">_type</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">_freq</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">_sta1</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">17</span><span class="p">:</span><span class="mi">32</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">_sta2</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">34</span><span class="p">:</span><span class="mi">49</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">_first_obs</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">57</span><span class="p">:</span><span class="mi">75</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">_epochs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">77</span><span class="p">:</span><span class="mi">81</span><span class="p">])</span>
+                <span class="n">num_of_bsl2</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">bsl_lst_2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">_aa</span><span class="p">,</span><span class="n">_type</span><span class="p">,</span><span class="n">_freq</span><span class="p">,</span><span class="n">_sta1</span><span class="p">,</span><span class="n">_sta2</span><span class="p">,</span><span class="n">_first_obs</span><span class="p">,</span><span class="n">_epochs</span><span class="p">]</span> <span class="p">)</span>
+                <span class="c">## print &#39;added list element -&gt;&#39;,[_aa,_type,_freq,_sta1,_sta2,_first_obs,_epochs]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Failed reading baselines!&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_ses</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__doy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ses</span><span class="p">:</span>
+                <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Failed reading baselines! Invalid session&#39;</span><span class="p">)</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="n">baseline_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bsl_lst_1</span><span class="p">,</span><span class="n">bsl_lst_2</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">j</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Inconsistent baselines&#39;</span><span class="p">)</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">j</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">baseline_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+
+        <span class="c">## return list: [aa, baseline_name, type, frequency, station1, station2, first_observation, # of epochs]</span>
+        <span class="k">return</span> <span class="n">baseline_list</span>
+</div>
+<div class="viewcode-block" id="gpsoutfile.getCrdSolInfo"><a class="viewcode-back" href="../bgps.html#bgps.gpsoutfile.getCrdSolInfo">[docs]</a>    <span class="k">def</span> <span class="nf">getCrdSolInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Given a GPSEST output file, this function will try to read information regarding the</span>
+<span class="sd">            (solution) coordinate results. The information is collected from the table:</span>
+<span class="sd">            &#39;NUM  STATION NAME     PARAMETER    A PRIORI VALUE       NEW VALUE     NEW- A PRIORI  RMS ERROR   3-D ELLIPSOID       2-D ELLIPSE&#39;</span>
+<span class="sd">            for every stations already mentioned in the instances station list. So make sure,</span>
+<span class="sd">            the instances station list is already filled. The return list, contains</span>
+<span class="sd">            a list for every station, in the following format:</span>
+<span class="sd">            [name,3x(a-priori,estimated,new-old,rms),3x(new-old,rms)]</span>
+<span class="sd">            for   X, Y, Z                            HGT, LAT, LON</span>
+<span class="sd">            TODO A same block of information maybe available in the section &#39;RESULTS PART 2&#39;. Try reading that</span>
+<span class="sd">            before reading the blok from &#39;RESULTS PART 1&#39;.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__filename</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;No such file &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">__filename</span><span class="p">)</span>
+
+        <span class="c">## skip everything until &#39;13. RESULTS (PART 1)&#39; line</span>
+        <span class="n">lstr</span> <span class="o">=</span> <span class="s">&#39;13. RESULTS (PART 1)&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">findFirstLine</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span><span class="n">lstr</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Coordinate list not found until EOF!&#39;</span><span class="p">)</span>
+
+        <span class="c">## skip everything until</span>
+        <span class="n">lstr</span> <span class="o">=</span> <span class="s">&#39;NUM  STATION NAME     PARAMETER    A PRIORI VALUE       NEW VALUE     NEW- A PRIORI  RMS ERROR   3-D ELLIPSOID       2-D ELLIPSE&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">findFirstLine</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span><span class="n">lstr</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Coordinate list not found until EOF!&#39;</span><span class="p">)</span>
+
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="n">station_info</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">it</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__stations</span><span class="p">)):</span>
+            <span class="n">tmp_info</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">station_</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">21</span><span class="p">]</span>
+                        <span class="n">tmp_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">station_</span><span class="p">)</span>
+                    <span class="n">cflag</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">23</span><span class="p">:</span><span class="mi">25</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">cflag</span> <span class="o">!=</span> <span class="s">&#39;X&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">cflag</span> <span class="o">!=</span> <span class="s">&#39;Y&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">cflag</span> <span class="o">!=</span> <span class="s">&#39;Z&#39;</span><span class="p">):</span>
+                        <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Error reading parameter&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                    <span class="n">a_priori</span>  <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">36</span><span class="p">:</span><span class="mi">51</span><span class="p">])</span>
+                    <span class="n">estimated</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">55</span><span class="p">:</span><span class="mi">70</span><span class="p">])</span>
+                    <span class="n">new_old</span>   <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">71</span><span class="p">:</span><span class="mi">82</span><span class="p">])</span>
+                    <span class="n">rms</span>       <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">85</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                    <span class="n">tmp_info</span> <span class="o">+=</span> <span class="p">[</span><span class="n">a_priori</span><span class="p">,</span><span class="n">estimated</span><span class="p">,</span><span class="n">new_old</span><span class="p">,</span><span class="n">rms</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Error reading cartesian parameters&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">new_old</span>   <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">71</span><span class="p">:</span><span class="mi">82</span><span class="p">])</span>
+                    <span class="n">rms</span>       <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">85</span><span class="p">:</span><span class="mi">95</span><span class="p">])</span>
+                    <span class="n">tmp_info</span> <span class="o">+=</span> <span class="p">[</span><span class="n">new_old</span><span class="p">,</span><span class="n">rms</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Error reading geodetic parameters&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+            <span class="n">station_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">tmp_info</span> <span class="p">)</span>
+            <span class="c">##print tmp_info</span>
+            <span class="n">it</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">it</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__stations</span><span class="p">):</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Error collecting station parameters&#39;</span><span class="p">)</span>
+
+        <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">station_info</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">bernutils 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, xp,da.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

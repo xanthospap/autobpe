@@ -1,0 +1,256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gpstime &mdash; bernutils 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="bernutils 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">bernutils 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for gpstime</h1><div class="highlight"><pre>
+<span class="c">#! /usr/bin/python</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="sd">&quot;&quot;&quot; Global Variables (Constants)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">JAN61980</span>    <span class="o">=</span> <span class="mi">44244</span>
+<span class="n">JAN11901</span>    <span class="o">=</span> <span class="mi">15385</span>
+<span class="n">SEC_PER_DAY</span> <span class="o">=</span> <span class="mf">86400.0e0</span>
+
+<span class="n">month_day</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="mi">151</span><span class="p">,</span> <span class="mi">181</span><span class="p">,</span> <span class="mi">212</span><span class="p">,</span> <span class="mi">243</span><span class="p">,</span> <span class="mi">273</span><span class="p">,</span> <span class="mi">304</span><span class="p">,</span> <span class="mi">334</span><span class="p">,</span> <span class="mi">365</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">91</span><span class="p">,</span> <span class="mi">121</span><span class="p">,</span> <span class="mi">152</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">244</span><span class="p">,</span> <span class="mi">274</span><span class="p">,</span> <span class="mi">305</span><span class="p">,</span> <span class="mi">335</span><span class="p">,</span> <span class="mi">366</span><span class="p">]</span>
+<span class="p">]</span>
+
+<div class="viewcode-block" id="mjd2pydt"><a class="viewcode-back" href="../gpstime.html#gpstime.mjd2pydt">[docs]</a><span class="k">def</span> <span class="nf">mjd2pydt</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span><span class="n">fmjd</span><span class="o">=.</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Convert a date given in Modified Julian Date format, to</span>
+<span class="sd">        a Python ``datetime`` object. The input MJD can be split</span>
+<span class="sd">        in any convinient way between the parameters ``mjd`` and</span>
+<span class="sd">        ``fmjd``. Or ``fmjd`` can be ignored and the date passed</span>
+<span class="sd">        in ``mjd``.</span>
+
+<span class="sd">        :param mjd: The Modified Julian Date; can be either ``float`` </span>
+<span class="sd">                    or ``integer``</span>
+<span class="sd">        :param fmjd: In case the MJD is plit in two parts, this is</span>
+<span class="sd">                     the second part of the input MJD. E.g. if</span>
+<span class="sd">                     MJD = 57222.75, then, for increased accuracy,</span>
+<span class="sd">                     one can use ``mjd = 57222`` and ``fmjd = .75``.</span>
+
+<span class="sd">        :returns:    A Python ``datetime`` object, representing the input</span>
+<span class="sd">                     (MJD) date.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">jd</span>   <span class="o">=</span> <span class="n">mjd</span> <span class="o">+</span> <span class="n">fmjd</span>
+    <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">jd</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">mjd</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="c">## just to be sure !</span>
+    <span class="n">fmjd</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="n">days_fr_jan1_1901</span> <span class="o">=</span> <span class="n">mjd</span> <span class="o">-</span> <span class="n">JAN11901</span>
+    <span class="n">num_four_yrs</span>      <span class="o">=</span> <span class="n">days_fr_jan1_1901</span><span class="o">/</span><span class="mi">1461</span>
+    <span class="n">years_so_far</span>      <span class="o">=</span> <span class="mi">1901</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">num_four_yrs</span>
+    <span class="n">days_left</span>         <span class="o">=</span> <span class="n">days_fr_jan1_1901</span> <span class="o">-</span> <span class="mi">1461</span><span class="o">*</span><span class="n">num_four_yrs</span>
+    <span class="n">delta_yrs</span>         <span class="o">=</span> <span class="n">days_left</span><span class="o">/</span><span class="mi">365</span> <span class="o">-</span> <span class="n">days_left</span><span class="o">/</span><span class="mi">1460</span>
+
+    <span class="n">year</span>   <span class="o">=</span> <span class="n">years_so_far</span> <span class="o">+</span> <span class="n">delta_yrs</span>
+    <span class="n">yday</span>   <span class="o">=</span> <span class="n">days_left</span> <span class="o">-</span> <span class="mi">365</span><span class="o">*</span><span class="n">delta_yrs</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">hour</span>   <span class="o">=</span> <span class="n">fmjd</span><span class="o">*</span><span class="mf">24.0</span>
+    <span class="n">minute</span> <span class="o">=</span> <span class="n">fmjd</span><span class="o">*</span><span class="mf">1440.0</span> <span class="o">-</span> <span class="n">hour</span><span class="o">*</span><span class="mf">60.0</span>
+    <span class="n">second</span> <span class="o">=</span> <span class="n">fmjd</span><span class="o">*</span><span class="mf">86400.0</span> <span class="o">-</span> <span class="n">hour</span><span class="o">*</span><span class="mf">3600.0</span> <span class="o">-</span> <span class="n">minute</span><span class="o">*</span><span class="mf">60.0</span>
+    <span class="n">leap</span>   <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">year</span><span class="o">%</span><span class="mi">4</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">guess</span>  <span class="o">=</span> <span class="n">yday</span><span class="o">*</span><span class="mf">0.032</span>
+    <span class="n">more</span>   <span class="o">=</span> <span class="nb">int</span><span class="p">((</span> <span class="n">yday</span> <span class="o">-</span> <span class="n">month_day</span><span class="p">[</span><span class="n">leap</span><span class="p">][</span><span class="n">guess</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">month</span>  <span class="o">=</span> <span class="n">guess</span> <span class="o">+</span> <span class="n">more</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">mday</span>   <span class="o">=</span> <span class="n">yday</span> <span class="o">-</span> <span class="n">month_day</span><span class="p">[</span><span class="n">leap</span><span class="p">][</span><span class="n">guess</span><span class="o">+</span><span class="n">more</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">mday</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">second</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="pydt2ydoy"><a class="viewcode-back" href="../gpstime.html#gpstime.pydt2ydoy">[docs]</a><span class="k">def</span> <span class="nf">pydt2ydoy</span><span class="p">(</span><span class="n">datetm</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Transform a Python ``datetime`` instance to year and </span>
+<span class="sd">        day of year.</span>
+
+<span class="sd">        :returns: A tuple consisting of </span>
+<span class="sd">        ``[year, day_of_year, hour, minute, second]``.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iyear</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">datetm</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&#39;%Y&#39;</span><span class="p">))</span>
+        <span class="n">idoy</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">datetm</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&#39;%j&#39;</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid date.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">datetm</span><span class="p">)</span> <span class="ow">is</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
+        <span class="n">ihour</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">imin</span>  <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">isec</span>  <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">datetm</span><span class="p">)</span> <span class="ow">is</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">:</span>
+        <span class="n">ihour</span> <span class="o">=</span> <span class="n">datetm</span><span class="o">.</span><span class="n">hour</span>
+        <span class="n">imin</span>  <span class="o">=</span> <span class="n">datetm</span><span class="o">.</span><span class="n">minute</span>
+        <span class="n">isec</span>  <span class="o">=</span> <span class="n">datetm</span><span class="o">.</span><span class="n">second</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Non-datetime object passed as input -&gt; gpstime.pydt2ydoy&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">iyear</span><span class="p">,</span> <span class="n">idoy</span><span class="p">,</span> <span class="n">ihour</span><span class="p">,</span> <span class="n">imin</span><span class="p">,</span> <span class="n">isec</span>
+</div>
+<div class="viewcode-block" id="pydt2gps"><a class="viewcode-back" href="../gpstime.html#gpstime.pydt2gps">[docs]</a><span class="k">def</span> <span class="nf">pydt2gps</span><span class="p">(</span><span class="n">datetm</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Transform a Python ``datetime`` instance to </span>
+<span class="sd">        gps week and seconds of week.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">year</span><span class="p">,</span> <span class="n">doy</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="n">sec</span> <span class="o">=</span> <span class="n">pydt2ydoy</span><span class="p">(</span><span class="n">datetm</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span>
+    <span class="k">return</span> <span class="n">ydoy2gps</span><span class="p">(</span><span class="n">year</span><span class="p">,</span><span class="n">doy</span><span class="p">,</span><span class="n">hour</span><span class="p">,</span><span class="nb">min</span><span class="p">,</span><span class="n">sec</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ydoy2gps"><a class="viewcode-back" href="../gpstime.html#gpstime.ydoy2gps">[docs]</a><span class="k">def</span> <span class="nf">ydoy2gps</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">doy</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=.</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Transform a tuple of ``year`` and day of year (i.e. ``doy``)</span>
+<span class="sd">        to gps week and seconds of week.</span>
+
+<span class="sd">        :returns: A tuple consisting of ``[gps_week, sec_of_week]``.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="p">[</span><span class="n">mjd</span><span class="p">,</span> <span class="n">fmjd</span><span class="p">]</span> <span class="o">=</span> <span class="n">ydoy2mjd</span><span class="p">(</span><span class="n">year</span><span class="p">,</span><span class="n">doy</span><span class="p">,</span><span class="n">hour</span><span class="p">,</span><span class="n">minute</span><span class="p">,</span><span class="n">seconds</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span>
+
+    <span class="n">gps_week</span> <span class="o">=</span> <span class="p">(</span><span class="n">mjd</span> <span class="o">-</span> <span class="n">JAN61980</span><span class="p">)</span> <span class="o">/</span> <span class="mi">7</span>
+    <span class="n">sec_of_week</span> <span class="o">=</span> <span class="p">((</span><span class="n">mjd</span> <span class="o">-</span> <span class="n">JAN61980</span><span class="p">)</span> <span class="o">-</span> <span class="n">gps_week</span><span class="o">*</span><span class="mi">7</span> <span class="o">+</span> <span class="n">fmjd</span> <span class="p">)</span> <span class="o">*</span> <span class="n">SEC_PER_DAY</span>
+
+    <span class="k">return</span> <span class="n">gps_week</span><span class="p">,</span> <span class="n">sec_of_week</span>
+</div>
+<div class="viewcode-block" id="ydoy2mjd"><a class="viewcode-back" href="../gpstime.html#gpstime.ydoy2mjd">[docs]</a><span class="k">def</span> <span class="nf">ydoy2mjd</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">doy</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=.</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Transform a tuple of ``year`` and day of year (i.e. ``doy``)</span>
+<span class="sd">        to Modified Julian Date and fraction of day.</span>
+<span class="sd">        Optional arguments include ``hour``, ``minute`` and ``second``.</span>
+
+<span class="sd">        :returns: A tuple consisting of ``[mjd, fmjd]``, where ``mjd`` is the</span>
+<span class="sd">                  (integer) Modified Julian Date and ``fmjd`` is the fraction</span>
+<span class="sd">                  of day (float).</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iyear</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
+        <span class="n">idoy</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">doy</span><span class="p">)</span>
+        <span class="n">ihour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hour</span><span class="p">)</span>
+        <span class="n">imin</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">minute</span><span class="p">)</span>
+        <span class="n">fsec</span>  <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">seconds</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid date.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">idoy</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">idoy</span> <span class="o">&gt;</span> <span class="mi">366</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid date.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ihour</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">ihour</span> <span class="o">&gt;</span> <span class="mi">23</span> <span class="ow">or</span> <span class="n">imin</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">imin</span> <span class="o">&gt;</span> <span class="mi">59</span> <span class="ow">or</span> <span class="n">fsec</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">fsec</span> <span class="o">&gt;</span> <span class="mi">60</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid date.&#39;</span><span class="p">)</span>
+
+    <span class="c">## compute the Modified Julian Date</span>
+    <span class="n">mjd</span>  <span class="o">=</span> <span class="p">((</span><span class="n">iyear</span> <span class="o">-</span> <span class="mi">1901</span><span class="p">)</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="mi">1461</span> <span class="o">+</span> <span class="p">((</span><span class="n">iyear</span> <span class="o">-</span> <span class="mi">1901</span><span class="p">)</span><span class="o">%</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="mi">365</span> <span class="o">+</span> <span class="n">idoy</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">JAN11901</span><span class="p">;</span>
+    <span class="n">fmjd</span> <span class="o">=</span> <span class="p">((</span><span class="n">fsec</span><span class="o">/</span><span class="mf">60.0</span> <span class="o">+</span> <span class="n">imin</span><span class="p">)</span><span class="o">/</span><span class="mf">60.0</span> <span class="o">+</span> <span class="n">ihour</span><span class="p">)</span><span class="o">/</span><span class="mf">24.0</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="n">mjd</span><span class="p">,</span> <span class="n">fmjd</span>
+</div>
+<div class="viewcode-block" id="ydoy2pydt"><a class="viewcode-back" href="../gpstime.html#gpstime.ydoy2pydt">[docs]</a><span class="k">def</span> <span class="nf">ydoy2pydt</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">doy</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Transform a date, given as ``year`` and day of year </span>
+<span class="sd">        (i.e. ``doy``) to a valid Python datetime instance.</span>
+<span class="sd">        Optional arguments include ``hour``, ``minute`` and ``second``,</span>
+<span class="sd">        all integers.</span>
+
+<span class="sd">        :returns: A ``datetime`` instance.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iyear</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
+        <span class="n">idoy</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">doy</span><span class="p">)</span>
+        <span class="n">ihour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hour</span><span class="p">)</span>
+        <span class="n">imin</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">minute</span><span class="p">)</span>
+        <span class="n">isec</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">seconds</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid date.&#39;</span><span class="p">)</span>
+
+    <span class="n">date_string</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%4i</span><span class="s"> </span><span class="si">%03i</span><span class="s"> </span><span class="si">%02i</span><span class="s"> </span><span class="si">%02i</span><span class="s"> </span><span class="si">%02i</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">iyear</span><span class="p">,</span> <span class="n">idoy</span><span class="p">,</span> <span class="n">ihour</span><span class="p">,</span> <span class="n">imin</span><span class="p">,</span> <span class="n">isec</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_string</span><span class="p">,</span> <span class="s">&#39;%Y %j %H %M %S&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">bernutils 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, xp,da.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

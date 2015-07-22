@@ -1,0 +1,312 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bcrd &mdash; bernutils 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="bernutils 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">bernutils 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for bcrd</h1><div class="highlight"><pre>
+<span class="c">#! /usr/bin/python</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">|===========================================|</span>
+<span class="sd">|** Higher Geodesy Laboratory             **|</span>
+<span class="sd">|** Dionysos Satellite Observatory        **|</span>
+<span class="sd">|** National Tecnical University of Athens**|</span>
+<span class="sd">|===========================================|</span>
+
+<span class="sd">filename              : </span>
+<span class="sd">version               : v-0.5</span>
+<span class="sd">created               : JUN-2015</span>
+
+<span class="sd">usage                 : Python routine to </span>
+
+<span class="sd">exit code(s)          : 0 -&gt; success</span>
+<span class="sd">                      : 1 -&gt; error</span>
+
+<span class="sd">description           :</span>
+
+<span class="sd">notes                 :</span>
+
+<span class="sd">TODO                  :</span>
+<span class="sd">bugs &amp; fixes          :</span>
+<span class="sd">last update           :</span>
+
+<span class="sd">report any bugs to    :</span>
+<span class="sd">                      : Xanthos Papanikolaou xanthos@mail.ntua.gr</span>
+<span class="sd">                      : Demitris Anastasiou  danast@mail.ntua.gr</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c">## Variables for Bernese v5.2 .CRD files</span>
+<span class="c">## Describe the format of a .CRD data line</span>
+<span class="n">CRD_HEADER_LINES</span>     <span class="o">=</span> <span class="mi">6</span>
+<span class="n">MARKER_NAME_INDEX</span>    <span class="o">=</span> <span class="mi">5</span>
+<span class="n">MARKER_NAME_LENGTH</span>   <span class="o">=</span> <span class="mi">4</span>
+<span class="n">MARKER_NUMBER_INDEX</span>  <span class="o">=</span> <span class="mi">10</span>
+<span class="n">MARKER_NUMBER_LENGTH</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">XCOMP_INDEX</span>          <span class="o">=</span> <span class="mi">22</span>
+<span class="n">XCOMP_LENGTH</span>         <span class="o">=</span> <span class="mi">15</span>
+<span class="n">YCOMP_INDEX</span>          <span class="o">=</span> <span class="mi">37</span>
+<span class="n">YCOMP_LENGTH</span>         <span class="o">=</span> <span class="mi">15</span>
+<span class="n">ZCOMP_INDEX</span>          <span class="o">=</span> <span class="mi">52</span>
+<span class="n">ZCOMP_LENGTH</span>         <span class="o">=</span> <span class="mi">15</span>
+<span class="n">FLAG_INDEX</span>           <span class="o">=</span> <span class="mi">67</span>
+
+<div class="viewcode-block" id="crdpoint"><a class="viewcode-back" href="../bcrd.html#bcrd.crdpoint">[docs]</a><span class="k">class</span> <span class="nc">crdpoint</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Class to represent a (GNSS/geodetic) Point as recorded in a Bernese</span>
+<span class="sd">        format .CRD file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name_</span>   <span class="o">=</span> <span class="s">&#39;&#39;</span>    <span class="c">#: Station name (4-digit); e.g. &#39;ANKR&#39;</span>
+    <span class="n">number_</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>    <span class="c">#: Station number; e.g. &#39;20805M002&#39;</span>
+    <span class="n">xcmp_</span>   <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>    <span class="c">#: x-component</span>
+    <span class="n">ycmp_</span>   <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>    <span class="c">#: y-component</span>
+    <span class="n">zcmp_</span>   <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>    <span class="c">#: z-component</span>
+    <span class="n">flag_</span>   <span class="o">=</span> <span class="s">&#39;&#39;</span>    <span class="c">#: flag</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="n">number</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="n">xcmp</span><span class="o">=</span><span class="s">&#39;.0&#39;</span><span class="p">,</span><span class="n">ycmp</span><span class="o">=</span><span class="s">&#39;.0&#39;</span><span class="p">,</span><span class="n">zcmp</span><span class="o">=</span><span class="s">&#39;.0&#39;</span><span class="p">,</span><span class="n">flag</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Constructor; all initialized to empty strings and/or .0 </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name_</span>   <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_</span> <span class="o">=</span> <span class="n">number</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xcmp_</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xcmp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ycmp_</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ycmp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zcmp_</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">zcmp</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ArithmeticError</span><span class="p">(</span><span class="s">&#39;Invalid initilization of CrdPoint&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xcmp_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ycmp_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zcmp_</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flag_</span> <span class="o">=</span> <span class="n">flag</span>
+
+<div class="viewcode-block" id="crdpoint.setFromCrdLine"><a class="viewcode-back" href="../bcrd.html#bcrd.crdpoint.setFromCrdLine">[docs]</a>    <span class="k">def</span> <span class="nf">setFromCrdLine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set (re-initialize) a crdpoint from a .CRD data line. Bernese v5.2</span>
+<span class="sd">            .CRD files have a strict format and this function expects such a</span>
+<span class="sd">            format to be followed.</span>
+
+<span class="sd">            :param line: A line containing coordinate information, as extracted</span>
+<span class="sd">                         (read) from a .CRD file</span>
+
+<span class="sd">            :returns:    Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">65</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BufferError</span><span class="p">(</span><span class="s">&#39;Error reading point from crd file [&#39;</span><span class="o">+</span>
+                    <span class="n">line</span><span class="o">+</span><span class="s">&#39;] ER1&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name_</span>   <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">MARKER_NAME_INDEX</span><span class="p">:</span>
+                <span class="n">MARKER_NAME_INDEX</span><span class="o">+</span><span class="n">MARKER_NAME_LENGTH</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">MARKER_NUMBER_INDEX</span><span class="p">:</span>
+                <span class="n">MARKER_NUMBER_INDEX</span><span class="o">+</span><span class="n">MARKER_NUMBER_LENGTH</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xcmp_</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">XCOMP_INDEX</span><span class="p">:</span><span class="n">XCOMP_INDEX</span><span class="o">+</span><span class="n">XCOMP_LENGTH</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ycmp_</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">YCOMP_INDEX</span><span class="p">:</span><span class="n">YCOMP_INDEX</span><span class="o">+</span><span class="n">YCOMP_LENGTH</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zcmp_</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">ZCOMP_INDEX</span><span class="p">:</span><span class="n">ZCOMP_INDEX</span><span class="o">+</span><span class="n">ZCOMP_LENGTH</span><span class="p">])</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BufferError</span><span class="p">(</span><span class="s">&#39;Error reading point from crd file [&#39;</span><span class="o">+</span>
+                    <span class="n">line</span><span class="o">+</span><span class="s">&#39;] ER2&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">FLAG_INDEX</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flag_</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">FLAG_INDEX</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flag_</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+</div>
+<div class="viewcode-block" id="crdpoint.name"><a class="viewcode-back" href="../bcrd.html#bcrd.crdpoint.name">[docs]</a>    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">use_marker_number</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return the full name of a station, i.e. </span>
+<span class="sd">            ``marker_name`` + ``marker_number``.</span>
+<span class="sd">            If ``use_marker_number`` is set to ``False`` then the instance&#39;s</span>
+<span class="sd">            ``marker number`` will not be included in the name returned.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name_</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">MARKER_NAME_LENGTH</span><span class="p">:</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name_</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">MARKER_NAME_LENGTH</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name_</span> <span class="o">+=</span> <span class="s">&#39; &#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">use_marker_number</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name_</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">MARKER_NUMBER_LENGTH</span><span class="p">:</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">MARKER_NUMBER_LENGTH</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">number_</span> <span class="o">+=</span> <span class="s">&#39; &#39;</span>
+
+        <span class="k">return</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">name_</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39; &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="crdpoint.asString"><a class="viewcode-back" href="../bcrd.html#bcrd.crdpoint.asString">[docs]</a>    <span class="k">def</span> <span class="nf">asString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">aa</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Compile a Bernese v5.2 .CRD file record line, using the instance&#39;s</span>
+<span class="sd">            attributes. ``aa`` is the number of station (can be any positive </span>
+<span class="sd">            integer), written at the begining of the returned line.</span>
+
+<span class="sd">            :returns: A .CRD record line.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">iaa</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">aa</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ArithmeticError</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%03i</span><span class="s">  </span><span class="si">%-17s%15.5f%15.5f%15.5f</span><span class="s">   </span><span class="si">%-5s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">iaa</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">(),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">xcmp_</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ycmp_</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">zcmp_</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">flag_</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="crdfile"><a class="viewcode-back" href="../bcrd.html#bcrd.crdfile">[docs]</a><span class="k">class</span> <span class="nc">crdfile</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; A class to hold a Bernese v5.2 format .CRD file. &quot;&quot;&quot;</span>
+    <span class="n">filename_</span> <span class="o">=</span> <span class="s">&#39;&#39;</span> <span class="c">#: the name of the file</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Contructor; checks whether the file exists or not &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Invalid initilization of .CRD file&#39;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename_</span> <span class="o">=</span> <span class="n">filename</span>
+
+<div class="viewcode-block" id="crdfile.getListOfPoints"><a class="viewcode-back" href="../bcrd.html#bcrd.crdfile.getListOfPoints">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfPoints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">stalst</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">disregard_number</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Read points off from a .CRD file; return all points as list.</span>
+<span class="sd">            If the optional argument ``stalst`` is given, (which is supposed</span>
+<span class="sd">            to hold a list of station names), then only stations matched</span>
+<span class="sd">            in the ``stalst`` list will be returned. By matched, i mean that</span>
+<span class="sd">            the tuple ``(marker_name, marker_number)`` is the same for both</span>
+<span class="sd">            stations.</span>
+<span class="sd">            If ``disregard_number`` is set to ``True`` and ``stalst`` is other </span>
+<span class="sd">            than ``None``, then the comparisson of station names, will only </span>
+<span class="sd">            be performed using the 4char station id (i.e. ``self.name_``) and </span>
+<span class="sd">            *NOT* the marker number.</span>
+
+<span class="sd">            :returns: A list of points (i.e. ``crdpoint`` s)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">points</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename_</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;Failed to open file&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename_</span><span class="p">)</span>
+
+        <span class="c">## Skip the first header lines</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">6</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="n">pt</span>  <span class="o">=</span> <span class="n">crdpoint</span><span class="p">()</span>
+        <span class="n">pts</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c">## Read off all the points and add them to the points list</span>
+        <span class="k">while</span> <span class="p">(</span><span class="bp">True</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pt</span> <span class="o">=</span> <span class="n">crdpoint</span><span class="p">()</span>
+                <span class="n">pt</span><span class="o">.</span><span class="n">setFromCrdLine</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">stalst</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">disregard_number</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">stalst</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="n">pt</span><span class="o">.</span><span class="n">name_</span><span class="p">]:</span>
+                            <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">pt</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="ow">in</span> <span class="n">stalst</span><span class="p">:</span>
+                            <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+                            <span class="n">pts</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+                    <span class="n">pts</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">except</span> <span class="n">BufferError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="c">## Close the file</span>
+        <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c">## Return the list of points</span>
+        <span class="k">return</span> <span class="n">points</span>
+</div>
+<div class="viewcode-block" id="crdfile.getFileHeader"><a class="viewcode-back" href="../bcrd.html#bcrd.crdfile.getFileHeader">[docs]</a>    <span class="k">def</span> <span class="nf">getFileHeader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return the header of a .CRD file as a list of lines,</span>
+<span class="sd">            with no trailing newline chars.</span>
+
+<span class="sd">            :returns: A list of lines included in the file header.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename_</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;Failed to open file .CRD file&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename_</span><span class="p">)</span>
+
+        <span class="n">header_lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">6</span><span class="p">):</span>
+            <span class="n">header_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">))</span>
+
+        <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">header_lines</span><span class="p">;</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">bernutils 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, xp,da.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

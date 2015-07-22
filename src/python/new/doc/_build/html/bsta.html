@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Module : bsta &mdash; bernutils 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="bernutils 0.1 documentation" href="index.html" />
+    <link rel="prev" title="Module : bgps" href="bgps.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="bgps.html" title="Module : bgps"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">bernutils 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-bsta">
+<h1>Module : bsta<a class="headerlink" href="#module-bsta" title="Permalink to this headline">¶</a></h1>
+<p>This module contains the class <strong>stafile</strong> which represents a Bernese v5.2
+station information file.</p>
+<p>Station Information files (extension .STA), contain information for GPS/GNSS
+stations regarding naming, equipment, etc, all of which are related to certain
+time intervals (epochs). In most cases when using the functions/modules of
+a <strong>stafile</strong> instance to collect information, an epoch must be supplied (in
+addition of-course to a station name).</p>
+<p>Station Information file format format is very strict, and most of the
+functions/modules depend that this format is kept. For an example of .STA
+files, see <a class="reference external" href="ftp://ftp.unibe.ch/aiub/BSWUSER52/STA/">ftp://ftp.unibe.ch/aiub/BSWUSER52/STA/</a> and the collection of .STA
+files placed there.</p>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="bsta.stafile">
+<em class="property">class </em><tt class="descclassname">bsta.</tt><tt class="descname">stafile</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile" title="Permalink to this definition">¶</a></dt>
+<dd><p>A station information class, to represent Bernese v5.2 format .STA 
+files.</p>
+<dl class="method">
+<dt id="bsta.stafile.findStationType01">
+<tt class="descname">findStationType01</tt><big>(</big><em>station</em>, <em>epoch=None</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile.findStationType01"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile.findStationType01" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will search for the station information (concerning
+a specific station) included in the <em>&#8216;TYPE 01&#8217;</em> block.
+Given a station name (e.g. &#8216;ANKR&#8217; or &#8216;ANKR 20805M002&#8217;), it will
+try to match the information line provided in the <em>&#8216;TYPE 01&#8217;</em> block,
+with a flag of <em>&#8216;001&#8217;</em> and <strong>NOT</strong> <em>&#8216;003&#8217;</em>. The station matching is <strong>NOT</strong>
+performed with the column <em>&#8216;STATION NAME&#8217;</em>, but with <em>&#8216;OLD STATION NAME&#8217;</em>
+In some cases, it might be necessary to also suply the epoch for
+which the info is needed (some times the stations are renamed and
+different names are adopted previous before and after a certain
+epoch).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>station</strong> &#8211; The name of the station to match.</li>
+<li><strong>epoch</strong> &#8211; A <tt class="docutils literal"><span class="pre">datetime</span></tt> object, epoch for which the info is
+wanted.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The <em>&#8216;TYPE 01&#8217;</em> block record for this station (for
+this epoch).</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt><em>TODO</em> <span class="classifier-delimiter">:</span> <span class="classifier">If a renaming line (flag 003) is encountered it is skipped.</span></dt>
+<dd>What should i do with this line ??</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.stafile.findStationType02">
+<tt class="descname">findStationType02</tt><big>(</big><em>station</em>, <em>epoch=None</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile.findStationType02"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile.findStationType02" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will search for station info recorded in <em>&#8216;TYPE 002&#8217;</em>
+and return it.
+The station name provided, will be resolved using the <em>&#8216;TYPE 001&#8217;</em>
+block using the function <tt class="docutils literal"><span class="pre">findStationType01</span></tt>. Hence, the name used to
+match info in the <em>&#8216;TYPE 002&#8217;</em> block will be the column <em>&#8216;STATION NAME&#8217;</em>
+E.g., given station name &#8216;ANKR&#8217; and using the CODE.STA file, we
+will get the name &#8216;ANKR 20805M002&#8217; and we will search the block
+&#8216;TYPE 002&#8217; for this name. Note that in case of renaming, a specific
+date may be needed (see <tt class="docutils literal"><span class="pre">findStationType01</span></tt>).
+If no date is provided, all entried for the station will be matched
+and returned; else, only the one withing the specified interval
+will be returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>station</strong> &#8211; The name of the station to match.</li>
+<li><strong>epoch</strong> &#8211; A <tt class="docutils literal"><span class="pre">datetime</span></tt> object, epoch for which the info is
+wanted.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list of <em>&#8216;TYPE 02&#8217;</em> block records for this station
+(for this epoch).</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.stafile.findTypeStart">
+<tt class="descname">findTypeStart</tt><big>(</big><em>stream</em>, <em>type</em>, <em>max_lines=1000</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile.findTypeStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile.findTypeStart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a (sta) input file stream, go to the line where a specific
+type starts. E.g. if the type specified is <em>&#8216;1&#8217;</em>, then this function
+will search for the line: <em>&#8216;TYPE 001: RENAMING OF STATIONS&#8217;</em>.
+The line to search for, is compiled using the <tt class="docutils literal"><span class="pre">type</span></tt> and the 
+<tt class="docutils literal"><span class="pre">__type_names</span></tt> dictionary. If the line is not found after 
+<tt class="docutils literal"><span class="pre">max_lines</span></tt> are read, then an exception is thrown.
+In case of sucess, the (header) line is returned, and the stream
+buffer is placed at the end of the header line.
+Note that the <tt class="docutils literal"><span class="pre">type</span></tt> parameter must be a positive integer in the
+range <tt class="docutils literal"><span class="pre">[1,</span> <span class="pre">len(___type_names)]</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stream</strong> &#8211; The input stream for this istance.</li>
+<li><strong>type</strong> &#8211; The number of type to search for.</li>
+<li><strong>max_lines</strong> &#8211; Max lines to read before quiting.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">On sucess, the matched line; the input stream is 
+left at the end of the matched line.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.stafile.getStationAntenna">
+<tt class="descname">getStationAntenna</tt><big>(</big><em>station</em>, <em>epoch=None</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile.getStationAntenna"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile.getStationAntenna" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find and return the antenna type, as recorded in the <em>&#8216;TYPE 002&#8217;</em>
+block</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.stafile.getStationName">
+<tt class="descname">getStationName</tt><big>(</big><em>station</em>, <em>epoch=None</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile.getStationName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile.getStationName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find and return the station name, as recorded in the <em>&#8216;TYPE 001&#8217;</em>
+block</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.stafile.getStationReceiver">
+<tt class="descname">getStationReceiver</tt><big>(</big><em>station</em>, <em>epoch=None</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile.getStationReceiver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile.getStationReceiver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find and return the receiver type, as recorded in the <em>&#8216;TYPE 002&#8217;</em>
+block</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Example usage of the class <strong>stafile</strong>, using CODE&#8217;s .STA file
+(available at &lt;<a class="reference external" href="ftp://ftp.unibe.ch/aiub/BSWUSER52/STA/CODE.STA">ftp://ftp.unibe.ch/aiub/BSWUSER52/STA/CODE.STA</a>&gt;)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">## Test Program</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">StaFile</span><span class="p">(</span><span class="s">&#39;CODE.STA&#39;</span><span class="p">)</span>
+<span class="c">## a renaming takes place, so this will fail if no epoch is given</span>
+<span class="n">ln1</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">findStationType01</span><span class="p">(</span><span class="s">&#39;S071&#39;</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2008</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">00</span><span class="p">,</span><span class="mo">00</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">ln1</span>
+<span class="c">## a renaming takes place, so this will fail if no epoch is given</span>
+<span class="n">ln1</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">findStationType01</span><span class="p">(</span><span class="s">&#39;S071&#39;</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">00</span><span class="p">,</span><span class="mo">00</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">ln1</span>
+<span class="c">## following two should be the same</span>
+<span class="n">ln1</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">findStationType01</span><span class="p">(</span><span class="s">&#39;OSN1 23904S001&#39;</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">00</span><span class="p">,</span><span class="mo">00</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">ln1</span>
+<span class="n">ln1</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">findStationType01</span><span class="p">(</span><span class="s">&#39;OSN1 23904S001&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">ln1</span>
+<span class="c">## a renaming takes place, so this will fail if no epoch is given</span>
+<span class="n">ln2</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">findStationType02</span><span class="p">(</span><span class="s">&#39;S071&#39;</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">00</span><span class="p">,</span><span class="mo">00</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">ln2</span>
+<span class="c">## return all entries, for all epochs</span>
+<span class="n">ln2</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">findStationType02</span><span class="p">(</span><span class="s">&#39;ANKR&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">ln2</span>
+<span class="c">## return entry for a specific interval</span>
+<span class="n">ln2</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">findStationType02</span><span class="p">(</span><span class="s">&#39;ANKR&#39;</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2015</span><span class="p">,</span><span class="mo">07</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">00</span><span class="p">,</span><span class="mo">00</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">ln2</span>
+<span class="k">print</span> <span class="n">x</span><span class="o">.</span><span class="n">getStationName</span><span class="p">(</span><span class="s">&#39;S071&#39;</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2008</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">00</span><span class="p">,</span><span class="mo">00</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">x</span><span class="o">.</span><span class="n">getStationName</span><span class="p">(</span><span class="s">&#39;S071&#39;</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">00</span><span class="p">,</span><span class="mo">00</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">x</span><span class="o">.</span><span class="n">getStationName</span><span class="p">(</span><span class="s">&#39;ANKR&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">x</span><span class="o">.</span><span class="n">getStationAntenna</span><span class="p">(</span><span class="s">&#39;S071&#39;</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2008</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">00</span><span class="p">,</span><span class="mo">00</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">x</span><span class="o">.</span><span class="n">getStationAntenna</span><span class="p">(</span><span class="s">&#39;S071&#39;</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">00</span><span class="p">,</span><span class="mo">00</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">x</span><span class="o">.</span><span class="n">getStationAntenna</span><span class="p">(</span><span class="s">&#39;ANKR&#39;</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">00</span><span class="p">,</span><span class="mo">00</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">x</span><span class="o">.</span><span class="n">getStationReceiver</span><span class="p">(</span><span class="s">&#39;S071&#39;</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2008</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">00</span><span class="p">,</span><span class="mo">00</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">x</span><span class="o">.</span><span class="n">getStationReceiver</span><span class="p">(</span><span class="s">&#39;S071&#39;</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">00</span><span class="p">,</span><span class="mo">00</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">x</span><span class="o">.</span><span class="n">getStationReceiver</span><span class="p">(</span><span class="s">&#39;ANKR&#39;</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">00</span><span class="p">,</span><span class="mo">00</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Module : bsta</a><ul>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="bgps.html"
+                        title="previous chapter">Module : bgps</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/bsta.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="bgps.html" title="Module : bgps"
+             >previous</a> |</li>
+        <li><a href="index.html">bernutils 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, xp,da.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bamb &mdash; bernutils 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="bernutils 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">bernutils 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for bamb</h1><div class="highlight"><pre>
+<span class="c">#! /usr/bin/python</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">amb_method</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;Code-Based Widelane&#39;</span><span class="p">:</span> <span class="s">&#39;#AR_WL&#39;</span><span class="p">,</span>
+    <span class="s">&#39;Code-Based Narrowlane&#39;</span><span class="p">:</span> <span class="s">&#39;#AR_NL&#39;</span><span class="p">,</span>
+    <span class="s">&#39;Phase-Based Widelane&#39;</span><span class="p">:</span> <span class="s">&#39;#AR_L5&#39;</span><span class="p">,</span>
+    <span class="s">&#39;Phase-Based Narrowlane&#39;</span><span class="p">:</span> <span class="s">&#39;#AR_L3&#39;</span><span class="p">,</span>
+    <span class="s">&#39;Quasi-Ionosphere-Free&#39;</span><span class="p">:</span> <span class="s">&#39;#AR_QIF&#39;</span><span class="p">,</span>
+    <span class="s">&#39;Direct L1/L2&#39;</span><span class="p">:</span> <span class="s">&#39;#AR_L12&#39;</span>
+<span class="p">}</span>
+<span class="sd">&#39;&#39;&#39; Ambiguity resolution methods and their id-codes </span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="n">amb_keys</span>   <span class="o">=</span> <span class="p">{</span><span class="s">&#39;cbwl&#39;</span><span class="p">:</span> <span class="s">&#39;Code-Based Widelane&#39;</span><span class="p">,</span>
+    <span class="s">&#39;cbnl&#39;</span><span class="p">:</span> <span class="s">&#39;Code-Based Narrowlane&#39;</span><span class="p">,</span>
+    <span class="s">&#39;pbwl&#39;</span><span class="p">:</span> <span class="s">&#39;Phase-Based Widelane&#39;</span><span class="p">,</span>
+    <span class="s">&#39;pbnl&#39;</span><span class="p">:</span> <span class="s">&#39;Phase-Based Narrowlane&#39;</span><span class="p">,</span>
+    <span class="s">&#39;qif&#39;</span><span class="p">:</span> <span class="s">&#39;Quasi-Ionosphere-Free&#39;</span><span class="p">,</span>
+    <span class="s">&#39;l12&#39;</span><span class="p">:</span> <span class="s">&#39;Direct L1/L2&#39;</span>
+<span class="p">}</span>
+<span class="sd">&#39;&#39;&#39; Ambiguity resolution method short names (id&#39;s) &#39;&#39;&#39;</span>
+
+<span class="n">satsys</span>     <span class="o">=</span> <span class="p">{</span><span class="s">&#39;G&#39;</span><span class="p">:</span> <span class="s">&#39;GPS&#39;</span><span class="p">,</span> <span class="s">&#39;R&#39;</span><span class="p">:</span> <span class="s">&#39;GLONASS&#39;</span><span class="p">,</span> <span class="s">&#39;GR&#39;</span><span class="p">:</span> <span class="s">&#39;MIXED&#39;</span><span class="p">}</span>
+<span class="sd">&#39;&#39;&#39; Satellite System id-names </span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="n">amb_lcs</span>   <span class="o">=</span> <span class="p">{</span><span class="s">&#39;cbwl&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;cbnl&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;pbwl&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;pbnl&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;qif&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&#39;l12&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+<span class="sd">&#39;&#39;&#39; Number of LC&#39;s for every method (i.e. columns of type: Max/RMS L5&#39; </span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="k">def</span> <span class="nf">satsys2key</span><span class="p">(</span><span class="n">ss</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Match a satellite system name (e.g. &#39;gps&#39;) to its identifier (e.g. &#39;G&#39;)</span>
+<span class="sd">        This does the opposite of the dictionary :py:data:`satsys`. E.g. </span>
+<span class="sd">        ``satsys[&#39;G&#39;] = &#39;GPS&#39;`` and ``satsys2key(&#39;gps&#39;) = &#39;G&#39;``. The argument</span>
+<span class="sd">        ``ss`` can be in lower or uppercase (i.e. ``satsys2key(&#39;gps&#39;) = </span>
+<span class="sd">        satsys2key(&#39;GPS&#39;)``).</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">ss</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ss</span> <span class="o">==</span> <span class="s">&#39;GPS&#39;</span> <span class="ow">or</span> <span class="n">ss</span> <span class="o">==</span> <span class="s">&#39;gps&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#39;G&#39;</span>
+    <span class="k">elif</span> <span class="n">ss</span> <span class="o">==</span> <span class="s">&#39;GLONASS&#39;</span> <span class="ow">or</span> <span class="n">ss</span> <span class="o">==</span> <span class="s">&#39;glonass&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#39;R&#39;</span>
+    <span class="k">elif</span> <span class="n">ss</span> <span class="o">==</span> <span class="s">&#39;MIXED&#39;</span> <span class="ow">or</span> <span class="n">ss</span> <span class="o">==</span> <span class="s">&#39;mixed&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#39;GR&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid satellite system string: &#39;</span><span class="o">+</span><span class="n">ss</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">ambstr2key</span><span class="p">(</span><span class="n">ambs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Match an ambiguity method string id (e.g. &#39;#AR_QIF&#39;) to a method id</span>
+<span class="sd">        (e.g. &#39;qif&#39;). The method string (i.e argument ``ambs``) should be passed</span>
+<span class="sd">        as recorded in an ambiguity summary file. The output string, can then</span>
+<span class="sd">        be used as a key value in the :py:data:`amb_keys` and later in the </span>
+<span class="sd">        :py:data:`amb_method` dictionary.</span>
+<span class="sd">        ``ambstr2key(&#39;#AR_QIF&#39;) = &#39;qif&#39;``</span>
+<span class="sd">        ``amb_keys[ambstr2key(&#39;#AR_QIF&#39;)] = &#39;Quasi-Ionosphere-Free&#39;``</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">ambs</span> <span class="o">=</span> <span class="n">ambs</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ambs</span> <span class="o">==</span> <span class="s">&#39;#AR_WL&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="s">&#39;cbwl&#39;</span>
+    <span class="k">elif</span> <span class="n">ambs</span> <span class="o">==</span> <span class="s">&#39;#AR_NL&#39;</span> <span class="p">:</span> <span class="k">return</span> <span class="s">&#39;cbnl&#39;</span>
+    <span class="k">elif</span> <span class="n">ambs</span> <span class="o">==</span> <span class="s">&#39;#AR_L5&#39;</span> <span class="p">:</span> <span class="k">return</span> <span class="s">&#39;pbwl&#39;</span>
+    <span class="k">elif</span> <span class="n">ambs</span> <span class="o">==</span> <span class="s">&#39;#AR_L3&#39;</span> <span class="p">:</span> <span class="k">return</span> <span class="s">&#39;pbnl&#39;</span>
+    <span class="k">elif</span> <span class="n">ambs</span> <span class="o">==</span> <span class="s">&#39;#AR_QIF&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="s">&#39;qif&#39;</span>
+    <span class="k">elif</span> <span class="n">ambs</span> <span class="o">==</span> <span class="s">&#39;#AR_L12&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="s">&#39;l12&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid ambiguity method string: &#39;</span><span class="o">+</span><span class="n">ambs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ambline"><a class="viewcode-back" href="../bamb.html#bamb.ambline">[docs]</a><span class="k">class</span> <span class="nc">ambline</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39; Class to hold an ambiguity record line for a specific baseline, as</span>
+<span class="sd">        described in an ambiguity summary file.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">__line</span>      <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">__lns</span>       <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">__method</span>    <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">__amb_key</span>   <span class="o">=</span> <span class="s">&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">line</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Constructor; the input record line ``line`` is examined to check</span>
+<span class="sd">            the resolution method, using the last column (field)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__line</span> <span class="o">=</span> <span class="n">line</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__lns</span>  <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ambkey</span>           <span class="o">=</span> <span class="n">ambstr2key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lns</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lns</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="c">## e.g. &#39;qif&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__method</span>    <span class="o">=</span> <span class="n">amb_keys</span><span class="p">[</span><span class="n">ambkey</span><span class="p">]</span> <span class="c">## e.g. &#39;Quasi-Ionosphere-Free&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__amb_key</span>   <span class="o">=</span> <span class="n">ambkey</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span>
+
+<div class="viewcode-block" id="ambline.baseline"><a class="viewcode-back" href="../bamb.html#bamb.ambline.baseline">[docs]</a>    <span class="k">def</span> <span class="nf">baseline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return the baseline name. &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lns</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="ambline.sta1"><a class="viewcode-back" href="../bamb.html#bamb.ambline.sta1">[docs]</a>    <span class="k">def</span> <span class="nf">sta1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return the first (base) station. &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="ambline.sta2"><a class="viewcode-back" href="../bamb.html#bamb.ambline.sta2">[docs]</a>    <span class="k">def</span> <span class="nf">sta2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return the second (rover) station name. &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lns</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="ambline.length"><a class="viewcode-back" href="../bamb.html#bamb.ambline.length">[docs]</a>    <span class="k">def</span> <span class="nf">length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return the baseline length in km. &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lns</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="ambline.method"><a class="viewcode-back" href="../bamb.html#bamb.ambline.method">[docs]</a>    <span class="k">def</span> <span class="nf">method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return the resolution method, as a method id (e.g. &#39;qif&#39;). &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__amb_key</span>
+</div>
+<div class="viewcode-block" id="ambline.ambsbefore"><a class="viewcode-back" href="../bamb.html#bamb.ambline.ambsbefore">[docs]</a>    <span class="k">def</span> <span class="nf">ambsbefore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Number of ambiguities before the resolution and mm. &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lns</span><span class="p">[</span><span class="mi">4</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lns</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="ambline.ambsafter"><a class="viewcode-back" href="../bamb.html#bamb.ambline.ambsafter">[docs]</a>    <span class="k">def</span> <span class="nf">ambsafter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Number of ambiguities after the resolution and mm. &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lns</span><span class="p">[</span><span class="mi">6</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lns</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="ambline.percent"><a class="viewcode-back" href="../bamb.html#bamb.ambline.percent">[docs]</a>    <span class="k">def</span> <span class="nf">percent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return the percentage of resolved ambiguities. &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lns</span><span class="p">[</span><span class="mi">8</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="ambline.satsys"><a class="viewcode-back" href="../bamb.html#bamb.ambline.satsys">[docs]</a>    <span class="k">def</span> <span class="nf">satsys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return the satellite system as string (e.g. &#39;GPS&#39;). &#39;&#39;&#39;</span>
+        <span class="n">sys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lns</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">satsys</span><span class="p">[</span><span class="n">sys</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid satellite system string: &#39;</span><span class="o">+</span><span class="n">sys</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="ambfile"><a class="viewcode-back" href="../bamb.html#bamb.ambfile">[docs]</a><span class="k">class</span> <span class="nc">ambfile</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39; A class to hold a Bernese ambiguity summary file (.SUM)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">__filename</span>   <span class="o">=</span> <span class="s">&#39;&#39;</span> <span class="c">#: The filename</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Initialize a sta object given its filename;</span>
+<span class="sd">            try locating the file</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;No such file &#39;</span><span class="o">+</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__filename</span> <span class="o">=</span> <span class="n">filename</span>
+
+<div class="viewcode-block" id="ambfile.collectBsls"><a class="viewcode-back" href="../bamb.html#bamb.ambfile.collectBsls">[docs]</a>    <span class="k">def</span> <span class="nf">collectBsls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">method</span><span class="p">,</span><span class="n">satsys</span><span class="o">=</span><span class="s">&#39;MIXED&#39;</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Collect the baseline records resolved using a given resolution </span>
+<span class="sd">            method (i.e. ``method``) with observations of a given satellite</span>
+<span class="sd">            system (``satsys``). The baseline records are collected as </span>
+<span class="sd">            **RAW lines** and returned in a list.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">## satellite system key:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sat_sys_key</span> <span class="o">=</span> <span class="n">satsys2key</span><span class="p">(</span><span class="n">satsys</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">bsls_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectMethodBsls</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span>
+
+        <span class="n">final_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">bsls_list</span><span class="p">:</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">ambline</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">j</span><span class="o">.</span><span class="n">method</span><span class="p">()</span> <span class="o">!=</span> <span class="n">method</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Something went wrong in collecting baselines! Methods dont match: &#39;</span><span class="o">+</span> <span class="n">method</span> <span class="o">+</span> <span class="s">&#39;-&#39;</span> <span class="o">+</span> <span class="n">j</span><span class="o">.</span><span class="n">method</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">j</span><span class="o">.</span><span class="n">satsys</span><span class="p">()</span> <span class="o">==</span> <span class="n">satsys</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span>
+                <span class="n">final_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">final_list</span>
+</div>
+<div class="viewcode-block" id="ambfile.collectMethodBsls"><a class="viewcode-back" href="../bamb.html#bamb.ambfile.collectMethodBsls">[docs]</a>    <span class="k">def</span> <span class="nf">collectMethodBsls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">method</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Collect the baseline records resolved using a given resolution </span>
+<span class="sd">            method (i.e. ``method``). The baseline records are collected as </span>
+<span class="sd">            **RAW lines** and returned in a list.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__filename</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">goToMethod</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span><span class="n">method</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span>
+
+        <span class="c">## skip 5 lines</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">):</span> <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="c"># read next line; if it is full of &#39;=&#39; no baselines to follow</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot collect baselines for resolution method &#39;</span><span class="o">+</span><span class="n">method</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;===&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">smeth1</span> <span class="o">=</span> <span class="n">amb_keys</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
+        <span class="n">smeth2</span> <span class="o">=</span> <span class="n">amb_method</span><span class="p">[</span><span class="n">smeth1</span><span class="p">]</span>
+
+        <span class="n">bsl_info</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">while</span> <span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()[</span><span class="o">-</span><span class="mi">7</span><span class="p">:]</span> <span class="o">!=</span> <span class="n">smeth2</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Error collecting baselines for resolution method &#39;</span><span class="o">+</span><span class="n">method</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;---&#39;</span><span class="p">:</span> <span class="c">## normal termination</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">bsl_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">bsl_info</span>
+</div>
+<div class="viewcode-block" id="ambfile.goToMethod"><a class="viewcode-back" href="../bamb.html#bamb.ambfile.goToMethod">[docs]</a>    <span class="k">def</span> <span class="nf">goToMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">istream</span><span class="p">,</span><span class="n">method</span><span class="p">,</span><span class="n">max_lines</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Position the input stream ``istream`` at the start of results</span>
+<span class="sd">            for method ``method`` (actualy at the end of the header line).</span>
+
+<span class="sd">            :note: The file will be searched starting from the current</span>
+<span class="sd">            position of the stream, and **NOT** from the begining of the</span>
+<span class="sd">            file.</span>
+
+<span class="sd">            :param istream:   The input stream (of an ambiguity summary file).</span>
+<span class="sd">            :param method:    The method to search for; This must be a valid</span>
+<span class="sd">                              string denoting a resolution method, as represented</span>
+<span class="sd">                              in the ``__amb_keys`` dictionary.</span>
+<span class="sd">            :param max_lines: Maximum number of lines to read before quiting.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">smeth1</span> <span class="o">=</span> <span class="n">amb_keys</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
+            <span class="n">smeth2</span> <span class="o">=</span> <span class="n">amb_method</span><span class="p">[</span><span class="n">smeth1</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid resolution method &#39;</span><span class="o">+</span><span class="n">method</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">smeth2</span> <span class="o">==</span> <span class="s">&#39;#AR_L12&#39;</span><span class="p">:</span>
+            <span class="nb">str</span> <span class="o">=</span> <span class="s">&#39; </span><span class="si">%s</span><span class="s"> Ambiguity Resolution (&lt;&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">smeth1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">str</span>   <span class="o">=</span> <span class="s">&#39; </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">) Ambiguity Resolution (&lt;&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">smeth1</span><span class="p">,</span><span class="n">smeth2</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;#AR_&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">))</span>
+
+        <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
+        <span class="n">line</span> <span class="o">=</span> <span class="n">istream</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">i</span>    <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">line_found</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="k">while</span> <span class="p">(</span><span class="n">line</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">max_lines</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">length</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">length</span><span class="p">]</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+                    <span class="n">line_found</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="k">break</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">istream</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">line_found</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">line</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Failed to find entry for method &#39;</span><span class="o">+</span><span class="n">smeth1</span><span class="p">)</span>
+<span class="c">#</span>
+<span class="c">## EXAMPLE USAGE</span>
+<span class="c">#x = ambfile(&#39;FFU151000_GNSS.SUM&#39;)</span>
+<span class="c">#fin = open(&#39;FFU151000_GNSS.SUM&#39;,&#39;r&#39;)</span>
+<span class="c">#print x.goToMethod(fin,&#39;l12&#39;)</span>
+<span class="c">#fin.seek(0)</span>
+<span class="c">#print x.goToMethod(fin,&#39;cbnl&#39;)</span>
+<span class="c">#fin.seek(0)</span>
+<span class="c">#print x.goToMethod(fin,&#39;pbwl&#39;)</span>
+<span class="c">#fin.seek(0)</span>
+<span class="c">#print x.goToMethod(fin,&#39;qif&#39;)</span>
+<span class="c">#print x.goToMethod(fin,&#39;lol&#39;)</span>
+<span class="c">#</span>
+<span class="c">#print x.collectMethodBsls(&#39;l12&#39;)</span>
+<span class="c">#print x.collectMethodBsls(&#39;cbnl&#39;)</span>
+<span class="c">#print x.collectMethodBsls(&#39;pbwl&#39;)</span>
+<span class="c">#print x.collectMethodBsls(&#39;qif&#39;)</span>
+<span class="c">#</span>
+<span class="c">#print x.collectBsls(&#39;l12&#39;,&#39;gps&#39;)</span>
+<span class="c">#print x.collectBsls(&#39;cbnl&#39;,&#39;glonass&#39;)</span>
+<span class="c">#print x.collectBsls(&#39;pbwl&#39;,&#39;gps&#39;)</span>
+<span class="c">#print x.collectBsls(&#39;qif&#39;)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">bernutils 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, xp,da.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

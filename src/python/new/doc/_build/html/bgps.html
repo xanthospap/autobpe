@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Module : bgps &mdash; bernutils 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="bernutils 0.1 documentation" href="index.html" />
+    <link rel="next" title="Module : bsta" href="bsta.html" />
+    <link rel="prev" title="Module : bcrd" href="bcrd.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="bsta.html" title="Module : bsta"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="bcrd.html" title="Module : bcrd"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">bernutils 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-bgps">
+<h1>Module : bgps<a class="headerlink" href="#module-bgps" title="Permalink to this headline">¶</a></h1>
+<p>This module contains the class <strong>gpsoutfile</strong> which represents a Bernese v5.2
+GPSEST output file.</p>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="bgps.gpsoutfile">
+<em class="property">class </em><tt class="descclassname">bgps.</tt><tt class="descname">gpsoutfile</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/bgps.html#gpsoutfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bgps.gpsoutfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to hold a Bernese v5.2 GPSEST output file</p>
+<dl class="method">
+<dt id="bgps.gpsoutfile.findFirstLine">
+<tt class="descname">findFirstLine</tt><big>(</big><em>stream</em>, <em>line</em>, <em>eof_line='&gt;&gt;&gt;'</em>, <em>max_lines=1000</em><big>)</big><a class="reference internal" href="_modules/bgps.html#gpsoutfile.findFirstLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bgps.gpsoutfile.findFirstLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a GPSEST output file, try to match the line passed as
+<tt class="docutils literal"><span class="pre">line</span></tt>, until <tt class="docutils literal"><span class="pre">eof_line</span></tt> is not matched and no more than
+<tt class="docutils literal"><span class="pre">max_lines</span></tt> are read.
+If the line is found, the stream input position, will be returned
+at the end of the matched line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stream</strong> &#8211; The (calling) instance&#8217;s input stream.</li>
+<li><strong>line</strong> &#8211; The prototype line to match.</li>
+<li><strong>eof_line</strong> &#8211; EOF record.</li>
+<li><strong>max_lines</strong> &#8211; Max lines to be read befor quiting.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">On success, the matched line; input buffer is set
+at the end of the matched line.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Warning:</th><td class="field-body"><p class="first last">Note that the search will start from the current get 
+position of the stream and <em>NOT</em> from the begining of 
+the file.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bgps.gpsoutfile.getBaselineList">
+<tt class="descname">getBaselineList</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bgps.html#gpsoutfile.getBaselineList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bgps.gpsoutfile.getBaselineList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will try to read all baselines processed in the run, 
+and report their information. The baselines are read from the 
+section:
+<em>2. OBSERVATION FILES, MAIN CHARACTERISTICS</em>
+Two tables are read, namely:
+[FILE  OBSERVATION FILE HEADER          OBSERVATION FILE                  SESS     RECEIVER 1            RECEIVER 2]
+and
+[FILE TYP FREQ.  STATION 1        STATION 2        SESS  FIRST OBSERV.TIME  #EPO  DT #EF #CLK ARC #SAT  W 12    #AMB  L1  L2  L5  RM]
+and the concatenated list is returned, i.e.:
+[aa, baseline_name, type, frequency, station1, station2, first_observation, # of epochs]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bgps.gpsoutfile.getCrdSolInfo">
+<tt class="descname">getCrdSolInfo</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bgps.html#gpsoutfile.getCrdSolInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bgps.gpsoutfile.getCrdSolInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a GPSEST output file, this function will try to read information regarding the
+(solution) coordinate results. The information is collected from the table:
+&#8216;NUM  STATION NAME     PARAMETER    A PRIORI VALUE       NEW VALUE     NEW- A PRIORI  RMS ERROR   3-D ELLIPSOID       2-D ELLIPSE&#8217;
+for every stations already mentioned in the instances station list. So make sure,
+the instances station list is already filled. The return list, contains
+a list for every station, in the following format:
+[name,3x(a-priori,estimated,new-old,rms),3x(new-old,rms)]
+for   X, Y, Z                            HGT, LAT, LON
+TODO A same block of information maybe available in the section &#8216;RESULTS PART 2&#8217;. Try reading that
+before reading the blok from &#8216;RESULTS PART 1&#8217;.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bgps.gpsoutfile.getHeaderInfo">
+<tt class="descname">getHeaderInfo</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bgps.html#gpsoutfile.getHeaderInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bgps.gpsoutfile.getHeaderInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a GPSEST output file, try to read the header
+information and return in in a list as:
+campaign_name, doy, session, year, date_run, username, # of stations</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Module : bgps</a><ul>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="bcrd.html"
+                        title="previous chapter">Module : bcrd</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="bsta.html"
+                        title="next chapter">Module : bsta</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/bgps.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="bsta.html" title="Module : bsta"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="bcrd.html" title="Module : bcrd"
+             >previous</a> |</li>
+        <li><a href="index.html">bernutils 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, xp,da.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
