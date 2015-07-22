@@ -24,6 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="bernutils 0.1 documentation" href="index.html" />
+    <link rel="next" title="Module : bamb" href="bamb.html" />
     <link rel="prev" title="Module : bgps" href="bgps.html" /> 
   </head>
   <body>
@@ -33,6 +34,12 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="bamb.html" title="Module : bamb"
+             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="bgps.html" title="Module : bgps"
              accesskey="P">previous</a> |</li>
@@ -63,8 +70,30 @@ files placed there.</p>
 <dl class="class">
 <dt id="bsta.stafile">
 <em class="property">class </em><tt class="descclassname">bsta.</tt><tt class="descname">stafile</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile" title="Permalink to this definition">¶</a></dt>
-<dd><p>A station information class, to represent Bernese v5.2 format .STA 
+<dd><p>A station information file (.STA) class, to represent Bernese v5.2 format .STA 
 files.</p>
+<dl class="method">
+<dt id="bsta.stafile.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a sta object given its filename;
+try locating the file</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bsta.stafile.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'bsta'</em><a class="headerlink" href="#bsta.stafile.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bsta.stafile._stafile__filename">
+<tt class="descname">_stafile__filename</tt><em class="property"> = ''</em><a class="headerlink" href="#bsta.stafile._stafile__filename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bsta.stafile._stafile__type_names">
+<tt class="descname">_stafile__type_names</tt><em class="property"> = ['RENAMING OF STATIONS', 'STATION INFORMATION', 'HANDLING OF STATION PROBLEMS', 'STATION COORDINATES AND VELOCITIES (ADDNEQ)', 'HANDLING STATION TYPES']</em><a class="headerlink" href="#bsta.stafile._stafile__type_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="bsta.stafile.findStationType01">
 <tt class="descname">findStationType01</tt><big>(</big><em>station</em>, <em>epoch=None</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile.findStationType01"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile.findStationType01" title="Permalink to this definition">¶</a></dt>
@@ -139,10 +168,10 @@ wanted.</li>
 <dt id="bsta.stafile.findTypeStart">
 <tt class="descname">findTypeStart</tt><big>(</big><em>stream</em>, <em>type</em>, <em>max_lines=1000</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile.findTypeStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile.findTypeStart" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a (sta) input file stream, go to the line where a specific
-type starts. E.g. if the type specified is <em>&#8216;1&#8217;</em>, then this function
+type starts. E.g. if the type specified is &#8216;1&#8217; (i.e. <tt class="docutils literal"><span class="pre">type=1</span></tt>), then this function
 will search for the line: <em>&#8216;TYPE 001: RENAMING OF STATIONS&#8217;</em>.
-The line to search for, is compiled using the <tt class="docutils literal"><span class="pre">type</span></tt> and the 
-<tt class="docutils literal"><span class="pre">__type_names</span></tt> dictionary. If the line is not found after 
+The line to search for, is compiled using the parameter <tt class="docutils literal"><span class="pre">type</span></tt> and the
+<tt class="xref py py-attr docutils literal"><span class="pre">__type_names</span></tt> dictionary. If the line is not found after 
 <tt class="docutils literal"><span class="pre">max_lines</span></tt> are read, then an exception is thrown.
 In case of sucess, the (header) line is returned, and the stream
 buffer is placed at the end of the header line.
@@ -249,6 +278,9 @@ block</p>
   <h4>Previous topic</h4>
   <p class="topless"><a href="bgps.html"
                         title="previous chapter">Module : bgps</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="bamb.html"
+                        title="next chapter">Module : bamb</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/bsta.txt"
@@ -277,6 +309,12 @@ block</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="bamb.html" title="Module : bamb"
+             >next</a> |</li>
         <li class="right" >
           <a href="bgps.html" title="Module : bgps"
              >previous</a> |</li>

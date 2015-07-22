@@ -5,16 +5,18 @@ import datetime
 import re
 
 class stafile:
-    ''' A station information class, to represent Bernese v5.2 format .STA 
+    ''' A station information file (.STA) class, to represent Bernese v5.2 format .STA 
         files.
     '''
     __filename  = '' #: The filename
-    ##: a dictionary to map a type to a header
     __type_names = ['RENAMING OF STATIONS',
             'STATION INFORMATION',
             'HANDLING OF STATION PROBLEMS', 
             'STATION COORDINATES AND VELOCITIES (ADDNEQ)',
             'HANDLING STATION TYPES']
+    ''' A dictionary to map a type to a header (e.g. 'TYPE 001' is 
+        'RENAMING OF STATIONS').
+    '''
 
     def __init__(self,filename):
         ''' Initialize a sta object given its filename;
@@ -26,10 +28,10 @@ class stafile:
 
     def findTypeStart(self,stream,type,max_lines=1000):
         ''' Given a (sta) input file stream, go to the line where a specific
-            type starts. E.g. if the type specified is *'1'*, then this function
+            type starts. E.g. if the type specified is '1' (i.e. ``type=1``), then this function
             will search for the line: *'TYPE 001: RENAMING OF STATIONS'*.
-            The line to search for, is compiled using the ``type`` and the 
-            ``__type_names`` dictionary. If the line is not found after 
+            The line to search for, is compiled using the parameter ``type`` and the
+            :py:attr:`__type_names` dictionary. If the line is not found after 
             ``max_lines`` are read, then an exception is thrown.
             In case of sucess, the (header) line is returned, and the stream
             buffer is placed at the end of the header line.

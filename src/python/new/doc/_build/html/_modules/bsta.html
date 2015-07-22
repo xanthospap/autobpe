@@ -54,31 +54,33 @@
 <span class="kn">import</span> <span class="nn">re</span>
 
 <div class="viewcode-block" id="stafile"><a class="viewcode-back" href="../bsta.html#bsta.stafile">[docs]</a><span class="k">class</span> <span class="nc">stafile</span><span class="p">:</span>
-    <span class="sd">&#39;&#39;&#39; A station information class, to represent Bernese v5.2 format .STA </span>
+    <span class="sd">&#39;&#39;&#39; A station information file (.STA) class, to represent Bernese v5.2 format .STA </span>
 <span class="sd">        files.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">__filename</span>  <span class="o">=</span> <span class="s">&#39;&#39;</span> <span class="c">#: The filename</span>
-    <span class="c">##: a dictionary to map a type to a header</span>
     <span class="n">__type_names</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;RENAMING OF STATIONS&#39;</span><span class="p">,</span>
             <span class="s">&#39;STATION INFORMATION&#39;</span><span class="p">,</span>
             <span class="s">&#39;HANDLING OF STATION PROBLEMS&#39;</span><span class="p">,</span> 
             <span class="s">&#39;STATION COORDINATES AND VELOCITIES (ADDNEQ)&#39;</span><span class="p">,</span>
             <span class="s">&#39;HANDLING STATION TYPES&#39;</span><span class="p">]</span>
+    <span class="sd">&#39;&#39;&#39; A dictionary to map a type to a header (e.g. &#39;TYPE 001&#39; is </span>
+<span class="sd">        &#39;RENAMING OF STATIONS&#39;).</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="stafile.__init__"><a class="viewcode-back" href="../bsta.html#bsta.stafile.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Initialize a sta object given its filename;</span>
 <span class="sd">            try locating the file</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;No such file &#39;</span><span class="o">+</span><span class="n">filename</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__filename</span> <span class="o">=</span> <span class="n">filename</span>
-
+</div>
 <div class="viewcode-block" id="stafile.findTypeStart"><a class="viewcode-back" href="../bsta.html#bsta.stafile.findTypeStart">[docs]</a>    <span class="k">def</span> <span class="nf">findTypeStart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">stream</span><span class="p">,</span><span class="nb">type</span><span class="p">,</span><span class="n">max_lines</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Given a (sta) input file stream, go to the line where a specific</span>
-<span class="sd">            type starts. E.g. if the type specified is *&#39;1&#39;*, then this function</span>
+<span class="sd">            type starts. E.g. if the type specified is &#39;1&#39; (i.e. ``type=1``), then this function</span>
 <span class="sd">            will search for the line: *&#39;TYPE 001: RENAMING OF STATIONS&#39;*.</span>
-<span class="sd">            The line to search for, is compiled using the ``type`` and the </span>
-<span class="sd">            ``__type_names`` dictionary. If the line is not found after </span>
+<span class="sd">            The line to search for, is compiled using the parameter ``type`` and the</span>
+<span class="sd">            :py:attr:`__type_names` dictionary. If the line is not found after </span>
 <span class="sd">            ``max_lines`` are read, then an exception is thrown.</span>
 <span class="sd">            In case of sucess, the (header) line is returned, and the stream</span>
 <span class="sd">            buffer is placed at the end of the header line.</span>

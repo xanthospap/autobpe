@@ -24,6 +24,8 @@ Documentation
 
 .. autoclass:: stafile
    :members:
+   :private-members:
+   :special-members:
    :undoc-members:
 
 -----------------------------
