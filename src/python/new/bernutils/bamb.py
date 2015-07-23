@@ -9,7 +9,7 @@ amb_method = {'Code-Based Widelane': '#AR_WL',
     'Quasi-Ionosphere-Free': '#AR_QIF',
     'Direct L1/L2': '#AR_L12'
 }
-''' Ambiguity resolution methods and their id-codes 
+''' Ambiguity resolution methods and their id-codes.
 '''
 
 amb_keys   = {'cbwl': 'Code-Based Widelane',
@@ -19,14 +19,15 @@ amb_keys   = {'cbwl': 'Code-Based Widelane',
     'qif': 'Quasi-Ionosphere-Free',
     'l12': 'Direct L1/L2'
 }
-''' Ambiguity resolution method short names (id's) '''
+''' Ambiguity resolution method short names (id's).
+'''
 
 satsys     = {'G': 'GPS', 'R': 'GLONASS', 'GR': 'MIXED'}
-''' Satellite System id-names 
+''' Satellite System id-names.
 '''
 
 amb_lcs   = {'cbwl': 1, 'cbnl': 1, 'pbwl': 1, 'pbnl': 1, 'qif': 2, 'l12': 1}
-''' Number of LC's for every method (i.e. columns of type: Max/RMS L5' 
+''' Number of LC's for every method (i.e. columns of type: Max/RMS L5').
 '''
 
 def satsys2key(ss):
@@ -69,17 +70,15 @@ class ambline:
     ''' Class to hold an ambiguity record line for a specific baseline, as
         described in an ambiguity summary file.
     '''
-    __line      = ''
-    __lns       = []
-    __method    = ''
-    __amb_key   = ''
 
     def __init__(self,line):
         ''' Constructor; the input record line ``line`` is examined to check
             the resolution method, using the last column (field)
         '''
-        self.__line = line
-        self.__lns  = line.split()
+        self.__line    = line
+        self.__lns     = line.split()
+        self.__method  = ''
+        self.__amb_key = ''
         try:
             ambkey           = ambstr2key(self.__lns[len(self.__lns)-1]) ## e.g. 'qif'
             self.__method    = amb_keys[ambkey] ## e.g. 'Quasi-Ionosphere-Free'
@@ -130,15 +129,14 @@ class ambline:
 class ambfile:
     ''' A class to hold a Bernese ambiguity summary file (.SUM)
     '''
-    __filename   = '' #: The filename
 
     def __init__(self,filename):
         ''' Initialize a sta object given its filename;
             try locating the file
         '''
-        if not os.path.isfile(filename):
-            raise IOError('No such file '+filename)
         self.__filename = filename
+        if not os.path.isfile(self.__ilename):
+            raise IOError('No such file '+filename)
 
     def collectBsls(self,method,satsys='MIXED'):
         ''' Collect the baseline records resolved using a given resolution 

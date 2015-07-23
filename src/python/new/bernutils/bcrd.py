@@ -48,18 +48,13 @@ class crdpoint:
     """ Class to represent a (GNSS/geodetic) Point as recorded in a Bernese
         format .CRD file.
     """
-    name_   = ''    #: Station name (4-digit); e.g. 'ANKR'
-    number_ = ''    #: Station number; e.g. '20805M002'
-    xcmp_   = .0    #: x-component
-    ycmp_   = .0    #: y-component
-    zcmp_   = .0    #: z-component
-    flag_   = ''    #: flag
 
     def __init__(self,name='',number='',xcmp='.0',ycmp='.0',zcmp='.0',flag=''):
         """ Constructor; all initialized to empty strings and/or .0 
         """
-        self.name_   = name
-        self.number_ = number
+        self.name_   = name   #: Station name (4-digit); e.g. 'ANKR'
+        self.number_ = number #: Station number; e.g. '20805M002'
+        self.flag_   = flag   #: flag
         try:
             self.xcmp_ = float(xcmp)
             self.ycmp_ = float(ycmp)
@@ -67,7 +62,6 @@ class crdpoint:
         except:
             raise ArithmeticError('Invalid initilization of CrdPoint')
             self.xcmp_ = self.ycmp_ = self.zcmp_ = .0
-        self.flag_ = flag
 
     def setFromCrdLine(self,line):
         """ Set (re-initialize) a crdpoint from a .CRD data line. Bernese v5.2
@@ -136,13 +130,12 @@ class crdpoint:
 
 class crdfile:
     """ A class to hold a Bernese v5.2 format .CRD file. """
-    filename_ = '' #: the name of the file
     
     def __init__(self,filename):
-        """ Contructor; checks whether the file exists or not """
-        if not os.path.isfile(filename):
-            raise Exception('Invalid initilization of .CRD file' + filename)
         self.filename_ = filename
+        """ Contructor; checks whether the file exists or not """
+        if not os.path.isfile(self.filename_):
+            raise Exception('Invalid initilization of .CRD file' + filename)
 
     def getListOfPoints(self,stalst=None,disregard_number=False):
         ''' Read points off from a .CRD file; return all points as list.

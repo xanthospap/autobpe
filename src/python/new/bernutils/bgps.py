@@ -4,19 +4,18 @@ import os
 
 class gpsoutfile:
     ''' A class to hold a Bernese v5.2 GPSEST output file '''
-    __filename  = ''  #: The filename of the output file
-    __program   = ''  #: The program that created (this) file
-    __campaign  = ''  #: Name of the campaign
-    __doy       = ''  #: Day Of Year (processed)
-    __ses       = ''  #: Session (processed)
-    __yr        = ''  #: Year (processed)
-    __stations  = []  #: List of stations included in the processing/output file
 
     def __init__(self,filename):
         ''' Constructor; check for file existance '''
-        if not os.path.isfile(filename):
+        self.__filename  = filename  #: The filename of the output file
+        self.__program   = ''  #: The program that created (this) file
+        self.__campaign  = ''  #: Name of the campaign
+        self.__doy       = ''  #: Day Of Year (processed)
+        self.__ses       = ''  #: Session (processed)
+        self.__yr        = ''  #: Year (processed)
+        self.__stations  = []  #: List of stations included in the processing/output file
+        if not os.path.isfile(self.__filename):
             raise IOError('No such file '+filename)
-        self.__filename = filename
 
     def findFirstLine(self,stream,line,eof_line='>>>',max_lines=1000):
         ''' Given a GPSEST output file, try to match the line passed as
