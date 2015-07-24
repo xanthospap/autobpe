@@ -6,6 +6,16 @@ import bernutils.bsta
 ## Test Program
 x = bernutils.bsta.stafile('CODE.STA')
 
+recs = x.fillStaRec('S071')
+print 'type001'
+for i in recs.type1List():
+    print i.line()
+
+recs = x.fillStaRec2('S071',recs)
+for i in recs.type2List():
+    print i.line()
+
+'''
 ## a renaming takes place, so this will fail if no epoch is given
 ln1 = x.findStationType01('S071',datetime.datetime(2008,01,01,01,00,00))
 print ln1
@@ -43,3 +53,4 @@ print x.getStationAntenna('ANKR',datetime.datetime(2005,01,01,01,00,00))
 print x.getStationReceiver('S071',datetime.datetime(2008,01,01,01,00,00))
 print x.getStationReceiver('S071',datetime.datetime(2005,01,01,01,00,00))
 print x.getStationReceiver('ANKR',datetime.datetime(2005,01,01,01,00,00))
+'''

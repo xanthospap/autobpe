@@ -22,7 +22,13 @@ Documentation
 
 .. currentmodule:: bsta
 
-.. autoclass:: stafile
+.. autoclass:: bsta.starec
+   :members:
+   :private-members:
+   :special-members:
+   :undoc-members:
+
+.. autoclass:: bsta.stafile
    :members:
    :private-members:
    :special-members:

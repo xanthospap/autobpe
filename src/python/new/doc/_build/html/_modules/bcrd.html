@@ -97,18 +97,13 @@
     <span class="sd">&quot;&quot;&quot; Class to represent a (GNSS/geodetic) Point as recorded in a Bernese</span>
 <span class="sd">        format .CRD file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">name_</span>   <span class="o">=</span> <span class="s">&#39;&#39;</span>    <span class="c">#: Station name (4-digit); e.g. &#39;ANKR&#39;</span>
-    <span class="n">number_</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>    <span class="c">#: Station number; e.g. &#39;20805M002&#39;</span>
-    <span class="n">xcmp_</span>   <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>    <span class="c">#: x-component</span>
-    <span class="n">ycmp_</span>   <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>    <span class="c">#: y-component</span>
-    <span class="n">zcmp_</span>   <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>    <span class="c">#: z-component</span>
-    <span class="n">flag_</span>   <span class="o">=</span> <span class="s">&#39;&#39;</span>    <span class="c">#: flag</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="n">number</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="n">xcmp</span><span class="o">=</span><span class="s">&#39;.0&#39;</span><span class="p">,</span><span class="n">ycmp</span><span class="o">=</span><span class="s">&#39;.0&#39;</span><span class="p">,</span><span class="n">zcmp</span><span class="o">=</span><span class="s">&#39;.0&#39;</span><span class="p">,</span><span class="n">flag</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Constructor; all initialized to empty strings and/or .0 </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name_</span>   <span class="o">=</span> <span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">number_</span> <span class="o">=</span> <span class="n">number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name_</span>   <span class="o">=</span> <span class="n">name</span>   <span class="c">#: Station name (4-digit); e.g. &#39;ANKR&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_</span> <span class="o">=</span> <span class="n">number</span> <span class="c">#: Station number; e.g. &#39;20805M002&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flag_</span>   <span class="o">=</span> <span class="n">flag</span>   <span class="c">#: flag</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">xcmp_</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xcmp</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ycmp_</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ycmp</span><span class="p">)</span>
@@ -116,7 +111,6 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ArithmeticError</span><span class="p">(</span><span class="s">&#39;Invalid initilization of CrdPoint&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">xcmp_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ycmp_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zcmp_</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">flag_</span> <span class="o">=</span> <span class="n">flag</span>
 
 <div class="viewcode-block" id="crdpoint.setFromCrdLine"><a class="viewcode-back" href="../bcrd.html#bcrd.crdpoint.setFromCrdLine">[docs]</a>    <span class="k">def</span> <span class="nf">setFromCrdLine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">line</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set (re-initialize) a crdpoint from a .CRD data line. Bernese v5.2</span>
@@ -185,13 +179,12 @@
 </div></div>
 <div class="viewcode-block" id="crdfile"><a class="viewcode-back" href="../bcrd.html#bcrd.crdfile">[docs]</a><span class="k">class</span> <span class="nc">crdfile</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot; A class to hold a Bernese v5.2 format .CRD file. &quot;&quot;&quot;</span>
-    <span class="n">filename_</span> <span class="o">=</span> <span class="s">&#39;&#39;</span> <span class="c">#: the name of the file</span>
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Contructor; checks whether the file exists or not &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Invalid initilization of .CRD file&#39;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filename_</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="sd">&quot;&quot;&quot; Contructor; checks whether the file exists or not &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename_</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Invalid initilization of .CRD file&#39;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">)</span>
 
 <div class="viewcode-block" id="crdfile.getListOfPoints"><a class="viewcode-back" href="../bcrd.html#bcrd.crdfile.getListOfPoints">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfPoints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">stalst</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">disregard_number</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Read points off from a .CRD file; return all points as list.</span>

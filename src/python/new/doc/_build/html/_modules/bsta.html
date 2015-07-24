@@ -53,29 +53,197 @@
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">re</span>
 
+<div class="viewcode-block" id="starec"><a class="viewcode-back" href="../bsta.html#bsta.starec">[docs]</a><span class="k">class</span> <span class="nc">starec</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39; A class to hold station information records for a single station.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">min_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">1900</span><span class="p">,</span><span class="mo">01</span><span class="p">,</span><span class="mo">01</span><span class="p">)</span> 
+    <span class="sd">&#39;&#39;&#39; Minimum date (i.e. for records that do not have one)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="starec.__init__"><a class="viewcode-back" href="../bsta.html#bsta.starec.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">name</span>     <span class="c">#: name as in &#39;OLD NAME&#39; column</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__type1_recs</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#: list of type 001 info (i.e. :py:class:`starec.type001`)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__type2_recs</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#: list of type 002 info (i.e. :py:class:`starec.type002`)</span>
+</div>
+<div class="viewcode-block" id="starec.appendtype1"><a class="viewcode-back" href="../bsta.html#bsta.starec.appendtype1">[docs]</a>    <span class="k">def</span> <span class="nf">appendtype1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">typ1</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Add a :py:class:`starec.type001` record; the new element is added</span>
+<span class="sd">            in ascending chronological order.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">## keep this list sorted !!</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__type1_recs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__type1_recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">typ1</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">typ1</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type1_recs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__type1_recs</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">typ1</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__type1_recs</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="n">typ</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">obj</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span> <span class="ow">and</span> <span class="n">typ</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type1_recs</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">():</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__type1_recs</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="n">typ1</span><span class="p">)</span>
+                        <span class="k">return</span>
+                <span class="k">if</span> <span class="n">typ1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type1_recs</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__type1_recs</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">stop</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__type1_recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">typ1</span><span class="p">)</span>
+                    <span class="k">return</span>
+        <span class="c"># should have never reached this point ...</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Duplicate or erroneous record&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="starec.appendtype2"><a class="viewcode-back" href="../bsta.html#bsta.starec.appendtype2">[docs]</a>    <span class="k">def</span> <span class="nf">appendtype2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">typ2</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Add a :py:class:`starec.type002` record; the new element is added</span>
+<span class="sd">            in ascending chronological order.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">## keep this list sorted !!</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__type2_recs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__type2_recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">typ2</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">typ2</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type2_recs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__type2_recs</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">typ2</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__type2_recs</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="n">typ</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">obj</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span> <span class="ow">and</span> <span class="n">typ</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type2_recs</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">():</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__type2_recs</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="n">typ2</span><span class="p">)</span>
+                        <span class="k">return</span>
+                <span class="k">if</span> <span class="n">typ2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type2_recs</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__type2_recs</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">stop</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__type2_recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">typ2</span><span class="p">)</span>
+                    <span class="k">return</span>
+        <span class="c"># should have never reached this point ...</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Duplicate or erroneous record&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="starec.type1List"><a class="viewcode-back" href="../bsta.html#bsta.starec.type1List">[docs]</a>    <span class="k">def</span> <span class="nf">type1List</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return the list of type 001 information (i.e. the list of </span>
+<span class="sd">            :py:class:`starec.type001` instances).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type1_recs</span>
+</div>
+<div class="viewcode-block" id="starec.type2List"><a class="viewcode-back" href="../bsta.html#bsta.starec.type2List">[docs]</a>    <span class="k">def</span> <span class="nf">type2List</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return the list of type 002 information (i.e. the list of </span>
+<span class="sd">            :py:class:`starec.type002` instances).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type2_recs</span>
+</div>
+<div class="viewcode-block" id="starec.type002"><a class="viewcode-back" href="../bsta.html#bsta.starec.type002">[docs]</a>    <span class="k">class</span> <span class="nc">type002</span><span class="p">:</span>
+        <span class="sd">&#39;&#39;&#39; A class to hold type 002 station information records for a single station.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="starec.type002.start"><a class="viewcode-back" href="../bsta.html#bsta.starec.type002.start">[docs]</a>        <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&#39;&#39;&#39; Return the start datetime (as ``datetime``). &#39;&#39;&#39;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span>
+</div>
+<div class="viewcode-block" id="starec.type002.stop"><a class="viewcode-back" href="../bsta.html#bsta.starec.type002.stop">[docs]</a>        <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&#39;&#39;&#39; Return the stop datetime (as ``datetime``). &#39;&#39;&#39;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stop</span>
+</div>
+<div class="viewcode-block" id="starec.type002.name"><a class="viewcode-back" href="../bsta.html#bsta.starec.type002.name">[docs]</a>        <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&#39;&#39;&#39; Return the name. &#39;&#39;&#39;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
+</div>
+<div class="viewcode-block" id="starec.type002.line"><a class="viewcode-back" href="../bsta.html#bsta.starec.type002.line">[docs]</a>        <span class="k">def</span> <span class="nf">line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&#39;&#39;&#39; Return the type 002 original, information record line. &#39;&#39;&#39;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__line</span>
+</div>
+<div class="viewcode-block" id="starec.type002.__init__"><a class="viewcode-back" href="../bsta.html#bsta.starec.type002.__init__">[docs]</a>        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">line</span><span class="p">):</span>
+            <span class="sd">&#39;&#39;&#39; Initialize a :py:class:`starec.type002` instance using a type 002</span>
+<span class="sd">                information line. This will set the start and stop date and the </span>
+<span class="sd">                station name.</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">27</span><span class="p">:</span><span class="mi">47</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__start</span> <span class="o">=</span> <span class="n">starec</span><span class="o">.</span><span class="n">min_date</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">27</span><span class="p">:</span><span class="mi">47</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s">&#39;%Y %m </span><span class="si">%d</span><span class="s"> %H %M %S&#39;</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid TYPE 002 datetime: [&#39;</span><span class="o">+</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;]&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">48</span><span class="p">:</span><span class="mi">68</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__stop</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__stop</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">48</span><span class="p">:</span><span class="mi">68</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s">&#39;%Y %m </span><span class="si">%d</span><span class="s"> %H %M %S&#39;</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid TYPE 002 datetime: [&#39;</span><span class="o">+</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;]&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stop</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid TYPE 002 datetime: [&#39;</span><span class="o">+</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;]&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="starec.type001"><a class="viewcode-back" href="../bsta.html#bsta.starec.type001">[docs]</a>    <span class="k">class</span> <span class="nc">type001</span><span class="p">:</span>
+        <span class="sd">&#39;&#39;&#39; A class to hold type 001 station information records for a single station.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="starec.type001.start"><a class="viewcode-back" href="../bsta.html#bsta.starec.type001.start">[docs]</a>        <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&#39;&#39;&#39; Return the start datetime (as ``datetime``). &#39;&#39;&#39;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span>
+</div>
+<div class="viewcode-block" id="starec.type001.stop"><a class="viewcode-back" href="../bsta.html#bsta.starec.type001.stop">[docs]</a>        <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&#39;&#39;&#39; Return the stop datetime (as ``datetime``). &#39;&#39;&#39;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stop</span>
+</div>
+<div class="viewcode-block" id="starec.type001.line"><a class="viewcode-back" href="../bsta.html#bsta.starec.type001.line">[docs]</a>        <span class="k">def</span> <span class="nf">line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&#39;&#39;&#39; Return the original information line. &#39;&#39;&#39;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__line</span>
+</div>
+<div class="viewcode-block" id="starec.type001.match"><a class="viewcode-back" href="../bsta.html#bsta.starec.type001.match">[docs]</a>        <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type2</span><span class="p">):</span>
+            <span class="sd">&#39;&#39;&#39; Match a type 002 record line with (this) instance.</span>
+<span class="sd">                This will return ``True``, if the type 002 record (i.e. ``type2``)</span>
+<span class="sd">                has the same name, as this instance and the duration of</span>
+<span class="sd">                this info is within this instance&#39;s limits.</span>
+
+<span class="sd">                :param type2: A :py:class:`starec.type002` instance.</span>
+
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="k">return</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">==</span> <span class="n">type2</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">type2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">type2</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="starec.type001.__init__"><a class="viewcode-back" href="../bsta.html#bsta.starec.type001.__init__">[docs]</a>        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">line</span><span class="p">):</span>
+            <span class="sd">&#39;&#39;&#39; Initialize a :py:class:`starec.type001` instance using a type 001</span>
+<span class="sd">                information line. This will set the start and stop date and the </span>
+<span class="sd">                station name.</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">27</span><span class="p">:</span><span class="mi">47</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__start</span> <span class="o">=</span> <span class="n">starec</span><span class="o">.</span><span class="n">min_date</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">27</span><span class="p">:</span><span class="mi">47</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s">&#39;%Y %m </span><span class="si">%d</span><span class="s"> %H %M %S&#39;</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid TYPE 001 datetime: [&#39;</span><span class="o">+</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;]&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">48</span><span class="p">:</span><span class="mi">68</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__stop</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__stop</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">48</span><span class="p">:</span><span class="mi">68</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s">&#39;%Y %m </span><span class="si">%d</span><span class="s"> %H %M %S&#39;</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid TYPE 001 datetime: [&#39;</span><span class="o">+</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;]&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stop</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid TYPE 001 datetime: [&#39;</span><span class="o">+</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;]&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+</div></div></div>
 <div class="viewcode-block" id="stafile"><a class="viewcode-back" href="../bsta.html#bsta.stafile">[docs]</a><span class="k">class</span> <span class="nc">stafile</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39; A station information file (.STA) class, to represent Bernese v5.2 format .STA </span>
 <span class="sd">        files.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">__filename</span>  <span class="o">=</span> <span class="s">&#39;&#39;</span> <span class="c">#: The filename</span>
     <span class="n">__type_names</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;RENAMING OF STATIONS&#39;</span><span class="p">,</span>
             <span class="s">&#39;STATION INFORMATION&#39;</span><span class="p">,</span>
             <span class="s">&#39;HANDLING OF STATION PROBLEMS&#39;</span><span class="p">,</span> 
             <span class="s">&#39;STATION COORDINATES AND VELOCITIES (ADDNEQ)&#39;</span><span class="p">,</span>
             <span class="s">&#39;HANDLING STATION TYPES&#39;</span><span class="p">]</span>
     <span class="sd">&#39;&#39;&#39; A dictionary to map a type to a header (e.g. &#39;TYPE 001&#39; is </span>
-<span class="sd">        &#39;RENAMING OF STATIONS&#39;).</span>
+<span class="sd">        &#39;RENAMING OF STATIONS&#39;). This list is shared among all</span>
+<span class="sd">        instances.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="stafile.__init__"><a class="viewcode-back" href="../bsta.html#bsta.stafile.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Initialize a sta object given its filename;</span>
 <span class="sd">            try locating the file</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;No such file &#39;</span><span class="o">+</span><span class="n">filename</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__filename</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;No such file &#39;</span><span class="o">+</span><span class="n">filename</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="stafile.findTypeStart"><a class="viewcode-back" href="../bsta.html#bsta.stafile.findTypeStart">[docs]</a>    <span class="k">def</span> <span class="nf">findTypeStart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">stream</span><span class="p">,</span><span class="nb">type</span><span class="p">,</span><span class="n">max_lines</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__findTypeStart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">stream</span><span class="p">,</span><span class="nb">type</span><span class="p">,</span><span class="n">max_lines</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Given a (sta) input file stream, go to the line where a specific</span>
 <span class="sd">            type starts. E.g. if the type specified is &#39;1&#39; (i.e. ``type=1``), then this function</span>
 <span class="sd">            will search for the line: *&#39;TYPE 001: RENAMING OF STATIONS&#39;*.</span>
@@ -115,9 +283,134 @@
             <span class="n">dummy_it</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="n">dummy_it</span> <span class="o">&gt;</span> <span class="n">max_lines</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;MAX_LINES encountered.&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="stafile.fillStaRec2"><a class="viewcode-back" href="../bsta.html#bsta.stafile.fillStaRec2">[docs]</a>    <span class="k">def</span> <span class="nf">fillStaRec2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">station</span><span class="p">,</span><span class="n">starecs</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__filename</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;No such file &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">__filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">starecs</span><span class="o">.</span><span class="n">type2List</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">starecs</span><span class="o">.</span><span class="n">__type2_recs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">starecs</span><span class="o">.</span><span class="n">type1List</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__findTypeStart</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">max_lines</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot find station&#39;</span><span class="p">)</span>
+
+        <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&#39;STATION NAME          FLG          FROM                   TO         RECEIVER TYPE         RECEIVER SERIAL NBR   REC #   ANTENNA TYPE          ANTENNA SERIAL NBR    ANT #    NORTH      EAST      UP      DESCRIPTION             REMARK&#39;</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Invalid line:[&#39;</span><span class="o">+</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">+</span><span class="s">&#39;]&#39;</span><span class="p">)</span>
+
+        <span class="n">station_found</span>      <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">while</span> <span class="p">(</span><span class="bp">True</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">break</span>
+
+            <span class="n">type2</span> <span class="o">=</span> <span class="n">starec</span><span class="o">.</span><span class="n">type002</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">starecs</span><span class="o">.</span><span class="n">type1List</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">type2</span><span class="p">):</span>
+                    <span class="n">starecs</span><span class="o">.</span><span class="n">appendtype2</span><span class="p">(</span><span class="n">type2</span><span class="p">)</span>
+                    <span class="n">station_found</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">starecs</span>
+        <span class="c">#if station_found:</span>
+        <span class="c">#    return starecs</span>
+        <span class="c">#else:</span>
+        <span class="c">#    return []</span>
+</div>
+<div class="viewcode-block" id="stafile.fillStaRec1"><a class="viewcode-back" href="../bsta.html#bsta.stafile.fillStaRec1">[docs]</a>    <span class="k">def</span> <span class="nf">fillStaRec1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">station</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Given a station name, this function will create and return a</span>
+<span class="sd">            py:class:`starec` instance, and fill all type 001 information</span>
+<span class="sd">            (i.e. the instance&#39;s :py:attr:`starec.__type1_recs` list). The</span>
+<span class="sd">            input ``station`` parameter is matched using the &#39;OLD NAME&#39;</span>
+<span class="sd">            column and **NOT** the &#39;STATION NAME&#39; column.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__filename</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;No such file &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">__filename</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__findTypeStart</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">max_lines</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot find station&#39;</span><span class="p">)</span>
+
+        <span class="c">## two unimportant lines ...</span>
+        <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="c">## header line ...</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&#39;STATION NAME          FLG          FROM                   TO         OLD STATION NAME      REMARK&#39;</span><span class="p">:</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot find station&#39;</span><span class="p">)</span>
+        <span class="c">## line [***...]</span>
+        <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="c">## WDC1 40451S005        003                       2006 07 16 23 59 59  S071 40451S005        NGA RENAMING</span>
+        <span class="c">## WDC3 40451S008        003  2006 07 17 00 00 00                       S071 40451S005        NGA RENAMING</span>
+        <span class="c">## WDC1 40451S005        001                       2006 07 16 23 59 59  S071*                 NGA</span>
+        <span class="c">## WDC3 40451S008        001  2006 07 17 00 00 00                       S071*                 NGA</span>
+        <span class="n">station_found</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">line</span>          <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">records</span>       <span class="o">=</span> <span class="n">starec</span><span class="p">(</span><span class="n">station</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="p">(</span><span class="bp">True</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">break</span>
+
+            <span class="n">generic_name</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">69</span><span class="p">:</span><span class="mi">89</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="c">## Remove the trailing &#39;*&#39; cause then e.g. &#39;DYNG*&#39; would match &#39;DYN&#39;</span>
+            <span class="k">if</span> <span class="n">generic_name</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;*&#39;</span><span class="p">:</span> <span class="n">generic_name</span> <span class="o">=</span> <span class="n">generic_name</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c">## Make a regex out of the old station name</span>
+            <span class="n">regex_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">generic_name</span><span class="p">)</span>
+
+            <span class="c">## Match with column &#39;OLD STATION NAME&#39;</span>
+            <span class="k">if</span> <span class="n">regex_name</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">station</span><span class="p">):</span> <span class="c">## and int(line[22:25]) == 1:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">rectmp1</span> <span class="o">=</span> <span class="n">starec</span><span class="o">.</span><span class="n">type001</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="k">raise</span>
+                <span class="n">records</span><span class="o">.</span><span class="n">appendtype1</span><span class="p">(</span><span class="n">rectmp1</span><span class="p">)</span>
+                <span class="n">station_found</span> <span class="o">=</span> <span class="bp">True</span>
+
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">records</span>
+        <span class="c">#if station_found:</span>
+        <span class="c">#    return records</span>
+        <span class="c">#else:</span>
+        <span class="c">#    return []</span>
+
 </div>
 <div class="viewcode-block" id="stafile.findStationType01"><a class="viewcode-back" href="../bsta.html#bsta.stafile.findStationType01">[docs]</a>    <span class="k">def</span> <span class="nf">findStationType01</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">station</span><span class="p">,</span><span class="n">epoch</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; This function will search for the station information (concerning</span>
+        <span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">            .. deprecated:: 1.1</span>
+<span class="sd">               use :py:fun:`stafile.fillStaRec1`</span>
+
+<span class="sd">            This function will search for the station information (concerning</span>
 <span class="sd">            a specific station) included in the *&#39;TYPE 01&#39;* block.</span>
 <span class="sd">            Given a station name (e.g. &#39;ANKR&#39; or &#39;ANKR 20805M002&#39;), it will</span>
 <span class="sd">            try to match the information line provided in the *&#39;TYPE 01&#39;* block,</span>
@@ -146,7 +439,7 @@
             <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;No such file &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">__filename</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">findTypeStart</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">max_lines</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__findTypeStart</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">max_lines</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot find station&#39;</span><span class="p">)</span>
@@ -231,12 +524,12 @@
         <span class="sd">&#39;&#39;&#39; This function will search for station info recorded in *&#39;TYPE 002&#39;*</span>
 <span class="sd">            and return it.</span>
 <span class="sd">            The station name provided, will be resolved using the *&#39;TYPE 001&#39;*</span>
-<span class="sd">            block using the function ``findStationType01``. Hence, the name used to</span>
+<span class="sd">            block using the function :py:func:`findStationType01`. Hence, the name used to</span>
 <span class="sd">            match info in the *&#39;TYPE 002&#39;* block will be the column *&#39;STATION NAME&#39;*</span>
 <span class="sd">            E.g., given station name &#39;ANKR&#39; and using the CODE.STA file, we</span>
 <span class="sd">            will get the name &#39;ANKR 20805M002&#39; and we will search the block</span>
 <span class="sd">            &#39;TYPE 002&#39; for this name. Note that in case of renaming, a specific</span>
-<span class="sd">            date may be needed (see ``findStationType01``).</span>
+<span class="sd">            date may be needed (see :py:func:`findStationType01`).</span>
 <span class="sd">            If no date is provided, all entried for the station will be matched</span>
 <span class="sd">            and returned; else, only the one withing the specified interval</span>
 <span class="sd">            will be returned.</span>
@@ -265,7 +558,7 @@
         <span class="n">station_name</span> <span class="o">=</span> <span class="n">type1</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">findTypeStart</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">max_lines</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__findTypeStart</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">max_lines</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot find station&#39;</span><span class="p">)</span>

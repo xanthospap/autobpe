@@ -68,6 +68,153 @@ files placed there.</p>
 <div class="section" id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="bsta.starec">
+<em class="property">class </em><tt class="descclassname">bsta.</tt><tt class="descname">starec</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="_modules/bsta.html#starec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to hold station information records for a single station.</p>
+<dl class="method">
+<dt id="bsta.starec.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bsta.starec.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'bsta'</em><a class="headerlink" href="#bsta.starec.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bsta.starec.appendtype1">
+<tt class="descname">appendtype1</tt><big>(</big><em>typ1</em><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.appendtype1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.appendtype1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a <a class="reference internal" href="#bsta.starec.type001" title="bsta.starec.type001"><tt class="xref py py-class docutils literal"><span class="pre">starec.type001</span></tt></a> record; the new element is added
+in ascending chronological order.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.starec.appendtype2">
+<tt class="descname">appendtype2</tt><big>(</big><em>typ2</em><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.appendtype2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.appendtype2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a <a class="reference internal" href="#bsta.starec.type002" title="bsta.starec.type002"><tt class="xref py py-class docutils literal"><span class="pre">starec.type002</span></tt></a> record; the new element is added
+in ascending chronological order.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bsta.starec.min_date">
+<tt class="descname">min_date</tt><em class="property"> = datetime.datetime(1900, 1, 1, 0, 0)</em><a class="headerlink" href="#bsta.starec.min_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Minimum date (i.e. for records that do not have one)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bsta.starec.type001">
+<em class="property">class </em><tt class="descname">type001</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.type001"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.type001" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to hold type 001 station information records for a single station.</p>
+<dl class="method">
+<dt id="bsta.starec.type001.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.type001.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.type001.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a <a class="reference internal" href="#bsta.starec.type001" title="bsta.starec.type001"><tt class="xref py py-class docutils literal"><span class="pre">starec.type001</span></tt></a> instance using a type 001
+information line. This will set the start and stop date and the 
+station name.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bsta.starec.type001.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'bsta'</em><a class="headerlink" href="#bsta.starec.type001.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bsta.starec.type001.line">
+<tt class="descname">line</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.type001.line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.type001.line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the original information line.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.starec.type001.match">
+<tt class="descname">match</tt><big>(</big><em>type2</em><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.type001.match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.type001.match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match a type 002 record line with (this) instance.
+This will return <tt class="docutils literal"><span class="pre">True</span></tt>, if the type 002 record (i.e. <tt class="docutils literal"><span class="pre">type2</span></tt>)
+has the same name, as this instance and the duration of
+this info is within this instance&#8217;s limits.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>type2</strong> &#8211; A <a class="reference internal" href="#bsta.starec.type002" title="bsta.starec.type002"><tt class="xref py py-class docutils literal"><span class="pre">starec.type002</span></tt></a> instance.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.starec.type001.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.type001.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.type001.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the start datetime (as <tt class="docutils literal"><span class="pre">datetime</span></tt>).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.starec.type001.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.type001.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.type001.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the stop datetime (as <tt class="docutils literal"><span class="pre">datetime</span></tt>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bsta.starec.type002">
+<em class="property">class </em><tt class="descclassname">starec.</tt><tt class="descname">type002</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.type002"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.type002" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to hold type 002 station information records for a single station.</p>
+<dl class="method">
+<dt id="bsta.starec.type002.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.type002.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.type002.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a <a class="reference internal" href="#bsta.starec.type002" title="bsta.starec.type002"><tt class="xref py py-class docutils literal"><span class="pre">starec.type002</span></tt></a> instance using a type 002
+information line. This will set the start and stop date and the 
+station name.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bsta.starec.type002.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'bsta'</em><a class="headerlink" href="#bsta.starec.type002.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bsta.starec.type002.line">
+<tt class="descname">line</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.type002.line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.type002.line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the type 002 original, information record line.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.starec.type002.name">
+<tt class="descname">name</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.type002.name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.type002.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.starec.type002.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.type002.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.type002.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the start datetime (as <tt class="docutils literal"><span class="pre">datetime</span></tt>).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.starec.type002.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.type002.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.type002.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the stop datetime (as <tt class="docutils literal"><span class="pre">datetime</span></tt>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.starec.type1List">
+<tt class="descclassname">starec.</tt><tt class="descname">type1List</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.type1List"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.type1List" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of type 001 information (i.e. the list of 
+<a class="reference internal" href="#bsta.starec.type001" title="bsta.starec.type001"><tt class="xref py py-class docutils literal"><span class="pre">starec.type001</span></tt></a> instances).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.starec.type2List">
+<tt class="descclassname">starec.</tt><tt class="descname">type2List</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bsta.html#starec.type2List"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.starec.type2List" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of type 002 information (i.e. the list of 
+<a class="reference internal" href="#bsta.starec.type002" title="bsta.starec.type002"><tt class="xref py py-class docutils literal"><span class="pre">starec.type002</span></tt></a> instances).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="bsta.stafile">
 <em class="property">class </em><tt class="descclassname">bsta.</tt><tt class="descname">stafile</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile" title="Permalink to this definition">¶</a></dt>
 <dd><p>A station information file (.STA) class, to represent Bernese v5.2 format .STA 
@@ -84,10 +231,37 @@ try locating the file</p>
 <tt class="descname">__module__</tt><em class="property"> = 'bsta'</em><a class="headerlink" href="#bsta.stafile.__module__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt id="bsta.stafile._stafile__filename">
-<tt class="descname">_stafile__filename</tt><em class="property"> = ''</em><a class="headerlink" href="#bsta.stafile._stafile__filename" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="method">
+<dt id="bsta.stafile._stafile__findTypeStart">
+<tt class="descname">_stafile__findTypeStart</tt><big>(</big><em>stream</em>, <em>type</em>, <em>max_lines=1000</em><big>)</big><a class="headerlink" href="#bsta.stafile._stafile__findTypeStart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a (sta) input file stream, go to the line where a specific
+type starts. E.g. if the type specified is &#8216;1&#8217; (i.e. <tt class="docutils literal"><span class="pre">type=1</span></tt>), then this function
+will search for the line: <em>&#8216;TYPE 001: RENAMING OF STATIONS&#8217;</em>.
+The line to search for, is compiled using the parameter <tt class="docutils literal"><span class="pre">type</span></tt> and the
+<tt class="xref py py-attr docutils literal"><span class="pre">__type_names</span></tt> dictionary. If the line is not found after 
+<tt class="docutils literal"><span class="pre">max_lines</span></tt> are read, then an exception is thrown.
+In case of sucess, the (header) line is returned, and the stream
+buffer is placed at the end of the header line.
+Note that the <tt class="docutils literal"><span class="pre">type</span></tt> parameter must be a positive integer in the
+range <tt class="docutils literal"><span class="pre">[1,</span> <span class="pre">len(___type_names)]</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stream</strong> &#8211; The input stream for this istance.</li>
+<li><strong>type</strong> &#8211; The number of type to search for.</li>
+<li><strong>max_lines</strong> &#8211; Max lines to read before quiting.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">On sucess, the matched line; the input stream is 
+left at the end of the matched line.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="bsta.stafile._stafile__type_names">
@@ -95,9 +269,27 @@ try locating the file</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="bsta.stafile.fillStaRec1">
+<tt class="descname">fillStaRec1</tt><big>(</big><em>station</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile.fillStaRec1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile.fillStaRec1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a station name, this function will create and return a
+py:class:<cite>starec</cite> instance, and fill all type 001 information
+(i.e. the instance&#8217;s <tt class="xref py py-attr docutils literal"><span class="pre">starec.__type1_recs</span></tt> list). The
+input <tt class="docutils literal"><span class="pre">station</span></tt> parameter is matched using the &#8216;OLD NAME&#8217;
+column and <strong>NOT</strong> the &#8216;STATION NAME&#8217; column.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bsta.stafile.fillStaRec2">
+<tt class="descname">fillStaRec2</tt><big>(</big><em>station</em>, <em>starecs</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile.fillStaRec2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile.fillStaRec2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="bsta.stafile.findStationType01">
 <tt class="descname">findStationType01</tt><big>(</big><em>station</em>, <em>epoch=None</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile.findStationType01"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile.findStationType01" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function will search for the station information (concerning
+<dd><div class="deprecated">
+<p><span class="versionmodified">Deprecated since version 1.1: </span>use <a href="#id1"><span class="problematic" id="id2">:py:fun:`stafile.fillStaRec1`</span></a></p>
+</div>
+<p>This function will search for the station information (concerning
 a specific station) included in the <em>&#8216;TYPE 01&#8217;</em> block.
 Given a station name (e.g. &#8216;ANKR&#8217; or &#8216;ANKR 20805M002&#8217;), it will
 try to match the information line provided in the <em>&#8216;TYPE 01&#8217;</em> block,
@@ -136,12 +328,12 @@ this epoch).</p>
 <dd><p>This function will search for station info recorded in <em>&#8216;TYPE 002&#8217;</em>
 and return it.
 The station name provided, will be resolved using the <em>&#8216;TYPE 001&#8217;</em>
-block using the function <tt class="docutils literal"><span class="pre">findStationType01</span></tt>. Hence, the name used to
+block using the function <a class="reference internal" href="#bsta.stafile.findStationType01" title="bsta.stafile.findStationType01"><tt class="xref py py-func docutils literal"><span class="pre">findStationType01()</span></tt></a>. Hence, the name used to
 match info in the <em>&#8216;TYPE 002&#8217;</em> block will be the column <em>&#8216;STATION NAME&#8217;</em>
 E.g., given station name &#8216;ANKR&#8217; and using the CODE.STA file, we
 will get the name &#8216;ANKR 20805M002&#8217; and we will search the block
 &#8216;TYPE 002&#8217; for this name. Note that in case of renaming, a specific
-date may be needed (see <tt class="docutils literal"><span class="pre">findStationType01</span></tt>).
+date may be needed (see <a class="reference internal" href="#bsta.stafile.findStationType01" title="bsta.stafile.findStationType01"><tt class="xref py py-func docutils literal"><span class="pre">findStationType01()</span></tt></a>).
 If no date is provided, all entried for the station will be matched
 and returned; else, only the one withing the specified interval
 will be returned.</p>
@@ -158,38 +350,6 @@ wanted.</li>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list of <em>&#8216;TYPE 02&#8217;</em> block records for this station
 (for this epoch).</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="bsta.stafile.findTypeStart">
-<tt class="descname">findTypeStart</tt><big>(</big><em>stream</em>, <em>type</em>, <em>max_lines=1000</em><big>)</big><a class="reference internal" href="_modules/bsta.html#stafile.findTypeStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bsta.stafile.findTypeStart" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a (sta) input file stream, go to the line where a specific
-type starts. E.g. if the type specified is &#8216;1&#8217; (i.e. <tt class="docutils literal"><span class="pre">type=1</span></tt>), then this function
-will search for the line: <em>&#8216;TYPE 001: RENAMING OF STATIONS&#8217;</em>.
-The line to search for, is compiled using the parameter <tt class="docutils literal"><span class="pre">type</span></tt> and the
-<tt class="xref py py-attr docutils literal"><span class="pre">__type_names</span></tt> dictionary. If the line is not found after 
-<tt class="docutils literal"><span class="pre">max_lines</span></tt> are read, then an exception is thrown.
-In case of sucess, the (header) line is returned, and the stream
-buffer is placed at the end of the header line.
-Note that the <tt class="docutils literal"><span class="pre">type</span></tt> parameter must be a positive integer in the
-range <tt class="docutils literal"><span class="pre">[1,</span> <span class="pre">len(___type_names)]</span></tt>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>stream</strong> &#8211; The input stream for this istance.</li>
-<li><strong>type</strong> &#8211; The number of type to search for.</li>
-<li><strong>max_lines</strong> &#8211; Max lines to read before quiting.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">On sucess, the matched line; the input stream is 
-left at the end of the matched line.</p>
 </td>
 </tr>
 </tbody>

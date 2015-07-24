@@ -53,19 +53,18 @@
 
 <div class="viewcode-block" id="gpsoutfile"><a class="viewcode-back" href="../bgps.html#bgps.gpsoutfile">[docs]</a><span class="k">class</span> <span class="nc">gpsoutfile</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39; A class to hold a Bernese v5.2 GPSEST output file &#39;&#39;&#39;</span>
-    <span class="n">__filename</span>  <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: The filename of the output file</span>
-    <span class="n">__program</span>   <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: The program that created (this) file</span>
-    <span class="n">__campaign</span>  <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: Name of the campaign</span>
-    <span class="n">__doy</span>       <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: Day Of Year (processed)</span>
-    <span class="n">__ses</span>       <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: Session (processed)</span>
-    <span class="n">__yr</span>        <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: Year (processed)</span>
-    <span class="n">__stations</span>  <span class="o">=</span> <span class="p">[]</span>  <span class="c">#: List of stations included in the processing/output file</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Constructor; check for file existance &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__filename</span>  <span class="o">=</span> <span class="n">filename</span>  <span class="c">#: The filename of the output file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__program</span>   <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: The program that created (this) file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__campaign</span>  <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: Name of the campaign</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doy</span>       <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: Day Of Year (processed)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ses</span>       <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: Session (processed)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__yr</span>        <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c">#: Year (processed)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stations</span>  <span class="o">=</span> <span class="p">[]</span>  <span class="c">#: List of stations included in the processing/output file</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__filename</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;No such file &#39;</span><span class="o">+</span><span class="n">filename</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__filename</span> <span class="o">=</span> <span class="n">filename</span>
 
 <div class="viewcode-block" id="gpsoutfile.findFirstLine"><a class="viewcode-back" href="../bgps.html#bgps.gpsoutfile.findFirstLine">[docs]</a>    <span class="k">def</span> <span class="nf">findFirstLine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">stream</span><span class="p">,</span><span class="n">line</span><span class="p">,</span><span class="n">eof_line</span><span class="o">=</span><span class="s">&#39;&gt;&gt;&gt;&#39;</span><span class="p">,</span><span class="n">max_lines</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Given a GPSEST output file, try to match the line passed as</span>
