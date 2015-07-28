@@ -4,6 +4,39 @@ import os
 import datetime
 import re
 
+def addToRecList1(stareclst, line):
+    ''' Given a list of :py:class:`starec`s, i.e. ``stareclst`` and a line
+        of type TYPE 001, this function will:
+        * resolve the line into a :py:class:`starec.type001` instance,
+        * append the instance into the ``stareclst`` list.
+        
+        If a :py:class:`starec` does not exist in the list for this station,
+        then a new :py:class:`starec` will be created and appended to the
+        ``stareclst`` list. Else (i.e. if a :py:class:`starec` does exist 
+        in the list for this station), then the new :py:class:`starec.type001` instance
+        will be added to this instance.
+        
+    '''
+    print 'resolving line -> [',line.rstrip(),']'
+    try:
+        type1 = starec.type001(line)
+    except:
+        raise
+    
+    #print type(stareclst), len(stareclst)
+
+    for idx, obj in enumerate(stareclst):
+        if obj.type1List()[0].old_staname() == type1.old_staname():
+            try:
+                obj.appendtype1(type1)
+            except:
+                raise
+            return
+    
+    newrec = starec(type1.old_staname())
+    newrec.appendtype1(type1)
+    stareclst.append(newrec)
+
 class starec:
     ''' A class to hold station information records for a single station.
     '''
@@ -17,7 +50,7 @@ class starec:
         self.__type1_recs = [] #: list of type 001 info (i.e. :py:class:`starec.type001`)
         self.__type2_recs = [] #: list of type 002 info (i.e. :py:class:`starec.type002`)
 
-    def appendtype1(self,typ1):
+    def appendtype1(self,typ1,enable_debug=True):
         ''' Add a :py:class:`starec.type001` record; the new element is added
             in ascending chronological order.
         '''
@@ -31,14 +64,21 @@ class starec:
                 return
             else:
                 for idx, obj in enumerate(self.__type1_recs[:-1]):
-                    if typ.start() >= obj.stop() and typ.stop() <= self.__type1_recs[idx+1].start():
+                    if typ1.start() >= obj.stop() and typ1.stop() <= self.__type1_recs[idx+1].start():
                         self.__type1_recs.insert(idx,typ1)
                         return
                 if typ1.start() >= self.__type1_recs[len(self.__type1_recs)-1].stop():
                     self.__type1_recs.append(typ1)
                     return
         # should have never reached this point ...
-        raise RuntimeError('Duplicate or erroneous record')
+        if enable_debug == True:
+            print 'Debuging Message for appendtype1()'
+            print '------------------------------------------------------------------------'
+            print 'got record line -> ['+typ1.line()+']'
+            print 'this record contains:'
+            for i in self.__type1_recs:
+                print '\t -> ['+i.line()+']'
+        raise RuntimeError('Duplicate or erroneous record -> '+typ1.line())
 
     def appendtype2(self,typ2):
         ''' Add a :py:class:`starec.type002` record; the new element is added
@@ -137,6 +177,14 @@ class starec:
             ''' Return the original information line. '''
             return self.__line
 
+        def staname(self):
+            ''' Return the 'STATION NAME' column. '''
+            return self.__name
+
+        def old_staname(self):
+            ''' Return the 'OLD STATION NAME' column. '''
+            return self.__line[69:90].strip(' ')
+
         def match(self,type2):
             ''' Match a type 002 record line with (this) instance.
                 This will return ``True``, if the type 002 record (i.e. ``type2``)
@@ -207,7 +255,7 @@ class stafile:
             Note that the ``type`` parameter must be a positive integer in the
             range ``[1, len(___type_names)]``.
 
-            :param stream:    The input stream for this istance.
+            :param stream:    Thif not line or len(line) < 5:e input stream for this istance.
             :param type:      The number of type to search for.
             :param max_lines: Max lines to read before quiting.
 
@@ -283,6 +331,50 @@ class stafile:
 
         return starecs, len(starecs.type2List())
 
+    def loadAll(self):
+        try:
+            fin = open(self.__filename,'r')
+        except:
+            fin.close()
+            raise IOError('No such file '+self.__filename)
+
+        try:
+            self.__findTypeStart(fin,1,max_lines=100)
+        except:
+            fin.close()
+            raise RuntimeError('Cannot find station')
+
+        ## two unimportant lines ...
+        fin.readline()
+        fin.readline()
+        ## header line ...
+        line = fin.readline()
+        if line.strip() != 'STATION NAME          FLG          FROM                   TO         OLD STATION NAME      REMARK':
+            fin.close()
+            raise RuntimeError('Cannot find station')
+        ## line [***...]
+        fin.readline()
+
+        line          = fin.readline()
+        rec_list      = []
+
+        while (True):
+            if not line or len(line) < 5:
+                fin.close()
+                break
+            try:
+                addToRecList1(rec_list, line)
+            except:
+                fin.close()
+                raise
+
+            line = fin.readline()
+
+        fin.close()
+
+        return rec_list
+
+
     def fillStaRec1(self,station):
         ''' Given a station name, this function will create and return a
             py:class:`starec` instance, and fill all type 001 information
@@ -342,4 +434,4 @@ class stafile:
 
         fin.close()
 
-        return records, len(starecs.type1List())
+        return records, len(records.type1List())
