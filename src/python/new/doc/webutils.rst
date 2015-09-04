@@ -1,15 +1,13 @@
 =============================
-Module : gpstimet
+Module webutils 
 =============================
 
-This module contains various functions to accomodate the easy handling of
-date and/or datetime obects. 
 
 -----------------------------
 Documentation
 -----------------------------
 
-.. automodule:: gpstime
+.. automodule:: bernutils.webutils
    :private-members:
    :special-members:
    :members:

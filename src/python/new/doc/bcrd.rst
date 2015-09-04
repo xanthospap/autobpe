@@ -21,13 +21,13 @@ files placed there.
 Documentation
 -----------------------------
 
-.. currentmodule:: bcrd
+.. currentmodule:: bernutils.bcrd
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Class crdpoint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: crdpoint
+.. autoclass:: bernutils.bcrd.crdpoint
    :members:
    :undoc-members:
 
@@ -35,7 +35,7 @@ Class crdpoint
 Class crdfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: crdfile
+.. autoclass:: bernutils.bcrd.crdfile
    :members:
    :undoc-members:
 

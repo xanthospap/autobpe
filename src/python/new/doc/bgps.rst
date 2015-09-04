@@ -10,9 +10,9 @@ GPSEST output file.
 Documentation
 -----------------------------
 
-.. currentmodule:: bgps
+.. currentmodule:: bernutils.bgps
 
-.. autoclass:: gpsoutfile
+.. autoclass:: bernutils.bgps.gpsoutfile
    :members:
    :undoc-members:
 

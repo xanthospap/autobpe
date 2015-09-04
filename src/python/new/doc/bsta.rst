@@ -20,15 +20,15 @@ files placed there.
 Documentation
 -----------------------------
 
-.. currentmodule:: bsta
+.. currentmodule:: bernutils.bsta
 
-.. autoclass:: bsta.starec
+.. autoclass:: bernutils.bsta.starec
    :members:
    :private-members:
    :special-members:
    :undoc-members:
 
-.. autoclass:: bsta.stafile
+.. autoclass:: bernutils.bsta.stafile
    :members:
    :private-members:
    :special-members:

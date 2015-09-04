@@ -157,7 +157,7 @@ class ambfile:
     ''' Collect the baseline records resolved using a given resolution 
         method (i.e. ``method``) with observations of a given satellite
         system (``satsys``). The baseline records are collected as 
-        **RAW lines** and returned in a list.
+        **RAW lines** and returned in a list. koko1
     '''
     ## satellite system key:
     try:
@@ -224,6 +224,9 @@ class ambfile:
     return bsl_info
 
   def collectMethodStats(self,method):
+    ''' Collect the lines from the statistics block at the end of each
+        resolution method.
+    '''
     fin = open(self.__filename)
 
     try:
@@ -397,4 +400,3 @@ class ambfile:
     print "</table>"
     
     print "</body>"
-      

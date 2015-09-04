@@ -1,34 +1,5 @@
 #! /usr/bin/python
 
-'''
-|===========================================|
-|** Higher Geodesy Laboratory             **|
-|** Dionysos Satellite Observatory        **|
-|** National Tecnical University of Athens**|
-|===========================================|
-
-filename              : 
-version               : v-0.5
-created               : JUN-2015
-
-usage                 : Python routine to 
-
-exit code(s)          : 0 -> success
-                      : 1 -> error
-
-description           :
-
-notes                 :
-
-TODO                  :
-bugs & fixes          :
-last update           :
-
-report any bugs to    :
-                      : Xanthos Papanikolaou xanthos@mail.ntua.gr
-                      : Demitris Anastasiou  danast@mail.ntua.gr
-'''
-
 ## Variables for Bernese v5.2 .CRD files
 ## Describe the format of a .CRD data line
 CRD_HEADER_LINES     = 6
@@ -130,7 +101,7 @@ class crdpoint:
 
 class crdfile:
     """ A class to hold a Bernese v5.2 format .CRD file. """
-    
+
     def __init__(self,filename):
         self.filename_ = filename
         """ Contructor; checks whether the file exists or not """
@@ -210,4 +181,4 @@ class crdfile:
             header_lines.append(fin.readline().rstrip('\n'))
 
         fin.close()
-        return header_lines;
+        return header_lines

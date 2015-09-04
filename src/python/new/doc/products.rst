@@ -7,7 +7,7 @@ Moduleproducts
 Documentation
 -----------------------------
 
-.. automodule:: products
+.. automodule:: bernutils.products
    :private-members:
    :special-members:
    :members:

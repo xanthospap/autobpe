@@ -21,13 +21,13 @@ used to accomodate the reading of **ambfile** objects; they are not used as stan
 Documentation
 -----------------------------
 
-.. currentmodule:: bamb
+.. currentmodule:: bernutils.bamb
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Class ambline
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: ambline
+.. autoclass:: bernutils.bamb.ambline
    :members:
    :undoc-members:
 
@@ -35,7 +35,7 @@ Class ambline
 Class ambfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: ambfile
+.. autoclass:: bernutils.bamb.ambfile
    :members:
    :undoc-members:
 
