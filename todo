@@ -1,5 +1,0 @@
-
-** Validate gpstime.py. All C-integers must be python integers!
-
-** wgeterp : when using standard names (-s), cod products should be downloaded with
-   lowercase letters NOT uppercase.

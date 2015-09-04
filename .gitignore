@@ -1,3 +1,10 @@
 ntua.keys
-*.e
-*.ps
+
+bernpy.egg-info/
+*.pyc
+build/
+dist/
+doc/_static/
+doc/_templates/
+doc/_build/
+obsolete/
