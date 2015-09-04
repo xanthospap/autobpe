@@ -147,7 +147,7 @@ class ambfile:
 
   def __init__(self,filename):
     ''' Initialize a sta object given its filename;
-        try locating the file
+        try locating the file.
     '''
     self.__filename = filename
     if not os.path.isfile(self.__filename):
@@ -157,7 +157,7 @@ class ambfile:
     ''' Collect the baseline records resolved using a given resolution 
         method (i.e. ``method``) with observations of a given satellite
         system (``satsys``). The baseline records are collected as 
-        **RAW lines** and returned in a list. koko1
+        **RAW lines** and returned in a list. koko1 is the shit.
     '''
     ## satellite system key:
     try:
@@ -325,7 +325,7 @@ class ambfile:
     print "\twidth: 100%;"
     print "\tbackground-color: #eee;"
     print "\tborder-collapse: collapse;"
-    print "\tborder: 0.1px solid black;"
+    print "\tborder: 1px solid black;"
     print "}"
     print "table#t02 {"
     print "\twidth: 50%;"
@@ -341,7 +341,7 @@ class ambfile:
 
     print "<body>"
     # Header
-    print """<table style="width:100%" id="t01">"""
+    print """<table style="width:100%" id="t01" border="1">"""
     print "\t<thead>"
     print "\t<tr>"
     for th in ('Baseline', 'Station 1', 'Station 2', 'Length (km)', '# of Ambs', 'Resolved (%)', 'Receiver 1', 'Receiver 2', 'Sat. System', 'Method'):
@@ -350,26 +350,36 @@ class ambfile:
     print "\t</thead>"
     
     print "\t<tbody>"
+    
+    cur_baseline = ""
+    html_entries = []
+    row_span     = 1
     for ambmth in amb_keys:
       info_list = []
       if satsys:
         info_list = self.collectBsls(ambmth,satsys)
       else:
         info_list = self.collectMethodBsls(ambmth)
+      # store the entries as long as we are in the same baseline;
+      # else flush them.
       for j in info_list:
         al = ambline(j)
-        print "\t<tr>"
-        print "\t\t<td>%s</td>" % al.baseline()
-        print "\t\t<td>%s</td>" % al.sta1()
-        print "\t\t<td>%s</td>" % al.sta2()
-        print "\t\t<td>%06.1f</td>" % al.length()
-        print "\t\t<td>%04i (%3.1f)</td>" % (al.ambsbefore()[0],al.ambsbefore()[1])
-        print "\t\t<td>%04.1f</td>" % al.percent()
-        print "\t\t<td>%s</td>"  % al.receiver1()
-        print "\t\t<td>%s</td>" % al.receiver2()
-        print "\t\t<td>%s</td>" % al.satsys()
-        print "\t\t<td>%s</td>" % al.method()
-        print "\t</tr>"
+        if cur_baseline == al.baseline():
+          row_span += 1
+          html_line = ("\t<tr>") +
+          ("\t\t<td>%s</td>" % al.baseline()) +
+          ("\t\t<td>%s</td>" % al.sta1())) +
+          ("\t\t<td>%s</td>" % al.sta2()) +
+          ("\t\t<td>%06.1f</td>" % al.length()) +
+          ("\t\t<td>%04i (%3.1f)</td>" % (al.ambsbefore()[0],al.ambsbefore()[1])) +
+          ("\t\t<td>%04.1f</td>" % al.percent()) +
+          ("\t\t<td>%s</td>"  % al.receiver1()) +
+          ("\t\t<td>%s</td>" % al.receiver2()) +
+          ("\t\t<td>%s</td>" % al.satsys()) +
+          ("\t\t<td>%s</td>" % al.method()) +
+          ("\t</tr>")
+        else:
+          
       info_list = self.collectMethodStats(ambmth)
       print "\t<tr>"
       for l in info_list:

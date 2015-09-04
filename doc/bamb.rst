@@ -36,7 +36,7 @@ Class ambfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: bernutils.bamb.ambfile
-   :members: toHtmlTable
+   :members:
 
 -----------------------------
 Examples
