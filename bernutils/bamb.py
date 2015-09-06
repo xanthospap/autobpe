@@ -3,6 +3,8 @@
 import os
 from datetime import datetime
 
+import matplotlib.pyplot as plt
+
 amb_method = {'Code-Based Widelane': '#AR_WL',
     'Code-Based Narrowlane': '#AR_NL',
     'Phase-Based Widelane': '#AR_L5',
@@ -23,7 +25,7 @@ amb_keys   = {'cbwl': 'Code-Based Widelane',
 ''' Ambiguity resolution method short names (id's).
 '''
 
-satsys     = {'G': 'GPS', 'R': 'GLONASS', 'GR': 'MIXED'}
+satsys_dict = {'G': 'GPS', 'R': 'GLONASS', 'GR': 'MIXED'}
 ''' Satellite System id-names.
 '''
 
@@ -90,16 +92,16 @@ class ambline:
   def receiver1(self):
     ''' Return the name of the first receiver '''
     if amb_lcs[self.__amb_key] == 1:
-      return self.__line[80:101].rstrip()
+      return self.__line[78:99].rstrip()
     else:
-      return self.__line[94:115].rstrip()
+      return self.__line[92:113].rstrip()
     
   def receiver2(self):
     ''' Return the name of the second receiver '''
     if amb_lcs[self.__amb_key] == 1:
-      return self.__line[101:121].rstrip()
+      return self.__line[99:120].rstrip()
     else:
-      return self.__line[115:136].rstrip()
+      return self.__line[113:134].rstrip()
 
   def baseline(self):
     ''' Return the baseline name. '''
@@ -137,7 +139,7 @@ class ambline:
     ''' Return the satellite system as string (e.g. 'GPS'). Fuck yeah! '''
     sys = self.__lns[9].strip()
     try:
-      return satsys[sys]
+      return satsys_dict[sys]
     except:
       raise RuntimeError('Invalid satellite system string: '+sys)
 
@@ -209,13 +211,14 @@ class ambfile:
     bsl_info = []
 
     while (line):
-      if line.rstrip()[-6:] != smeth2:
-        break
       if len(line) < 5:
         fin.close()
         raise RuntimeError('Error collecting baselines for resolution method '+method)
-      elif line[0:3] == ' --': ## normal termination
+      if line[0:3] == ' --': ## normal termination
         break
+      if line.strip()[-7:].strip() != smeth2:
+        fin.close()
+        raise RuntimeError('Error invalid resolution method '+method)
       else:
         bsl_info.append(line)
       line = fin.readline()
@@ -243,13 +246,14 @@ class ambfile:
       fin.close()
       raise RuntimeError('Cannot collect baselines for resolution method '+method)
     elif line[0:3] == '===':
+      #print 'no baselines; returning'
       return []
     
     smeth1 = amb_keys[method]
     smeth2 = amb_method[smeth1]
 
     bsl_info = []
-
+    #print 'did not return yeat ..'
     while (line):
       if line.strip()[-7:].strip() != smeth2:
         fin.close()
@@ -261,12 +265,18 @@ class ambfile:
       if line[0:3] == ' --': ## normal termination
         break
 
+    #print 'should read the stats line now ..'
     line = fin.readline()
-    while len(line) > 4 and line[0:4] == "Tot:":
+    
+    #print 'first line = ['+line.strip()+']'
+    #print 'length=',str(len(line)),'and l[0:4]=',line[0:4]
+    while len(line) > 4 and line.lstrip()[0:4] == "Tot:":
       bsl_info.append(line)
+      #print 'appending line -> ['+line.strip()+']'
       line = fin.readline()
     
     fin.close()
+    #print 'before closing, len of bsl = ', str(len(bsl_info))
     return bsl_info
 
   def goToMethod(self,istream,method,max_lines=1000):
@@ -314,11 +324,26 @@ class ambfile:
       return line
     else:
       raise RuntimeError('Failed to find entry for method '+smeth1)
+    
+  def visualize(self,satsys=None):
+    x = [1, 2, 3, 4]
+    y = [1, 4, 9, 6]
+    labels = ['Frogs', 'Hogs', 'Bogs', 'Slogs']
+
+    plt.plot(x, y, 'ro')
+    # You can specify a rotation for the tick labels in degrees or with keywords.
+    plt.xticks(x, labels, rotation='vertical')
+    # Pad margins so that markers don't get clipped by the axes
+    plt.margins(0.2)
+    # Tweak spacing to prevent clipping of tick-labels
+    plt.subplots_adjust(bottom=0.15)
+    plt.savefig('koko.eps', format='eps')
+    return
 
   def toHtmlTable(self,satsys=None):
     ''' Translate the file to an html table '''
     
-    # CSS
+    ## write CSS info and html head section
     print "<head>"
     print "<style>"
     print "table#t01, th#t01, td#t01  {"
@@ -338,13 +363,14 @@ class ambfile:
     print "}"
     print "</style>"
     print "</head>"
-
     print "<body>"
-    # Header
+    
+    ## Table header
     print """<table style="width:100%" id="t01" border="1">"""
     print "\t<thead>"
     print "\t<tr>"
-    for th in ('Baseline', 'Station 1', 'Station 2', 'Length (km)', '# of Ambs', 'Resolved (%)', 'Receiver 1', 'Receiver 2', 'Sat. System', 'Method'):
+    for th in ('Baseline', 'Station 1', 'Station 2', 'Length (km)', '# of Ambs', \
+      'Resolved (%)', 'Receiver 1', 'Receiver 2', 'Sat. System', 'Method'):
       print "\t\t<th>"+th+"</th>"
     print "\t</tr>"
     print "\t</thead>"
@@ -354,47 +380,82 @@ class ambfile:
     cur_baseline = ""
     html_entries = []
     row_span     = 1
+
+    ## For every resolution method posible ..
     for ambmth in amb_keys:
+
+      ## create a list holding all baselines (for this method)
       info_list = []
       if satsys:
         info_list = self.collectBsls(ambmth,satsys)
       else:
         info_list = self.collectMethodBsls(ambmth)
+
+      print "<!-- Collected", str(len(info_list)), "baselines for method", amb_keys[ambmth], "-->"
       # store the entries as long as we are in the same baseline;
       # else flush them.
       for j in info_list:
         al = ambline(j)
-        if cur_baseline == al.baseline():
-          row_span += 1
-          html_line = ("\t<tr>") +
-          ("\t\t<td>%s</td>" % al.baseline()) +
-          ("\t\t<td>%s</td>" % al.sta1())) +
-          ("\t\t<td>%s</td>" % al.sta2()) +
-          ("\t\t<td>%06.1f</td>" % al.length()) +
-          ("\t\t<td>%04i (%3.1f)</td>" % (al.ambsbefore()[0],al.ambsbefore()[1])) +
-          ("\t\t<td>%04.1f</td>" % al.percent()) +
-          ("\t\t<td>%s</td>"  % al.receiver1()) +
-          ("\t\t<td>%s</td>" % al.receiver2()) +
-          ("\t\t<td>%s</td>" % al.satsys()) +
-          ("\t\t<td>%s</td>" % al.method()) +
-          ("\t</tr>")
+        if cur_baseline != al.baseline():
+          ##  we've reached a new basline. flush the html_entries, where in the
+          ##+ first element we have to (first) substitute the correct number
+          ##+ for ROWSPAN.
+          for tr in html_entries:
+            print tr.replace("ROWSPAN", "\""+str(row_span)+"\"")
+          html_entries = []
+          row_span  = 1
+          html_line = "\n\t<tr>" + \
+            "\n\t\t<td rowspan=ROWSPAN>%s</td>" % al.baseline() + \
+            "\n\t\t<td rowspan=ROWSPAN>%s</td>" % al.sta1() + \
+            "\n\t\t<td rowspan=ROWSPAN>%s</td>" % al.sta2() + \
+            "\n\t\t<td rowspan=ROWSPAN>%6.1f</td>" % al.length() + \
+            "\n\t\t<td>%4i (%3.1f)</td>" % (al.ambsbefore()[0],al.ambsbefore()[1]) + \
+            "\n\t\t<td>%4.1f</td>" % al.percent() + \
+            "\n\t\t<td rowspan=ROWSPAN>%s</td>"  % al.receiver1() + \
+            "\n\t\t<td rowspan=ROWSPAN>%s</td>" % al.receiver2() + \
+            "\n\t\t<td>%s</td>" % al.satsys() + \
+            "\n\t\t<td>%s</td>" % al.method() + \
+            "\n\t</tr>"
+          html_entries.append(html_line)
+          cur_baseline = al.baseline()
         else:
-          
-      info_list = self.collectMethodStats(ambmth)
-      print "\t<tr>"
-      for l in info_list:
-        if ambstr2key(l.strip()[-7:].strip()) == ambmth or not satsys:
-          print "\t\t<td>%s</td>" % l[1]
-          print "\t\t<td></td>"
-          print "\t\t<td></td>"
-          print "\t\t<td>%06.1f</td>" % float(l[2])
-          print "\t\t<td>%04i (%3.1f)</td>" % (int(l[3]), float(l[4]))
-          print "\t\t<td>%04.1f</td>" % float(l[7])
-          print "\t\t<td></td>"
-          print "\t\t<td></td>"
-          print "\t\t<td>%s</td>"  % al.satsys()
-          print "\t\t<td>%s</td>" % al.method()
-      print "\t</tr>"
+          ##  same baseline; just add the info in a new element in the 
+          ##+ html_entries list.
+          row_span += 1
+          html_line = "\n\t<tr>" + \
+          "\n\t\t<td>%4i (%3.1f)</td>" % (al.ambsbefore()[0],al.ambsbefore()[1]) + \
+          "\n\t\t<td>%4.1f</td>" % al.percent() + \
+          "\n\t\t<td>%s</td>" % al.satsys() + \
+          "\n\t\t<td>%s</td>" % al.method() + \
+          "\n\t</tr>"
+          html_entries.append(html_line)
+      
+      ## flush remaining baselines (last baseline of current method).
+      for tr in html_entries:
+        print tr.replace("ROWSPAN", "\""+str(row_span)+"\"")
+      html_entries = []
+      stats_list = []
+      ##  collect the general info (statistics) for this method and print them
+      stats_list = self.collectMethodStats(ambmth)
+      if len(stats_list) == 0:
+        print "\t<tr style=\"background-color:red\">"
+        print "\t\t<td colspan=\"10\">Resolution method \"%s\" not used</td>" %(amb_keys[ambmth])
+      else:
+        for ln in stats_list:
+          if ambstr2key(ln.strip()[-7:].strip()) == ambmth or not satsys:
+            l = ln.split()
+            print "\t<tr style=\"background-color:red\">"
+            print "\t\t<td>%s</td>" % l[1]
+            print "\t\t<td></td>"
+            print "\t\t<td></td>"
+            print "\t\t<td>%6.1f</td>" % float(l[2])
+            print "\t\t<td>%4i (%3.1f)</td>" % (int(l[3]), float(l[4]))
+            print "\t\t<td>%4.1f</td>" % float(l[7])
+            print "\t\t<td></td>"
+            print "\t\t<td></td>"
+            print "\t\t<td>%s</td>"  % (satsys_dict[ln[59:62].strip()])
+            print "\t\t<td>%s</td>" % al.method()
+            print "\t</tr>"
 
     print "\t</tbody>"
     print "\t<caption>Ambiguity resolution information, extracted from %s at %s</caption>" %(self.__filename, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))

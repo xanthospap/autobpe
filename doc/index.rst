@@ -12,13 +12,7 @@ Contents:
    :maxdepth: 2
 
    intro
-   bamb
-   bcrd
-   bsta
-   bgps
-   gpstime
-   products
-   webutils
+   bamb2
 
 Indices and tables
 ==================
