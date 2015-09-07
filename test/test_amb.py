@@ -35,6 +35,7 @@ import bernutils.bamb2
 #fin.close()
 ###############################
 
-x = bernutils.bamb2.ambfile('FFU151000_GNSS.SUM')
-lst = x.method_lines('qif', 'R')
-print lst
+x = bernutils.bamb2.AmbFile('FFU151000_GNSS.SUM')
+#lst = x.method_lines('qif', 'R')
+#print lst
+x.toHtml()

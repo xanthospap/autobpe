@@ -27,7 +27,7 @@ Documentation
 Class ambline
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: bernutils.bamb.ambline
+.. autoclass:: bernutils.bamb.AmbLine
    :members:
    :undoc-members:
 
@@ -35,7 +35,7 @@ Class ambline
 Class ambfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: bernutils.bamb.ambfile
+.. autoclass:: bernutils.bamb.AmbFile
    :members:
 
 -----------------------------

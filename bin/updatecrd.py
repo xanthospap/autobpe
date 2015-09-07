@@ -122,7 +122,7 @@ if not len(flags):
 
 ## Read all points from the updated file
 try:
-    lst1 = updateCrd.getListOfPoints(stations,drop_marker_numbers)
+    lst1 = updateCrd.getListOfPoints(stations, drop_marker_numbers)
     if DDEBUG: print 'Read',len(lst1),'station from update file'
 except:
     print >> sys.stderr,'ERROR. Failed reading points from file:',update_file
@@ -130,7 +130,7 @@ except:
 
 ## Read all points from the reference file
 try:
-    lst2 = referenceCrd.getListOfPoints(stations,drop_marker_numbers)
+    lst2 = referenceCrd.getListOfPoints(stations, drop_marker_numbers)
     if DDEBUG: print 'Read',len(lst1),'station from update file'
 except:
     print >> sys.stderr,'ERROR. Failed reading points from file:',reference_file
@@ -193,7 +193,7 @@ for i in updlst:
 fin.close()
 
 ## Last step: rename the temporary file to the updated file
-os.rename('.tmp.CRD',update_file)
+os.rename('.tmp.CRD', update_file)
 
 ## Print the number of stations update and exit
 if DDEBUG: print 'Wrote',len(updlst),'stations in file',update_file,'.'

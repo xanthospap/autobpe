@@ -27,7 +27,7 @@ Documentation
 Class crdpoint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: bernutils.bcrd.crdpoint
+.. autoclass:: bernutils.bcrd.CrdPoint
    :members:
    :undoc-members:
 
@@ -35,7 +35,7 @@ Class crdpoint
 Class crdfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: bernutils.bcrd.crdfile
+.. autoclass:: bernutils.bcrd.CrdFile
    :members:
    :undoc-members:
 
