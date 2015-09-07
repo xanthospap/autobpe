@@ -31,4 +31,10 @@ To `compile` (this) document, go to autobpe/src/python/new/doc and type
 
 | $> `make html`
 
+
+ Bugs
+=====================================
+
+Report any bugs to the dedicated Bugzilla tracker http://dionysos.survey.ntua.gr/bugzilla/
+
 .. image:: index.jpeg

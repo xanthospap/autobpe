@@ -9,19 +9,22 @@ def grabHttpFile(url, files, saveas):
                      the filename to be downloaded.
       :param files:  A list of files to be downloaded from the
                      given url.
-      :param saveas: The name(s) of the corresponding saved files.
+      :param saveas: The name(s) of the corresponding saved files, i.e. how to
+                     (localy) save each file in the ``files`` list.
 
-      :returns: A list of tuples, containing (each) the web file and
-                the (absolute path of) the saved file.
+      :returns:      A list of tuples, containing (each) the web file and
+                     the (absolute path of) the saved file.
+      
+      The next code block will download the files 'http://my.server.org/foo/bar/file1.txt'
+      and save it to '/home/lol/sf1.txt' and also download 'http://my.server.org/foo/bar/file2.txt'
+      and save it to '$(PWD)/sf2.txt'.
 
       .. code-block:: python
+
          file_list  = ['file1.txt', 'file2.txt']
          saved_list = ['/home/lol/sf1.txt', 'sf2.txt']
-         lst = grebHttpFile('http://my.server.org/foo/bar')
+         lst = grebHttpFile('http://my.server.org/foo/bar', file_list, saved_list)
 
-      Will download the file 'http://my.server.org/foo/bar/file1.txt' and
-      save it to '/home/lol/sf1.txt' and also download 'http://my.server.org/foo/bar/file2.txt'
-      and save it to '$(PWD)/sf2.txt'.
   '''
   if len(files) != len(saveas):
     raise RuntimeError('Download file list and save file list not equal')
