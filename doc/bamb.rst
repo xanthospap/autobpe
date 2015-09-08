@@ -4,8 +4,8 @@ Module : bamb
 
 This module contains the classes:
 
-* AmbFile and
-* AmbLine
+* ``AmbFile`` and
+* ``AmbLine``
 
 **AmbFile** represents a Bernese v5.2 ambiguity resolution summary file. 
 
@@ -18,18 +18,24 @@ and/or statistics are recorded for the given technique.
 
 The default extension is .SUM (e.g. AMBYYDDDS.SUM). 
 
-Ambiguity resolution summary file format format is very strict, and most of the 
-functions/modules depend that this format is kept.
+.. note::
+  Ambiguity resolution summary file format format is very strict, and most of the 
+  functions/modules depend that this format is kept.
 
-See the Examples section for an test ambiguity resolution summary file.
+See the :ref:`bamb-examples` section for an test ambiguity resolution summary file.
 
 **AmbLine** is a class holding ambiguity resolution record lines. Such instances 
-are normally used to accomodate the reading of **AmbFile** objects; they are not 
+are normally used to accomodate the reading of ``AmbFile`` objects; they are not 
 used as standalone.
 
-For example, most member functions of the **AmbFile** class, read in the needed
+For example, most member functions of the ``AmbFile`` class, read in the needed
 records for a given resolution method (as raw strings) and then cast the individual
-lines to instances of **AmbLine** to extract information.
+lines to instances of ``AmbLine`` to extract information.
+
+.. warning::
+  Baseline ambiguity information lines are not fixed-size. Different methods result
+  in record lines of different length. This is taken care of when casting a raw record
+  line in an ``AmbLine`` instance.
 
 -----------------------------
 Documentation
@@ -51,6 +57,8 @@ Class ambfile
 
 .. autoclass:: bernutils.bamb.AmbFile
   :members:
+
+.. _bamb-examples:
 
 -----------------------------
 Examples

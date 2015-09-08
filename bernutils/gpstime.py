@@ -1,5 +1,3 @@
-#! /usr/bin/python
-
 import datetime
 import time
 
@@ -60,8 +58,7 @@ def pydt2ydoy(datetm):
     ''' Transform a Python ``datetime`` instance to year and 
         day of year.
 
-        :returns: A tuple consisting of 
-        ``[year, day_of_year, hour, minute, second]``.
+        :returns: A tuple consisting of ``[year, day_of_year, hour, minute, second]``.
 
     '''
     try:

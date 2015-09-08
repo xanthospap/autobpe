@@ -94,30 +94,11 @@ def getCodDcb(stype, datetm, out_dir=None):
       :param datetm:  A python ``datetime`` object.
       :param out_dir: Path to directory where the downloaded file shall
                       be stored.
-                      
+
       :returns:       A list/tuple with two strings; the first one is the 
                       filename of the downloaded file. The second element is the
                       (original) name of the remote file.
 
-      .. note:: Available Code Differential Bias files from CODE:
-
-          * P1P2yymm.DCB
-                          GNSS monthly P1-P2 code bias
-                          solutions in Bernese DCB format
-          * P1C1yymm.DCB/F
-                          GPS monthly P1-C1 code bias solutions
-                          in Bernese DCB format and in a format
-                          specific to the CC2NONCC utility
-          * P1C1yymm_RINEX.DCB/F
-                          GNSS monthly P1-C1 code bias
-                          values in Bernese DCB format and in
-                          a format specific to the CC2NONCC
-                          utility directly extracted from
-                          RINEX observation files
-          * P2C2yymm_RINEX.DCB
-                          GNSS monthly P2-C2 code bias
-                          values in Bernese DCB format directly
-                          extracted from RINEX observation files
   '''
   ## output dir must exist
   if out_dir and not os.path.isdir(out_dir):

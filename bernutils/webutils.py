@@ -5,25 +5,15 @@ import os
 def grabHttpFile(url, files, saveas):
   ''' Download file(s) from an http webserver.
 
-      :param url:    The server's address; do not append the
+      :param url:    The server's address/hostname; do not append the
                      the filename to be downloaded.
       :param files:  A list of files to be downloaded from the
                      given url.
-      :param saveas: The name(s) of the corresponding saved files, i.e. how to
-                     (localy) save each file in the ``files`` list.
+      :param saveas: (Optional) The name(s) of the corresponding saved files, 
+                     i.e. how to (localy) save each file in the ``files`` list.
 
       :returns:      A list of tuples, containing (each) the web file and
                      the (absolute path of) the saved file.
-      
-      The next code block will download the files 'http://my.server.org/foo/bar/file1.txt'
-      and save it to '/home/lol/sf1.txt' and also download 'http://my.server.org/foo/bar/file2.txt'
-      and save it to '$(PWD)/sf2.txt'.
-
-      .. code-block:: python
-
-         file_list  = ['file1.txt', 'file2.txt']
-         saved_list = ['/home/lol/sf1.txt', 'sf2.txt']
-         lst = grebHttpFile('http://my.server.org/foo/bar', file_list, saved_list)
 
   '''
   if len(files) != len(saveas):
@@ -48,18 +38,22 @@ def grabHttpFile(url, files, saveas):
 def grabFtpFile(host,dirn,filen,saveas=None,username=None,password=None):
   ''' Download a file from an ftp server.
 
-      :param host:   The host ip (e.g. ``ftp.unibe.ch``).
-      :param dirn:   The directory in the host server, where the file 
-                     is located (e.g. ``/aiub/CODE/``).
-      :param filen:  The name of the file to download (e.g. ``COD18650.EPH.Z``).
-      :param saveas: How to save the file in localhost (e.g. ``copy.txt``); 
-                     if not set, the name ``filen`` will be used.
-      :param username: The username to connect to the ftp site (if any).
-      :param password: The password to connect to the ftp site (if any).
+      :param host:     The host ip/hostname (e.g. ``ftp.unibe.ch``).
+      :param dirn:     The directory in the host server, where the file 
+                       is located (e.g. ``/aiub/CODE/``).
+      :param filen:    The name of the file to download (e.g. ``COD18650.EPH.Z``).
+      :param saveas:   (Optional) How to save the file in localhost (e.g. ``copy.txt``); 
+                       if not set, the name ``filen`` will be used.
+      :param username: (Optional) The username to connect to the ftp site (if any).
+      :param password: (Optional) The password to connect to the ftp site (if any).
 
       :returns: In sucess, a tuple is returned; first element is the
                 name of the saved file (absolute path), the second element
                 is the name of the file on web.
+
+      .. note:: See the documentation API for a detailed table of valid ``stype``
+                values.
+
    '''
   if host[-1] == '/' : host = host[:-1]
   if dirn[0]  != '/' : dirn = '/' + dirn
@@ -99,4 +93,4 @@ def grabFtpFile(host,dirn,filen,saveas=None,username=None,password=None):
   ftp.quit()
   localfile.close()
 
-  return os.path.abspath(saveas), '%s%s%s'%(host,dirn,filen)
+  return os.path.abspath(saveas), '%s%s%s'%(host, dirn, filen)
