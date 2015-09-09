@@ -123,7 +123,7 @@ i.e. P1C1yymm.DCB for April 2014, saved in /home/foo/bar/ :
 .. code-block:: python
 
   >>> import datetime
-  >>> import products
+  >>> import bernutils.products
 
   >>> apr2014 = datetime.date(2014, 4, 1) # only need a date not datetime
   >>> result  = bernutils.products.getCodDcb('c1', apr2014, '/home/foo/bar/')
