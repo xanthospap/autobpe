@@ -7,10 +7,17 @@ import datetime
 dtm = datetime.datetime(2015,01,01,12,34,10)
 dt  = datetime.date(2004,01,01)
 yesterday = datetime.date.today() - datetime.timedelta(1)
-today = datetime.date.today()
+today = datetime.datetime.today()
 
 # path to download files
 dir = '/home/xanthos/Downloads'
+
+bernutils.products.getCodErp2(dtm)
+
+bernutils.products.getCodErp2(yesterday)
+
+bernutils.products.getCodErp2(datetime.date.today() - datetime.timedelta(10))
+
 '''
 # final orbit for dtm
 p1 = bernutils.products.getCodSp3('f',dtm,dir)
@@ -43,14 +50,15 @@ print 'downloaded file ->',p4
 # lets get the min and max dates reported in this last erp file
 mmd = bernutils.products.erpTimeSpan(p4[0],True)
 print 'max and min dates in erp file: ',mmd
-'''
+
 ## now same dcb's ...
-dcb1 = bernutils.products.getCodDcb('c1',dtm)
-print 'got cdb ->',dcb1
+#dcb1 = bernutils.products.getCodDcb('c1',dtm)
+#print 'got cdb ->',dcb1
 
 #dcb2 = bernutils.products.getCodDcb('c2_rnx',dt)
 ## WARNING This file actualy doesn't exist !!
 #print 'got cdb ->',dcb2
 
-dcb3 = bernutils.products.getCodDcb('p2',today,dir)
-print 'got cdb ->',dcb3
+#dcb3 = bernutils.products.getCodDcb('p2',today,dir)
+#print 'got cdb ->',dcb3
+'''
