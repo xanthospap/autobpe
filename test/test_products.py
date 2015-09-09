@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-import bernutils.products
+import bernutils.products.pyerp
 import datetime
 
 # set a datetime and a date
@@ -12,11 +12,11 @@ today = datetime.datetime.today()
 # path to download files
 dir = '/home/xanthos/Downloads'
 
-bernutils.products.getCodErp2(dtm)
+bernutils.products.pyerp.getCodErp(dtm, '/home/xanthos/Downloads/')
 
-bernutils.products.getCodErp2(yesterday)
+bernutils.products.pyerp.getCodErp(yesterday,'/home/xanthos/Downloads')
 
-bernutils.products.getCodErp2(datetime.date.today() - datetime.timedelta(10))
+bernutils.products.pyerp.getCodErp(datetime.date.today() - datetime.timedelta(10))
 
 '''
 # final orbit for dtm

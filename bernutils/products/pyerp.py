@@ -1,0 +1,323 @@
+import os
+import datetime
+import ftplib
+
+import bernutils.gpstime
+import bernutils.webutils
+import bernutils.products.prodgen
+
+erp_type = {'d': 'CODwwww7.ERP.Z',
+  'f': 'cofwwww7.erp.Z',
+  'r': 'CODwwwwn.ERP_R',
+  'u': 'COD.ERP_U',
+  'p': 'CODwwwwn.ERP_Pi',
+  '2d': 'CO2wwww7.ERP.Z',
+  '2f': 'cf2wwww7.erp.Z'
+}
+''' A dictionary to hold pairs of erp file types and corresponding
+    erp file names.
+'''
+
+COD_HOST      = bernutils.products.prodgen.COD_HOST
+IGS_HOST      = bernutils.products.prodgen.IGS_HOST
+COD_DIR       = bernutils.products.prodgen.COD_DIR
+COD_DIR_2013  = bernutils.products.prodgen.COD_DIR_2013
+IGS_DIR       = bernutils.products.prodgen.IGS_DIR
+IGS_DIR_REP2  = bernutils.products.prodgen.IGS_DIR_REP2
+
+def erpTimeSpan(filen, as_mjd=True):
+  ''' Given an ERP filename, this function will return the min
+      and max dates for which the file has info.
+
+      :param filen:  The filename of the erp file.
+      :param as_mjd: (Optional) if set to ``True``, the mina and max dates are
+                     returned in Modified Julian Date format; else they are
+                     returned as Python ``datetime`` instances.
+      :returns:      A tuple of  denoting [max_date, min_date] for which erp
+                     are available.
+  '''
+
+  try:
+    fin = open(filen, 'r')
+  except:
+    raise RuntimeError('Cannot open erp file: %s' %filen)
+
+  for i in range(1,5):
+    line = fin.readline()
+
+  line = fin.readline()
+  if line.split()[0] != 'MJD':
+    fin.close()
+    raise RuntimeError('Invalid erp format: %s' %filen)
+
+  line     = fin.readline()
+  mjd_list = []
+  dummy_it = 0
+
+  line = fin.readline()
+  while (line and dummy_it < 1000):
+    if as_mjd == True: ## append as MJD instances
+      mjd_list.append(float(line.split()[0]))
+    else: ## append as datetime.datetime instances
+      mjd_list.append(bernutils.gpstime.mjd2pydt(float(line.split()[0])))
+    dummy_it += 1
+    line = fin.readline()
+
+  fin.close()
+
+  if dummy_it >= 1000:
+    raise RuntimeError('Failed reading erp: %s' %filen)
+
+  return max(mjd_list), min(mjd_list)
+
+
+def __cod_erp_all_final__(use_repro_13=False, use_one_day_sol=False, igs_repro2=False):
+  ''' Utility function; do not use as standalone. For each valid final CODE erp
+      file, return the needed information for downloading. Using the input
+      parameters, only one valid erp final file can be used.
+      
+
+      param use_repro_13:     Use (or not) CODE's REPRO_2013 products (only 
+                              available via CODE's ftp server).
+
+      :param use_one_day_sol: Use the clean, one-day-solution (only available
+                              via igs/cddis ftp sever).
+
+      :returns:               A valid erp FILENAME, a HOST and a DIRectory (in 
+                              the HOST where the file FILENAME is to be found)
+                              for each possible, valid, erp file. Using these
+                              information, one can download the file. Every possible
+                              (triple) combination is returned as a list (so the
+                              function returns a list of lists).
+
+      .. note:: One-day-solutions are only available at the CDDIS ftp host.
+
+      .. note:: The options here should **exactly match** the ones described 
+        in the  ``products.rst`` file.
+
+  '''
+  # Manage repro2 igs campaign erp files.
+  if igs_repro2 == True:
+    HOST = IGS_HOST
+    DIR  = IGS_DIR_REP2 + '/wwww/'
+    ## One-day solution: (CDDIS)/repro2/wwww/cf2wwww7.erp.Z
+    if use_one_day_sol == True:
+      FILENAME = 'cf2wwww7.erp.Z'
+    ## Normal erp (3-day) (CDDIS)/repro2/wwww/co2wwww7.erp.Z
+    else:
+      FILENAME = 'co2wwww7.erp.Z'
+
+  else:
+    ## One-day solution (CDDIS)/wwww/cofwwww7.erp.Z
+    if use_one_day_sol == True:
+      FILENAME = 'cofwwww7.erp.Z'
+      HOST     = IGS_HOST
+      DIRN     = IGS_DIR + '/wwww/'
+
+    ## CODE's 2013 re-processing (CODE)/REPRO_2013/CODE/yyyy/CODwwwwd.ERP.Z
+    elif use_repro_13 == True:
+      FILENAME = 'CODwwwwd.ERP.Z'
+      HOST     = COD_HOST
+      DIR      = COD_DIR_2013 + '/yyyy/'
+
+    ## Normal, 3-day file (CODE)/CODE/yyyy/CODwwwwd.ERP.Z
+    else:
+      FILENAME = 'CODwwww7.ERP.Z'
+      HOST     = COD_HOST
+      DIR      = COD_DIR + '/yyyy/'
+
+    return [[ FILENAME, HOST, DIR ]]
+
+def __cod_erp_all_final_rapid__():
+  ''' Utility function; do not use as standalone. Returns a triple of 
+      ``[FILENAME, HOST, DIR]`` for every possible final-rapid erp file produced
+      by CODE AC. More than one files are returned (in fact two).
+
+      :returns: A valid erp FILENAME, a HOST and a DIRectory (in the HOST where 
+                the file FILENAME is to be found) list for every possible 
+                final-rapid erp file. So, alist of lists.
+
+      .. note:: The options here should **exactly match** the ones described in
+         the ``products.rst`` file.
+
+  '''
+
+  ## final rapid (in yyy_M folder)
+  FILENAME_FR1 = 'CODwwwwd.ERP_M.Z'
+  HOST_FR1     = COD_HOST
+  DIR_FR1      = COD_DIR + '/yyyy_M/'
+
+  ## final rapid (in root folder)
+  FILENAME_FR2 = 'CODwwwwd.ERP_M'
+  HOST_FR2     = COD_HOST
+  DIR_FR2      = COD_DIR
+
+  return  [[FILENAME_FR1, HOST_FR1, DIR_FR1], 
+           [FILENAME_FR2, HOST_FR2, DIR_FR2]]
+
+def __cod_erp_all_early_rapid__():
+  ''' Utility function; do not use as standalone. Returns a triple of 
+      ``[FILENAME, HOST, DIR]`` for every possible early-rapid erp file produced
+      by CODE AC. This is actually only one file.
+
+      :returns: A valid erp FILENAME, a HOST and a DIRectory (in the HOST where
+                the file FILENAME is to be found), for the early-rapid erp file.
+
+      .. note:: The options here should **exactly match** the ones described in
+        the ``products.rst`` file.
+
+  '''
+  return [[ 'CODwwwwd.ERP_R', COD_HOST, COD_DIR ]]
+
+def __cod_erp_all_ultra_rapid__():
+  ''' Utility function; do not use as standalone. Returns a triple of
+      ``[FILENAME, HOST, DIR]`` for a valid CODE-generated ultra-rapid erp file.
+
+      :returns: A valid erp FILENAME, a HOST and a DIRectory (in the HOST where 
+        the file FILENAME is to be found). These are concatenated into a list.
+
+      .. note::
+        The options here should **exactly match** the ones described in the ``products.rst``
+        file.
+
+  '''
+  return [[ 'COD.ERP_U', COD_HOST, COD_DIR ]]
+
+def __cod_erp_all_prediction__(str_id='5D'):
+  ''' Utility function; do not use as standalone. Returns a triple of 
+      ``[FILENAME, HOST, DIR]`` for any valid prediction erp file.
+      
+      :param str_id: The id of the solution type (as string). Can be any of:
+      
+        * ``'5D'``,
+        * ``'P2'``
+        * ``'P'``
+
+      :returns: A valid erp FILENAME, a HOST and a DIRectory (in the HOST where 
+        the file FILENAME is to be found) for a CODE prediction erp file, 
+        depending on the ``str_id`` parameter.
+
+      .. note:: The options here should **exactly match** the ones described in 
+        the ``products.rst`` file.
+
+  '''
+  if str_id == '5D':
+    FILENAME = 'CODwwwwd.ERP_5D'
+  elif str_id == 'P2':
+    FILENAME = 'CODwwwwd.ERP_P2'
+  elif str_id == 'P':
+    FILENAME = 'CODwwwwd.ERP_P'
+  else:
+    raise RuntimeError('Invalid ERP prediction flag %s.', str_id)
+
+  return [[ FILENAME, COD_HOST, COD_DIR ]]
+
+def getCodErp(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, igs_repro2=False):
+  ''' This function is responsible for downloading an optimal, valid erp file
+      for a given date. The user-defined input variables can further narrow
+      down the possible choices.
+
+      :param dtdays:          The date(time) for wich we want the erp information, as
+                              a Python ``datetime.datetime`` or ``dadtetime.date``
+                              instance.
+
+      :param out_dir:         (Optional) Directory where the downloaded file is
+                              to be saved.
+
+      :param use_repro_13:    (Optional) Use (or not) CODE's REPRO_2013 products
+                              (only an option for final erp.
+
+      :param use_one_day_sol: (Optional) Use the clean, one-day-solution.
+      
+      :param igs_repro2:      (Optional) Use IGS 2nd reprocessing campaign 
+                              product files.
+
+      :returns:               A list containing remote file and the file saved.
+
+      .. note:: Parameters ``use_repro_13``, ``use_one_day_sol`` and ``igs_repro2``
+        are only relevant to final products (else they'll be ignored).
+
+      .. note:: Final, one-day-solutions and igs repro2 erp's are only available
+        at the CDDIS ftp host.
+
+      .. note:: The options here should **exactly match** the ones described in 
+        the ``products.rst`` file.
+        
+      .. note:: This functions uses :func:`bernutils.products.pyerp.__cod_erp_all_final__`,
+        :func:`bernutils.products.pyerp.__cod_erp_all_final_rapid__`,
+        :func:`bernutils.products.pyerp.__cod_erp_all_early_rapid__`,
+        :func:`bernutils.products.pyerp.__cod_erp_all_ultra_rapid__` and
+        :func:`bernutils.products.pyerp.__cod_erp_all_prediction__`.
+
+  '''
+  ## output dir must exist
+  if out_dir and not os.path.isdir(out_dir):
+    raise RuntimeError('Invalid directory: %s -> getCodErp.' %out_dir)
+
+  ## transform date to datetime (if needed)
+  if type(datetm) == datetime.date:
+    datetm = datetime.datetime.combine(datetm, datetime.datetime.min.time())
+
+  ## check input parameters
+  if use_repro_13 == True and (use_one_day_sol == True or igs_repro2 == True):
+    raise RuntimeError('Invalid erp options! Cannot have both cod and erp hosts')
+  
+  ## compute delta time (in days) from today
+  dt = datetime.datetime.today() - datetm
+  dt = dt.days + (dt.seconds // 3600) /24.0
+
+  options = []
+
+  ## depending on deltatime, get a list of optional erp files
+  if dt >= 15:
+    options =  __cod_erp_all_final__(use_repro_13, use_one_day_sol, igs_repro2)
+  elif dt >= 4:
+    options  =  __cod_erp_all_final__(use_repro_13, use_one_day_sol, igs_repro2)
+    options += __cod_erp_all_final_rapid__()
+  elif dt >= 0:
+    options  = __cod_erp_all_final_rapid__()
+    options += __cod_erp_all_early_rapid__()
+  elif dt > -1:
+    options  = __cod_erp_all_early_rapid__()
+    options += __cod_erp_all_ultra_rapid__()
+  elif dt > -15:
+    options  = __cod_erp_all_prediction__()
+  else:
+    raise RuntimeError('DeltaTime two far in the future %+03.1f', dt)
+  
+  ## compute the needed date formats
+  week, sow = bernutils.gpstime.pydt2gps(datetm)
+  dow       = int(datetm.strftime('%w'))
+  iyear     = int(datetm.strftime('%Y'))
+
+  ## need to replace the dates
+  options = [ i.replace('yyyy', ('%04i' %iyear)).replace('wwwwd', ('%04i%01i' %(week, dow))).replace('wwww', ('%04i' %week)) for slst in options for i in slst ]
+  options = [ options[x:x+3] for x in xrange(0, len(options), 3) ]
+
+  print 'Delta days is : %+04.1f' %dt
+  for i in options:
+    print 'will try: ', i
+
+  ## the successeful triple is ..
+  suc_triple = []
+
+  ##  for every possible  erp file, see if we can download it. we stop at the
+  ##+ first successeful download.
+  for triple in options:
+    try:
+      if out_dir: 
+        saveas = os.path.join(out_dir, triple[0])
+      else:
+        saveas = triple[0]
+      info = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
+      suc_triple = triple
+      break
+    except:
+      pass
+
+  if len(suc_triple) == 0:
+    raise RuntimeError('Failed to download erp file (0/%1i)' %len(options))
+
+  print 'Downloaded %s to %s' %(info[0], info[1])
+  
+  return '%s' %suc_triple[0], '%s/%s/%s' %(suc_triple[1], suc_triple[2], suc_triple[0])

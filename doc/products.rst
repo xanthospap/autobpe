@@ -1,5 +1,5 @@
 =============================
-Moduleproducts
+Module products
 =============================
 
 ----------------------------------
@@ -72,7 +72,7 @@ Available Code Differential Bias files from CODE are (see [aiub-ftp-readme]_):
 
 .. note:: No DCBs are included in the ``REPRO_2013`` foolder.
 
-The function :func:`bernutils.products.getCodDcb` uses the following translation table to
+The function :func:`bernutils.products.pydcb.getCodDcb` uses the following translation table to
 interpret the input parameter ``stype``.
 
 +-----------------------------------+------------+---------------------------------+
@@ -136,6 +136,7 @@ Available ERP files from CODE are (see [aiub-ftp-readme]_):
   .. note::
     As soon as a final product is available the corresponding rapid,
     ultra-rapid, or predicted product is removed from the aftp server.
+    
 
 * ftp://ftp.unibe.ch/aiub/CODE/yyyy/
 
@@ -144,41 +145,53 @@ Available ERP files from CODE are (see [aiub-ftp-readme]_):
   * **CODwwww7.ERP.Z**
     collection of the 7 daily COD-ERP solutions of the week
 
-* http://www.aiub.unibe.ch/download/REPRO_2013/BSWUSER52/yyyy/
-
-  * **CODyyddd.ERP.Z**
-    Daily final Earth rotation parameter files, Bernese format
-
 * http://www.aiub.unibe.ch/download/REPRO_2013/CODE/yyyy/
 
   * **CODwwwwd.ERP.Z**
     Daily final Earth rotation parameter files, IERS format
+    
+* Also ... available !
+
+  ERPs generated for the igs REPRO2 campaign. These are available via the
+  igs ftp server, in two versions:
+    
+    #. **cf2wwww7.erp.Z** from (CDDIS)/repro2/wwww/, and
+    #. **co22wwww7.erp.Z** from (CDDIS)/repro2/wwww/
 
 The function used to download an erp file from CODE's remote server is 
-:func:`bernutils.products.getCodErp`. 
+:func:`bernutils.products.pyerp.getCodErp`.
 
-+-------------------+--------------------+-----------------------------------------------------------------------------------------------------+
-| today - dt (days) | File to download   | Notes                                                                                               |
-+===================+====================+=====================================================================================================+
-| >= 15.0           | CODwwwwd.ERP.Z,    | * if REPRO_2013 flag set, (CODE)/REPRO_2013/CODE/yyyy/CODwwwwd.ERP.Z                                |
-|                   | or                 | * if one-day-solution flag set, (CDDIS)/wwww/cofwwww7.erp.Z                                         |
-|                   | cofwwww7.erp.Z     | * else (CODE)/yyyy/CODwwwwd.ERP.Z                                                                   |
-+-------------------+--------------------+-----------------------------------------------------------------------------------------------------+
-| [4, 15)           | CODwwwwn.ERP_M[.Z] | * check for final erp (as above)                                                                    |
-|                   | or as above        | * check for final rapid: (CODE)/yyyy_M/CODwwwwd.ERP_M.Z                                             |
-|                   |                    | * check for final rapid: (CODE)/CODwwwwd.ERP_M                                                      |
-+-------------------+--------------------+-----------------------------------------------------------------------------------------------------+
-| (0, 4)            | CODwwwwn.ERP_M [.Z]| * check for final rapid: (CODE)/yyyy_M/CODwwwwd.ERP_M.Z                                             |
-|                   | CODwwwwn.ERP_M     | * check for final rapid: (CODE)/CODwwwwd.ERP_M                                                      |
-|                   | CODwwwwn.ERP_R     | * check for early rapid: (CODE)/CODwwwwd.ERP_R                                                      |
-+-------------------+--------------------+-----------------------------------------------------------------------------------------------------+
-| (0, -1]           | COD.ERP_U          | * check for ultra rapid: (CODE)/COD.ERP_U                                                           |
-|                   | CODwwwwd.ERP_5D    | * check for prediction: (CODE)/CODwwwwd.ERP_5D                                                      |
-+-------------------+--------------------+-----------------------------------------------------------------------------------------------------+
-| [-15, -1]         | CODwwwwd.ERP_5D    | * check for prediction: (CODE)/CODwwwwd.ERP_5D                                                      |
-+-------------------+--------------------+-----------------------------------------------------------------------------------------------------+
-| < -15             | ERROR                                                                                                                    |
-+-------------------+--------------------+-----------------------------------------------------------------------------------------------------+
++-------------------+--------------------+-------------------------------------+---------------------------------------------+
+|                   |                    | FLAGS                               |                                             |
+| today - dt (days) | File to download   +--------+-----------+----------------+  HOST + DIR                                 |
+|                   |                    | REPRO2 | REPRO2013 | OneDaySolution |                                             |
++===================+====================+========+===========+================+=============================================+
+| >= 15.0           | CODwwwwd.ERP.Z     | NO     | NO        | NO             | (CODE)/yyyy/                                |
+|                   +--------------------+--------+-----------+----------------+---------------------------------------------+
+|                   | cf2wwww7.erp.Z     | YES    | NO        | YES            | (CDDIS)/repro2/wwww/                        |
+|                   +--------------------+--------+-----------+----------------+---------------------------------------------+
+|                   | co22wwww7.erp.Z    | YES    | NO        | NO             | (CDDIS)/repro2/wwww/                        |
+|                   +--------------------+--------+-----------+----------------+---------------------------------------------+
+|                   | cofwwww7.erp.Z     | NO     | NO        | YES            | (CDDIS)/wwww/                               |
+|                   +--------------------+--------+-----------+----------------+---------------------------------------------+
+|                   | CODwwwwd.ERP.Z     | YES    | NO        | NO             | (CODE)/REPRO_2013/CODE/yyyy/                |
++-------------------+--------------------+--------+-----------+----------------+---------------------------------------------+
+| [4, 15)           | First search for a valid final erp (as above)                                                          |
+|                   +--------------------+-------------------------------------+---------------------------------------------+
+|                   | CODwwwwd.ERP_M.Z   |                                     | (CODE)/yyyy_M/                              |
+|                   +--------------------+          Ignored                    +---------------------------------------------+
+|                   | CODwwwwd.ERP_M     |                                     | (CODE)/                                     |
++-------------------+--------------------+-------------------------------------+---------------------------------------------+
+| [0, 4)            | First search for a valid final rapid erp (as above)                                                    |
+|                   +--------------------+-------------------------------------+---------------------------------------------+
+|                   | CODwwwwd.ERP_R     |           Ignored                   | (CODE)/                                     |
++-------------------+--------------------+-------------------------------------+---------------------------------------------+
+| (0, -1]           | COD.ERP_U          |                                     |                                             |
+|                   +--------------------+           Ignored                   | (CODE)                                      |
+|                   | CODwwwwd.ERP_5D    |                                     |                                             |
++-------------------+--------------------+-------------------------------------+---------------------------------------------+
+| [-15, -1)         | CODwwwwd.ERP_5D    |           Ignored                   | (CODE)                                      |
++-------------------+--------------------+-------------------------------------+---------------------------------------------+
 
 IGS AC
 ^^^^^^^^
@@ -203,10 +216,10 @@ i.e. P1C1yymm.DCB for April 2014, saved in /home/foo/bar/ :
 .. code-block:: python
 
   >>> import datetime
-  >>> import bernutils.products
+  >>> import bernutils.products.pydcb
 
   >>> apr2014 = datetime.date(2014, 4, 1) # only need a date not datetime
-  >>> result  = bernutils.products.getCodDcb('c1', apr2014, '/home/foo/bar/')
+  >>> result  = bernutils.products.pydcb.getCodDcb('c1', apr2014, '/home/foo/bar/')
   >>> result
   >>> ('/home/foo/bar/P1C11404.DCB.Z', 'ftp.unibe.ch/aiub/CODE/2014/P1C11404.DCB.Z')
 

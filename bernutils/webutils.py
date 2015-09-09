@@ -35,7 +35,7 @@ def grabHttpFile(url, files, saveas):
 
   return return_list
 
-def grabFtpFile(host,dirn,filen,saveas=None,username=None,password=None):
+def grabFtpFile(host, dirn, filen, saveas=None, username=None, password=None):
   ''' Download a file from an ftp server.
 
       :param host:     The host ip/hostname (e.g. ``ftp.unibe.ch``).
