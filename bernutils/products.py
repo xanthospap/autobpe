@@ -121,24 +121,23 @@ def getCodDcb(stype, datetm, out_dir=None):
   iyr2  = int(datetm.strftime('%y'))
   imonth= int(datetm.strftime('%m'))
 
+  ## get running dcb
   if today.year == datetm.year and today.month == datetm.month:
     filename = generic_file.replace('yymm','')
     saveas   = filename
-    if out_dir:
-      saveas = os.path.join(out_dir, filename)
+    if out_dir: saveas = os.path.join(out_dir, filename)
     try:
       localfile, webfile = _getRunningDcb_(filename, saveas)
       return localfile, webfile
     except:
       raise
+
+  ## try for final; if fail, try for running
   elif dt.days < 30:
-    ## try for final; if fail, try for running
-    filename = generic_file.replace('yy', ('%02i'%iyr2))
-    filename = filename.replace('mm', ('%02i'%imonth))
+    filename = generic_file.replace('yymm', ('%02i%02i' %(iyr2, imonth)))
     filename+= '.Z'
     saveas   = filename
-    if out_dir:
-      saveas = os.path.join(out_dir, filename)
+    if out_dir:  saveas = os.path.join(out_dir, filename)
     try:
       localfile, webfile = _getFinalDcb_(iyear,filename,saveas)
       return localfile, webfile
@@ -152,11 +151,13 @@ def getCodDcb(stype, datetm, out_dir=None):
         return localfile, webfile
       except:
         raise
+
+  ## get final dcb
   elif dt.days >= 30:
-    filename = generic_file.replace('yy',('%02i'%iyr2))
-    filename = filename.replace('mm',('%02i'%imonth))
+    filename = generic_file.replace('yymm', ('%02i%02i' %(iyr2, imonth)))
     filename+= '.Z'
     saveas   = filename
+    if out_dir: saveas = os.path.join(out_dir, filename)
     try:
       localfile, webfile = _getFinalDcb_(iyear,filename,saveas)
       return localfile, webfile
