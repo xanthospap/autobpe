@@ -9,7 +9,7 @@ Welcome to bernutils's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    intro
    bamb

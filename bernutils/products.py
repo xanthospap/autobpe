@@ -1,6 +1,6 @@
+import os
 import datetime
 import ftplib
-import os
 import bernutils.gpstime
 import bernutils.webutils
 
@@ -234,9 +234,9 @@ def getCodErp(stype, datetm=None, out_dir=None, use_repro_13=False, prd=0):
 
       :param datetm: A Python ``datetime`` object; not needed
                      if downloading an ultra-rapid product.
-                     
+
       :param out_dir: Output directory (i.e. where the file is to be saved at).
-      
+
       :param prd:    If the user wants the predicted erp (i.e.
                      ``stype = 'p'``, then the prd denotes:
 
@@ -255,7 +255,7 @@ def getCodErp(stype, datetm=None, out_dir=None, use_repro_13=False, prd=0):
                   of the file on web.
 
       .. note::
-          This function is very similar to products.getCodSp3(...)
+        This function is very similar to products.getCodSp3(...)
 
   '''
   ## output dir must exist
@@ -273,7 +273,7 @@ def getCodErp(stype, datetm=None, out_dir=None, use_repro_13=False, prd=0):
   ## date must be specified, except for ultra-rapid
   if stype != 'u' and not datetm:
     raise RuntimeError('Must specify date -> getCodErp.')
-  
+
   ## generic erp file name (including e.g. 'wwww')
   try:
     generic_filen = erp_type[stype]
