@@ -73,6 +73,9 @@ def getCodDcb(stype, datetm, out_dir=None):
                       filename of the downloaded file. The second element is the
                       (original) name of the remote file.
 
+      .. note:: This functions uses :func:`bernutils.products.pydcb._getFinalDcb_`
+        and :func:`bernutils.products.pydcb._getRunningDcb_`
+
   '''
   ## output dir must exist
   if out_dir and not os.path.isdir(out_dir):

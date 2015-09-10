@@ -105,6 +105,31 @@ interpret the input parameter ``stype``.
 | CODE_FULL.DCB                     |     -      | Not yet a valid choice          |
 +-----------------------------------+------------+---------------------------------+
 
+-----------------------------
+Documentation
+-----------------------------
+
+.. automodule:: bernutils.products.pydcb
+   :members:
+   :undoc-members:
+
+-----------------------------
+Examples
+-----------------------------
+
+If we want the dcb file containing the monthly P1-C1 DCB solution for GPS satellites, 
+i.e. P1C1yymm.DCB for April 2014, saved in /home/foo/bar/ :
+
+.. code-block:: python
+
+  >>> import datetime
+  >>> import bernutils.products.pydcb
+
+  >>> apr2014 = datetime.date(2014, 4, 1) # only need a date not datetime
+  >>> result  = bernutils.products.pydcb.getCodDcb('c1', apr2014, '/home/foo/bar/')
+  >>> result
+  >>> ('/home/foo/bar/P1C11404.DCB.Z', 'ftp.unibe.ch/aiub/CODE/2014/P1C11404.DCB.Z')
+
 --------------------------------------
 ERP (Earth Rotation Parameters) files
 --------------------------------------
@@ -112,6 +137,12 @@ ERP (Earth Rotation Parameters) files
 Earth Rotation Parameters files are produced by various Analysis Centers (AC) and
 hence can be downloaded by various remote sources. In the ``bernutils`` library, two
 ACs are available for downloading erp files, namely CODE and IGS.
+
+.. warning::
+
+  In the following paragraphs, the AC-specific details for ERP files are summarized.
+  However, it is recomended to use the AC-independent function :func:`bernutils.products.pyerp.getErp`
+  to download any erp file (and **NOT** the versions per AC).
 
 CODE AC
 ^^^^^^^^
@@ -136,7 +167,6 @@ Available ERP files from CODE are (see [aiub-ftp-readme]_):
   .. note::
     As soon as a final product is available the corresponding rapid,
     ultra-rapid, or predicted product is removed from the aftp server.
-    
 
 * ftp://ftp.unibe.ch/aiub/CODE/yyyy/
 
@@ -149,16 +179,16 @@ Available ERP files from CODE are (see [aiub-ftp-readme]_):
 
   * **CODwwwwd.ERP.Z**
     Daily final Earth rotation parameter files, IERS format
-    
-* Also ... available !
+
+* Also available !
 
   ERPs generated for the igs REPRO2 campaign. These are available via the
   igs ftp server, in two versions:
-    
+
     #. **cf2wwww7.erp.Z** from (CDDIS)/repro2/wwww/, and
     #. **co22wwww7.erp.Z** from (CDDIS)/repro2/wwww/
 
-The function used to download an erp file from CODE's remote server is 
+The function used to download a CODE-generated erp is 
 :func:`bernutils.products.pyerp.getCodErp`.
 
 +-------------------+--------------------+-------------------------------------+---------------------------------------------+
@@ -196,13 +226,48 @@ The function used to download an erp file from CODE's remote server is
 IGS AC
 ^^^^^^^^
 
-todo!!
+Available ERP files from IGS are (see [igs-products]_):
+
+* **Ultra-Rapid** (predicted half) iguwwwwd_[00|06|12|18].erp.Z
+* **Ultra-Rapid** (observed half) iguwwwwd_[00|06|12|18].erp.Z
+* **Rapid** igrwwwwd.erp.Z
+* **Final** igswwww7.erp.Z
+* **igu00p01.erp.Z** Accumulated Ultra Rapid IGS erp files (in /products area 
+  **NOT** archived by gps week)
+* **ig2yyPwwww.erp.Z** igs repro2 erp files (in /products/repro2 area)
+
+The function used to download an igs-generated erp file is 
+:func:`bernutils.products.pyerp.getIGSErp`.
+
++-------------------+--------------------+--------+---------------------------------------------+
+|                   |                    | FLAGS  |                                             |
+| today - dt (days) | File to download   +--------+  HOST + DIR                                 |
+|                   |                    | REPRO2 |                                             |
++===================+====================+========+=============================================+
+| >= 17.0           | igswwww7.erp.Z     | NO     | (CDDIS)/wwww/                               |
+|                   +--------------------+--------+---------------------------------------------+
+|                   | ig2yyPwwww.erp.Z   | YES    | (CDDIS)/repro2/wwww/                        |
++-------------------+--------------------+--------+---------------------------------------------+
+| [4, 17)           | First search for a valid final erp (as above)                             |
+|                   +--------------------+--------+---------------------------------------------+
+|                   | igrwwwwd.erp.Z     |   -    | (CDDIS)/wwww/                               |
++-------------------+--------------------+--------+---------------------------------------------+
+| [0, 4)            | First search for a valid rapid erp (as above)                             |
+|                   +--------------------+--------+---------------------------------------------+
+|                   | iguwwwwd_HH.erp.Z  |   -    | (CDDIS)/wwww/                               |
++-------------------+--------------------+--------+---------------------------------------------+
+| (0, -1]           | First search for a valid rapid erp (as above)                             |
+|                   +--------------------+--------+---------------------------------------------+
+|                   | igu00p01.erp.Z     |   -    | (CDDIS)                                     |
++-------------------+--------------------+--------+---------------------------------------------+
+| [-15, -1)         | igu00p01.erp.Z     |   -    | (CDDIS)                                     |
++-------------------+--------------------+------------------------------------------------------+
 
 -----------------------------
 Documentation
 -----------------------------
 
-.. automodule:: bernutils.products
+.. automodule:: bernutils.products.pyerp
    :members:
    :undoc-members:
 
@@ -210,21 +275,10 @@ Documentation
 Examples
 -----------------------------
 
-If we want the dcb file containing the monthly P1-C1 DCB solution for GPS satellites, 
-i.e. P1C1yymm.DCB for April 2014, saved in /home/foo/bar/ :
-
-.. code-block:: python
-
-  >>> import datetime
-  >>> import bernutils.products.pydcb
-
-  >>> apr2014 = datetime.date(2014, 4, 1) # only need a date not datetime
-  >>> result  = bernutils.products.pydcb.getCodDcb('c1', apr2014, '/home/foo/bar/')
-  >>> result
-  >>> ('/home/foo/bar/P1C11404.DCB.Z', 'ftp.unibe.ch/aiub/CODE/2014/P1C11404.DCB.Z')
-
 -----------------------------
 References
 -----------------------------
 
 .. [aiub-ftp-readme] ftp://ftp.unibe.ch/aiub/AIUB_AFTP.TXT, last accessed Sep, 2015
+
+.. [igs-products] https://igscb.jpl.nasa.gov/components/prods.html

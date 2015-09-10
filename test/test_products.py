@@ -12,11 +12,19 @@ today = datetime.datetime.today()
 # path to download files
 dir = '/home/xanthos/Downloads'
 
+print '//-------------------------------------------------------------------//'
 bernutils.products.pyerp.getCodErp(dtm, '/home/xanthos/Downloads/tmp_prods/')
-
+print '//-------------------------------------------------------------------//'
+bernutils.products.pyerp.getIgsErp(dtm, '/home/xanthos/Downloads/tmp_prods/')
+print '//-------------------------------------------------------------------//'
 bernutils.products.pyerp.getCodErp(yesterday,'/home/xanthos/Downloads/tmp_prods')
-
+print '//-------------------------------------------------------------------//'
+bernutils.products.pyerp.getIgsErp(yesterday,'/home/xanthos/Downloads/tmp_prods')
+print '//-------------------------------------------------------------------//'
 bernutils.products.pyerp.getCodErp(datetime.date.today() - datetime.timedelta(10))
+print '//-------------------------------------------------------------------//'
+bernutils.products.pyerp.getIgsErp(datetime.date.today() - datetime.timedelta(10))
+print '//-------------------------------------------------------------------//'
 
 '''
 # final orbit for dtm
