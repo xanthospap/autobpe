@@ -83,9 +83,10 @@ def grabFtpFile(host, dirn, filen, saveas=None, username=None, password=None):
   except:
     ftp.quit()
     ## remove corrupt file
-    try: 
-      if os.path.isfile(localfile):
-          os.remove(localfile)
+    try:
+      localfile.close()
+      if os.path.isfile(saveas):
+        os.remove(saveas)
     except:
       pass
     raise RuntimeError('Failed to download file: %s' %(host + dirn + filen))

@@ -12,9 +12,9 @@ today = datetime.datetime.today()
 # path to download files
 dir = '/home/xanthos/Downloads'
 
-bernutils.products.pyerp.getCodErp(dtm, '/home/xanthos/Downloads/')
+bernutils.products.pyerp.getCodErp(dtm, '/home/xanthos/Downloads/tmp_prods/')
 
-bernutils.products.pyerp.getCodErp(yesterday,'/home/xanthos/Downloads')
+bernutils.products.pyerp.getCodErp(yesterday,'/home/xanthos/Downloads/tmp_prods')
 
 bernutils.products.pyerp.getCodErp(datetime.date.today() - datetime.timedelta(10))
 
