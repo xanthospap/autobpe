@@ -114,11 +114,11 @@ pygments_style = 'sphinx'
 # html_theme = 'haiku'
 # html_theme = 'nature'
 # html_theme = 'openlmitheme'
-# html_theme = 'pylonsfw'
+html_theme = 'pylonsfw'
 # html_theme = 'pyramidnew'
 # html_theme = 'scrolls'
 # html_theme = 'sphinxdoc'
-html_theme = 'traditional'
+# html_theme = 'traditional'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

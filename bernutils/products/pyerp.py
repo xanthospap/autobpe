@@ -163,7 +163,7 @@ def __cod_erp_all_final__(use_repro_13=False, use_one_day_sol=False, igs_repro2=
     if use_one_day_sol == True:
       FILENAME = 'cofwwww7.erp.Z'
       HOST     = IGS_HOST
-      DIRN     = IGS_DIR + '/wwww/'
+      DIR      = IGS_DIR + '/wwww/'
 
     ## CODE's 2013 re-processing (CODE)/REPRO_2013/CODE/yyyy/CODwwwwd.ERP.Z
     elif use_repro_13 == True:
@@ -177,7 +177,7 @@ def __cod_erp_all_final__(use_repro_13=False, use_one_day_sol=False, igs_repro2=
       HOST     = COD_HOST
       DIR      = COD_DIR + '/yyyy/'
 
-    return [[ FILENAME, HOST, DIR ]]
+  return [[ FILENAME, HOST, DIR ]]
 
 def __cod_erp_all_final_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
