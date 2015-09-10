@@ -20,6 +20,9 @@ import os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../bernutils'))
 
+## the following is for aditional themes (--xp--)
+sys.path.append(os.path.abspath('/usr/lib/python2.7/site-packages/sphinx/themes/'))
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -49,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'bernutils'
-copyright = u'2015, xp, da'
+copyright = u'2015, xp, da licence: WTFPL'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -103,7 +106,19 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+# html_theme = 'default'
+# html_theme = 'pylons'
+# html_theme = 'agogo'
+# html_theme = 'basic'
+# html_theme = 'epub'
+# html_theme = 'haiku'
+# html_theme = 'nature'
+# html_theme = 'openlmitheme'
+# html_theme = 'pylonsfw'
+# html_theme = 'pyramidnew'
+# html_theme = 'scrolls'
+# html_theme = 'sphinxdoc'
+html_theme = 'traditional'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -111,7 +126,8 @@ html_theme = 'default'
 #html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+# uncomment for additional themes
+html_theme_path = ['/usr/lib/python2.7/site-packages/sphinx/themes/']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".

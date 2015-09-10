@@ -4,7 +4,7 @@ except ImportError:
     from distutils.core import setup
 
 config = {
-    'description': 'Python modules to accomodate Bernese5.2 wrappers.',
+    'description': 'Python module to accomodate routine GNSS processing at NTUA.',
     'author': 'xp, da',
     'url': 'https://github.com/xanthospap/autobpe',
     'download_url': '',
