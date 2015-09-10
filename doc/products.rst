@@ -182,8 +182,10 @@ Available ERP files from CODE are (see [aiub-ftp-readme]_):
 
 * Also available !
 
-  ERPs generated for the igs REPRO2 campaign. These are available via the
-  igs ftp server, in two versions:
+  * **cofwwww7.erp.Z** One-day, final erp files from igs
+
+  * ERPs generated for the igs REPRO2 campaign. These are available via the
+    igs ftp server, in two versions:
 
     #. **cf2wwww7.erp.Z** from (CDDIS)/repro2/wwww/, and
     #. **co22wwww7.erp.Z** from (CDDIS)/repro2/wwww/
@@ -275,10 +277,67 @@ Documentation
 Examples
 -----------------------------
 
+----------------------------------------
+Satellite Orbit Information files (SP3)
+----------------------------------------
+
+CODE AC
+^^^^^^^^
+
+.. warning:: CODE does not use the default extension for sp3 files (i.e. .sp3).
+  Instead, it uses the .EPH extension.
+
+Available sp3-formated files from CODE are (see [aiub-ftp-readme]_):
+
+* ftp://ftp.unibe.ch/aiub/CODE/
+
+  * **COD.EPH_U** 
+    CODE ultra-rapid GNSS orbits; GNSS ephemeris/broadcast clock data in at 15-min
+    intervals in SP3 format, including accuracy codes computed from a long-arc
+    analysis.
+  * **COD.EPH_5D** Last update of CODE 5-day orbit predictions, from
+    rapid analysis, including all active GLONASS satellites
+  * **CODwwwwd.EPH_M** 
+    CODE final rapid GNSS orbits (middle day of a long-arc solution where the rapid
+    observations were completed by a subsequent ultra-rapid dataset)
+  * **CODwwwwd.EPH_R** 
+    CODE early rapid GNSS orbits (third day of a 72-hour solution)
+  * **CODwwwwd.EPH_P**
+    CODE 24-hour GNSS orbit predictions
+  * **CODwwwwd.EPH_P2**
+    CODE 48-hour GNSS orbit predictions
+  * **CODwwwwd.ERP_5D**
+    CODE 5-day GNSS orbit predictions
+
+  .. note::
+    As soon as a final product is available the corresponding rapid,
+    ultra-rapid, or predicted product is removed from the aftp server.
+
+* ftp://ftp.unibe.ch/aiub/CODE/yyyy/
+
+  * **CODwwwwd.EPH.Z**
+    GNSS ephemeris/clock data in 7 daily files at 15-min intervals in SP3 format, 
+    including accuracy codes computed from a long-arc analysis.
+
+* http://www.aiub.unibe.ch/download/REPRO_2013/CODE/yyyy/
+
+  * **CODwwwwd.EPH.Z**
+    Final GNSS orbits
+
+* Also available !
+
+  * **cofwwww7.eph.Z** One-day, final sp3 files from igs
+
+  * SP3s generated for the igs REPRO2 campaign. These are available via the
+    igs ftp server, in two versions:
+
+    #. **cf2wwww7.eph.Z** from (CDDIS)/repro2/wwww/, and
+    #. **co22wwww7.eph.Z** from (CDDIS)/repro2/wwww/
+
 -----------------------------
 References
 -----------------------------
 
 .. [aiub-ftp-readme] ftp://ftp.unibe.ch/aiub/AIUB_AFTP.TXT, last accessed Sep, 2015
 
-.. [igs-products] https://igscb.jpl.nasa.gov/components/prods.html
+.. [igs-products] https://igscb.jpl.nasa.gov/components/prods.html, last accessed Sep, 2015
