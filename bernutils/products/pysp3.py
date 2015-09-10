@@ -472,10 +472,41 @@ def getOrb(datetm, ac='cod', out_dir=None, use_repro_13=False, use_one_day_sol=F
   else:
     raise RuntimeError('Invalid Analysis Center: %s.' %ac)
 
-def getNav(datetm, sat_sys='G', session='0'):
+def getNav(datetm, sat_sys='G', station=None, hour=None):
+  ''' This function will download a broadcast orbit file either an accumulated one
+  
   try:
     nchar = SAT_SYS_TO_NAV_DICT[sat_sys]
   except:
     raise RuntimeError('Invalid Satellite System identifier: [%s]' %sat_sys)
+  
+  if hour and not station:
+    raise RuntimeError('Hourly navigation files only available for igs stations')
+  
+  if hour and sat_sys != 'G':
+    raise RuntimeError('Hourly navigation files only available gps')
+  
+  ## compute the needed date formats
+  iyear = int(datetm.strftime('%Y'))
+  yy    = int(datetm.strftime('%y'))
+  doy   = int(datetm.strftime('%j'))
+  
+  HOST = IGS_HOST
+  
+  DIR  = '/gnss/data/daily/%04i/%03i/%02i%s/' %(iyear, doy, yy, nchar)
+  
+  if hour:
+    ihour   = int(hour)
+    session = SES_IDENTIFIERS_INT[ihour]
+  else:
+    session = '0'
+  
+  if not station: station = 'brdc'
 
-  NAVFILE = 'brdc%03i%1s.%02i%1s.Z' %(doy, session, yy, nchar)
+  NAVFILE = '%s%03i%1s.%02i%1s.Z' %(doy, session, yy, nchar)
+  
+  try:
+    info = bernutils.webutils.grabFtpFile(HOST, DIR, NAVFILE, NAVFILE)
+    return info
+  except:
+    raise RuntimeError('Failed to fetch navigation file: %s' %(HOST+DIR+NAVFILE))
