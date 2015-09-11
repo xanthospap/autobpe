@@ -83,10 +83,10 @@ def __cod_sp3_all_final__(use_repro_13=False, use_one_day_sol=False, igs_repro2=
                               (triple) combination is returned as a list (so the
                               function returns a list of lists).
 
-      .. note:: One-day-solutions are only available at the CDDIS ftp host.
-
-      .. note:: The options here should **exactly match** the ones described 
-        in the  ``products.rst`` file.
+      .. note:: 
+        # One-day-solutions are only available at the CDDIS ftp host.
+        # The options here should **exactly match** the ones described 
+          in the  ``products.rst`` file.
 
   '''
   # Manage repro2 igs campaign erp files.
@@ -130,12 +130,12 @@ def __cod_sp3_all_final_rapid__():
                 the file FILENAME is to be found) list for every possible 
                 final-rapid sp3 file. So, alist of lists.
 
-      .. note:: The options here should **exactly match** the ones described in
-         the ``products.rst`` file.
-
-      .. note:: There are two possible fina-rapid sp3 files, stored in different
-        product areas and in different formats (.Z or uncompressed). The function
-        will thus return information for both.
+      .. note:: 
+        #. The options here should **exactly match** the ones described in the
+           ``products.rst`` file.
+        #. There are two possible fina-rapid sp3 files, stored in different
+           product areas and in different formats (.Z or uncompressed). The function
+           will thus return information for both.
 
   '''
 
@@ -228,16 +228,15 @@ def getIgsSp3(datetm, out_dir=None, igs_repro2=False):
 
       :returns:               A list containing saved file and the remote file.
 
-      .. note:: Parameter ``igs_repro2`` is only relevant to final products 
-        (else it'll be ignored).
-
-      .. note:: The options here should **exactly match** the ones described in 
-        the ``products.rst`` file.
-
-      .. note:: This functions uses :func:`bernutils.products.pyerp.__igs_sp3_all_final__`,
-        :func:`bernutils.products.pyerp.__igs_sp3_all_rapid__`,
-        :func:`bernutils.products.pyerp.__igs_sp3_all_ultra_rapid__` and
-        :func:`bernutils.products.pyerp.__igs_sp3_all_prediction__`.
+      .. note:: 
+        #. Parameter ``igs_repro2`` is only relevant to final products
+           (else it'll be ignored).
+        #. The options here should **exactly match** the ones described in
+           the ``products.rst`` file.
+        #. This functions uses :func:`bernutils.products.pyerp.__igs_sp3_all_final__`,
+           :func:`bernutils.products.pyerp.__igs_sp3_all_rapid__`,
+           :func:`bernutils.products.pyerp.__igs_sp3_all_ultra_rapid__` and
+           :func:`bernutils.products.pyerp.__igs_sp3_all_prediction__`.
 
   '''
   ## output dir must exist
@@ -335,20 +334,18 @@ def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
 
       :returns:               A list containing saved file and the remote file.
 
-      .. note:: Parameters ``use_repro_13``, ``use_one_day_sol`` and ``igs_repro2``
-        are only relevant to final products (else they'll be ignored).
-
-      .. note:: Final, one-day-solutions and igs repro2 erp's are only available
-        at the CDDIS ftp host.
-
-      .. note:: The options here should **exactly match** the ones described in 
-        the ``products.rst`` file.
-
-      .. note:: This functions uses :func:`bernutils.products.pysp3.__cod_sp3_all_final__`,
-        :func:`bernutils.products.pysp3.__cod_sp3_all_final_rapid__`,
-        :func:`bernutils.products.pysp3.__cod_sp3_all_early_rapid__`,
-        :func:`bernutils.products.pysp3.__cod_sp3_all_ultra_rapid__` and
-        :func:`bernutils.products.pysp3.__cod_sp3_all_prediction__`.
+      .. note::
+        #. Parameters ``use_repro_13``, ``use_one_day_sol`` and ``igs_repro2``
+           are only relevant to final products (else they'll be ignored).
+        #. Final, one-day-solutions and igs repro2 erp's are only available
+           at the CDDIS ftp host.
+        #. The options here should **exactly match** the ones described in
+           the ``products.rst`` file.
+        #. This functions uses :func:`bernutils.products.pysp3.__cod_sp3_all_final__`,
+           :func:`bernutils.products.pysp3.__cod_sp3_all_final_rapid__`,
+           :func:`bernutils.products.pysp3.__cod_sp3_all_early_rapid__`,
+           :func:`bernutils.products.pysp3.__cod_sp3_all_ultra_rapid__` and
+           :func:`bernutils.products.pysp3.__cod_sp3_all_prediction__`.
 
   '''
   ## output dir must exist
@@ -456,11 +453,12 @@ def getOrb(datetm, ac='cod', out_dir=None, use_repro_13=False, use_one_day_sol=F
 
       :returns:               A list containing saved file and the remote file.
 
-      .. note:: Parameters ``use_repro_13``, ``use_one_day_sol`` and ``igs_repro2``
-        are only relevant to final products (else they'll be ignored).
+      .. note::
 
-      .. note:: Final, one-day-solutions and igs repro2 erp's are only available
-        at the CDDIS ftp host.
+        #. Parameters ``use_repro_13``, ``use_one_day_sol`` and ``igs_repro2``
+           are only relevant to final products (else they'll be ignored).
+        #. Final, one-day-solutions and igs repro2 erp's are only available at
+           the CDDIS ftp host.
 
   '''
 

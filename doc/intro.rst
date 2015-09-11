@@ -1,5 +1,5 @@
 bernutils Introduction
-======================
+***********************
 
 | Documentation for the bernutils Python package
 
@@ -31,6 +31,17 @@ Bugs
 ====
 
 Report any bugs to the dedicated Bugzilla tracker http://dionysos.survey.ntua.gr/bugzilla/
+
+Contributing
+============
+
+Fork / clone / branch the repository.
+
+Rules:
+
+* Do **NOT** use tabs; only whitespaces,
+* Whithin the project, tab = 2 whitespaces
+* Comment your code (sphinx-rst)
 
 Copyright
 =========

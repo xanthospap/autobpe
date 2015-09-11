@@ -1,13 +1,16 @@
-=============================
-Module : gpstimet
-=============================
+******************
+Module : gpstime
+******************
+
+Introduction
+=============
 
 This module contains various functions to accomodate the easy handling of
 date and/or datetime obects. 
 
------------------------------
+
 Documentation
------------------------------
+==============
 
 .. automodule:: bernutils.gpstime
    :private-members:
@@ -15,6 +18,6 @@ Documentation
    :members:
    :undoc-members:
 
------------------------------
+
 Examples
------------------------------
+=========

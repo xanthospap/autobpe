@@ -1,6 +1,9 @@
-=============================
+***************
 Module : bsta
-=============================
+***************
+
+Itroduction
+============
 
 This module contains the class **stafile** which represents a Bernese v5.2
 station information file. 
@@ -16,9 +19,9 @@ functions/modules depend that this format is kept. For an example of .STA
 files, see ftp://ftp.unibe.ch/aiub/BSWUSER52/STA/ and the collection of .STA
 files placed there.
 
------------------------------
+
 Documentation
------------------------------
+==============
 
 .. currentmodule:: bernutils.bsta
 
@@ -34,9 +37,9 @@ Documentation
    :special-members:
    :undoc-members:
 
------------------------------
+
 Examples
------------------------------
+==========
 
 Example usage of the class **stafile**, using CODE's .STA file
 (available at <ftp://ftp.unibe.ch/aiub/BSWUSER52/STA/CODE.STA>)

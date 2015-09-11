@@ -1,6 +1,9 @@
-=============================
+**************
 Module : bcrd
-=============================
+**************
+
+Introduction
+=============
 
 This module contains the class **crdfile** which represents a Bernese v5.2
 station coordinate file. 
@@ -17,28 +20,28 @@ functions/modules depend that this format is kept. For an example of .CRD
 files, see ftp://ftp.unibe.ch/aiub/BSWUSER52/STA/ and the collection of .CRD
 files placed there.
 
------------------------------
+
 Documentation
------------------------------
+==============
 
 .. currentmodule:: bernutils.bcrd
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Class crdpoint
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------
 
 .. autoclass:: bernutils.bcrd.CrdPoint
    :members:
    :undoc-members:
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Class crdfile
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------
 
 .. autoclass:: bernutils.bcrd.CrdFile
    :members:
    :undoc-members:
 
------------------------------
+
 Examples
------------------------------
+==========

@@ -1,10 +1,9 @@
-=============================
+***************
 Module products
-=============================
+***************
 
-----------------------------------
 DCB files (Differential Code Bias)
-----------------------------------
+==================================
 
 DCB files are always downloaded from CODE's ftp archive. Depending on the latency
 they can be placed in different directories: old DCB files are archived into
@@ -105,7 +104,6 @@ interpret the input parameter ``stype``.
 | CODE_FULL.DCB                     |     -      | Not yet a valid choice          |
 +-----------------------------------+------------+---------------------------------+
 
------------------------------
 Documentation
 -----------------------------
 
@@ -113,7 +111,6 @@ Documentation
    :members:
    :undoc-members:
 
------------------------------
 Examples
 -----------------------------
 
@@ -130,9 +127,9 @@ i.e. P1C1yymm.DCB for April 2014, saved in /home/foo/bar/ :
   >>> result
   >>> ('/home/foo/bar/P1C11404.DCB.Z', 'ftp.unibe.ch/aiub/CODE/2014/P1C11404.DCB.Z')
 
---------------------------------------
+
 ERP (Earth Rotation Parameters) files
---------------------------------------
+======================================
 
 Earth Rotation Parameters files are produced by various Analysis Centers (AC) and
 hence can be downloaded by various remote sources. In the ``bernutils`` library, two
@@ -145,7 +142,7 @@ ACs are available for downloading erp files, namely CODE and IGS.
   to download any erp file (and **NOT** the versions per AC).
 
 CODE AC
-^^^^^^^^
+--------
 
 Available ERP files from CODE are (see [aiub-ftp-readme]_):
 
@@ -226,7 +223,7 @@ The function used to download a CODE-generated erp is
 +-------------------+--------------------+-------------------------------------+---------------------------------------------+
 
 IGS AC
-^^^^^^^^
+-------
 
 Available ERP files from IGS are (see [igs-products]_):
 
@@ -265,21 +262,21 @@ The function used to download an igs-generated erp file is
 | [-15, -1)         | igu00p01.erp.Z     |   -    | (CDDIS)                                     |
 +-------------------+--------------------+--------+---------------------------------------------+
 
------------------------------
+
 Documentation
------------------------------
+--------------
 
 .. automodule:: bernutils.products.pyerp
    :members:
    :undoc-members:
 
------------------------------
-Examples
------------------------------
 
-----------------------------------------
+Examples
+---------
+
+
 Satellite Orbit Information files (SP3)
-----------------------------------------
+========================================
 
 .. warning::
 
@@ -288,7 +285,7 @@ Satellite Orbit Information files (SP3)
   to download any sp3 file (and **NOT** the versions per AC).
 
 CODE AC
-^^^^^^^^
+--------
 
 .. warning:: CODE does not use the default extension for sp3 files (i.e. .sp3).
   Instead, it uses the .EPH extension.
@@ -376,7 +373,7 @@ The function used to download a CODE-generated erp is
 +-------------------+--------------------+-------------------------------------+---------------------------------------------+
 
 IGS AC
-^^^^^^^^
+-------
 
 Available SP3 files from IGS are (see [igs-products]_):
 
@@ -413,9 +410,9 @@ The function used to download an igs-generated erp file is
 | [-15, -1)         |                        -                                                  |
 +-------------------+--------------------+--------+---------------------------------------------+
 
-----------------------------------------
+
 Broadcast Satellite Orbit files (NAV)
-----------------------------------------
+-------------------------------------
 
 It is also possible to download navigation orbit files (in RINEX format), either
 the accumulated daily one (where the station name is replaced by 'brdc'), or
@@ -428,21 +425,65 @@ For Station-specific navigation files it is also possible to download hourly fil
 
 For more information, see the function :func:`bernutils.products.pysp3.getNav`.
 
------------------------------
+
 Documentation
------------------------------
+--------------
 
 .. automodule:: bernutils.products.pysp3
    :members:
    :undoc-members:
 
------------------------------
-Examples
------------------------------
 
------------------------------
+Examples
+---------
+
+Inospheric Information/Model Files
+===================================
+
+Ionospheric Correction/Model/Map files can be formated in various ways
+and contain different kind of information. Within the Bernese software, users
+usually make use of the .ION files. These files are Bernese-specific.
+
+.ION files
+--------------
+
+ION files are distributed by CODE; the following options are available (see [aiub-ftp-readme]_):
+
+* ftp://ftp.unibe.ch/aiub/CODE/
+
+  * **COD.ION_U** Last update of CODE rapid ionosphere product (1 day) complemented
+    with ionosphere predictions (2 days)
+  * **CODwwwwd.ION_R** CODE rapid ionosphere product, Bernese format
+  * **CODwwwwd.ION_P** CODE 1-day ionosphere predictions, Bernese format
+  * **CODwwwwd.ION_P2** CODE 2-day ionosphere predictions, Bernese format
+  * **CODwwwwd.ION_P5** CODE 5-day ionosphere predictions, Bernese format
+
+* ftp://ftp.unibe.ch/aiub/CODE/yyyy
+
+  * **CODwwwwd.ION.Z**  CODE final ionosphere product, Bernese format
+
++-------------------+--------------------+---------------------------------------------+
+|                   |                    |                                             |
+| today - dt (days) | File to download   +  HOST + DIR                                 |
+|                   |                    |                                             |
++===================+====================+=============================================+
+| >= 15.0           | CODwwwwd.ION.Z     | (CODE)/yyyy/                                |
++-------------------+--------------------+---------------------------------------------+
+| [4, 15)           | First search for a valid final .ION (as above)                   |
+|                   +--------------------+---------------------------------------------+
+|                   | CODwwwwd.ION_R     | (CODE)                                      |
++-------------------+--------------------+---------------------------------------------+
+| [4, 1)            | CODwwwwd.ION_R     | (CODE)                                      |
++-------------------+--------------------+---------------------------------------------+
+| [1, -1)           | First search for a valid rapid ION file                          |
+|                   +--------------------+---------------------------------------------+
+|                   | COD.ION_U          | (CODE)                                      |
++-------------------+--------------------+---------------------------------------------+
+| [-1, -3)          | COD.ION_U          | (CODE)                                      |
++-------------------+--------------------+---------------------------------------------+
+
 References
------------------------------
+===========
 
 .. [aiub-ftp-readme] ftp://ftp.unibe.ch/aiub/AIUB_AFTP.TXT, last accessed Sep, 2015
 

@@ -1,6 +1,9 @@
-=============================
+**************
 Module : bamb
-=============================
+**************
+
+Introduction
+=============
 
 This module contains the classes:
 
@@ -37,32 +40,32 @@ lines to instances of ``AmbLine`` to extract information.
   in record lines of different length. This is taken care of when casting a raw record
   line in an ``AmbLine`` instance.
 
------------------------------
+
 Documentation
------------------------------
+==============
 
 .. currentmodule:: bernutils.bamb
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Class ambline
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------
 
 .. autoclass:: bernutils.bamb.AmbLine
   :members:
   :undoc-members:
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Class ambfile
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------
 
 .. autoclass:: bernutils.bamb.AmbFile
   :members:
 
 .. _bamb-examples:
 
------------------------------
+
 Examples
------------------------------
+----------
 
 .. code-block:: python
 
