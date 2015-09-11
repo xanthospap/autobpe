@@ -1,8 +1,14 @@
 #! /usr/bin/python
 
 import datetime
-import bernutils.bsta
+import bernutils.bsta2
 
+x = bernutils.bsta2.StaFile('CODE.STA')
+
+x.match_old_name('WTZR')
+x.match_old_name('BJCO')
+
+'''
 ## Test Program
 x = bernutils.bsta.stafile('CODE.STA')
 
@@ -19,3 +25,4 @@ recs = []
 recs = x.loadAll()
 for i in recs.type1List():
     print i.line()
+'''

@@ -106,7 +106,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-# html_theme = 'default'
+html_theme = 'default'
 # html_theme = 'pylons'
 # html_theme = 'agogo'
 # html_theme = 'basic'
@@ -114,7 +114,7 @@ pygments_style = 'sphinx'
 # html_theme = 'haiku'
 # html_theme = 'nature'
 # html_theme = 'openlmitheme'
-html_theme = 'pylonsfw'
+# html_theme = 'pylonsfw'
 # html_theme = 'pyramidnew'
 # html_theme = 'scrolls'
 # html_theme = 'sphinxdoc'
