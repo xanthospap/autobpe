@@ -284,7 +284,7 @@ Satellite Orbit Information files (SP3)
 .. warning::
 
   In the following paragraphs, the AC-specific details for SP3 files are summarized.
-  However, it is recomended to use the AC-independent function :func:`bernutils.products.pyerp.getSp3`
+  However, it is recomended to use the AC-independent function :func:`bernutils.products.pysp3.getOrb`
   to download any sp3 file (and **NOT** the versions per AC).
 
 CODE AC
@@ -341,7 +341,7 @@ Available sp3-formated files from CODE are (see [aiub-ftp-readme]_):
     #. **co22wwww7.eph.Z** from (CDDIS)/repro2/wwww/
 
 The function used to download a CODE-generated erp is 
-:func:`bernutils.products.pyerp.getCodSp3`.
+:func:`bernutils.products.pysp3.getCodSp3`.
 
 +-------------------+--------------------+-------------------------------------+---------------------------------------------+
 |                   |                    | FLAGS                               |                                             |
@@ -387,7 +387,7 @@ Available SP3 files from IGS are (see [igs-products]_):
 * **ig2yyPwwwwd.sp3.Z** igs repro2 sp3 files (in /products/repro2 area)
 
 The function used to download an igs-generated erp file is 
-:func:`bernutils.products.pyerp.getIgsErp`.
+:func:`bernutils.products.pysp3.getIgsSp3`.
 
 +-------------------+--------------------+--------+---------------------------------------------+
 |                   |                    | FLAGS  |                                             |
@@ -417,7 +417,28 @@ The function used to download an igs-generated erp file is
 Broadcast Satellite Orbit files (NAV)
 ----------------------------------------
 
+It is also possible to download navigation orbit files (in RINEX format), either
+the accumulated daily one (where the station name is replaced by 'brdc'), or
+for a given station.
 
+For Station-specific navigation files it is also possible to download hourly files.
+
+.. warning:: Station-specific navigation files are only available for igs staions,
+  since the function uses the cddis archive.
+
+For more information, see the function :func:`bernutils.products.pysp3.getNav`.
+
+-----------------------------
+Documentation
+-----------------------------
+
+.. automodule:: bernutils.products.pysp3
+   :members:
+   :undoc-members:
+
+-----------------------------
+Examples
+-----------------------------
 
 -----------------------------
 References

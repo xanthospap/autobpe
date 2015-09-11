@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-import bernutils.products.pyerp
+import bernutils.products.pysp3
 import datetime
 
 # set a datetime and a date
@@ -13,20 +13,4 @@ today = datetime.datetime.today()
 dir = '/home/xanthos/Downloads'
 
 
-bernutils.products.pyerp.getErp(dtm, 'cod', dir, use_one_day_sol=True)
-
-'''
-print '//-------------------------------------------------------------------//'
-bernutils.products.pyerp.getCodErp(dtm, '/home/xanthos/Downloads/tmp_prods/')
-print '//-------------------------------------------------------------------//'
-bernutils.products.pyerp.getIgsErp(dtm, '/home/xanthos/Downloads/tmp_prods/')
-print '//-------------------------------------------------------------------//'
-bernutils.products.pyerp.getCodErp(yesterday,'/home/xanthos/Downloads/tmp_prods')
-print '//-------------------------------------------------------------------//'
-bernutils.products.pyerp.getIgsErp(yesterday,'/home/xanthos/Downloads/tmp_prods')
-print '//-------------------------------------------------------------------//'
-bernutils.products.pyerp.getCodErp(datetime.date.today() - datetime.timedelta(10))
-print '//-------------------------------------------------------------------//'
-bernutils.products.pyerp.getIgsErp(datetime.date.today() - datetime.timedelta(10))
-print '//-------------------------------------------------------------------//'
-'''
+print bernutils.products.pysp3.getNav(dtm, 'G', dir)

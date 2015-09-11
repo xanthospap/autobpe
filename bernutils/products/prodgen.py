@@ -6,7 +6,11 @@ COD_DIR_2013  = '/aiub/REPRO_2013/CODE'
 IGS_DIR       = '/gnss/products'
 IGS_DIR_REP2  = '/gnss/products/repro2'
 
-SAT_SYS_TO_NAV_DICT = { 'G': 'n', 'R': 'G', 'S': 'H' }
+SAT_SYS_TO_NAV_DICT = { 
+  'G': 'n', 
+  'R': 'g', 
+  'S': 'h' 
+}
 
 SES_IDENTIFIERS_CHAR = {
   'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6,

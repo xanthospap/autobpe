@@ -344,11 +344,11 @@ def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
       .. note:: The options here should **exactly match** the ones described in 
         the ``products.rst`` file.
 
-      .. note:: This functions uses :func:`bernutils.products.pyerp.__cod_sp3_all_final__`,
-        :func:`bernutils.products.pyerp.__cod_sp3_all_final_rapid__`,
-        :func:`bernutils.products.pyerp.__cod_sp3_all_early_rapid__`,
-        :func:`bernutils.products.pyerp.__cod_sp3_all_ultra_rapid__` and
-        :func:`bernutils.products.pyerp.__cod_sp3_all_prediction__`.
+      .. note:: This functions uses :func:`bernutils.products.pysp3.__cod_sp3_all_final__`,
+        :func:`bernutils.products.pysp3.__cod_sp3_all_final_rapid__`,
+        :func:`bernutils.products.pysp3.__cod_sp3_all_early_rapid__`,
+        :func:`bernutils.products.pysp3.__cod_sp3_all_ultra_rapid__` and
+        :func:`bernutils.products.pysp3.__cod_sp3_all_prediction__`.
 
   '''
   ## output dir must exist
@@ -472,41 +472,86 @@ def getOrb(datetm, ac='cod', out_dir=None, use_repro_13=False, use_one_day_sol=F
   else:
     raise RuntimeError('Invalid Analysis Center: %s.' %ac)
 
-def getNav(datetm, sat_sys='G', station=None, hour=None):
-  ''' This function will download a broadcast orbit file either an accumulated one
-  
+def getNav(datetm, sat_sys='G', out_dir=None, station=None, hour=None):
+  ''' This function will download a broadcast orbit file, either an accumulated one
+      (i.e. a brdc file) or a station-specific one. The url to download navigation
+      files is cddis, so the station-specific nav files available only match
+      igs stations (or any other distributed by cddis). For station-specific
+      nav files, it is also possible to download hourly broadcst files.
+
+      :param datetm: The date(time) for wich we want the orbit information,
+                     as a Python ``datetime.datetime`` or ``dadtetime.date``
+                     instance.
+
+      :param sat_sys: The satellite system for which we want the nav file for.
+                      Can be any of:
+
+                      * ``'G'`` for gps,
+                      * ``'R'`` for glonass
+                      * ``'S'`` for sbas
+
+                      .. warning:: The options here, must match the ones in the
+                        :data:`bernutils.products.pysp3.SAT_SYS_TO_NAV_DICT`
+                        dictionary.
+
+      :param out_dir: (Optional) Directory where the downloaded file is
+                      to be saved.
+
+      :param station: If we want a station specific bradcast file, then this
+                      parameter shall hold the 4-char id of the station. Note
+                      that the station must be ditributed by cddis (or else
+                      the file won't be available).
+
+      :param hour:    If we want a station-specific, hourly broadcast file, then
+                      this parameter shall hold the hour of day. The hour should
+                      be an integer or float/double in the range [0, 23). Hourly
+                      navigation files are only available for station-specific
+                      navigation files.
+
+  '''
+
   try:
-    nchar = SAT_SYS_TO_NAV_DICT[sat_sys]
+    nchar = bernutils.products.prodgen.SAT_SYS_TO_NAV_DICT[sat_sys]
   except:
     raise RuntimeError('Invalid Satellite System identifier: [%s]' %sat_sys)
-  
+
   if hour and not station:
     raise RuntimeError('Hourly navigation files only available for igs stations')
-  
+
   if hour and sat_sys != 'G':
     raise RuntimeError('Hourly navigation files only available gps')
-  
+
+  ## output dir must exist
+  if out_dir and not os.path.isdir(out_dir):
+    raise RuntimeError('Invalid directory: %s -> getNav' %out_dir)
+
   ## compute the needed date formats
   iyear = int(datetm.strftime('%Y'))
   yy    = int(datetm.strftime('%y'))
   doy   = int(datetm.strftime('%j'))
-  
+
   HOST = IGS_HOST
-  
-  DIR  = '/gnss/data/daily/%04i/%03i/%02i%s/' %(iyear, doy, yy, nchar)
-  
+
+  DIR  = '/gnss/data/daily/%04i/%03i' %(iyear, doy)
+
   if hour:
     ihour   = int(hour)
-    session = SES_IDENTIFIERS_INT[ihour]
+    session = bernutils.products.prodgen.SES_IDENTIFIERS_INT[ihour]
+    DIR     = DIR.replace('daily', 'hourly')
+    DIR     = DIR + ( '/%02i/' %ihour )
   else:
     session = '0'
-  
+    DIR     = DIR + ( '/%02i%s/' %(yy, nchar) )
+
   if not station: station = 'brdc'
 
-  NAVFILE = '%s%03i%1s.%02i%1s.Z' %(doy, session, yy, nchar)
-  
+  NAVFILE = '%s%03i%1s.%02i%1s.Z' %(station, doy, session, yy, nchar)
+  saveas  = NAVFILE
+  if out_dir:
+    saveas = os.path.join(out_dir, saveas)
+
   try:
-    info = bernutils.webutils.grabFtpFile(HOST, DIR, NAVFILE, NAVFILE)
+    info = bernutils.webutils.grabFtpFile(HOST, DIR, NAVFILE, saveas)
     return info
   except:
     raise RuntimeError('Failed to fetch navigation file: %s' %(HOST+DIR+NAVFILE))
