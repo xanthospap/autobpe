@@ -5,8 +5,9 @@ import bernutils.bsta2
 
 x = bernutils.bsta2.StaFile('CODE.STA')
 
-x.match_old_name('WTZR')
-x.match_old_name('BJCO')
+#x.match_old_name('WTZR')
+#x.match_old_name('BJCO')
+x.match_old_name2(['HARK', 'WTZR', 'EXWI', 'DYNG'])
 
 '''
 ## Test Program
