@@ -279,7 +279,11 @@ class StaFile:
       line = self.__stream.readline()
 
   def match_old_name2(self, stations):
-    ''' given a station name, '''
+    ''' given a station name, 
+    
+        .. warning:: Note that Type001 records, with a flag = '003' are not used
+          to extract information. They only triger a warning message.
+    '''
 
     ## we'll make some changes to station_list later on ..
     station_list = stations
