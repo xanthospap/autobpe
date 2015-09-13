@@ -19,6 +19,8 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../bernutils'))
+sys.path.append(os.path.abspath('../bernutils/'))
+sys.path.append(os.path.abspath('../bernutils/products/'))
 
 ## the following is for aditional themes (--xp--)
 sys.path.append(os.path.abspath('/usr/lib/python2.7/site-packages/sphinx/themes/'))

@@ -5,9 +5,10 @@ import bernutils.bsta2
 
 x = bernutils.bsta2.StaFile('CODE.STA')
 
-#x.match_old_name('WTZR')
-#x.match_old_name('BJCO')
-x.match_old_name2(['HARK', 'WTZR', 'EXWI', 'DYNG'])
+#x.match_old_name(['HARK', 'WTZR', 'EXWI', 'DYNG', 'S071'])
+#x.get_station_list()
+x.__match_type_001__()
+x.__match_type_001__(['HARK', 'WTZR', 'EXWI', 'DYNG', 'S071'])
 
 '''
 ## Test Program

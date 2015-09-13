@@ -15,7 +15,7 @@ Contents:
    bamb
    bcrd
    bgps
-   bsta2
+   bsta
    gpstime
    products
    webutils

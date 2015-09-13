@@ -1,435 +1,432 @@
 import os
-import datetime
+import sys
 import re
+import fnmatch
+import datetime
 
-def addToRecList1(stareclst, line):
-    ''' Given a list of :py:class:`starec`s, i.e. ``stareclst`` and a line
-        of type TYPE 001, this function will:
-        * resolve the line into a :py:class:`starec.type001` instance,
-        * append the instance into the ``stareclst`` list.
+__DEBUG_MODE__ = True
+
+MIN_STA_DATE = datetime.datetime.min
+MAX_STA_DATE = datetime.datetime.max
+
+class Type001:
+  ''' A class to hold type 001 station information records for a single station.
+  '''
+  def __init__(self, line):
+    ''' Initialize a :py:class:`bernutils.bsta.type001` instance using a type 001
+        information line. This will set the start and stop date and the 
+        station name.
         
-        If a :py:class:`starec` does not exist in the list for this station,
-        then a new :py:class:`starec` will be created and appended to the
-        ``stareclst`` list. Else (i.e. if a :py:class:`starec` does exist 
-        in the list for this station), then the new :py:class:`starec.type001` instance
-        will be added to this instance.
+        An example of a .STA file type 001 info line follows::
         
+          STATION NAME          FLG          FROM                   TO         OLD STATION NAME      REMARK
+          ****************      ***  YYYY MM DD HH MM SS  YYYY MM DD HH MM SS  ********************  ************************
+          AIRA 21742S001        001  1980 01 06 00 00 00  2099 12 31 00 00 00  AIRA*                 MGEX,aira_20120821.log
+          ISBA 20308M001        003                                            ISBA                  EXTRA RENAMING
+
     '''
-    print 'resolving line -> [',line.rstrip(),']'
-    try:
-        type1 = starec.type001(line)
-    except:
-        raise
+    self.__sta_name   = line[0:16].rstrip()
+    self.__flag       = line[22:25].rstrip()
+    self.__old_name   = line[69:89].rstrip()
+    self.__remark     = line[91:].rstrip()
+
+    ## resolve the start date (or set to min if empty)
+    t_str = line[27:46].strip()
+    if len(t_str) == 0:
+      self.__start_date = MIN_STA_DATE
+    else:
+      try:
+        self.__start_date = datetime.datetime.strptime(t_str.strip(), '%Y %m %d %H %M %S')
+      except:
+        raise RuntimeError('Invalid date format at line [%s]' %line.strip())
     
-    #print type(stareclst), len(stareclst)
+    ## resolve stop date (or set to now)
+    t_str = line[48:67].strip()
+    if len(t_str) == 0:
+      self.__stop_date = MAX_STA_DATE ##datetime.datetime.now()
+    else:
+      try:
+        self.__stop_date = datetime.datetime.strptime(t_str.strip(), '%Y %m %d %H %M %S')
+      except:
+        raise RuntimeError('Invalid date format at line [%s]' %line.strip())
 
-    for idx, obj in enumerate(stareclst):
-        if obj.type1List()[0].old_staname() == type1.old_staname():
-            try:
-                obj.appendtype1(type1)
-            except:
-                raise
-            return
+  def __str_format__(self):
+    ''' Format the instance as a valid Type 001 record
+    '''
+    t_start = '                   '
+    t_stop  = '                   '
+    if self.__start_date != MIN_STA_DATE:
+      t_start = self.__start_date.strftime('%Y %m %d %H %M %S')
+    if self.__stop_date != MAX_STA_DATE:
+      t_stop = self.__stop_date.strftime('%Y %m %d %H %M %S')
+    return '%-16s      %3s  %19s  %19s  %-20s  %-25s' \
+      %(self.__sta_name, self.__flag, t_start, t_stop, self.__old_name, self.__remark)
+
+  def __repr__(self):
+    return self.__str_format__()
+
+  def __str__(self):
+    return self.__str_format__()
+
+  def __issue_renaming__warning__(self, station):
+    ''' Issue a warning (to stderr) of a station renaming
+    '''
+    t1 = 'start of operation'
+    if self.__start_date != MIN_STA_DATE:
+      t1 = self.__start_date.strftime('%Y-%m-%d')
     
-    newrec = starec(type1.old_staname())
-    newrec.appendtype1(type1)
-    stareclst.append(newrec)
+    t2 = 'today'
+    if self.__stop_date != MAX_STA_DATE:
+      t2 = self.__stop_date.strftime('%Y-%m-%d')
 
-class starec:
-    ''' A class to hold station information records for a single station.
+    sys.stderr.write('[WARNING] station %s seems to be renamed to %s, from  %s to %s\n'
+      %(station, self.__sta_name, t1, t2))
+
+  def start(self):
+    ''' Return the start datetime (as ``datetime``). '''
+    return self.__start_date
+
+  def stop(self):
+    ''' Return the stop datetime (as ``datetime``). '''
+    return self.__stop_date
+
+  def station_name(self):
+    ''' Return the 'STATION NAME' column. '''
+    return self.__sta_name
+
+  def old_staname(self):
+    ''' Return the 'OLD STATION NAME' column. '''
+    return self.__old_name
+
+  def flag(self):
+    ''' Return the flag as integer; in case it is missing, return -1
     '''
+    try: return int(self.__flag)
+    except: return -1
 
-    min_date = datetime.datetime(1900,01,01) 
-    ''' Minimum date (i.e. for records that do not have one)
+class Type002:
+  ''' A class to hold type 002 station information records for a single station.
+  '''
+
+  def __init__(self, line):
+    ''' Initialize a :py:class:`bernutils.bsta.type002` instance using a type 002
+        information line. This will set the start and stop date and the 
+        station name.
+        
+        An example of a .STA file type 002 info line follows::
+        
+          STATION NAME          FLG          FROM                   TO         RECEIVER TYPE         RECEIVER SERIAL NBR   REC #   ANTENNA TYPE          ANTENNA SERIAL NBR    ANT #    NORTH      EAST      UP      DESCRIPTION             REMARK
+          ****************      ***  YYYY MM DD HH MM SS  YYYY MM DD HH MM SS  ********************  ********************  ******  ********************  ********************  ******  ***.****  ***.****  ***.****  **********************  ************************
+          AFKB                  001                                            LEICA GRX1200GGPRO                          999999  LEIAT504GG      LEIS                        999999    0.0000    0.0000    0.0000  Kabul, AF               NEW
+          AZGB 49541S001        001                       2004 07 20 23 59 59  TRIMBLE 4000SSE                             999999  TRM22020.00+GP  NONE                        999999    0.0000    0.0000    0.0000  Globe, US               NEW
+          AZGB 49541S001        001  2004 07 21 00 00 00  2004 08 26 23 59 59  TRIMBLE 4700                                999999  TRM33429.00+GP  NONE                        999999    0.0000    0.0000    0.0000  Globe, US               NEW
+
     '''
+    self.__sta_name    = line[0:16].rstrip()
+    self.__flag        = line[22:25].rstrip()
+    self.__receiver_t  = line[69:89].rstrip()
+    self.__receiver_sn = line[91:111].rstrip()
+    self.__receiver_nr = line[113:119].rstrip()
+    self.__antenna_t   = line[121:141].rstrip()
+    self.__antenna_sn  = line[143:163].rstrip()
+    self.__antenna_nr  = line[165:171].rstrip()
+    # print 'NEU from [%s] [%s] [%s]' %(line[173:181], line[183:191], line[193:201])
+    self.__north       = float(line[173:181].rstrip())
+    self.__east        = float(line[183:191].rstrip())
+    self.__up          = float(line[193:201].rstrip())
+    self.__description = line[203:225].rstrip()
+    self.__remark      = line[227:].rstrip()
 
-    def __init__(self,name):
-        self.__name = name     #: name as in 'OLD NAME' column
-        self.__type1_recs = [] #: list of type 001 info (i.e. :py:class:`starec.type001`)
-        self.__type2_recs = [] #: list of type 002 info (i.e. :py:class:`starec.type002`)
+    ## resolve the start date (or set to min if empty)
+    t_str = line[27:46].strip()
+    if len(t_str) == 0:
+      self.__start_date = MIN_STA_DATE
+    else:
+      try:
+        self.__start_date = datetime.datetime.strptime(t_str.strip(), '%Y %m %d %H %M %S')
+      except:
+        raise RuntimeError('Invalid date format at line [%s]' %line.strip())
+    
+    ## resolve stop date (or set to now)
+    t_str = line[48:67].strip()
+    if len(t_str) == 0:
+      self.__stop_date = MAX_STA_DATE
+    else:
+      try:
+        self.__stop_date = datetime.datetime.strptime(t_str.strip(), '%Y %m %d %H %M %S')
+      except:
+        raise RuntimeError('Invalid date format at line [%s]' %line.strip())
 
-    def appendtype1(self,typ1,enable_debug=True):
-        ''' Add a :py:class:`starec.type001` record; the new element is added
-            in ascending chronological order.
-        '''
-        ## keep this list sorted !!
-        if len(self.__type1_recs) == 0:
-            self.__type1_recs.append(typ1)
-            return
+  def __str_format__(self):
+    ''' Format the instance as a valid Type 002 record
+    '''
+    t_start = '                   '
+    t_stop  = '                   '
+    if self.__start_date != MIN_STA_DATE:
+      t_start = self.__start_date.strftime('%Y %m %d %H %M %S')
+    if self.__stop_date != MAX_STA_DATE:
+      t_stop = self.__stop_date.strftime('%Y %m %d %H %M %S')
+    return '%-16s      %3s  %19s  %19s  %-20s  %-20s  %-6s  %-20s  %-20s  %-6s  %8.4f  %8.4f  %8.4f  %-22s  %-25s' \
+      %(self.__sta_name, self.__flag, t_start, t_stop, self.__receiver_t, self.__receiver_sn, \
+        self.__receiver_nr, self.__antenna_t, self.__antenna_sn, self.__antenna_nr, \
+        self.__north, self.__east, self.__up, self.__description, self.__remark)
+
+  def __repr__(self):
+    return self.__str_format__()
+
+  def __str__(self):
+    return self.__str_format__()
+
+  def __match_t1__(self, t1):
+    ''' Check if (this) Type 002 entry matches a Type 001 entry. Will check the
+        following:
+        
+        * self.__sta_name   =  t1.station_name
+        * self.__start_date >= t1.start
+        * self.__stop_date  <= t1.stop
+        
+        :param t1: A ``Type001`` instance.
+
+    '''
+    return self.__sta_name == t1.station_name() \
+      and (self.__start_date >= t1.start() or  self.__start_date == MIN_STA_DATE) \
+      and (self.__stop_date <= t1.stop() or self.__stop_date == MAX_STA_DATE)
+
+class StaFile:
+  ''' A class to represent a Bernese-format station information file (.STA)
+  '''
+
+  def __init__(self, filen):
+    ''' Initialize a StaFile instance; set the filename, try to open the file
+        and then search and mark all places (in the file) where a type starts
+    '''
+    if not os.path.isfile(filen):
+      raise RuntimeError('Cannot find .STA file [%s]' %filen)
+    fin = open(filen, 'r')
+      
+    ## search for the places in the file, where 'TYPE XXX' starts
+    self.__type_pos = {}
+    line = fin.readline()
+    rgx  = re.compile("^TYPE 00[1-9]:")
+    while line:
+      if rgx.match(line):
+        self.__type_pos[int(line[7])] = fin.tell()
+      line = fin.readline()
+    
+    ## add a dummy mark at the end of the dictionary
+    self.__type_pos[max(self.__type_pos.keys())+1] = fin.tell()
+
+    ## return at the top
+    fin.seek(0)
+
+    ## we must at least have read the type 001 and type 002 lies
+    if 1 not in self.__type_pos or 2 not in self.__type_pos:
+      fin.close()
+      raise RuntimeError('Invalid sta file. Type001 and/or Type002 not found')
+      
+    ## assign the filename
+    self.__filename = filen
+    self.__stream   = fin
+
+  def __del__(self):
+    if not self.__stream.closed:
+      if __DEBUG_MODE__ == True:
+        print '[DEBUG] Destructor closed the file.'
+      self.__stream.close()
+
+  def __type_range__(self, int_type):
+    ''' Return the range (i.e. the places in the file) where a specific type
+        starts and ends.
+    '''
+    return [self.__type_pos[int_type], self.__type_pos[int_type+1]]
+
+  def __match_type_001__help__(self, end_of_block):
+    ''' This is a help function, do not use as standalone! It will read the
+        Type 001 block and populate a dictionary where the key is the station name
+        (actually the old station name) and the vaues are lists containing
+        ype001 instances.
+        
+        :param end_of_block: The position (i the input file) where the Type 001
+                             block ends.
+
+        :returns:        A dictionary, where the key is the station name (actually
+                         the old station name) and the vaues are lists containing
+                         Type001 instances. If a station has more than one Type 001
+                         records, then it's value will have multiple Type001 
+                         instances, all appended to the same list.
+
+        .. warning:: The input stream/buffer must be placed at the begining of
+          the block. Any empty lines will cause an exception to be thrown.
+
+    '''
+    ##  a dcitionary; the key is the stations name (**NOT** old station name) and
+    ##+ the values are a list (for each station) of type001 instances.
+    tp01_dic = {}
+
+    ## read all stations ...
+    line = self.__stream.readline()
+    while line and  self.__stream.tell() < end_of_block:
+      t1 = Type001(line)
+      if t1.flag() == 3:
+        t1.__issue_renaming__warning__(t1.old_staname())
+      else:
+        station = t1.old_staname()
+        if station in tp01_dic:
+          tp01_dic[station].append(t1)
         else:
-            if typ1.stop() <= self.__type1_recs[0].start():
-                self.__type1_recs.insert(0,typ1)
-                return
-            else:
-                for idx, obj in enumerate(self.__type1_recs[:-1]):
-                    if typ1.start() >= obj.stop() and typ1.stop() <= self.__type1_recs[idx+1].start():
-                        self.__type1_recs.insert(idx,typ1)
-                        return
-                if typ1.start() >= self.__type1_recs[len(self.__type1_recs)-1].stop():
-                    self.__type1_recs.append(typ1)
-                    return
-        # should have never reached this point ...
-        if enable_debug == True:
-            print 'Debuging Message for appendtype1()'
-            print '------------------------------------------------------------------------'
-            print 'got record line -> ['+typ1.line()+']'
-            print 'this record contains:'
-            for i in self.__type1_recs:
-                print '\t -> ['+i.line()+']'
-        raise RuntimeError('Duplicate or erroneous record -> '+typ1.line())
+          tp01_dic[station] = [t1]
+      line = self.__stream.readline()
 
-    def appendtype2(self,typ2):
-        ''' Add a :py:class:`starec.type002` record; the new element is added
-            in ascending chronological order.
-        '''
-        ## keep this list sorted !!
-        if len(self.__type2_recs) == 0:
-            self.__type2_recs.append(typ2)
-            return
-        else:
-            if typ2.stop() <= self.__type2_recs[0].start():
-                self.__type2_recs.insert(0,typ2)
-                return
-            else:
-                for idx, obj in enumerate(self.__type2_recs[:-1]):
-                    if typ.start() >= obj.stop() and typ.stop() <= self.__type2_recs[idx+1].start():
-                        self.__type2_recs.insert(idx,typ2)
-                        return
-                if typ2.start() >= self.__type2_recs[len(self.__type2_recs)-1].stop():
-                    self.__type2_recs.append(typ2)
-                    return
-        # should have never reached this point ...
-        raise RuntimeError('Duplicate or erroneous record')
+    if __DEBUG_MODE__ == True:
+      print '[DEBUG] Found %5i stations in .STA file %s' %(len(tp01_dic), self.__filename)
 
-    def type1List(self):
-        ''' Return the list of type 001 information (i.e. the list of 
-            :py:class:`starec.type001` instances).
-        '''
-        return self.__type1_recs
+    return tp01_dic
 
-    def type2List(self):
-        ''' Return the list of type 002 information (i.e. the list of 
-            :py:class:`starec.type002` instances).
-        '''
-        return self.__type2_recs
+  def __match_type_001__(self, stations=[]):
+    ''' Given a list of stations, search in Type 001 to find them, and return
+        the information.
+        
+        .. note:: The comparisson (i.e. if a certain station in the ``stations``
+          list matches a given record), is performed using the ``OLD STATION NAME``
+          column, using UNIX shell-type wildcards.
+        
+        :param stations: A list of stations to match (if possible) in the Type 001
+                         block. If an empty list is passed instead, the function
+                         will return information for all stations listed in
+                         the Type 001 block.
 
-    class type002:
-        ''' A class to hold type 002 station information records for a single station.
-        '''
-        pass
+        :returns:        A dictionary, where the key is the station name (actually
+                         the old station name) and the vaues are lists containing
+                         Type001 instances. If a station has more than one Type 001
+                         records, then it's value will have multiple Type001 
+                         instances, all appended to the same list.
 
-        def start(self):
-            ''' Return the start datetime (as ``datetime``). '''
-            return self.__start
-
-        def stop(self):
-            ''' Return the stop datetime (as ``datetime``). '''
-            return self.__stop
-
-        def name(self):
-            ''' Return the name. '''
-            return self.__name
-
-        def line(self):
-            ''' Return the type 002 original, information record line. '''
-            return self.__line
-
-        def __init__(self,line):
-            ''' Initialize a :py:class:`starec.type002` instance using a type 002
-                information line. This will set the start and stop date and the 
-                station name.
-            '''
-            self.__name = line[0:20].strip()
-            if line[27:47].strip() == '':
-                self.__start = starec.min_date
-            else:
-                try:
-                    self.__start = datetime.datetime.strptime(line[27:47].strip(), '%Y %m %d %H %M %S')
-                except:
-                    raise RuntimeError('Invalid TYPE 002 datetime: ['+line.strip('\n')+']')
-            if line[48:68].strip() == '':
-                self.__stop = datetime.datetime.combine(datetime.date.today(), datetime.datetime.max.time())
-            else:
-                try:
-                    self.__stop = datetime.datetime.strptime(line[48:68].strip(), '%Y %m %d %H %M %S')
-                except:
-                    raise RuntimeError('Invalid TYPE 002 datetime: ['+line.strip('\n')+']')
-            if self.__start > self.__stop:
-                raise RuntimeError('Invalid TYPE 002 datetime: ['+line.strip('\n')+']')
-            self.__line = line.rstrip('\n')
-
-    class type001:
-        ''' A class to hold type 001 station information records for a single station.
-        '''
-        pass
-
-        def start(self):
-            ''' Return the start datetime (as ``datetime``). '''
-            return self.__start
-
-        def stop(self):
-            ''' Return the stop datetime (as ``datetime``). '''
-            return self.__stop
-
-        def line(self):
-            ''' Return the original information line. '''
-            return self.__line
-
-        def staname(self):
-            ''' Return the 'STATION NAME' column. '''
-            return self.__name
-
-        def old_staname(self):
-            ''' Return the 'OLD STATION NAME' column. '''
-            return self.__line[69:90].strip(' ')
-
-        def match(self,type2):
-            ''' Match a type 002 record line with (this) instance.
-                This will return ``True``, if the type 002 record (i.e. ``type2``)
-                has the same name, as this instance and the duration of
-                this info is within this instance's limits.
-
-                :param type2: A :py:class:`starec.type002` instance.
-
-            '''
-            return ( self.__name == type2.name() and self.start() >= type2.start() and self.stop() >= type2.stop() )
-
-        def __init__(self,line):
-            ''' Initialize a :py:class:`starec.type001` instance using a type 001
-                information line. This will set the start and stop date and the 
-                station name.
-            '''
-            self.__name = line[0:20].strip()
-            if line[27:47].strip() == '':
-                self.__start = starec.min_date
-            else:
-                try:
-                    self.__start = datetime.datetime.strptime(line[27:47].strip(), '%Y %m %d %H %M %S')
-                except:
-                    raise RuntimeError('Invalid TYPE 001 datetime: ['+line.strip('\n')+']')
-            if line[48:68].strip() == '':
-                self.__stop = datetime.datetime.combine(datetime.date.today(), datetime.datetime.max.time())
-            else:
-                try:
-                    self.__stop = datetime.datetime.strptime(line[48:68].strip(), '%Y %m %d %H %M %S')
-                except:
-                    raise RuntimeError('Invalid TYPE 001 datetime: ['+line.strip('\n')+']')
-            if self.__start > self.__stop:
-                raise RuntimeError('Invalid TYPE 001 datetime: ['+line.strip('\n')+']')
-            self.__line = line.rstrip('\n')
-
-class stafile:
-    ''' A station information file (.STA) class, to represent Bernese v5.2 format .STA
-        files.
+        .. warning:: Note that Type001 records, with a flag = '003' are not used
+          to extract information. They only triger a warning message.
     '''
-    __type_names = ['RENAMING OF STATIONS',
-            'STATION INFORMATION',
-            'HANDLING OF STATION PROBLEMS', 
-            'STATION COORDINATES AND VELOCITIES (ADDNEQ)',
-            'HANDLING STATION TYPES']
-    ''' A dictionary to map a type to a header (e.g. 'TYPE 001' is 
-        'RENAMING OF STATIONS'). This list is shared among all
-        instances.
+    ## get the range in file to search for
+    from_p, to_p = self.__type_range__(1)
+
+    ## go to the begining of the block
+    self.__stream.seek(from_p)
+    
+    ## there should be an extra 4 lines ...
+    for i in range(0, 4): line = self.__stream.readline()
+
+    ##  if we are going to read in all stations (i.e the stations list is empty)
+    ##+ let the help function do the work ...
+    if len(stations) == 0:
+      return self.__match_type_001__help__(to_p)
+    
+    ## the dictionary to be returned
+    ## for each station in the list, add an entry
+    sta_tp1 = {}
+    for sta in stations: sta_tp1[sta] = []
+    
+    ## read all stations ...
+    line = self.__stream.readline()
+    while line and  self.__stream.tell() < to_p:
+      t1 = Type001(line)
+      for sta in stations:
+        if fnmatch.fnmatch(sta, t1.old_staname()):
+          if t1.flag() == 3:
+            t1.__issue_renaming__warning__(station)
+          else:
+            sta_tp1[sta].append(t1)
+            break
+      line = self.__stream.readline()
+
+    if __DEBUG_MODE__ == True:
+      print '[DEBUG] Found %5i stations in .STA file %s' %(len(sta_tp1), self.__filename)
+
+    return sta_tp1
+
+  def match_old_name(self, stations):
+    ''' given a station name, 
+    
+        .. warning:: Note that Type001 records, with a flag = '003' are not used
+          to extract information. They only triger a warning message.
     '''
 
-    def __init__(self,filename):
-        ''' Initialize a sta object given its filename;
-            try locating the file
-            TODO add header resolution to make sure this a valid .STA file
-        '''
-        self.__filename = filename
-        if not os.path.isfile(self.__filename):
-            raise IOError('No such file '+filename)
+    ## we'll make some changes to station_list later on ..
+    station_list = stations
 
-    def __findTypeStart(self,stream,type,max_lines=1000):
-        ''' Given a (sta) input file stream, go to the line where a specific
-            type starts. E.g. if the type specified is '1' (i.e. ``type=1``), then this function
-            will search for the line: *'TYPE 001: RENAMING OF STATIONS'*.
-            The line to search for, is compiled using the parameter ``type`` and the
-            :py:attr:`__type_names` dictionary. If the line is not found after 
-            ``max_lines`` are read, then an exception is thrown.
-            In case of sucess, the (header) line is returned, and the stream
-            buffer is placed at the end of the header line.
-            Note that the ``type`` parameter must be a positive integer in the
-            range ``[1, len(___type_names)]``.
+    ## get the range in file to search for
+    from_p, to_p = self.__type_range__(1)
 
-            :param stream:    Thif not line or len(line) < 5:e input stream for this istance.
-            :param type:      The number of type to search for.
-            :param max_lines: Max lines to read before quiting.
+    ## go to the begining of the block
+    self.__stream.seek(from_p)
+    
+    ## there should be an extra 4 lines ...
+    for i in range(0, 4): line = self.__stream.readline()
 
-            :returns:         On sucess, the matched line; the input stream is 
-                              left at the end of the matched line.
-        '''
-        try:
-            itype = int(type)
-            if itype > len(self.__type_names) + 1:
-                raise RuntimeError('Invalid TYPE to search for : ['+ type + ']')
-        except:
-            raise RuntimeError('Invalid TYPE to search for.')
+    ##  We define two dictionaries:
+    ##+ 1. sta_tp1 key-> [stations name] value->[a list of Type 001 instances]
+    ##+ 2. sta_tp2 key-> [stations name] value->[a list of Type 002 instances]
+    sta_tp1 = {}
+    sta_tp2 = {}
+    for s in station_list:
+      sta_tp1[s] = []
+      sta_tp2[s] = []
 
-        line_str = 'TYPE %03i: %s' %(itype,self.__type_names[itype-1])
+    ##  match the old_station_name in each line with the name given, using UNIX
+    ##+ shell-style wildcards.
+    line = self.__stream.readline()
+    while line and  self.__stream.tell() < to_p:
+      t1 = Type001(line)
+      for sta in station_list:
+        if fnmatch.fnmatch(sta, t1.old_staname()):
+          if t1.flag() == 3:
+            t1.__issue_renaming__warning__(station)
+          else:
+            sta_tp1[sta].append(t1)
+          break
+      line = self.__stream.readline()
 
-        dummy_it = 0
-        line = stream.readline()
+    ## we must have at least found 1 entry ..
+    at_least_one_found = False
+    not_found_list     = []
+    for sta in station_list:
+      if len(sta_tp1[sta]) == 0:
+        sys.stderr.write('[WARNING] Unable to match station %s\n' %sta)
+        not_found_list.append(sta)
+      else:
+        at_least_one_found = True
+    if not at_least_one_found:
+      raise RuntimeError('Unable to match any station')
+    
+    ## remove any stations not found in type 001 from dictionaries & station_list
+    for sta in not_found_list:
+      del sta_tp1[sta]
+      del sta_tp2[sta]
+      station_list.remove(sta)
 
-        while (True):
-            if not line:
-                raise RuntimeError('EOF encountered.')
-            if line.strip() == line_str:
-                return line;
-            line = stream.readline()
-            dummy_it += 1
-            if dummy_it > max_lines:
-                raise RuntimeError('MAX_LINES encountered.')
+    ## now find the entries in Type 002
+    from_p, to_p = self.__type_range__(2)
+    self.__stream.seek(from_p)
+    for i in range(0, 4): line = self.__stream.readline()
+    
+    ## walk through all entries of type 002 and match the type 001 lines
+    line = self.__stream.readline()
+    while line and len(line)>10 and self.__stream.tell() < to_p:
+      t2 = Type002(line)
+      for sta in station_list:
+        for t1 in sta_tp1[sta]:
+          if t2.__match_t1__(t1):
+            #print 'type2: [%s]' %t2
+            sta_tp2[sta].append(t2)
+      line = self.__stream.readline()
 
-    def fillStaRec2(self,station,starecs):
-        try:
-            fin = open(self.__filename,'r')
-        except:
-            fin.close()
-            raise IOError('No such file '+self.__filename)
-
-        if len(starecs.type2List()) != 0:
-            starecs.__type2_recs = []
-
-        if len(starecs.type1List()) == 0:
-            return []
-
-        try:
-            self.__findTypeStart(fin,2,max_lines=10000)
-        except:
-            fin.close()
-            raise RuntimeError('Cannot find station')
-
-        fin.readline()
-        fin.readline()
-
-        line = fin.readline()
-        if line.strip() != 'STATION NAME          FLG          FROM                   TO         RECEIVER TYPE         RECEIVER SERIAL NBR   REC #   ANTENNA TYPE          ANTENNA SERIAL NBR    ANT #    NORTH      EAST      UP      DESCRIPTION             REMARK':
-            fin.close()
-            raise RuntimeError('Invalid line:['+line.strip()+']')
-
-        station_found      = False
-
-        line = fin.readline()
-        line = fin.readline()
-        while (True):
-            if len(line) < 5:
-                fin.close()
-                break
-
-            type2 = starec.type002(line)
-            for i in starecs.type1List():
-                if i.match(type2):
-                    starecs.appendtype2(type2)
-                    station_found = True
-            line = fin.readline()
-
-        fin.close()
-
-        return starecs, len(starecs.type2List())
-
-    def loadAll(self):
-        try:
-            fin = open(self.__filename,'r')
-        except:
-            fin.close()
-            raise IOError('No such file '+self.__filename)
-
-        try:
-            self.__findTypeStart(fin,1,max_lines=100)
-        except:
-            fin.close()
-            raise RuntimeError('Cannot find station')
-
-        ## two unimportant lines ...
-        fin.readline()
-        fin.readline()
-        ## header line ...
-        line = fin.readline()
-        if line.strip() != 'STATION NAME          FLG          FROM                   TO         OLD STATION NAME      REMARK':
-            fin.close()
-            raise RuntimeError('Cannot find station')
-        ## line [***...]
-        fin.readline()
-
-        line          = fin.readline()
-        rec_list      = []
-
-        while (True):
-            if not line or len(line) < 5:
-                fin.close()
-                break
-            try:
-                addToRecList1(rec_list, line)
-            except:
-                fin.close()
-                raise
-
-            line = fin.readline()
-
-        fin.close()
-
-        return rec_list
-
-
-    def fillStaRec1(self,station):
-        ''' Given a station name, this function will create and return a
-            py:class:`starec` instance, and fill all type 001 information
-            (i.e. the instance's :py:attr:`starec.__type1_recs` list). The
-            input ``station`` parameter is matched using the 'OLD NAME'
-            column and **NOT** the 'STATION NAME' column.
-        '''
-        try:
-            fin = open(self.__filename,'r')
-        except:
-            fin.close()
-            raise IOError('No such file '+self.__filename)
-
-        try:
-            self.__findTypeStart(fin,1,max_lines=100)
-        except:
-            fin.close()
-            raise RuntimeError('Cannot find station')
-
-        ## two unimportant lines ...
-        fin.readline()
-        fin.readline()
-        ## header line ...
-        line = fin.readline()
-        if line.strip() != 'STATION NAME          FLG          FROM                   TO         OLD STATION NAME      REMARK':
-            fin.close()
-            raise RuntimeError('Cannot find station')
-        ## line [***...]
-        fin.readline()
-
-        station_found = False
-        line          = fin.readline()
-        records       = starec(station)
-
-        while (True):
-            if not line or len(line) < 5:
-                fin.close()
-                break
-
-            generic_name = line[69:89].strip()
-            ## Remove the trailing '*' cause then e.g. 'DYNG*' would match 'DYN'
-            if generic_name[-1] == '*': generic_name = generic_name[:-1]
-            ## Make a regex out of the old station name
-            regex_name = re.compile(generic_name)
-
-            ## Match with column 'OLD STATION NAME'
-            if regex_name.match(station): ## and int(line[22:25]) == 1:
-                try:
-                    rectmp1 = starec.type001(line)
-                except:
-                    fin.close()
-                    raise
-                records.appendtype1(rectmp1)
-                station_found = True
-
-            line = fin.readline()
-
-        fin.close()
-
-        return records, len(records.type1List())
+    if __DEBUG_MODE__ == True:
+      for station in station_list:
+        print '================================================================='
+        print '[%s]' %station
+        print '-----------------------------------------------------------------'
+        print '\tType 001:'
+        t1_lst = sta_tp1[station]
+        for t1 in t1_lst:
+          print 'type 001-> [%s]' %t1
+        print '-----------------------------------------------------------------'
+        t2_lst = sta_tp2[station]
+        for t2 in t2_lst:
+          print 'type 002-> [%s]' %t2
