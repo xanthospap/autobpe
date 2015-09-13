@@ -341,6 +341,46 @@ class StaFile:
 
     return sta_tp1
 
+  def __match_type_002__(self, dictnr):
+    ''' Given a dictionay with key (old) station names and values lists of Type001
+        instances, this function will search through the block Type 002 and return
+        a dictionary with the same keys as the original, but with values the 
+        corresponding Type 002 entries.
+        
+        :param dictnr: A dictionary with key (old) station names and values 
+          lists of Type001 instances, e.g. like the one returned from the function
+          :func:`__match_type_001__`.
+        
+        :returns: A dictionary with the same keys as the original, but with values
+          the corresponding Type 002 entries.
+
+    '''
+    ## find the entries in Type 002
+    from_p, to_p = self.__type_range__(2)
+    self.__stream.seek(from_p)
+    for i in range(0, 4): line = self.__stream.readline()
+    
+    ## the dictionary to be returned
+    ## for each station in the dictionary, add an entry
+    sta_tp2 = {}
+    for sta in dictnr: sta_tp2[sta] = []
+    
+    ## walk through all entries of type 002
+    line = self.__stream.readline()
+    while line and len(line)>10 and self.__stream.tell() < to_p:
+      t2       = Type002(line)
+      archived = False
+      for sta in dictnr:
+        if archived: break
+        for tp1 in dictnr[sta]:
+          if t2.__match_t1__(tp1):
+            sta_tp2[sta].append(t2)
+            archived = True
+            break
+      line = self.__stream.readline()
+      
+    return sta_tp2
+
   def match_old_name(self, stations):
     ''' given a station name, 
     

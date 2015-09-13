@@ -1,14 +1,19 @@
 #! /usr/bin/python
 
 import datetime
-import bernutils.bsta2
+import bernutils.bsta
 
-x = bernutils.bsta2.StaFile('CODE.STA')
+x = bernutils.bsta.StaFile('CODE.STA')
 
 #x.match_old_name(['HARK', 'WTZR', 'EXWI', 'DYNG', 'S071'])
 #x.get_station_list()
-x.__match_type_001__()
-x.__match_type_001__(['HARK', 'WTZR', 'EXWI', 'DYNG', 'S071'])
+#x.__match_type_001__()
+dict1 = x.__match_type_001__(['HARK', 'WTZR', 'EXWI', 'DYNG', 'S071'])
+dict2 = x.__match_type_002__(dict1)
+for i in dict2:
+  print 'ENTRIES FOR STATION %s' %i
+  for j in dict2[i]:
+    print '[%s]' %j
 
 '''
 ## Test Program
