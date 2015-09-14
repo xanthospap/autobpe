@@ -4,7 +4,7 @@ import re
 import fnmatch
 import datetime
 
-__DEBUG_MODE__ = True
+__DEBUG_MODE__ = False
 
 MIN_STA_DATE = datetime.datetime.min
 MAX_STA_DATE = datetime.datetime.max
@@ -156,6 +156,29 @@ class Type002:
         self.__stop_date = datetime.datetime.strptime(t_str.strip(), '%Y %m %d %H %M %S')
       except:
         raise RuntimeError('Invalid date format at line [%s]' %line.strip())
+
+  def station_name(self):
+    return self.__sta_name
+  def flag(self):
+    return self.__flag
+  def receiver_type(self):
+    return self.__receiver_t
+  def receiver_serial_nr(self):
+    return self.__receiver_sn
+  def receiver_nr(self):
+    return self.__receiver_nr
+  def antenna_type(self):
+    return self.__antenna_t
+  def antenna_serial_nr(self):
+    return self.__antenna_sn
+  def antenna_nr(self):
+    return self.__antenna_nr
+  def north(self):
+    return self.__north
+  def east(self):
+    return self.__east
+  def up(self):
+    return self.__up
 
   def __str_format__(self):
     ''' Format the instance as a valid Type 002 record
@@ -470,3 +493,43 @@ class StaFile:
         t2_lst = sta_tp2[station]
         for t2 in t2_lst:
           print 'type 002-> [%s]' %t2
+
+def rearange_dictionary(dictnr):
+  ''' Given a dictionary with key (old) station names and values lists of Type001
+      instances (e.g. like the one returned from :func:`StaFile.__match_type_001__`,
+      this function will re-arange the dictionary in the form where key is the
+      station name (and **NOT** old station name) and the values are the corresponding
+      lists of Type 001 instances.
+
+      :param dictnr: A dictionary with key (old) station names and values 
+        lists of Type001 instances, e.g. like the one returned from the function
+        :func:`__match_type_001__`.
+
+      :returns:  A dictionary with key station names and values lists of 
+        Type001 instances for the corresponding stations.
+
+  '''
+  new_dict = {}
+    
+  for key, value in dictnr.iteritems():
+    for t1 in value:
+      station = t1.station_name()
+      if station in new_dict:
+        new_dict[station].append(t1)
+      else:
+        new_dict[station] = [t1]
+  return new_dict
+
+def loose_compare_type1(t1r, t1l):
+  ''' Compare two Type 001 instances, ignoring the ``remark`` member
+  '''
+  return t1r.station_name() == t1l.station_name() \
+    and t1r.flag() == t1l.flag() \
+    and t1r.old_staname() == t1l.old_staname()
+
+def loose_compare_type2(t2r, t2l):
+  ''' Compare two Type 002 instances, ignoring the ``remark`` member
+  '''
+  str1 = '%s' %t2r
+  str2 = '%s' %t2l
+  return str1[0:50] == str2[0:50]
