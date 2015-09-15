@@ -26,6 +26,17 @@ To `compile` (this) document, go to autobpe/src/python/new/doc and type
 
   $> make html
 
+.. warning:: To compile the documentation for the ``bernutils`` package you will
+  need ``Sphinx``, see http://sphinx-doc.org/.
+
+
+The ``/bin`` directory
+=======================
+
+The ``/bin`` directory includes a number of programs (scripts) used in the routine
+processing. They are **NOT** documented via Sphinx/reStructuredText nor are they
+described here. Look in the directory ``/doc/automati-doc``; there should be a file
+``build.sh``; run it, it should generate a pdf output called ``automati.pdf``.
 
 Bugs
 ====
@@ -41,7 +52,7 @@ Rules:
 
 * Do **NOT** use tabs; only whitespaces,
 * Whithin the project, tab = 2 whitespaces
-* Comment your code (sphinx-rst)
+* Comment your code (sphinx/rst)
 
 Copyright
 =========
