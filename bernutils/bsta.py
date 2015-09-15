@@ -520,7 +520,7 @@ def rearange_dictionary(dictnr):
 
   '''
   new_dict = {}
-    
+
   for key, value in dictnr.iteritems():
     for t1 in value:
       station = t1.station_name()
@@ -530,16 +530,31 @@ def rearange_dictionary(dictnr):
         new_dict[station] = [t1]
   return new_dict
 
-def loose_compare_type1(t1r, t1l):
-  ''' Compare two Type 001 instances, ignoring the ``remark`` member
+def loose_compare_type1(t1r, t1l, no_marker_number=False):
+  ''' Compare two Type 001 instances, ignoring the ``remark`` member.
+      If the parameter ``no_marker_number`` is set to True, then the station names
+      compared will be truncated to the first 4 characters.
   '''
-  return t1r.station_name() == t1l.station_name() \
-    and t1r.flag() == t1l.flag() \
-    and t1r.old_staname() == t1l.old_staname()
+  str1 = t1r.station_name()
+  str2 = t1l.station_name()
+  if no_marker_number == False:
+    return str1 == str2 \
+      and t1r.flag() == t1l.flag() \
+      and t1r.old_staname() == t1l.old_staname()
+  else:
+    return str1[0:4] == str2[0:4] \
+      and t1r.flag() == t1l.flag() \
+      and t1r.old_staname() == t1l.old_staname()
 
-def loose_compare_type2(t2r, t2l):
-  ''' Compare two Type 002 instances, ignoring the ``remark`` member
+def loose_compare_type2(t2r, t2l, no_marker_number=False):
+  ''' Compare two Type 002 instances, ignoring the ``remark`` member. If the 
+      parameter ``no_marker_number`` is set to True, then the station names
+      compared will be truncated to the first 4 characters.
   '''
   str1 = '%s' %t2r
   str2 = '%s' %t2l
-  return str1[0:50] == str2[0:50]
+  #print '->[%s]' %str1
+  if no_marker_number == True:
+    str1 = str1[0:4] + str1[20:201]
+    str2 = str2[0:4] + str2[20:201]
+  return str1[0:201] == str2[0:201]

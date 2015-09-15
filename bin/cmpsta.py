@@ -47,6 +47,22 @@ stations            = []
 reference_sta       = ''
 local_sta           = ''
 split_output        = False
+no_marker_numbers   = False
+stations_diff       = [] ## see Note 1
+
+'''
+Note 1
+-----------------------
+Why do we need the ``stations_diff`` list? Say we compare a station STA. We find
+differences in the Type 001 records, so we create a file ``STA.stadf`` and write
+the Type001 diffs. Then we compare its Type002 records and we find (again) different
+records. Now, if we re-open the file ``STA.stadf`` to report these Type002 diffs,
+the (already written) Type001 diffs will disapear. So, before opening the file to
+write any Type002 records, we first check if the station occurs in the ``stations_diff``;
+if it does, then this means that we have already created a new file ``STA.stadf``
+with Type001 records, and we need to append to that.
+'''
+
 
 ## help function
 def help (i):
@@ -72,10 +88,17 @@ def print_incosistency(itype, station, l1, fn1, l2, fn2):
 
   '''
   if split_output == True:
-    print 'Redirecting to %s.stadf' %station
-    fn = '%s.stadf' %station
+    ## warning! do not use wildcards in station/file names
+    fnn = station
+    if station[-1] == '*': fnn = station[0:-1]+'__'
+    if station[-1] == '?': fnn = station[0:-1]+'_'
+    print 'Redirecting to %s.stadf' %fnn
+    fn = '%s.stadf' %fnn
     temp = sys.stdout #store original stdout object for later
-    sys.stdout = open(fn, 'w')
+    if itype == 2 and station in stations_diff:
+      sys.stdout = open(fn, 'a')
+    else:
+      sys.stdout = open(fn, 'w')
 
   print 'INCONSISTENCY FOR STATION %s' %station
   print 'File %s contains the Type %03i records:' %(fn1, itype)
@@ -96,7 +119,7 @@ def main(argv):
     help(1)
 
   try:
-    opts, args = getopt.getopt(argv,'hs:r:l:',['help', 'stations=', 'reference-sta=', 'local-sta=', 'splitout'])
+    opts, args = getopt.getopt(argv,'hs:r:l:',['help', 'stations=', 'reference-sta=', 'local-sta=', 'splitout', 'no-station-number'])
   except getopt.GetoptError:
     help(1)
 
@@ -116,6 +139,9 @@ def main(argv):
     elif opt in ('--splitout'):
       global split_output
       split_output = True
+    elif opt in ('--no-station-number'):
+      global no_marker_numbers
+      no_marker_numbers = True
     else:
       print >> sys.stderr, 'Invalid command line argument: %s' %opt
 
@@ -145,21 +171,29 @@ locsta = bernutils.bsta.StaFile(local_sta)
 ref_dict_01 = refsta.__match_type_001__(stations)
 loc_dict_01 = locsta.__match_type_001__(stations)
 
-EXITS_STATUS = 0
+## the exit status; always set it to the right value
+EXIT_STATUS = 0
 
-## find missing stations
+##  find missing stations; we only care if the station is missing from the local
+##+ sta file **NOT** the remote one.
 missing_from_d1 = [ x for x in ref_dict_01 if len(ref_dict_01[x]) == 0 ]
-missing_from_d2 = [ x for x in loc_dict_01 if len(loc_dict_01[x]) == 0 ]
+#missing_from_d2 = [ x for x in loc_dict_01 if len(loc_dict_01[x]) == 0 ]
 if len(missing_from_d1) > 0:
   for i in missing_from_d1:
-    print 'Station %s not found in sta file: %s' %(i, reference_sta)
-    EXITS_STATUS = 2
+    print '[WARNING] Station %s not found in reference sta file: %s; Station will not be compared.' %(i, reference_sta)
     del ref_dict_01[i]
-if len(missing_from_d2) > 0:
-  for i in missing_from_d2:
-    print 'Station %s not found in sta file: %s' %(i, local_sta)
-    EXITS_STATUS = 2
-    del ref_dict_02[i]
+    if i in loc_dict_01:
+      del loc_dict_01[i]
+#if len(missing_from_d2) > 0:
+#  for i in missing_from_d2:
+#    print 'Station %s not found in sta file: %s' %(i, local_sta)
+#    EXIT_STATUS = 2
+#    #del loc_dict_01[i]
+
+## Note! All stations in ref_dict_01 must exist in ref_dict_02 even empty
+for i in ref_dict_01:
+  if not i in loc_dict_01:
+    loc_dict_01[i] = []
 
 ## read Type002 info (as dictionary) from both .STA files
 ref_dict_02 = refsta.__match_type_002__(ref_dict_01)
@@ -173,11 +207,10 @@ for key1, val1 in ref_dict_01.iteritems():
   if len(__val2) > len(__val1):
     __val1, __val2 = __val2, __val1
   for rc1 in __val1:
-    #mismatch = False
-    if not any(bernutils.bsta.loose_compare_type1(rc1, rc2) for rc2 in __val2):
-      #mismatch = True
+    if not any(bernutils.bsta.loose_compare_type1(rc1, rc2, no_marker_numbers) for rc2 in __val2):
+      stations_diff.append(key1)
       print_incosistency(1, key1, val1, reference_sta, val2, local_sta)
-      EXITS_STATUS = 3
+      EXIT_STATUS = 3
       break
 
 ## do the comparisson; first match Type 002 records
@@ -188,10 +221,10 @@ for key1, val1 in ref_dict_02.iteritems():
   if len(__val2) > len(__val1):
     __val1, __val2 = __val2, __val1
   for rc1 in __val1:
-    if not any(bernutils.bsta.loose_compare_type2(rc1, rc2) for rc2 in __val2):
+    if not any(bernutils.bsta.loose_compare_type2(rc1, rc2, no_marker_numbers) for rc2 in __val2):
       print_incosistency(2, key1, val1, reference_sta, val2, local_sta)
-      EXITS_STATUS = 3
+      EXIT_STATUS = 3
       break
 
 ## all done; exit
-sys.exit(0)
+sys.exit(EXIT_STATUS)

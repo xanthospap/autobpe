@@ -1,0 +1,113 @@
+\subsection{cmpsta}
+\label{cmpsta}
+
+\subsubsection{Purpose}
+\texttt{cmpsta.py} is a Python script to compare two Bernese v5.2 station information
+files (default extansion \texttt{.STA}). Station information files are divided into
+blocks of information, called \textbf{Types}; the most important are:
+\begin{itemize}
+\item the \texttt{Type 001} block, in which the station name or renaming are recorded
+(normally using UNIX wildcards), and
+\item the \texttt{Type 002} block, in which the equipment information are recorded.
+\end{itemize}
+The script only reads and compares the two first blocks, i.e. \texttt{Type 001} and \texttt{Type 002}.
+
+
+Note that the format of these station information files is very strict and the script
+can only run successefuly if the input files follow this format. This goes for all
+stations recorded in the files, \textbf{not} only the ones to be read/compared.
+
+
+Note also the input and output stations names, correspond to the column \texttt{OLD STATION NAME}
+in the \texttt{Type 001} block, and the matching is performed using UNIX shell-like
+wildcard notation.
+
+For example, given the following extract of a station information file:
+\begin{Verbatim}[fontsize=\scriptsize]
+STATION NAME          FLG          FROM                   TO         OLD STATION NAME      REMARK
+****************      ***  YYYY MM DD HH MM SS  YYYY MM DD HH MM SS  ********************  ************************
+AIRA 21742S001        001  1980 01 06 00 00 00  2099 12 31 00 00 00  AIRA*                 MGEX,aira_20120821.log
+AUT0 49431M001        001                                            AUT0*                 MGEX,aut0_20121227.log
+AXPV 10057M001        001                                            AXPV*                 MGEX,axpv_20130515.log
+\end{Verbatim}
+if we start the script, comparing the station \texttt{'AIRA'}, then this will be matched
+to \texttt{'AIRA 21742S001'}.
+
+\subsubsection{Usage}
+\texttt{cmpsta -l [STA1] -r [STA2] [OPTIONS]}\\
+at least \texttt{-l} and \texttt{-r}
+must be specified as command line arguments.\\
+
+Switches:
+\begin{itemize}
+\item \texttt{-l --local-sta=}[STAFILE]\\
+The station information file to compare. This must be a valid .STA file (including path).
+\item \texttt{-r --reference-sta=}[STAFILE]\\
+The station information file to compare against. If this file is not found, then the 
+script will try to download it from CODE's ftp server, at \url{ftp://ftp.unibe.ch//aiub/BSWUSER52/STA/}
+\item \texttt{-s --stations=}[STA1,STA2,...]\\
+A comma-seperated list of stations to compare. These are going to be matched using the 
+\texttt{OLD STATION NAME} column(s) in the \texttt{Type 001} block. If no stations are
+given, then the script will compare all stations.
+\item \texttt{--splitout}\\
+By default, all discrepancies (if found) are reported to \texttt{stdout}. If this switch is on,
+then the discrepancies will be recorded to station-specific files, named as 
+\texttt{\$(station).stadf}\footnotemark[1].
+\item \texttt{--no-marker-numbers}\\
+By default, station names are mathced using both the 4-char id and the station number (if any).
+Hence, station \texttt{'WTZR'} will not be considered the same station as \texttt{'WTZR 14201M010'}.
+If this switch is enabled, then when comparing station names only the first four 
+chars are considered (which should be the station id), hence in the previous example
+station names \texttt{'WTZR'} and \texttt{'WTZR 14201M010'} would be considered equal.
+\textbf{Use with care}, sometimes station names are necessary to distinguish between stations!
+\item \texttt{-h --help}\\
+Display (this) help message and exit.
+\item \texttt{-v --version}\\
+Dsiplay version and exit.
+\end{itemize}
+
+\subsubsection{Prerequisites}
+\begin{itemize}
+\item \texttt{bernutils} Python (library) module.
+\end{itemize}
+
+\subsubsection{Exit Status}
+\begin{tabular}{l l}
+\label{tab:cs_exit_status}
+Exit Code & Status\\
+\hline
+0 & Success; no discrepancies between the files \\
+1 & Error (most probably format error) \\
+2 & Missing stations(s) from compared .STA file\footnotemark[2]\\
+3 & Discrepancies for one (or more) stations\\
+\hline
+\end{tabular}
+
+\subsubsection{ToDo}
+\begin{tabular}{l l l}
+Date & What & Status\\
+\hline \\
+15,Sep,15  & add switch for help and version & Waiting ...\\
+\end{tabular}
+
+\subsubsection{Bugs}
+%Send reports to:\\
+%Xanthos Papanikolaou \href{mailto:xanthos@mail.ntua.gr}{mailto:xanthos@mail.ntua.gr}\\
+%Demitris Anastasiou  \href{mailto:danast@mail.ntua.gr}{mailto:danast@mail.ntua.gr}\\
+%Vangelis Zacharis  \href{mailto:vanzach@survey.ntua.gr}{mailto:vanzach@survey.ntua.gr}\\
+See \autoref{subsec:bugs1}.
+\bigskip
+
+\begin{tabular}{l l l}
+Date & What & Status\\
+\hline \\
+SEP, 2015 & help and version switch not working. Fix & Waiting ...\\
+\end{tabular}
+
+\footnotetext[1]{If the station name contains wildcard characters (i.e. '?' or '*')
+then these will not be used to form the filename for the discrepancies. '?' will be
+substituted with '\_' and '*' with '\_\_'}
+\footnotetext[2]{Missing stations are only reported if the occur in the compared .STA file 
+(i.e. the one specified with the \texttt{-l} option). If a station is missing from the reference
+.STA file, then the station is just skipped and no error is reported (only a warning message
+is printed).}
