@@ -5,10 +5,10 @@ except ImportError:
 
 config = {
     'description': 'Python module to accomodate routine GNSS processing at NTUA.',
-    'author': 'xp, da',
+    'author': 'xp, da, vz',
     'url': 'https://github.com/xanthospap/autobpe',
     'download_url': '',
-    'author_email': 'xanthos@mail.ntua.gr, danast@mail.ntua.gr',
+    'author_email': 'xanthos@mail.ntua.gr, danast@mail.ntua.gr, vanzach@survey.ntua.gr',
     'version': '0.1',
     'packages': ['bernutils', 'bernutils.products'],
     'scripts': [],
