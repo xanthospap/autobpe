@@ -1,4 +1,4 @@
-STATION INFORMATION FILE FOR BERNESE GNSS SOFTWARE 5.2           18-JUN-15 13:56
+STATION INFORMATION FILE FOR BERNESE GNSS SOFTWARE 5.2           01-SEP-15 13:56
 --------------------------------------------------------------------------------
 
 FORMAT VERSION: 1.01
@@ -9,18 +9,81 @@ TYPE 001: RENAMING OF STATIONS
 
 STATION NAME          FLG          FROM                   TO         OLD STATION NAME      REMARK
 ****************      ***  YYYY MM DD HH MM SS  YYYY MM DD HH MM SS  ********************  ************************
+AIRA 21742S001        001  1980 01 06 00 00 00  2099 12 31 00 00 00  AIRA*                 MGEX,aira_20120821.log
+AUT0 49431M001        001                                            AUT0*                 MGEX,aut0_20121227.log
+AXPV 10057M001        001                                            AXPV*                 MGEX,axpv_20130515.log
+BBYS 11514M001        001                                            BBYS*                 MGEX,bbys_20131111.log
 BJCO 32701M001        003                                            BJCO                  EXTRA RENAMING
+CEBR 13408M001        001                                            CEBR*                 MGEX,cebr_20140124.log
+CHOF 21788M001        001                                            CHOF*                 MGEX,chof_20121227.log
+CHPG 41609M004        001                                            CHPG*                 MGEX,chpg_20130430.log
+CKIS 50213M003        001                                            CKIS*                 MGEX,ckis_20140710.log
+CPVG 39601M001        001                                            CPVG*                 MGEX,cpvg_20131218.log
+CUT0 59945M001        001  1980 01 06 00 00 00  2099 12 31 00 00 00  CUT0*                 MGEX,From CUT01270.12O
+DLF1 13502M009        001  2011 04 15 10 00 00  2099 12 31 00 00 00  DLF1*                 MGEX,From dlf1_20130812.log
+DYNG 12602M006        001  1980 01 06 00 00 00  2099 12 31 00 00 00  DYNG*                 MGEX,From DYNG1660.12O
 ETAD 31503M001        003                                            ETAD                  EXTRA RENAMING
 ETDD 31505M001        003                                            ETDD                  EXTRA RENAMING
 ETJI 31504M001        003                                            ETJI                  EXTRA RENAMING
 FAIV                  003                                            FAIV?                 EXTRA RENAMING
 FAIV                  003                                            FAIV 40408M001        FAIR HAS ID DOMES NUMBER
+FTNA 92902S002        001  1980 01 06 00 00 00  2099 12 31 00 00 00  FTNA*                 MGEX,ftna_20120912.log
+GAP1 19403M001        001  1980 01 06 00 00 00  2099 12 31 00 00 00  GAP1*                 MGEX,gap1_20120727.log
+GOP6 11502M006        001  2011 12 21 00 00 00  2099 12 31 00 00 00  GOP6*                 MGEX,From gop6_20150625.log
+GOP7 11502M006        001                                            GOP7*                 MGEX,gop7_20130514.log
+GRA2 11001M004        001  1980 01 06 00 00 00  2099 12 31 00 00 00  GRA2*                 MGEX,From GRA21660.12O
+GRAC 10002M010        001  1980 01 06 00 00 00  2099 12 31 00 00 00  GRAC*                 MGEX,From GRAC1270.12O
+HRAG 30302M010        001                                            HRAG*                 MGEX,hrag_20121226.log
 IDDR 49451M001        003                                            IDDR                  CORS RENAMING
 ISBA 20308M001        003                                            ISBA                  EXTRA RENAMING
+ILDX 19724M001        001                                            ILDX*                 MGEX,ildx_20130708.log
+JFNG 21602M006        001  1980 01 06 00 00 00  2099 12 31 00 00 00  JFNG*                 MGEX,From jfng_20121029.log
 JPLV 40400M008        003                                            JPLV                  EXTRA RENAMING
+KIR8 10422M002        001  2011 08 12 00 00 00  2099 12 31 00 00 00  KIR8*                 MGEX,From kir8_20150616.log
+KLOP 14214M002        001  1997 03 19 00 00 00                       KLOP*                 MGEX,klop_20150701.log
+KRGG 91201M007        001  1980 01 06 00 00 00  2099 12 31 00 00 00  KRGG*                 MGEX,From krgg_20121122.log
+KZN2 12374M001        001                                            KZN2*                 MGEX,kzn2_20130701.log
+LLAG 31302M003        001                                            LLAG*                 MGEX,llag_20121227.log
+MAJU 51501M001        001                                            MAJU*                 MGEX,maju_20131015.log
+MALA 13443M001        001  2000 03 15 00 00 00                       MALA*                 MGEX,mala_20150316.log
+MAO0 40445M005        001                                            MAO0*                 MGEX,mao0_20121226.log
+MAR7 10405M003        001  2011 04 27 00 00 00  2099 12 31 00 00 00  MAR7*                 MGEX,From mar7_20150116.log
+MAYG 90101M001        001                                            MAYG*                 MGEX,mayg_20131218.log
+MELI 19379M001        001  2011 12 14 12 00 00  2099 12 31 00 00 00  MELI*                 MGEX,From meli_20140915.log
+METG 10503M002        001  1980 01 06 00 00 00  2099 12 31 00 00 00  METG*                 MGEX,From metg_20121023.log
+MRO1 59913M001        001                                            MRO1*                 MGEX,mro1_20140320.log
+MYVA 10205M001        001  1980 01 06 00 00 00  2099 12 31 00 00 00  MYVA*                 MGEX,From MYVA1270.12O
+NRMG 92701M005        001  1980 01 06 00 00 00  2099 12 31 00 00 00  NRMG*                 MGEX,From nrmg_20120919.log
+OBE3 14208M005        001  1980 01 06 00 00 00  2099 12 31 00 00 00  OBE3*                 MGEX,From OBE31270.12O
+OBE4 14208M007        001  2012 09 28 12 00 00  2099 12 31 00 00 00  OBE4*                 MGEX,From obe4_20130109.log
+OHIX 66008M006        001  1980 01 06 00 00 00  2099 12 31 00 00 00  OHIX*                 MGEX,From OHIX1270.12O
+ONS1 10402M007        001  2012 01 28 00 00 00  2099 12 31 00 00 00  ONS1*                 MGEX,From ons1_20150616.log
+POHN 51601M001        001  2003 05 01 00 00 00                       POHN*                 MGEX,pohn_20150429.log
+PTVL 51402M002        001                                            PTVL*                 MGEX,ptvl_20140520.log
+SAMO 50603M001        001                                            SAMO*                 MGEX,samo.log
+SGOC 23501M003        001  1980 01 06 00 00 00  2099 12 31 00 00 00  SGOC*                 MGEX,From SGOC1270.12O
+SIN0 22601M003        001                                            SIN0*                 MGEX,sin0_20121227.log
+SIN1 22601M003        001                                            SIN1*                 MGEX,sin1_20130502.log
+SMNE 10001M007        001                                            SMNE*                 MGEX,smne_20130515.log
+STFU 49430S001        001                                            STFU*                 MGEX,stfu_20130205.log
+STJ3 40101M005        001                                            STJ3*                 MGEX,stj3_20140516.log
+THTG 92201M016        001  1980 01 06 00 00 00  2099 12 31 00 00 00  THTG*                 MGEX,thtg_20121116.log
 TN22 49450M001        003                                            TN22                  CORS RENAMING
-TSEA 49448S001        003                                            TSEA                  
+TONG 50902M001        001                                            TONG*                 MGEX,tong_20140710.log
+TSEA 49448S001        003                                            TSEA
+TUVA 51101M001        001                                            TUVA*                 MGEX,tuva_20140710.log
+UCAL 49106M001        001                                            UCAL*                 MGEX,ucal_20130830.log
+UNBD 40146M003        001                                            UNBD*                 MGEX,unbd_20130814.log
+UNX2 50190M002        001                                            UNX2*                 MGEX,unx2_20121226.log
+UNX3 50190M002        001                                            UNX3*                 MGEX,unx3_20130118.log
+USN4 40451S007        001  1980 01 06 00 00 00  2014 11 12 10 59 59  USN4*                 MGEX,From USN41270.12O
+USN4 40451S009        001  2014 12 03 00 00 00  2099 12 31 23 59 59  USN4*                 MGEX,From USN43370.14O
+USN5 40451S007        001  1980 01 06 00 00 00  2014 11 12 10 59 59  USN5*                 MGEX,From USN51270.12O
+USN5 40451S009        001  2014 12 03 00 00 00  2099 12 31 23 59 59  USN5*                 MGEX,From USN53370.14O
+VOIM 33303M001        001                                            VOIM*                 MGEX,voim_20130805.log
 VTSP 49449M001        003                                            VTSP                  CORS RENAMING
+WARK 50243M001        001                                            WARK*                 MGEX,wark_20130502.log
+YEL2 40127M006        001                                            YEL2*                 MGEX,yel2_20130916.log
 AFKB                  001                                            AFKB*                 NEW
 AZGB 49541S001        001                                            AZGB*                 NEW
 BARH 49927S001        001                                            BARH*                 NEW
@@ -115,6 +178,7 @@ AMUN 66040M001        001                                            AMUN*      
 ANKR 20805M002        001                                            ANKR*                 STN
 ANTC 41713S001        001                                            ANTC*                 IGS.SNX
 AOML 49914S001        001                                            AOML*                 STN
+AREG 42202M008        001                                            AREG*                 MGEX,areg_20130507.log
 AREQ 42202M005        001                                            AREQ*                 STN
 AREV 42202M005        001                                            AREV*                 NEW
 ARTU 12362M001        001                                            ARTU*                 STN
@@ -180,8 +244,9 @@ CHTI 50242M001        001                                            CHTI*      
 CHUR 40128M002        001                                            CHUR*                 STN
 CICE 40508M001        001                                            CICE*                 (PDR)
 COCO 50127M001        001                                            COCO*                 STN
+CONX 41719M002        001                                            CONX*                 MGEX,conx_20130211.log
 CONZ 41719M002        001                                            CONZ*                 STN
-COPO 41714S001        001                                            COPO*                 IGS.SNX
+COPO 41714S001        001                       2015 08 05 23 59 59  COPO*                 IGS.SNX
 CORD 41511M001        001                                            CORD*                 STN
 COYQ 41715S001        001                                            COYQ*                 STN
 CRAO 12337M002        001                                            CRAO*                 NEW REP
@@ -317,6 +382,7 @@ KOKV 40424M004        001                                            KOKV*      
 KOSG 13504M003        001                                            KOSG*                 STN
 KOU1 97301M211        001                                            KOU1*                 STN
 KOUC 92727S001        001                                            KOUC*                 NEW
+KOUG 97301M402        001  1980 01 06 00 00 00  2099 12 31 00 00 00  KOUG*                 MGEX,koug_20111206.log
 KOUR 97301M210        001                                            KOUR*                 STN
 KR0G 10422M001        001                                            KR0G*                 STN (IGLOS)
 KSMV 21701S007        001                                            KSMV*                 NEW REP
@@ -347,11 +413,13 @@ MALI 33201M001        001                                            MALI*      
 MANA 41201S001        001                                            MANA*                 IGS.SNX
 MANZ 40513S001        001                                            MANZ*                 NEW
 MAR6 10405M002        001                                            MAR6*                 STN
+MARS 10073M008        001                                            MARS*                 MGEX,mars_20121001.log
 MAS1 31303M002        001  1999 07 04 00 00 00                       MAS1*                 STN (RENAMING!)
 MASP 31303M001        001                                            MASP*                 STN (RENAMING!)
 MASP 31303M002        001                       1999 07 03 23 59 59  MAS1*                 STN (RENAMING!)
 MAT1 12734M009        001                                            MAT1*                 STN (IGLOS)
 MATE 12734M008        001                                            MATE*                 STN
+MATG 12734M010        001  1980 01 06 00 00 00  2099 12 31 00 00 00  MATG*                 MGEX,matg_20120521.log
 MAUI 40445S008        001                                            MAUI*                 STN
 MAW1 66004M001        001                                            MAW1*                 STN
 MBAR 33901M001        001                                            MBAR*                 STN
@@ -386,7 +454,7 @@ MTKA 21741S002        001                                            MTKA*      
 MUEJ 14282M001        001                                            MUEJ*                 GREF
 NANO 40138M001        001                                            NANO*                 STN
 NEIA 41620M002        001                                            NEIA*                 SIRGAS
-NIC2                  001                                            NIC2*                 
+NIC2                  001                                            NIC2*
 NICO 14302M001        001                                            NICO*                 STN
 NIST 49507M002        001                                            NIST*                 NEW
 NISU 49507M001        001                                            NISU*                 NEW
@@ -471,6 +539,7 @@ REUN 97401M003        001                                            REUN*      
 REY2 10202M003        001                                            REY2*                 STN
 REYK 10202M001        001                                            REYK*                 STN
 REYZ 10202M003        001                                            REYZ*                 STN (IGLOS)
+RGDG 41507M007        001                                            RGDG*                 MGEX,rgdg_20131106.log
 RICH 40499S020        001                                            RICH*                 STN
 RIGA 12302M002        001                                            RIGA*                 NEW REP
 RIO2 41507M006        001                                            RIO2*                 NEW
@@ -566,6 +635,7 @@ SCUB 40701M001        001                                            SCUB*      
 SCV1                  001                                            SCV1*                 NEW
 SELE 12352M001        001                                            SELE*                 STN
 SEY1 39801M001        001                                            SEY1*                 STN
+SEYG 39801M004        001  1980 01 06 00 00 00  2099 12 31 00 00 00  SEYG*                 MGEX,RINEX header
 SFER 13402M004        001                                            SFER*                 STN
 SHAO 21605M002        001                                            SHAO*                 STN
 SIMO 30307M001        001                                            SIMO*                 STN
@@ -634,6 +704,7 @@ UNB3 40146M002        001                                            UNB3*      
 UNBJ 40146M002        001  2006 08 16 00 00 00                       UNBJ*                 STN (IGLOS)
 UNBJ 40146M002        003  2006 08 16 00 00 00                       UNB1 40146S001        CHG
 UNBN 40146M002        001                                            UNBN*                 NEW
+UNBS 40146M003        001                                            UNBS*                 MGEX,unbs_20120910.log
 UNBT 40146M002        001                                            UNBT*                 NEW
 UNSA 41514M001        001                                            UNSA*                 STN
 UNTR 12785M001        001                                            UNTR*                 NEW
@@ -670,6 +741,8 @@ WILL 40134M001        001                                            WILL*      
 WIND 31101M001        001                                            WIND*                 NEW
 WROC 12217M001        001                                            WROC*                 STN (IGLOS)
 WSRT 13506M005        001                                            WSRT*                 STN
+WTZ2 14201M015        001                                            WTZ2*                 MGEX,From wtz2_20130513.log
+WTZ3 14201M015        001                                            WTZ3*                 MGEX,From wtz3_20130522.log
 WTZA 14201M013        001                                            WTZA*                 NEW
 WTZG 14201M012        001                                            WTZG*                 STN (IGLOS)
 WTZJ 14201M012        001                                            WTZJ*                 STN (IGLOS)
@@ -677,7 +750,7 @@ WTZL 14201M022        001                                            WTZL*      
 WTZR 14201M010        001                                            WTZR*                 STN
 WTZS 14201M015        001                                            WTZS*                 NEW
 WTZZ 14201M014        001                                            WTZZ*                 STN (IGLOS)
-WUH2                  001                                            WUH2*                 NEW 1sec-data
+WUH2 21602M007        001                                            WUH2*                 DOMES NUMBER added
 WUHN 21602M001        001                                            WUHN*                 STN
 XIAN 21614M001        001                                            XIAN*                 STN
 XMAS 50183M001        001                                            XMAS*                 NEW 1sec-data
@@ -722,14 +795,21 @@ AZGB 49541S001        001  2007 04 23 00 00 00  2008 06 16 23 59 59  TRIMBLE 470
 AZGB 49541S001        001  2008 06 17 00 00 00                       TRIMBLE NETR5                               999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.0000  Globe, US               NEW (ngs/azgb.log.txt)
 BARH 49927S001        001                       2007 03 26 23 59 59  TRIMBLE 4000SSI                             999999  TRM29659.00     UNAV                        999999    0.0000    0.0000    0.0000  Bar Harbor, US          NEW
 BARH 49927S001        001  2007 03 27 00 00 00                       LEICA GRX1200GGPRO                          999999  LEIAX1202GG     NONE                        999999    0.0000    0.0000    0.0000  Bar Harbor, US          NEW
+BBYS 11514M001        001  2012 09 14 10 00 00  2015 05 20 06 00 00  TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.1180  Banska Bystrica, SK     MGEX,bbys_20131111.log
+BBYS 11514M001        001  2015 07 31 07 17 00                       TRIMBLE NETR9                               999999  TRM59800.00     NONE  5222354502             54502    0.0000    0.0000    0.1310  Banska Bystrica, SK     MGEX,bbys_20150810.log
+CEBR 13408M001        001                                            SEPT POLARX4                                999999  SEPCHOKE_MC     NONE                        999999    0.0000    0.0000    0.1780  Cebreros, ES            MGEX,cebr_20140124.log
 CNMR 50512M001        001                       2008 02 04 23 59 59  TRIMBLE 4700                                999999  TRM33429.20+GP  UNAV                        999999    0.0000    0.0000    0.0000  Saipan, US              NEW
 CNMR 50512M001        001  2008 02 05 00 00 00                       TRIMBLE NETR5                               999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0000  Saipan, US              NEW
+CPVG 39601M001        001                                            TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.4300  Espargos, CV            From cpvg_20131218.log
 CPXF 49642S001        001                       2002 06 25 23 59 59  ASHTECH Z-XII3                              999999  ASH701945B_M    SCIT                        999999    0.0000    0.0000    0.0083  Lagrande, US            NEW
 CPXF 49642S001        001  2002 06 26 00 00 00  2004 04 12 23 59 59  ASHTECH UZ-12                               999999  ASH701945B_M    SCIT                        999999    0.0000    0.0000    0.0083  Lagrande, US            NEW
 CPXF 49642S001        001  2004 04 13 00 00 00  2007 07 22 23 59 59  LEICA RS500                                 999999  LEIAT504        LEIS                        999999    0.0000    0.0000    0.0083  Lagrande, US            NEW
 CPXF 49642S001        001  2007 07 23 00 00 00  2007 09 30 23 59 59  LEICA GRX1200GGPRO                          999999  LEIAT504        LEIS                        999999    0.0000    0.0000    0.0083  Lagrande, US            NEW
 CPXF 49642S001        001  2007 10 01 00 00 00                       LEICA GRX1200GGPRO                          999999  LEIAT504GG      LEIS                        999999    0.0000    0.0000    0.0083  Lagrande, US            NEW
 CTWN                  001                                            TRIMBLE NETR5                               999999  ASH701941.B     SCIT                        999999    0.0000    0.0000    0.0000  Cape Town, ZA           NEW
+CUT0 59945M001        001                                            TRIMBLE NETR9                               999999  TRM59800.00     SCIS                        999999    0.0000    0.0000    0.0000  Perth, AU               From cut0_20120418.log
+DLF1 13502M009        001  2011 04 15 10 00 00                       TRIMBLE NETR9                               999999  LEIAR25.R3      LEIT  10030006               30006    0.0000    0.0000    0.0000  Delft, NL               From dlf1_20130812.log
+DYNG 12602M006        001                                            TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    2.0180  Dionysos,Greece         From dyng_20111107.log
 EPRT 49928S001        001                       2004 05 02 23 59 59  TRIMBLE 4000SSI                             999999  TRM29659.00     UNAV                        999999    0.0000    0.0000    0.0000  Eastport, US            NEW
 EPRT 49928S001        001  2004 05 03 00 00 00  2004 07 09 23 59 59  TRIMBLE 4000SSE                             999999  TRM29659.00     UNAV                        999999    0.0000    0.0000    0.0000  Eastport, US            NEW
 EPRT 49928S001        001  2004 07 10 00 00 00  2008 05 09 23 59 59  TRIMBLE 4000SSE                             999999  TRM29659.00     LEIS                        999999    0.0000    0.0000    0.0000  Eastport, US            NEW
@@ -745,9 +825,12 @@ ILHA 41634M001        001  2010 09 20 00 00 00                       LEICA GRX12
 MNLS                  001                       2004 09 29 23 59 59  TRIMBLE 4000SSI                             999999  TRM22020.00+GP  TCWD                        999999    0.0000    0.0000    0.0000  LeSueur, US             NEW
 MNLS                  001  2004 09 30 00 00 00  2006 10 10 23 59 59  TRIMBLE 5700                                999999  TRM41249.00     NONE                        999999    0.0000    0.0000    0.0000  LeSueur, US             NEW
 MNLS                  001  2006 10 11 00 00 00                       TRIMBLE NETR5                               999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0000  LeSueur, US             NEW
-POVE 41628M001        001                                            TRIMBLE NETR5                               999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.0075  Porto Velho, BR         NEW
+POVE 41628M001        001                       2015 07 21 15 59 59  TRIMBLE NETR5                               999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.0075  Porto Velho, BR         NEW
+POVE 41628M001        001  2015 07 21 16 00 00  2015 07 21 19 05 59  TRIMBLE NETR8                               999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.0075  Porto Velho, BR         From pove_20150804.log
+POVE 41628M001        001  2015 07 21 19 06 00                       TRIMBLE NETR8                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0075  Porto Velho, BR         From pove_20150804.log
 RECF 41617M001        001                       2012 08 28 17 19 59  TRIMBLE NETR5                               999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0710  Recif, BR               NEW
 RECF 41617M001        001  2012 08 28 17 20 00                       TRIMBLE NETR8                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0710  Recif, BR               recf_20120924.log
+RGDG 41507M007        001                                            TRIMBLE NETR9                               999999  TRM59800.00     SCIS                        999999    0.0000    0.0000    0.4200  Rio Grande, AR          From rgdg_20131106.log
 ROSA 41632M001        001                                            TRIMBLE NETR5                               999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0080  Rosana, BR              NEW
 SALU 41640M001        001                       2013 06 11 17 00 00  TRIMBLE NETR5                               999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0080  Sao Luis, BR            NEW
 SALU 41640M001        001  2013 06 11 17 25 00                       TRIMBLE NETR8                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0080  Sao Luis, BR            salu_20130626.log
@@ -770,6 +853,7 @@ ABMF 97103M001        001  2015 04 28 15 00 00                       LEICA GR25 
 ABPO 33302M001        001                                            ASHTECH UZ-12                               999999  ASH701945G_M    SCIT                        999999    0.0000    0.0000    0.0083  Antananarivo, MG        NEW
 ADIS 31502M001        001                       2008 03 10 23 59 59  TRIMBLE 4000SSI                             999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.0007  Addis Ababa, ET         HTR+TRN
 ADIS 31502M001        001  2008 03 11 00 00 00                       JPS LEGACY                                  999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.0010  Addis Ababa, ET         HTR+TRN
+AIRA 21742S001        001                                            TRIMBLE NETR9                               999999  TRM59800.00     SCIS                        999999    0.0000    0.0000    0.0000  Aira, JP                From aira_20120821.log
 AIS1 49998S001        001                                            ASHTECH Z-XII3                              999999  ASH700829.3     SNOW                        999999    0.0000    0.0000    0.0000  Annette Island, USA     ais1.log
 AJAC 10077M005        001                       2008 11 25 23 59 59  ASHTECH Z-XII3                              999999  ASH700936A_M    NONE                        999999    0.0000    0.0000    0.0000  Ajaccio, FR             HTR+TRN
 AJAC 10077M005        001  2008 11 26 00 00 00  2012 12 05 08 59 59  LEICA GRX1200GGPRO                          999999  LEIAT504GG      NONE                        999999    0.0000    0.0000    0.0000  Ajaccio, FR             ajac_20081125.log
@@ -809,6 +893,7 @@ ANKR 20805M002        001  2008 03 05 00 00 00  2008 05 05 23 59 59  LEICA GRX12
 ANKR 20805M002        001  2008 05 06 00 00 00                       TPS E_GGD                                   999999  TPSCR3_GGD      CONE  70243                  70243    0.0000    0.0000    0.0700  Ankara, TR              HTR+TRN
 ANTC 41713S001        001                                            ASHTECH Z-XII3                              999999  ASH700936D_M    SNOW                        999999    0.0000    0.0000    0.0000  Los Angeles, Chile      IGS.SNX
 AOML 49914S001        001                                            ROGUE SNR-8000                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0000  Key Biscayne, US        HTR+TRN
+AREG 42202M008        001                                            TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000   -0.0006    0.4291  Arequipa, PE            areg_20130507.log
 AREQ 42202M005        001                       2001 06 23 23 59 59  AOA SNR-8000 ACT                            999999  AOAD/M_T        JPLA                        999999    0.0000    0.0000    0.0610  Arequipa, PE            HTR+TRN
 AREQ 42202M005        001  2001 06 24 00 00 00  2002 08 17 00 00 00  AOA SNR-8000 ACT                            999999  AOAD/M_T        JPLA                        999999    0.0000    0.0000    0.0610  Arequipa, PE            HTR+TRN
 AREQ 42202M005        001  2002 08 17 00 00 00  2011 08 19 11 59 59  ASHTECH UZ-12                               999999  AOAD/M_T        JPLA                        999999    0.0000    0.0000    0.0610  Arequipa, PE            IGSMAIL.4032
@@ -829,6 +914,8 @@ AUCK 50209M001        001  2002 12 02 00 00 00  2003 01 08 23 59 59  ASHTECH UZ-
 AUCK 50209M001        001  2003 01 09 00 00 00  2005 11 02 23 59 59  ASHTECH Z-XII3                              999999  ASH701945C_M    NONE                        999999    0.0000    0.0000    0.0016  Whangaparaoa, NZ        HTR+TRN
 AUCK 50209M001        001  2005 11 03 00 00 00  2011 02 28 23 59 59  TRIMBLE NETRS                               999999  TRM41249.00     NONE                        999999    0.0000    0.0000    0.0550  Whangaparaoa, NZ        IGSSTATION.683
 AUCK 50209M001        001  2011 03 01 00 00 00                       TRIMBLE NETR9                               999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0550  Whangaparaoa, NZ        auck_20110301.log
+AUT0 49431M001        001                                            JAVAD TRE_G3TH DELTA                        999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.0000  Austin, US              From AUT0_20121227.LOG
+AXPV 10057M001        001                                            TRIMBLE NETR9                               999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.0000  Aix En Provence, FR     From axpv_20130515.log
 AZCO 49454M001        001                                            TPS LEGACY                                  999999  TPSCR3_GGD      CONE                        999999    0.0000    0.0000    0.0000  Bisbee, US              NEW
 BADG 12338M002        001  2010 03 15 00 00 00                       JAVAD TRE_G3TH DELTA                        999999  JAVRINGANT_DM   JVDM                        999999    0.0000    0.0000    0.0280  Badary, RU              badg_20100423.log
 BAHR 24901M002        001                                            ASHTECH Z-XII3                              999999  ASH700936B_M    SNOW                        999999    0.0000    0.0000    3.1220  Manama, BH              HTR+TRN
@@ -894,7 +981,8 @@ BOGT 41901M001        001  2007 12 13 00 00 00  2008 06 06 23 59 59  ASHTECH UZ-
 BOGT 41901M001        001  2008 06 07 00 00 00  2009 09 09 14 59 59  ASHTECH UZ-12                               999999  ASH701945G_M    NONE                        999999    0.0000    0.0000    0.0610  Bogota, CO              IGSMAIL.3910
 BOGT 41901M001        001  2009 09 09 15 00 00  2010 08 11 16 45 59  ASHTECH UZ-12                               999999  ASH701945E_M    NONE                        999999    0.0000    0.0000    0.0610  Bogota, CO              IGSMAIL.3910
 BOGT 41901M001        001  2010 08 11 16 46 00  2010 08 23 23 59 59  TRIMBLE NETRS                               999999  ASH701945E_M    NONE                        999999    0.0000    0.0000    0.0610  Bogota, CO              IGSSTATION.3938
-BOGT 41901M001        001  2010 08 24 00 00 00                       ASHTECH UZ-12                               999999  ASH701945E_M    NONE                        999999    0.0000    0.0000    0.0610  Bogota, CO              IGSSTATION.3957
+BOGT 41901M001        001  2010 08 24 00 00 00  2015 08 19 16 00 00  ASHTECH UZ-12                               999999  ASH701945E_M    NONE                        999999    0.0000    0.0000    0.0610  Bogota, CO              IGSSTATION.3957
+BOGT 41901M001        001  2015 08 19 21 00 00                       JAVAD TRE_3 DELTA                           999999  JAVRINGANT_DM   NONE                        999999    0.0000    0.0000    0.0610  Bogota, CO              IGSSTATION.3957
 BOMJ 41612M001        001  2009 10 19 00 00 00                       TRIMBLE NETR5                               999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0080  Bom Jesus Da Lapa, BR   bomj_20100301.log
 BOR1 12205M002        001                       1999 05 31 23 59 59   *** UNDEFINED ***                          999999   *** UNDEFINED ***                          999999    0.0000    0.0000    0.0621  Borowiec, PL            HTR
 BOR1 12205M002        001  1999 06 01 00 00 00  2007 07 07 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0624  Borowiec, PL            HTR+TRN
@@ -975,6 +1063,8 @@ CHAT 50207M001        001                       2001 11 27 23 59 59  ROGUE SNR-8
 CHAT 50207M001        001  2001 11 28 00 00 00                       ASHTECH Z-XII3                              999999  ASH701945C_M    NONE                        999999    0.0000    0.0000    0.0062  Waitangi, NZ            IGSMAIL.3612
 CHB1 49856S001        001                                            ASHTECH Z-XII3                              999999  ASH700829.3     SNOW                        999999    0.0000    0.0000    0.0000                          
 CHDU 21617M001        001  2003 11 28 00 00 00                       TRIMBLE 5700                                999999  TRM29659.00                                 999999    0.0000    0.0000    0.0500  Southwest China         NEW
+CHOF 21788M001        001                                            JAVAD TRE_G3TH DELTA                        999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.0000  Chofu, JP               From chof_20121227.log
+CHPG 41609M004        001                                            TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0003    0.0002    0.4246  Cachoeira Paulista, BR  From chpg_20130430.log
 CHPI 41609M003        001                       2003 05 07 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0792  Cachoeira Paulista, BR  NEW
 CHPI 41609M003        001  2003 05 08 00 00 00  2013 07 30 20 29 59  ASHTECH UZ-12                               999999  ASH701945C_M    NONE                        999999    0.0000    0.0000    0.0792  Cachoeira Paulista, BR  NEW
 CHPI 41609M003        001  2013 07 30 20 30 00                       JAVAD TRE_G3TH DELTA                        999999  TPSCR.G3        NONE                        999999    0.0000    0.0000    0.0792  Cachoeira Paulista, BR  From chpi_20130801.log
@@ -987,18 +1077,20 @@ CHUR 40128M002        001  2009 04 01 00 00 00  2010 09 01 14 38 00  AOA SNR-800
 CHUR 40128M002        001  2010 09 02 00 00 00  2011 08 25 23 59 59  TPS NETG3                                   999999  ASH701945E_M    NONE                        999999    0.0000    0.0000    0.1000  Churchill, CA           chur_20100901.log
 CHUR 40128M002        001  2011 08 26 00 00 00                       TPS NET-G3A                                 999999  ASH701945E_M    NONE                        999999    0.0000    0.0000    0.1000  Churchill, CA           chur_20100901.log
 CICE 40508M001        001                                            ROGUE SNR-8000                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0814  Ensenada,  Mexiko       manually from LOG
+CKIS 50213M003        001                                            TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0005  Rarotonga, CK           From ckis_20140710.log
 COCO 50127M001        001                       2004 06 24 00 00 00  AOA SNR-12 ACT                              999999  AOAD/M_T        AUST                        999999    0.0000    0.0000    0.0040  Cocos Island, AU        HTR+TRN
 COCO 50127M001        001  2004 06 24 00 00 00  2009 05 03 23 59 59  ASHTECH UZ-12                               999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0040  Cocos Island, AU        IGSSTATION.61
 COCO 50127M001        001  2009 05 05 00 00 00  2011 10 23 23 59 59  TRIMBLE NETR5                               999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0040  Cocos Island, AU        IGSSTATION.61
 COCO 50127M001        001  2011 10 24 00 00 00  2015 06 14 23 59 59  TRIMBLE NETR8                               999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0040  Cocos Island, AU        coco_20111024.log
 COCO 50127M001        001  2015 06 15 00 00 00                       SEPT POLARXS                                999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0040  Cocos Island, AU        coco_20150615.log
+CONX 41719M002        001                                            JAVAD TRE_G3TH DELTA                        999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0574  Concepcion, CL          From conx_20130211.log
 CONZ 41719M002        001                       2005 05 17 23 59 59  JPS LEGACY                                  999999  JPSREGANT_DD_E1 NONE                        999999    0.0000    0.0000   -0.0125  Concepcion, CL          HTR+TRN
 CONZ 41719M002        001  2005 05 18 00 00 00  2006 06 22 23 59 59  JPS LEGACY                                  999999  TPSCR3_GGD      CONE                        999999    0.0000    0.0000    0.0574  Concepcion, CL          HTR+TRN
 CONZ 41719M002        001  2006 06 23 00 00 00  2009 04 30 23 59 59  TPS E_GGD                                   999999  TPSCR3_GGD      CONE                        999999    0.0000    0.0000    0.0574  Concepcion, CL          HTR+TRN
 CONZ 41719M002        001  2009 05 01 00 00 00  2011 07 18 23 59 59  LEICA GRX1200GGPRO                          999999  TPSCR3_GGD      CONE                        999999    0.0000    0.0000    0.0574  Concepcion, CL          HTR+TRN
 CONZ 41719M002        001  2011 07 19 00 00 00                       LEICA GRX1200+GNSS                          999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0574  Concepcion, CL          IGSSTATION.4481
 COPO 41714S001        001                       2008 07 03 14 05 59  ASHTECH Z-XII3                              999999  ASH700936D_M    SNOW                        999999    0.0000    0.0000    0.0000  Copiapo, Chile          IGS.SNX
-COPO 41714S001        001  2008 07 03 14 06 00                       TRIMBLE NETRS                               999999  ASH700936D_M    SNOW                        999999    0.0000    0.0000    0.0000  Copiapo, Chile          copo_20080901.log
+COPO 41714S001        001  2008 07 03 14 06 00  2015 08 05 23 59 59  TRIMBLE NETRS                               999999  ASH700936D_M    SNOW                        999999    0.0000    0.0000    0.0000  Copiapo, Chile          decomissioned,IGSSTATION-6279
 CORD 41511M001        001                       2005 03 02 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0792  Cordoba, AR             HTR+TRN
 CORD 41511M001        001  2005 03 03 00 00 00  2010 10 12 00 00 00  ASHTECH UZ-12                               999999  ASH701945G_M    NONE                        999999    0.0000    0.0000    0.0792  Cordoba, AR             HTR+TRN
 CORD 41511M001        001  2013 08 28 00 00 00                       JAVAD TRE_G3TH DELTA                        999999  TPSCR.G3        NONE                        999999    0.0000    0.0000    0.0922  Cordoba, AR             From cord_20130909.log
@@ -1126,13 +1218,15 @@ FLIN 40135M001        001                       1997 01 07 23 59 59   *** UNDEFI
 FLIN 40135M001        001  1997 01 08 00 00 00  2009 05 12 23 59 59  AOA BENCHMARK ACT                           999999  AOAD/M_T        SCIS                        999999    0.0000    0.0000    0.1500  Flin Flon, CA           HTR+TRN
 FLIN 40135M001        001  2009 05 13 00 00 00  2010 12 21 12 59 59  LEICA GRX1200PRO                            999999  AOAD/M_T        SCIS                        999999    0.0000    0.0000    0.1500  Flin Flon, CA           ISSTATION.3056
 FLIN 40135M001        001  2010 12 21 13 00 00  2014 02 24 23 59 59  TPS NETG3                                   999999  NOV750.R4       NONE                        999999    0.0000    0.0000    0.1500  Flin Flon, CA           ISSTATION.4160
-FLIN 40135M001        001  2014 02 25 00 00 00                       TPS NET-G3A                                 999999  NOV750.R4       NONE                        999999    0.0000    0.0000    0.1500  Flin Flon, CA           ISSTATION.5693
+FLIN 40135M001        001  2014 02 25 00 00 00  2015 07 06 15 59 59  TPS NET-G3A                                 999999  NOV750.R4       NONE                        999999    0.0000    0.0000    0.1500  Flin Flon, CA           ISSTATION.5693
+FLIN 40135M001        001  2015 07 06 16 00 00                       TPS NET-G3A                                 999999  NOV750.R4       NOVS                        999999    0.0000    0.0000    0.1500  Flin Flon, CA           flin_20150706.log
 FLRS 31907M001        001                                            LEICA GRX1200GGPRO                          999999  LEIAT504GG      NONE                        999999    0.0000    0.0000    0.0000  Flores, PT              NEW
 FORT 41602M001        001                       2006 02 27 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_TA_NGS   DOME                        999999    0.0000    0.0000    0.6430  Eusebio, BR             HTR+TRN
 FORT 41602M001        001  2006 02 28 00 00 00                       ROGUE SNR-8000                              999999  AOAD/M_TA_NGS   NONE                        999999    0.0000    0.0000    0.6430  Eusebio, BR             HTR+TRN
 FRDN 40146M001        001                       2014 01 31 18 59 59  TPS NETG3                                   999999  TPSCR.G3        NONE                        999999    0.0000    0.0000    0.1000  Fredericton, CA         NEW
 FRDN 40146M001        001  2014 01 31 19 00 00                       TPS NET-G3A                                 999999  TPSCR.G3        NONE                        999999    0.0000    0.0000    0.1000  Fredericton, CA         NEW
 FREE 43605S001        001                                            ASHTECH Z-XII3                              999999  ASH701933B_M    SNOW                        999999    0.0000    0.0000    0.0000  Freeport, BS            HTR+TRN
+FTNA 92902S002        001                                            TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0000  Maopo'Opo, WF           From ftna_20120912.log
 FUNC 13911S001        001                       2007 10 11 23 59 59  LEICA RS500                                 999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.0000  Funchal, PT             NEW
 FUNC 13911S001        001  2007 10 12 00 00 00  2008 04 01 23 59 59  LEICA SR520                                 999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.0000  Funchal, PT             NEW
 FUNC 13911S001        001  2008 04 02 00 00 00                       LEICA GRX1200GGPRO                          999999  LEIAT504GG      NONE                        999999    0.0000    0.0000    0.0000  Funchal, PT             NEW
@@ -1141,13 +1235,15 @@ GANP 11515M001        001                       2006 08 24 23 59 59  TRIMBLE 470
 GANP 11515M001        001  2006 08 25 00 00 00  2009 08 18 23 59 59  TRIMBLE NETR5                               999999  TRM55971.00     NONE                         37385    0.0000    0.0000    0.3830  Ganovce, SK             NEW (EUREF)
 GANP 11515M001        001  2009 08 19 00 00 00  2012 04 19 23 59 59  TRIMBLE NETR8                               999999  TRM55971.00     NONE  37385                  37385    0.0000    0.0000    0.3830  Ganovce, SK             NEW (EUREF)
 GANP 11515M001        001  2012 04 20 00 00 00                       TRIMBLE NETR9                               999999  TRM55971.00     NONE  37385                  37385    0.0000    0.0000    0.3830  Ganovce, SK             IGSSTATION-4885
+GAP1 19403M001        001                                            TPS NETG3                                   999999  TPSCR.G3        TPSD                        999999    0.0000    0.0000    0.0000  Tres Cantos, ES         From gap1_20120727.log
 GENO 12712M002        001                       2013 05 21 13 59 59  TRIMBLE 4000SSI                             999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.0000  Genova, Italy           IGS.SNX
 GENO 12712M002        001  2013 05 21 14 00 00                       TRIMBLE 4700                                999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.0000  Genova, IT              From geno_20130527.log
 GJOV 10332M001        001                                            ASHTECH Z18                                 999999  ASH701946.2     SNOW                        999999    0.0000    0.0000    0.1800  Gjovik, NO              HTR+TRN
 GLPS 42005M002        001                       2008 10 07 23 59 59  ASHTECH Z-XII3                              999999  ASH701945B_M    SCIT                        999999    0.0000    0.0000    0.0083  Puerto Ayora, EC        IGSMAIL.4338
 GLPS 42005M002        001  2008 10 08 00 00 00  2012 11 13 23 59 59  ASHTECH UZ-12                               999999  ASH701945B_M    SCIT                        999999    0.0000    0.0000    0.0083  Puerto Ayora, EC        
 GLPS 42005M002        001  2012 11 14 00 00 00  2012 12 06 21 44 59  ASHTECH UZ-12                               999999  ASH701945B_M    NONE                        999999    0.0000    0.0000    0.0083  Puerto Ayora, EC        Damaged antenna radome
-GLPS 42005M002        001  2012 12 06 21 45 00                       ASHTECH UZ-12                               999999  ASH701945B_M    SCIT                        999999    0.0000    0.0000    0.0083  Puerto Ayora, EC        reinstalled radome
+GLPS 42005M002        001  2012 12 06 21 45 00  2015 08 17 21 01 00  ASHTECH UZ-12                               999999  ASH701945B_M    SCIT                        999999    0.0000    0.0000    0.0083  Puerto Ayora, EC        reinstalled radome
+GLPS 42005M002        001  2015 08 17 21 15 00                       JAVAD TRE_G3TH DELTA                        999999  ASH701945B_M    SCIT                        999999    0.0000    0.0000    0.0083  Puerto Ayora, EC        glps_20150817.log
 GLSV 12356M001        001                       2007 11 12 23 59 59  TRIMBLE 4000SSI                             999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.0000  Kiev, UA                HTR+TRN
 GLSV 12356M001        001  2007 11 13 00 00 00                       NOV OEMV3                                   999999  NOV702GG        NONE                        999999    0.0000    0.0000    0.0000  Kiev, UA                HTR+TRN
 GMSD 21749S002        001  2003 11 13 00 00 00  2008 10 13 23 59 59  NOV MILLEN-RT2                              999999  NOV503+CR       SPKE                        999999    0.0000    0.0000    0.0000  Nakatane Town, JP       
@@ -1166,12 +1262,25 @@ GOL2 40405S031        001                       2006 09 26 23 59 59  ROGUE SNR-1
 GOL2 40405S031        001  2006 09 27 00 00 00                       ASHTECH UZ-12                               999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0254  Goldstone, US           HTR+TRN
 GOLD 40405S031        001                       2011 09 14 13 50 00  ASHTECH Z-XII3                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0254  Goldstone, US           HTR+TRN
 GOLD 40405S031        001  2011 09 19 15 45 00                       JPS EGGDT                                   999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0254  Goldstone, US           gold_20110920.log
+GOP6 11502M006        001  2011 12 21 00 00 00                       LEICA GRX1200+GNSS                          999999  LEIAR25.R4      LEIT  725071                 25071    0.0000    0.0000    0.0653  Ondrejov, CZ            From gop_20150625.log
+GOP7 11502M006        001                       2015 08 21 08 30 00  JAVAD TRE_G3TH DELTA                        999999  LEIAR25.R4      LEIT                        999999    0.0000    0.0000    0.0653  Ondrejov, CZ            From gop7_20130514.log
+GOP7 11502M006        001  2015 08 21 08 45 00                       TRIMBLE NETR9                               999999  LEIAR25.R4      LEIT                        999999    0.0000    0.0000    0.0653  Ondrejov, CZ            From gop7_20150821.log
 GOPE 11502M002        001                       2006 01 23 23 59 59  ASHTECH Z18                                 999999  ASH701946.3     SNOW                        999999    0.0000    0.0000    0.0464  Ondrejov, CZ            HTR+TRN
 GOPE 11502M002        001  2006 01 24 00 00 00  2006 07 14 23 59 59  ASHTECH Z18                                 999999  ASH701946.3     SNOW                        999999    0.0000    0.0000    0.0467  Ondrejov, CZ            HTR+TRN
 GOPE 11502M002        001  2006 07 15 00 00 00  2009 12 13 23 59 59  ASHTECH Z18                                 999999  TPSCR3_GGD      CONE                        999999    0.0000    0.0000    0.1114  Ondrejov, CZ            HTR+TRN
 GOPE 11502M002        001  2009 12 14 00 00 00                       TPS NETG3                                   999999  TPSCR.G3        TPSH                        999999    0.0000    0.0000    0.1114  Ondrejov, CZ            HTR+TRN
 GOUG 30608M001        001                                            TRIMBLE 4000SSI                             999999  TRM29659.00     TCWD                        999999    0.0000    0.0000    0.0030  Gough Island, SH        HTR+TRN
-GRAB 11001M004        001                                            ASHTECH Z18                                 999999  ASH701073.1     NONE                        999999    0.0000    0.0000    0.0603                          HTR+TRN
+GRA2 11001M004        001                                            LEICA GRX1200+GNSS                          999999  LEIAR25.R4      LEIT                        999999    0.0000    0.0000    0.0600  Graz, AT                From gra2_20120213.log
+GRAB 11001M004        001  1998 10 28 00 00 00  2004 09 02 10 59 59  ASHTECH Z18                                 999999  ASH701073.1     SNOW                        999999    0.0000    0.0000    0.0000  Graz, AT                HTR+TRN
+GRAB 11001M004        001  2004 09 02 11 00 00  2008 01 23 16 48 59  ASHTECH Z18                                 999999  ASH700936D_M    SNOW                        999999    0.0000    0.0000    0.0600  Graz, AT                HTR+TRN
+GRAB 11001M004        001  2008 01 23 16 49 00  2008 04 24 12 59 59  ASHTECH UZ-12                               999999  ASH700936D_M    SNOW                        999999    0.0000    0.0000    0.0600  Graz, AT                HTR+TRN
+GRAB 11001M004        001  2008 04 24 13 00 00  2011 01 31 10 59 59  TPS GB-1000                                 999999  TPSCR.G3        TPSH                        999999    0.0000    0.0000    0.0600  Graz, AT                HTR+TRN
+GRAB 11001M004        001  2011 07 01 00 00 00  2011 12 01 10 44 59  IFEN SX_NSR_RT_400                          999999  TPSCR.G3        TPSH                        999999    0.0000    0.0000    0.0600  Graz, AT                HTR+TRN
+GRAB 11001M004        001  2011 12 01 10 45 00  2012 03 29 10 59 59  IFEN SX_NSR_RT_400                          999999  LEIAR25.R4      LEIT                        999999    0.0000    0.0000    0.0600  Graz, AT                MGEX,from grab_20120213.log
+GRAB 11001M004        001  2012 03 29 11 00 00                       IFEN SX_NSR_RT_800                          999999  LEIAR25.R4      LEIT                        999999    0.0000    0.0000    0.0600  Graz, AT                MGEX,from grab_20120524.log
+GRAC 10002M010        001                       2013 07 30 14 59 59  TRIMBLE NETR9                               999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0500  Caussols, FR            MGEX,from grac_20120322.log
+GRAC 10002M010        001  2013 07 30 15 00 00  2014 08 01 13 59 59  TRIMBLE NETR9                               999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.0500  Caussols, FR            MGEX,from grac_20131015.log
+GRAC 10002M010        001  2014 08 01 14 00 00                       LEICA GR25                                  999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.0500  Caussols, FR            MGEX,from grac_20140903.log
 GRAS 10002M006        001                       1996 05 06 23 59 59  ROGUE SNR-8100                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0350  Caussols, FR            IGSSTATION.212
 GRAS 10002M006        001  1996 05 07 00 00 00  2003 04 22 23 59 59  ROGUE SNR-12 RM                             999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0350  Caussols, FR            IGSSTATION.212
 GRAS 10002M006        001  2003 04 23 00 00 00  2004 10 20 23 59 59  TRIMBLE 4000SSI                             999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.0350  Caussols, FR            IGSSTATION.212
@@ -1253,6 +1362,7 @@ HOLM 40148M001        001  2002 08 09 00 00 00  2002 10 23 23 59 59  ASHTECH Z-X
 HOLM 40148M001        001  2002 10 24 00 00 00  2002 11 21 23 59 59  ASHTECH UZ-12                               999999  ASH701945D_M    NONE                        999999    0.0000    0.0000    0.1000  Holman, CA              IGSMAIL.4188
 HOLM 40148M001        001  2002 11 22 00 00 00  2002 11 26 23 59 59  ASHTECH Z-XII3                              999999  ASH701945D_M    NONE                        999999    0.0000    0.0000    0.1000  Holman, CA              IGSMAIL.4188
 HOLM 40148M001        001  2002 11 27 00 00 00                       ASHTECH UZ-12                               999999  ASH701945D_M    NONE                        999999    0.0000    0.0000    0.1000  Holman, CA              IGSMAIL.4188
+HRAG 30302M010        001                                            JAVAD TRE_G2T DELTA                         999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0000  Krugersdorp, ZA         From hrag_20121226.log
 HRAO 30302M004        001                       2004 11 18 23 59 59  ASHTECH Z-XII3                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0814  Krugersdorp, ZA         HTR+TRN
 HRAO 30302M004        001  2004 11 19 00 00 00  2007 04 25 23 59 59  ASHTECH Z-XII3                              999999  ASH701945C_M    NONE                        999999    0.0000    0.0000    0.0814  Krugersdorp, ZA         IGSSTAT.0267
 HRAO 30302M004        001  2007 04 26 00 00 00  2007 12 12 23 59 59  ASHTECH UZ-12                               999999  ASH701945C_M    NONE                        999999    0.0000    0.0000    0.0814  Krugersdorp, ZA         IGSSTAT.0267
@@ -1267,6 +1377,7 @@ IISC 22306M001        001                                             *** UNDEFI
 IISC 22306M002        001                       2008 07 09 23 59 59  ASHTECH Z-XII3                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0780  Bangalore, IN           HTR+TRN
 IISC 22306M002        001  2008 07 10 00 00 00  2009 01 07 23 59 59  ASHTECH Z-XII3                              999999  ASH701945E_M    NONE                        999999    0.0000    0.0000    0.0780  Bangalore, IN           HTR+TRN
 IISC 22306M002        001  2009 01 08 00 00 00                       ASHTECH UZ-12                               999999  ASH701945E_M    NONE                        999999    0.0000    0.0000    0.0780  Bangalore, IN           iisc_20090114.log
+ILDX 19724M001        001                                            TRIMBLE NETR9                               999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.1350  Ile D'Aix, FR           From ildx_20130708.log
 IMPZ 41615M001        001  2009 10 19 00 00 00  2014 11 30 23 59 59  TRIMBLE NETR5                               999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0080  Imperatriz, BR          impz_20100301.log
 IMPZ 41615M001        001  2014 12 01 00 00 00                       TRIMBLE NETRS                               999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0080  Imperatriz, BR          change in the RINEX header
 INEG 40507M001        001                       2000 01 31 23 59 59   *** UNDEFINED ***                          999999   *** UNDEFINED ***                          999999    0.0000    0.0000    0.0660  Aguascalientes, MX      HTR
@@ -1302,6 +1413,7 @@ JAB1 50136M001        001  2007 02 22 00 00 00  2007 11 28 23 59 59  ASHTECH UZ-
 JAB1 50136M001        001  2007 11 29 00 00 00                       ASHTECH UZ-12                               999999  LEIAT504        NONE                        999999    0.0000    0.0000    0.0030  Jabiru, AU              IGSSTATION.1932
 JAMA 42601S001        001                                            ASHTECH UZ-12                               999999  AOAD/M_TA_NGS   SNOW                        999999    0.0000    0.0000    0.0000  Kingston, JM            HTR+TRN
 JASO L08              001                                            TRSR                                        999999  SPENCER/CR      NONE                        999999    0.0000    0.0000    0.0000  JASON                   LEO
+JFNG 21602M006        001                                            TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0000  Jiufeng, CN             From jfng_20121029.log
 JOEN 10512M001        001                                            ASHTECH Z-XII3                              999999  ASH700936A_M    SNOW                        999999    0.0000    0.0000    0.0000  Joensuu, FI             HTR+TRN
 JOG2 23109M002        001                       2011 05 02 23 59 59  AOA BENCHMARK ACT                           999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0480  Yogyakarta, ID          From JOG2242K30.05O
 JOG2 23109M002        001  2011 05 03 00 00 00  2011 05 29 23 59 59  SEPT POLARX2                                999999  TPSCR3_GGD      NONE                        999999    0.0000    0.0000    0.1206  Yogyakarta, ID          JOG21490.11D.Z
@@ -1353,12 +1465,22 @@ KIR0 10422M001        001                       2003 08 19 23 59 59  ASHTECH UZ-
 KIR0 10422M001        001  2003 08 20 00 00 00  2007 12 13 23 59 59  JPS E_GGD                                   999999  AOAD/M_T        OSOD                        999999    0.0000    0.0000    0.0710  Kiruna, SE              IGSMAIL.4545
 KIR0 10422M001        001  2007 12 14 00 00 00  2015 03 02 14 59 59  JPS EGGDT                                   999999  AOAD/M_T        OSOD                        999999    0.0000    0.0000    0.0710  Kiruna, SE              IGSSTATION.1963
 KIR0 10422M001        001  2015 03 02 15 00 00                       JAVAD TRE_G3TH DELTA                        999999  AOAD/M_T        OSOD                        999999    0.0000    0.0000    0.0710  Kiruna, SE              kir0_20150302.log
+KIR8 10422M002        001  2011 08 12 00 00 00  2012 02 15 23 59 59  JAVAD TRE_G3TH DELTA                        999999  LEIAR25.R3      LEIT  09030016               30016    0.0000    0.0000    0.0030  Kiruna, SE              From kir8_20150616.log
+KIR8 10422M002        001  2012 02 16 00 00 00                       TRIMBLE NETR9                               999999  LEIAR25.R3      LEIT  09030016               30016    0.0000    0.0000    0.0030  Kiruna, SE              From kir8_20150616.log
 KIRU 10403M002        001                       2000 09 27 23 59 59   *** UNDEFINED ***                          999999   *** UNDEFINED ***                          999999    0.0000    0.0000    0.0620  Kiruna, SE              HTR
 KIRU 10403M002        001  2000 09 28 00 00 00  2003 03 12 23 59 59  AOA SNR-8100 ACT                            999999  ASH701945C_M    NONE                        999999    0.0000    0.0000    0.0620  Kiruna, SE              HTR+TRN
 KIRU 10403M002        001  2003 03 13 00 00 00  2013 02 19 11 59 59  ASHTECH UZ-12                               999999  ASH701945C_M    SNOW                        999999    0.0000    0.0000    0.0620  Kiruna, SE              HTR+TRN
 KIRU 10403M002        001  2013 02 19 12 00 00                       SEPT POLARX4                                999999  SEPCHOKE_MC     SPKE                        999999    0.0000    0.0000    0.1120  Kiruna, SE              kiru_20130304.log
 KIT3 12334M001        001                       2012 10 16 23 59 59  AOA SNR-8000 ACT                            999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0460  Kitab, UZ               HTR+TRN
 KIT3 12334M001        001  2012 10 17 00 00 00                       JAVAD TRE_G3TH DELTA                        999999  JAV_RINGANT_G3T NONE                        999999    0.0000    0.0000    0.1206  Kitab, UZ               kit3_20121017.log
+KLOP 14214M002        001  1997 03 19 00 00 00  2001 05 08 09 45 59  TRIMBLE 4000SSI                             999999  TRM22020.00+GP  DOME  0220010373             10373    0.0000    0.0000    0.0720  Kloppenheim, DE         From klop_20150701.log
+KLOP 14214M002        001  2001 05 08 09 45 00  2002 07 02 08 08 59  TRIMBLE 4000SSI                             999999  TRM29659.00     NONE  0220174214             74214    0.0000    0.0000    0.0690  Kloppenheim, DE         From klop_20150701.log
+KLOP 14214M002        001  2002 07 02 09 55 00  2004 10 28 09 14 59  TRIMBLE 4000SSI                             999999  TRM29659.00     NONE  0220181795             81795    0.0000    0.0000    0.0690  Kloppenheim, DE         From klop_20150701.log
+KLOP 14214M002        001  2004 10 28 09 15 00  2007 04 26 12 44 59  TRIMBLE NETRS                               999999  TRM29659.00     NONE  0220181795             81795    0.0000    0.0000    0.0690  Kloppenheim, DE         From klop_20150701.log
+KLOP 14214M002        001  2007 04 26 12 45 00  2007 06 27 10 59 59  TRIMBLE NETR5                               999999  TRM29659.00     NONE  0220181795             81795    0.0000    0.0000    0.0690  Kloppenheim, DE         From klop_20150701.log
+KLOP 14214M002        001  2007 06 27 11 00 00  2013 06 28 08 59 59  TRIMBLE NETR5                               999999  TRM55971.00     TZGD  30260441               60441    0.0000    0.0000    0.0660  Kloppenheim, DE         From klop_20150701.log
+KLOP 14214M002        001  2013 06 28 10 10 00  2013 12 11 07 27 59  TRIMBLE NETR5                               999999  TRM57971.00     TZGD  1441043065             43065    0.0000    0.0000    0.0660  Kloppenheim, DE         From klop_20150701.log
+KLOP 14214M002        001  2013 12 11 07 48 00                       TRIMBLE NETR9                               999999  TRM57971.00     TZGD  1441043065             43065    0.0000    0.0000    0.0660  Kloppenheim, DE         From klop_20140304.log
 KODK 40419S003        001                       2006 02 28 23 59 59  ASHTECH Z-XII3                              999999  ASH701933B_M    SCIS                        999999    0.0000    0.0000    0.0000  Kodiak, US              HTR+TRN
 KODK 40419S003        001  2006 03 01 00 00 00                       ASHTECH UZ-12                               999999  ASH701933B_M    SCIS                        999999    0.0000    0.0000    0.0000  Kodiak, US              HTR+TRN
 KOKB 40424M004        001                       2002 04 01 23 59 59  AOA SNR-8100 ACT                            999999  AOAD/M_T        JPLA                        999999    0.0000    0.0000    0.0614  Kokee Park, US          HTR+TRN
@@ -1377,6 +1499,7 @@ KOU1 97301M211        001  2012 10 07 00 00 00                       JPS LEGACY 
 KOUC 92727S001        001                       2009 11 16 23 59 59  TRIMBLE NETRS                               999999  TRM41249.00     TZGD                        999999    0.0000    0.0000    0.0000  Koumac, NC              NEW
 KOUC 92727S001        001  2009 11 17 00 00 00  2014 04 22 20 59 59  TRIMBLE NETR5                               999999  TRM57971.00     TZGD                        999999    0.0000    0.0000    0.0000  Koumac, NC              NEW
 KOUC 92727S001        001  2014 04 22 21 00 00                       TRIMBLE NETR9                               999999  TRM57971.00     TZGD                        999999    0.0000    0.0000    0.0000  Koumac, NC              kouc_20140423.log
+KOUG 97301M402        001                                            LEICA GR10                                  999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0000  Kourou, GF              koug_20111206.log
 KOUR 97301M210        001                       1997 09 30 23 59 59  ROGUE SNR-8C                                999999  AOAD/M_B        NONE                        999999    0.0000    0.0000    0.1320  Kourou, GF              HTR
 KOUR 97301M210        001  1997 10 01 00 00 00  1997 10 05 23 59 59  ROGUE SNR-8C                                999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0450  Kourou, GF              HTR
 KOUR 97301M210        001  1997 10 06 00 00 00  2000 03 06 23 59 59  ROGUE SNR-8100                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0450  Kourou, GF              HTR+TRN
@@ -1391,6 +1514,7 @@ KR0G 10422M001        001  1995 03 13 00 00 00  1995 07 09 23 59 59  ASHTECH Z18
 KR0G 10422M001        001  1995 07 10 00 00 00  1996 07 29 23 59 59  ASHTECH Z18                                 999999  AOAD/M_T        DOME                        999999    0.0000    0.0000    0.0710  Kiruna, SE              HTR+TRN
 KR0G 10422M001        001  1996 07 30 00 00 00  1996 10 29 23 59 59  ASHTECH Z18                                 999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0710  Kiruna, SE              HTR+TRN
 KR0G 10422M001        001  1996 10 30 00 00 00                       ASHTECH Z18                                 999999  AOAD/M_T        OSOD                        999999    0.0000    0.0000    0.0710  Kiruna, SE              HTR+TRN
+KRGG 91201M007        001                                            LEICA GR10                                  999999  LEIAR25.R4      LEIT                        999999    0.0004    0.0034    1.0332  Port Aux Francais, TF   From krgg_20121122.log
 KSMV 21701S007        001  1997 07 01 00 00 00  2000 09 04 23 59 59  ASHTECH Z-XII3                              999999  ASH700718A      NONE                        999999    0.0000    0.0000    0.0000  Kashima, Japan          
 KSMV 21701S007        001  2000 09 05 00 00 00  2000 09 18 23 59 59  ASHTECH Z-XII3                              999999  ASH700936E      NONE                        999999    0.0000    0.0000    0.0000  Kashima, Japan          
 KSMV 21701S007        001  2000 09 19 00 00 00  2000 10 09 23 59 59  ASHTECH Z-XII3                              999999  ASH700718A      NONE                        999999    0.0000    0.0000    0.0000  Kashima, Japan          
@@ -1399,7 +1523,9 @@ KSMV 21701S007        001  2008 01 01 00 00 00                       TRIMBLE NET
 KSTU 12349M002        001                                            AOA SNR-8000 ACT                            999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0460  Krasnoyarsk, RU         HTR+TRN
 KUNM 21609M001        001                                            ROGUE SNR-8000                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0793  Kunming, CN             HTR+TRN
 KWJ1 50506M001        001                                            AOA SNR-8100 ACT                            999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0630  Kwajalein Atoll, MH     HTR+TRN
-LAE1 51002M001        001                                            ASHTECH Z-XII3                              999999  ASH700936A_M    NONE                        999999    0.0000    0.0000    0.0110  Lae, PG                 HTR+TRN
+KZN2 12374M001        001                                            TRIMBLE NETR9                               999999  TRM59800.00     SCIS                        999999    0.0000    0.0000    0.0750  Kazan, RU               From kzn2_20130701.log
+LAE1 51002M001        001  1997 07 28 00 00 00  2013 08 31 23 59 59  ASHTECH Z-XII3                              999999  ASH700936A_M    NONE                        999999    0.0000    0.0000    0.0110  Lae, PG                 HTR+TRN
+LAE1 51002M001        001  2013 09 01 00 00 00                       ASHTECH UZ-12                               999999  ASH700936A_M    NONE                        999999    0.0000    0.0000    0.0110  Lae, PG                 From lae1_20140822.log
 LAMA 12209M001        001                       2000 10 06 23 59 59   *** UNDEFINED ***                          999999   *** UNDEFINED ***                          999999    0.0000    0.0000    0.0610  Olsztyn, PL             HTR
 LAMA 12209M001        001  2000 10 07 00 00 00  2007 11 17 23 59 59  ASHTECH Z-XII3                              999999  ASH700936F_C    SNOW                        999999    0.0000    0.0000    0.0610  Olsztyn, PL             HTR+TRN
 LAMA 12209M001        001  2007 11 18 00 00 00  2011 02 08 23 59 59  LEICA GRX1200GGPRO                          999999  LEIAT504GG      LEIS                        999999    0.0000    0.0000    0.0600  Olsztyn, PL             HTR+TRN
@@ -1417,6 +1543,7 @@ LHAZ 21613M002        001  2007 03 02 00 00 00  2013 09 12 08 09 59  TPS E_GGD  
 LHAZ 21613M002        001  2013 09 12 08 10 00  2014 02 11 07 59 59  TPS E_GGD                                   999999  ASH701941.B     NONE                        999999    0.0000    0.0000    0.1330  Lhasa, CN               From lhaz_20130912.log
 LHAZ 21613M002        001  2014 02 11 08 00 00                       TPS E_GGD                                   999999  ASH701941.B     SNOW                        999999    0.0000    0.0000    0.1330  Lhasa, CN               From lhaz_20140410.log
 LINR 50124M001        001                                            3SNAV R100-30T 12                           999999  3S-02-TSADM     NONE                        999999    0.0000    0.0000    2.0630  Sydney, AU              igex
+LLAG 31302M003        001                                            JAVAD TRE_G2T DELTA                         999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.0000  La Laguna, ES           From llag_20121227.log
 LMMF 97205M001        001                       2011 11 02 23 59 59  TRIMBLE NETR5                               999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0000  Le Lamentin, FR         IGSSTATION.3488
 LMMF 97205M001        001  2011 11 03 00 00 00  2013 06 24 12 59 59  TRIMBLE NETR9                               999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0000  Le Lamentin, FR         IGSSTATION.3488
 LMMF 97205M001        001  2013 06 24 13 00 00                       TRIMBLE NETR9                               999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.0000  Le Lamentin, FR         From lmmf_20130624.log
@@ -1440,6 +1567,13 @@ MAD2 13407S012        001  2004 11 30 00 00 00                       ASHTECH Z-X
 MADR 13407S012        001                       2014 01 15 19 14 59  ASHTECH Z-XII3                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0254  Robledo, ES             HTR+TRN
 MADR 13407S012        001  2014 01 15 19 15 00                       JAVAD TRE_G3TH DELTA                        999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0254  Robledo, ES             HTR+TRN
 MAG0 12354M001        001                                            ASHTECH Z-XII3                              999999  ASH700936D_M    JPLA                        999999    0.0000    0.0000    0.0800  Magadan, RU             HTR+TRN
+MAJU 51501M001        001  2007 05 22 00 00 00  2012 03 15 01 02 00  ASHTECH UZ-12                               999999  ASH701945C_M    SCIS                        999999    0.0000    0.0000    0.0000  Rita, Majuro, MH        From maju_20131015.log
+MAJU 51501M001        001  2012 03 25 02 58 00  2013 10 13 00 00 00  TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0014  Rita, Majuro, MH        From maju_20131015.log
+MAJU 51501M001        001  2013 10 15 00 00 00  2015 06 10 00 00 00  TRIMBLE NETR9                               999999  ASH701945C_M    NONE                        999999    0.0000    0.0000    0.0000  Rita, Majuro, MH        From maju_20131015.log
+MAJU 51501M001        001  2015 06 10 00 00 00                       SEPT POLARX4TR                              999999  JAVRINGANT_DM   NONE                        999999    0.0000    0.0000    0.0016  Rita, Majuro, MH        From maju_20131015.log
+MALA 13443M001        001  2000 03 15 00 00 00  2008 08 11 10 59 59  TRIMBLE 4000SSI                             999999  TRM29659.00     TCWD  0173808                73808    0.0000    0.0000    3.0510  Malaga, ES              From mala_20150316.log
+MALA 13443M001        001  2008 08 12 00 00 00  2013 03 13 15 50 59  LEICA GRX1200GGPRO                          999999  LEIAT504GG      LEIS  200560                   560    0.0000    0.0000    3.0510  Malaga, ES              From mala_20150316.log
+MALA 13443M001        001  2013 03 13 19 50 00                       LEICA GR25                                  999999  LEIAR25.R4      LEIT  725494                 25494    0.0000    0.0000    3.0516  Malaga, ES              From mala_20150316.log
 MAL2 33201M003        001                       2008 09 10 23 59 59  JPS LEGACY                                  999999  ASH701946.3     NONE                        999999    0.0000    0.0000    0.0000  Malindi, KE             NEW (IGSSTATION-2376)
 MAL2 33201M003        001  2008 09 11 00 00 00  2013 04 04 11 59 59  JPS LEGACY                                  999999  ASH701945C_M    NONE                        999999    0.0000    0.0000    0.0000  Malindi, KE             IGSSTATION-2493
 MAL2 33201M003        001  2013 04 04 12 00 00  2013 10 28 13 45 00  JPS LEGACY                                  999999  LEIAR25.R4      NONE                        999999    0.0000    0.0000    0.0000  Malindi, KE
@@ -1450,10 +1584,15 @@ MALI 33201M001        001  1997 10 23 00 00 00                       ASHTECH Z-X
 MANA 41201S001        001                       2012 02 14 13 59 59  TRIMBLE 4000SSI                             999999  TRM29659.00     UNAV                        999999    0.0000    0.0000    0.0000  Managua, NI             IGS.SNX
 MANA 41201S001        001  2012 02 14 14 00 00                       TRIMBLE NETR9                               999999  TRM29659.00     UNAV                        999999    0.0000    0.0000    0.0000  Managua, NI             mana_20120214.log
 MANZ 40513S001        001                                            ASHTECH Z-XII3                              999999  ASH701933B_M    SNOW                        999999    0.0000    0.0000    0.0000  Manzanillo, MX          NEW
+MAO0 40445M005        001                                            JAVAD TRE_G3TH DELTA                        999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0000  Haleakala, Maui, US     From mao0_20121226.log
 MAR6 10405M002        001                       2003 08 19 23 59 59  ASHTECH Z-XII3                              999999  AOAD/M_T        OSOD                        999999    0.0000    0.0000    0.0710  Maartsbo, SE            HTR+TRN
 MAR6 10405M002        001  2003 08 20 00 00 00  2006 06 27 23 59 59  JPS LEGACY                                  999999  AOAD/M_T        OSOD                        999999    0.0000    0.0000    0.0710  Maartsbo, SE            IGSMAIL.4545
 MAR6 10405M002        001  2006 06 28 00 00 00  2015 02 27 16 24 59  JPS E_GGD                                   999999  AOAD/M_T        OSOD                        999999    0.0000    0.0000    0.0710  Maartsbo, SE            IGSMAIL.4545
-MAR6 10405M002        001  2015 02 27 16 25 00                       JAVAD TRE_G3TH DELTA                        999999  AOAD/M_T        OSOD                        999999    0.0000    0.0000    0.0710  Maartsbo, SE            from mar6_20150227.log
+MAR6 10405M002        001  2015 02 27 16 25 00  2015 06 05 09 29 59  JAVAD TRE_G3TH DELTA                        999999  AOAD/M_T        OSOD                        999999    0.0000    0.0000    0.0710  Maartsbo, SE            from mar6_20150227.log
+MAR6 10405M002        001  2015 06 05 09 30 00                       JAVAD TRE_G3TH DELTA                        999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0710  Maartsbo, SE            from mar6_20150605.log
+MAR7 10405M003        001  2011 04 27 00 00 00  2012 02 12 23 59 59  JAVAD TRE_G3TH DELTA                        999999  LEIAR25.R3      LEIT  09040009               40009    0.0000    0.0000    0.0030  Maartsbo, SE            From mar7_20150116.log
+MAR7 10405M003        001  2012 02 13 00 00 00                       TRIMBLE NETR9                               999999  LEIAR25.R3      LEIT  09040009               40009    0.0000    0.0000    0.0030  Maartsbo, SE            From mar7_20150116.log
+MARS 10073M008        001                                            LEICA GR25                                  999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.0700  Marseille, FR           From mars_20121001.log
 MAS1 31303M002        001                       2008 07 06 23 59 59  ASHTECH Z-XII3                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0330  Maspalomas, ES          HTR+TRN
 MAS1 31303M002        001  2008 07 08 00 00 00  2012 06 18 14 19 59  JPS LEGACY                                  999999  ASH701945E_M    NONE                        999999    0.0000    0.0000    0.0330  Maspalomas, ES          HTR+TRN
 MAS1 31303M002        001  2012 06 18 14 20 00  2012 09 27 11 59 59  JPS LEGACY                                  999999  LEIAR25.R4      NONE                        999999    0.0000    0.0000    0.0330  Maspalomas, ES          HTR+TRN  
@@ -1467,12 +1606,14 @@ MATE 12734M008        001  1996 07 09 00 00 00  1999 06 17 23 59 59  ROGUE SNR-8
 MATE 12734M008        001  1999 06 18 00 00 00  2008 11 20 23 59 59  TRIMBLE 4000SSI                             999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.1010  Matera, IT              HTR+TRN
 MATE 12734M008        001  2008 11 21 00 00 00  2008 11 23 23 59 59  LEICA GRX1200GGPRO                          999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.1010  Matera, IT              HTR+TRN
 MATE 12734M008        001  2008 11 24 00 00 00                       LEICA GRX1200GGPRO                          999999  LEIAT504GG      NONE                        999999    0.0000    0.0000    0.1010  Matera, IT              HTR+TRN
+MATG 12734M010        001                                            LEICA GRX1200+GNSS                          999999  LEIAR25         NONE                        999999    0.0000    0.0000    0.0000  Matera, IT              From matg_20120521.log
 MAUI 40445S008        001                       2012 05 01 20 42 59  ASHTECH Z-XII3                              999999  ASH700936D_M    SNOW                        999999    0.0000    0.0000    0.0000  Haleakala, US           NEW
 MAUI 40445S008        001  2012 05 01 20 43 00                       TRIMBLE NETRS                               999999  ASH700936D_M    SNOW                        999999    0.0000    0.0000    0.0000  Haleakala, US           maui_20120503.log
 MAW1 66004M001        001                       2004 12 06 23 59 59  AOA ICS-4000Z ACT                           999999  AOAD/M_T        AUST                        999999    0.0000    0.0000    0.0035  Mawson, AQ              HTR+TRN
 MAW1 66004M001        001  2004 12 07 00 00 00  2006 12 14 23 59 59  ASHTECH UZ-12                               999999  AOAD/M_T        AUST                        999999    0.0000    0.0000    0.0035  Mawson, AQ              HTR+TRN
 MAW1 66004M001        001  2006 12 25 00 00 00  2009 01 07 23 59 59  LEICA GRX1200                               999999  AOAD/M_T        AUST                        999999    0.0000    0.0000    0.0035  Mawson, AQ              HTR+TRN
 MAW1 66004M001        001  2009 01 08 00 00 00                       LEICA GRX1200GGPRO                          999999  AOAD/M_T        AUST                        999999    0.0000    0.0000    0.0035  Mawson, AQ              IGSSTATION.2764
+MAYG 90101M001        001                                            TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    3.0356  Dzaoudzi, YT            From mayg_20131218.log
 MBAR 33901M001        001                       2008 06 27 23 59 59  ASHTECH Z-XII3                              999999  ASH701945B_M    SCIS                        999999    0.0000    0.0000    0.0083  Mbarara, UG             HTR+TRN
 MBAR 33901M001        001  2008 06 28 00 00 00  2012 06 26 01 04 59  ASHTECH UZ-12                               999999  ASH701945B_M    SCIS                        999999    0.0000    0.0000    0.0083  Mbarara, UG             HTR+TRN
 MBAR 33901M001        001  2012 06 26 01 05 00                       JAVAD TRE_G3TH DELTA                        999999  ASH701945B_M    SCIS                        999999    0.0000    0.0000    0.0083  Mbarara, UG             logfile
@@ -1502,6 +1643,8 @@ MDVO 12309M002        001                                            TRIMBLE 400
 MDVZ 12309M004        001                                            ASHTECH Z18                                 999999  ASH701073.1     NONE                        999999    0.0000    0.0000    0.0000  Mendeleevo, RU          HTR+TRN
 MEDI 12711M003        001                       2001 04 02 23 59 59  ROGUE SNR-8100                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0000  Medicina, IT            HTR+TRN
 MEDI 12711M003        001  2001 04 03 00 00 00                       TRIMBLE 4000SSI                             999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.0000  Medicina, IT            HTR+TRN
+MELI 19379M001        001  2011 12 14 12 00 00                       LEICA GR10                                  999999  LEIAR25.R4      LEIT  725140                 25140    0.0000    0.0000    0.0606  Melilla, ES             From meli_20140915.log
+METG 10503M002        001                                            TRIMBLE NETR9                               999999  TRM59800.00     SCIS                        999999    0.0046    0.0020    2.0352  Metsahovi, FI           From metg_20121023.log
 METS 10503S011        001  2000 05 24 00 00 00  2010 08 19 14 30 59  ASHTECH Z-XII3                              999999  AOAD/M_B        NONE                        999999    0.0000    0.0000    0.0000  Kirkkonummi, FI         HTR+TRN
 METS 10503S011        001  2010 08 19 14 31 00  2013 06 28 11 45 00  ASHTECH Z-XII3                              999999  AOAD/M_T        NONE                           519    0.0000    0.0000    0.0000  Kirkkonummi, FI         mets_20100823.log
 METS 10503S011        001  2013 06 28 11 55 00                       ASHTECH Z-XII3                              999999  ASH700936C_M    NONE                         11761    0.0000    0.0000    0.0000  Kirkkonummi, FI         From mets_20130628.log
@@ -1541,6 +1684,7 @@ MR6G 10405M002        001  1995 12 14 00 00 00  1996 01 09 23 59 59  ASHTECH GG2
 MR6G 10405M002        001  1996 01 10 00 00 00  1996 05 06 23 59 59  ASHTECH GG24C                               999999  AOAD/M_T        SNOW                        999999    0.0000    0.0000    0.0710  Maartsbo, SE            HTR+TRN
 MR6G 10405M002        001  1996 05 07 00 00 00  2001 02 19 23 59 59  ASHTECH GG24C                               999999  AOAD/M_T        OSOD                        999999    0.0000    0.0000    0.0710  Maartsbo, SE            HTR+TRN
 MR6G 10405M002        001  2001 02 20 00 00 00                       ASHTECH Z18                                 999999  AOAD/M_T        OSOD                        999999    0.0000    0.0000    0.0710  Maartsbo, SE            HTR+TRN
+MRO1 59913M001        001                                            TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0000  Boolardy Station, AU    From mro1_20140320.log
 MSKU 32810M001        001                                            ASHTECH Z-XII3                              999999  ASH701945B_M    NONE                        999999    0.0000    0.0000    0.0083  Franceville, GA         IGSSTATION.206
 MTBG 11030M001        001                       1999 06 30 23 59 59  ASHTECH Z-XII3                              999999  JPSREGANT_DD_E1 NONE                        999999    0.0000    0.0000    0.0000  Mattersburg, AT         HTR+TRN
 MTBG 11030M001        001  1999 07 01 00 00 00  2006 08 02 23 59 59  JPS LEGACY                                  999999  JPSREGANT_DD_E1 NONE                        999999    0.0000    0.0000    0.0000  Mattersburg, AT         HTR+TRN
@@ -1552,6 +1696,7 @@ MUEJ 14282M001        001  2004 02 27 12 00 00  2006 05 29 15 00 00  JPS LEGACY 
 MUEJ 14282M001        001  2006 05 29 15 00 00  2006 08 28 13 00 00  JPS LEGACY                                  999999  TPSCR3_GGD      CONE                        999999    0.0000    0.0000    0.0450  Munich, Bavaria         GREF sitelog
 MUEJ 14282M001        001  2006 08 28 13 00 00  2008 08 26 14 59 59  JPS LEGACY                                  999999  TPSCR3_GGD      CONE                        999999    0.0000    0.0000    0.0260  Munich, Bavaria         GREF sitelog
 MUEJ 14282M001        001  2008 08 26 15 00 00                       JPS LEGACY                                  999999  LEIAT504GG      LEIS                        999999    0.0000    0.0000    0.0260  Munich, Bavaria         GREF sitelog
+MYVA 10205M001        001                                            LEICA GR10                                  999999  LEIAR25.R4      LEIT                        999999    0.0000    0.0000    0.0000  Reykjahlid, IS          From myva_20120118.log
 NANO 40138M001        001                       2001 11 07 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_T        EMRA                        999999    0.0000    0.0000    0.1000  Nanoose Bay, CA         HTR+TRN
 NANO 40138M001        001  2001 11 08 00 00 00  2002 10 18 23 59 59  AOA BENCHMARK ACT                           999999  AOAD/M_T        EMRA                        999999    0.0000    0.0000    0.1000  Nanoose Bay, CA         IGSMAIL.3586
 NANO 40138M001        001  2002 10 19 00 00 00  2003 01 09 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_T        EMRA                        999999    0.0000    0.0000    0.1000  Nanoose Bay, CA         IGSMAIL.3586
@@ -1605,6 +1750,7 @@ NRL1 40451S301        001                                            ASHTECH Z-X
 NRMD 92701M005        001                       2009 10 01 23 59 59  TRIMBLE NETRS                               999999  TRM41249.00     TZGD                        999999    0.0000    0.0000    0.0000  Noumea, FR              IGSMAIL.5580
 NRMD 92701M005        001  2009 10 02 00 00 00  2014 04 07 23 19 59  TRIMBLE NETR5                               999999  TRM57971.00     TZGD                        999999    0.0000    0.0000    0.0000  Noumea, FR              IGSMAIL.5580
 NRMD 92701M005        001  2014 04 07 23 20 00                       TRIMBLE NETR9                               999999  TRM57971.00     TZGD                        999999    0.0000    0.0000    0.0000  Noumea, FR              nrmd_20140423.log
+NRMG 92701M005        001                                            TRIMBLE NETR9                               999999  TRM57971.00     TZGD                        999999    0.0000    0.0000    0.0000  Noumea, FR              From nrmg_20120919.log
 NSSP 12312M001        001                       2003 02 06 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_T        UNAV                        999999    0.0000    0.0000    0.0792  Yerevan, AM             HTR+TRN
 NSSP 12312M001        001  2003 02 07 00 00 00                       ASHTECH UZ-12                               999999  ASH701945C_M    UNAV                        999999    0.0000    0.0000    0.0792  Yerevan, AM             HTR+TRN
 NTUS 22601M001        001                       2007 06 24 23 59 59  AOA SNR-12 ACT                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0776  Singapore, SG           HTR+TRN
@@ -1625,6 +1771,8 @@ NYAL 10317M001        001  1999 08 27 00 00 00  2009 05 12 23 59 59  AOA BENCHMA
 NYAL 10317M001        001  2009 05 13 00 00 00                       TRIMBLE NETRS                               999999  AOAD/M_B        DOME                        999999    0.0040   -0.0010    5.2160  Ny-Alesund, NO          HTR
 NYAL 10317M003        001                       1999 07 03 23 59 59  ROGUE SNR-12 RM                             999999  ASH701073.1                                 999999    0.0000    0.0000    0.0000  Ny-Alesund, NO          HTR+TRN
 OBE2 14208M003        001                                            AOA BENCHMARK ACT                           999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0460  Oberpfaffenhofen, DE    obe2_20030414.log
+OBE3 14208M005        001                                            JAVAD TRE_G3TH DELTA                        999999  JAV_RINGANT_G3T NONE                        999999    0.0000    0.0000    0.1206  Oberpfaffenhofen, DE    From obe3_20120116.log
+OBE4 14208M007        001  2012 09 28 12 00 00                       JAVAD TRE_G3TH DELTA                        999999  JAV_RINGANT_G3T NONE  340                      340    0.0000    0.0000    0.0700  Oberpfaffenhofen, DE    From obe4_20130109.log
 OBER 14208M001        001                                            AOA SNR-8000 ACT                            999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0460  Oberpfaffenhofen, DE    HTR+TRN
 OBET 14208M004        001                       2004 11 15 23 59 59  ASHTECH Z-XII3T                             999999  3S-02-TSADM     NONE                        999999    0.0000    0.0000    0.0000  Wessling, DE            obet_20030515.log
 OBET 14208M004        001  2004 11 16 00 00 00                       SEPT POLARX2                                999999  3S-02-TSADM     NONE                        999999    0.0000    0.0000    0.0000  Wessling, DE            obet_20041124.log
@@ -1645,8 +1793,14 @@ OHI3 66008M006        001  2013 02 07 21 00 00  2013 09 28 11 59 59  LEICA GRX12
 OHI3 66008M006        001  2013 09 28 12 00 00  2014 03 01 16 29 59  LEICA GRX1200+GNSS                          999999  LEIAR25.R4      LEIT                        999999    0.0000    0.0000    0.0660  O'Higgins, AQ           From ohi3_20130213.log
 OHI3 66008M006        001  2014 03 01 16 30 00                       LEICA GR25                                  999999  LEIAR25.R4      LEIT                        999999    0.0000    0.0000    0.0660  O'Higgins, AQ           From ohi3_20140303.log
 OHIG 66008M001        001                                            AOA SNR-8000 ACT                            999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0010  O'Higgins, AQ           HTR+TRN
+OHIX 66008M006        001                       2013 02 07 20 59 00  LEICA GRX1200+GNSS                          999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0668  O'Higgins, AQ           From ohix_20120203.log
+OHIX 66008M006        001  2013 02 07 21 00 00  2013 09 28 11 59 59  LEICA GRX1200+GNSS                          999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0660  O'Higgins, AQ           From ohix_20130213.log
+OHIX 66008M006        001  2013 09 28 12 00 00  2014 03 01 16 29 59  LEICA GRX1200+GNSS                          999999  LEIAR25.R4      LEIT                        999999    0.0000    0.0000    0.0660  O'Higgins, AQ           From ohix_20130213.log
+OHIX 66008M006        001  2014 03 01 16 30 00                       LEICA GR25                                  999999  LEIAR25.R4      LEIT                        999999    0.0000    0.0000    0.0660  O'Higgins, AQ           From ohix_20140303.log
 OHIZ 66008M004        001                                            ASHTECH Z18                                 999999  ASH701941.B     SNOW                        999999    0.0000    0.0000    0.1215  O'Higgins, AQ           HTR+TRN
 OKC2                  001                                            ASHTECH Z-XII3                              999999  ASH701945C_M    NONE                        999999    0.0000    0.0000    0.0000                          From OKC21120.04O
+ONS1 10402M007        001  2012 01 28 00 00 00  2012 02 15 23 59 59  JAVAD TRE_G3TH DELTA                        999999  LEIAR25.R3      LEIT  08520002               20002    0.0000    0.0000    0.0030  Onsala, SE              From ons1_20150616.log
+ONS1 10402M007        001  2012 02 16 00 00 00                       TRIMBLE NETR9                               999999  LEIAR25.R3      LEIT  08520002               20002    0.0000    0.0000    0.0030  Onsala, SE              From ons1_20150616.log
 ONSA 10402M004        001                       1999 02 01 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_B        DUTD                        999999    0.0000    0.0000    0.9950  Onsala, SE              HTR+TRN
 ONSA 10402M004        001  1999 02 02 00 00 00  2003 08 18 23 59 59  ASHTECH Z-XII3                              999999  AOAD/M_B        OSOD                        999999    0.0000    0.0000    0.9950  Onsala, SE              HTR+TRN
 ONSA 10402M004        001  2003 08 19 00 00 00  2004 03 10 23 59 59  JPS LEGACY                                  999999  AOAD/M_B        OSOD                        999999    0.0000    0.0000    0.9950  Onsala, SE              IGSMAIL.4545
@@ -1712,6 +1866,11 @@ PIE1 40456M001        001  2013 10 24 17 00 00                       JAVAD TRE_G
 PIMO 22003M001        001                       2008 05 23 23 59 59  ASHTECH Z-XII3                              999999  ASH701945C_M    NONE                        999999    0.0000    0.0000    0.0792  Quezon City, PH         HTR+TRN
 PIMO 22003M001        001  2008 05 24 00 00 00  2014 01 15 23 59 59  ASHTECH UZ-12                               999999  ASH701945C_M    NONE                        999999    0.0000    0.0000    0.0792  Quezon City, PH         pimo_20080610.log
 PIMO 22003M001        001  2014 01 16 00 00 00                       JAVAD TRE_G3TH DELTA                        999999  ASH701945C_M    NONE                        999999    0.0000    0.0000    0.0792  Quezon City, PH         RINEX, confirmed by dataflow
+POHN 51601M001        001  2003 05 01 00 00 00  2011 12 06 23 59 59  ASHTECH UZ-12                               999999  ASH701945C_M    SCIS                        999999    0.0000    0.0000    0.0000  Pohnpei, Micronesia)    From pohn_20150429.log
+POHN 51601M001        001  2011 12 07 00 00 00  2014 03 05 21 59 59  TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0000  Pohnpei, Micronesia)    From pohn_20140710.log
+POHN 51601M001        001  2014 03 25 23 25 00  2014 10 20 23 59 59  TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0019  Pohnpei, Micronesia)    From pohn_20140710.log
+POHN 51601M001        001  2014 11 12 04 00 00  2015 08 13 23 59 59  TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0025  Pohnpei, Micronesia)    From pohn_20140710.log
+POHN 51601M001        001  2015 08 14 00 00 00                       TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0030  Pohnpei, Micronesia)    From pohn_20150814.log
 POL2 12348M001        001                       2001 11 12 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0780  Bishkek, KG             HTR+TRN
 POL2 12348M001        001  2001 11 13 00 00 00  2009 10 22 23 59 59  ASHTECH Z-XII3                              999999  ASH701945C_M    NONE                        999999    0.0000    0.0000    0.0780  Bishkek, KG             HTR+TRN
 POL2 12348M001        001  2009 10 23 00 00 00                       ASHTECH UZ-12                               999999  TPSCR.G3        NONE                        999999    0.0000    0.0000    0.0780  Bishkek, KG             HTR+TRN
@@ -1730,6 +1889,7 @@ PTBB 14234M001        001                       2002 03 18 23 59 59  ROGUE SNR-8
 PTBB 14234M001        001  2002 03 19 00 00 00  2006 07 25 23 59 59  ASHTECH Z-XII3T                             999999  ASH700936E      SNOW                        999999    0.0000    0.0000    0.0562  Braunschweig, DE        HTR+TRN
 PTBB 14234M001        001  2006 07 26 00 00 00  2006 11 13 23 59 59  SEPT POLARX2                                999999  ASH700936E      SNOW                        999999    0.0000    0.0000    0.0562  Braunschweig, DE        IGSSTATION.1037
 PTBB 14234M001        001  2006 11 14 00 00 00                       ASHTECH Z-XII3T                             999999  ASH700936E      SNOW                        999999    0.0000    0.0000    0.0562  Braunschweig, DE        IGSSTATION.1691
+PTVL 51402M002        001                                            TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0000  Port Vila, VU           From ptvl_20140520.log
 QAQ1 43007M001        001                       2003 08 26 23 59 59  ASHTECH UZ-12                               999999  ASH701941.B     SCIS                        999999    0.0000    0.0000    0.1206  Qaqortoq, GL            HTR+TRN
 QAQ1 43007M001        001  2003 08 27 00 00 00  2003 09 29 23 59 59  ASHTECH UZ-12                               999999  ASH701941.B     NONE                        999999    0.0000    0.0000    0.1206  Qaqortoq, GL            HTR+TRN
 QAQ1 43007M001        001  2003 09 30 00 00 00  2003 12 29 23 59 59  ASHTECH UZ-12                               999999  ASH701941.B     SCIS                        999999    0.0000    0.0000    0.1206  Qaqortoq, GL            HTR+TRN
@@ -1791,6 +1951,7 @@ RIOP 42006M001        001  2007 05 01 00 00 00  2009 06 30 23 59 59  TRIMBLE 400
 RIOP 42006M001        001  2009 07 01 00 00 00                       TRIMBLE NETRS                               999999  TRM41249.00     NONE                        999999    0.0000    0.0000    0.0729  Riobamba, EC            HTR+TRN
 ROTH 66007M003        001                                            LEICA GRX1200+GNSS                          999999  LEIAR25         LEIT                        999999    0.0000    0.0000    0.0000  Rothera, AQ             NEW
 SACC L07              001                                            BLACKJACK                                   999999  JPLD/M_R        NONE                        999999    0.0000    0.0000    0.0000  SAC-C                   LEO
+SAMO 50603M001        001                                            TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0019  Fagalii Village Di, WS  From samo.log
 SANT 41705M003        001                       1996 07 16 23 59 59   *** UNDEFINED ***                          999999   *** UNDEFINED ***                          999999    0.0000    0.0000    0.0930  Santiago, CL            HTR
 SANT 41705M003        001  1996 07 17 00 00 00  2007 12 13 23 59 59  ASHTECH Z-XII3                              999999  AOAD/M_T        JPLA                        999999    0.0000    0.0000    0.0614  Santiago, CL            HTR+TRN
 SANT 41705M003        001  2007 12 14 00 00 00                       ASHTECH UZ-12                               999999  AOAD/M_T        JPLA                        999999    0.0000    0.0000    0.0614  Santiago, CL            IGSSTATION.1971
@@ -1817,13 +1978,17 @@ SEY1 39801M001        001  2002 02 06 00 00 00  2007 06 28 23 59 59  ASHTECH UZ-
 SEY1 39801M001        001  2007 06 29 00 00 00  2011 08 02 23 59 59  ASHTECH UZ-12                               999999  ASH701945B_M    DOME                        999999    0.0000    0.0000    1.2065  La Misere, SC           HTR+TRN
 SEY1 39801M001        001  2011 08 03 00 00 00  2013 02 06 23 59 59  ASHTECH UZ-12                               999999  ASH701945E_M    NONE                        999999    0.0000    0.0000    1.2065  La Misere, SC           HTR+TRN
 SEY1 39801M001        001  2013 05 15 00 00 00                       JAVAD TRE_G3TH DELTA                        999999  ASH701945E_M    NONE                        999999    0.0000    0.0000    1.2065  La Misere, SC           sey1_20130515.log
+SEYG 39801M004        001                                            TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999   -0.0011   -0.0010    0.5193  La Misere, SC           MGEX,seyg_20121212.log
 SFER 13402M004        001                       2002 03 04 23 59 59  TRIMBLE 4000SSI                             999999  TRM29659.00     NONE                        999999    0.0000    0.0000    1.6260  San Fernando, ES        HTR+TRN
 SFER 13402M004        001  2002 03 05 00 00 00  2005 11 27 23 59 59  TRIMBLE 4000SSE                             999999  TRM29659.00     NONE                        999999    0.0000    0.0000    1.6260  San Fernando, ES        IGSMAIL.3768
 SFER 13402M004        001  2005 11 28 00 00 00  2014 01 30 11 39 59  TRIMBLE NETRS                               999999  TRM29659.00     NONE                        999999    0.0000    0.0000    1.6260  San Fernando, ES        sfer_20051128.log
 SFER 13402M004        001  2014 01 30 11 40 00                       LEICA GR25                                  999999  LEIAR20         NONE                        999999    0.0000    0.0000    1.6260  San Fernando, ES        sfer_20140130.log
+SGOC 23501M003        001                                            JAVAD TRE_G3TH DELTA                        999999  JAV_RINGANT_G3T NONE                        999999    0.0000    0.0000    0.1220  Colombo, SL             From sgoc_20111214.log
 SHAO 21605M002        001                       2007 09 26 23 59 59  ROGUE SNR-8100                              999999  AOAD/M_T        JPLA                        999999    0.0000    0.0000    0.0814  Sheshan, CN             HTR+TRN
 SHAO 21605M002        001  2007 09 27 00 00 00                       ASHTECH UZ-12                               999999  AOAD/M_T        JPLA                        999999    0.0000    0.0000    0.0814  Sheshan, CN             HTR+TRN
 SIMO 30307M001        001                                            ROGUE SNR-8000                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0520  Simonstown, ZA          HTR+TRN
+SIN0 22601M003        001                                            JAVAD TRE_G3TH DELTA                        999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0000  Singapore, SG           From sin0_20121227.log
+SIN1 22601M003        001                                            TRIMBLE NETR9                               999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0000  Singapore, SG           From sin1_20130502.log
 SIO3 40460M004        001  1993 05 06 00 00 00  1993 07 07 23 59 59  TRIMBLE 4000SST                             999999  TRM14532.00     NONE                        999999    0.0000    0.0000    1.9000  La Jolla, USA           
 SIO3 40460M004        001  1993 07 08 00 00 00  1993 08 05 23 59 59  ASHTECH P-XII3                              999999  ASH700228A      NONE                        999999    0.0000    0.0000    1.8448  La Jolla, USA           
 SIO3 40460M004        001  1993 08 06 00 00 00  1993 08 09 23 59 59  TRIMBLE 4000SST                             999999  TRM14532.00     NONE                        999999    0.0000    0.0000    1.8448  La Jolla, USA           
@@ -1836,6 +2001,7 @@ SIO3 40460M004        001  1995 07 27 00 00 00  2000 04 11 23 59 59  ASHTECH Z-X
 SIO3 40460M004        001  2000 04 12 00 00 00                       ASHTECH Z-XII3                              999999  ASH701945B_M    SCIS                        999999    0.0000    0.0000    1.7452  La Jolla, USA           
 SJDV 10090M001        001  1997 10 14 10 00 00  2010 02 25 09 59 59  TRIMBLE NETRS                               999999  ASH700936A_M    NONE                        999999    0.0000    0.0000    0.0000  S. Jean des Vignes, FR  HTR+TRN
 SJDV 10090M001        001  2010 02 25 10 00 00                       ASHTECH Z-XII3                              999999  ASH700936A_M    NONE                        999999    0.0000    0.0000    0.0000  S. Jean des Vignes, FR  $loge/sjdv_20100316.log
+SMNE 10001M007        001                                            TRIMBLE NETR9                               999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.1390  Saint-Mand, FR          From smne_20130515.log
 SMST 21726M001        001  2004 04 01 00 00 00  2012 03 15 23 59 59  TRIMBLE 5700                                999999  TRM41249.00     TZGD                        999999    0.0000    0.0000    1.8660  Nachi Katsuura-Cho, JP  smst_20080131.log
 SMST 21726M001        001  2012 03 16 00 00 00                       TRIMBLE 5700                                999999  TRM41249.00     DOME                        999999    0.0000    0.0000    1.9550  Nachi Katsuura-Cho, JP  smst_20120911.log
 SODA 10513M001        001                                            ASHTECH Z-XII3                              999999  AOAD/M_T        DUTD                        999999    0.0000    0.0000    0.0000  Sodankyla, FI           HTR+TRN
@@ -1854,8 +2020,10 @@ SSIA 41401S001        001  2012 03 06 00 00 00                       TRIMBLE NET
 STAV 10330M001        001                       1997 10 09 23 59 59   *** UNDEFINED ***                          999999   *** UNDEFINED ***                          999999    0.0000    0.0000    5.0830  Stavanger, NO           HTR
 STAV 10330M001        001  1997 10 10 00 00 00  1998 06 08 23 59 59   *** UNDEFINED ***                          999999   *** UNDEFINED ***                          999999    0.0000    0.0000    5.0830  Stavanger, NO           HTR
 STAV 10330M001        001  1998 06 09 00 00 00                       TRIMBLE 4000SSI                             999999  TRM29659.00     SCIS                        999999    0.0000    0.0000    5.5550  Stavanger, NO           HTR+TRN
+STFU 49430S001        001                                            JAVAD TRE_G3TH DELTA                        999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.0000  Palo Alto, US           From stfu_20130205.log
 STK2 21731S004        001  2012 02 24 00 00 00                       TRIMBLE NETR9                               999999  TRM59800.00     SCIS                        999999    0.0000    0.0000    0.0000  Shintotsukawa, JP       stk2_20120314.log
 STHL 30606M003        001                                            TPS NET-G3A                                 999999  TPSCR.G3        SCIS                        999999    0.0000    0.0000    0.0083  Longwood, GB            sthl_20110720.log
+STJ3 40101M005        001                                            SEPT POLARX4TR                              999999  LEIAR25.R4      NONE                        999999    0.0000    0.0000    0.0525  St. John'S, CA          From stj3_20140516.log
 STJO 40101M001        001                       1994 03 13 23 59 59   *** UNDEFINED ***                          999999   *** UNDEFINED ***                          999999    0.0000    0.0000    0.1000  St. John's, CA          HTR
 STJO 40101M001        001  1994 03 14 00 00 00  2003 09 23 23 59 59  AOA SNR-12 ACT                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.1000  St. John's, CA          HTR+TRN
 STJO 40101M001        001  2003 09 24 00 00 00  2010 03 18 14 55 00  AOA BENCHMARK ACT                           999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.1000  St. John's, CA          IGSMAIL.4618
@@ -1921,6 +2089,7 @@ TERS 13534M001        001  2008 09 17 00 00 00  2013 08 29 17 04 59  TPS ODYSSEY
 TERS 13534M001        001  2013 08 29 17 05 00  2014 06 07 11 59 59  SEPT POLARX4                                999999  TRM29659.00     UNAV                        999999    0.0000    0.0000    0.0000  Terschelling, NL        ters_20130829.log
 TERS 13534M001        001  2014 06 07 12 00 00                       SEPT POLARX4                                999999  LEIAR25.R4      LEIT  26700                  26700    0.0000    0.0000    0.0000  Terschelling, NL        ters_20130829.log
 TGCV 39601S001        001                                            LEICA CRS1000                               999999  LEIAT504        LEIS                        999999    0.0000    0.0000    0.0000  Palmeira, CV            HTR+TRN
+THTG 92201M016        001                                            LEICA GR10                                  999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    1.0500  Papeete, PF             From thtg_20121116.log
 THTI 92201M009        001                       2004 01 12 23 59 59  TRIMBLE 4000SSI                             999999  TRM29659.00     NONE                        999999    0.0000    0.0000    1.0470  Papeete, PF             HTR+TRN
 THTI 92201M009        001  2004 01 13 00 00 00  2010 11 23 23 59 59  ASHTECH UZ-12                               999999  ASH701945E_M    NONE                        999999    0.0000    0.0000    1.0470  Papeete, PF             HTR+TRN
 THTI 92201M009        001  2010 11 24 00 00 00                       TRIMBLE NETR8                               999999  ASH701945E_M    NONE                        999999    0.0000    0.0000    1.0470  Papeete, PF             IGSSTATION.4124
@@ -1952,13 +2121,15 @@ TLSE 10003M009        001  2003 12 02 00 00 00  2009 12 09 23 59 59  TRIMBLE 400
 TLSE 10003M009        001  2009 12 10 00 00 00  2010 02 24 23 59 59  TRIMBLE NETR5                               999999  TRM29659.00     NONE                        999999    0.0000    0.0000    1.0530  Toulouse, FR            HTR+TRN
 TLSE 10003M009        001  2010 02 25 00 00 00  2011 04 18 12 59 59  TRIMBLE NETR5                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    1.0530  Toulouse, FR            HTR+TRN
 TLSE 10003M009        001  2011 04 18 13 00 00                       TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    1.0530  Toulouse, FR            HTR+TRN (log file)
+TONG 50902M001        001                                            TRIMBLE NETR9                               999999  TRM59800.00     SCIS                        999999    0.0000    0.0000    0.0014  Nuku'Alofa, Kolofo, TO  From tong_20140710.log
 TORI 12724M002        001                       2011 03 07 23 59 59  LEICA GRX1200+GNSS                          999999  LEIAR25         LEIT                        999999    0.0000    0.0000    0.0000                          NEW
 TORI 12724M002        001  2011 03 08 00 00 00                       LEICA GRX1200+GNSS                          999999  LEIAR25         NONE                         30025    0.0000    0.0000    0.0000                          NEW
 TOUL 10003M004        001                                            ROGUE SNR-12 RM                             999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.6325  Toulouse, FR            HTR+TRN
 TOW2 50140M001        001                       2002 10 02 23 59 59  AOA ICS-4000Z ACT                           999999  AOAD/M_T        AUST                        999999    0.0000    0.0000    0.0035  Cape Ferguson, AU       HTR+TRN
 TOW2 50140M001        001  2002 10 03 00 00 00  2008 09 29 23 59 59  ASHTECH UZ-12                               999999  AOAD/M_T        AUST                        999999    0.0000    0.0000    0.0035  Cape Ferguson, AU       IGSMAIL.4102
 TOW2 50140M001        001  2008 09 30 00 00 00  2011 09 22 23 59 59  LEICA GRX1200GGPRO                          999999  AOAD/M_T        AUST                        999999    0.0000    0.0000    0.0035  Cape Ferguson, AU       IGSMAIL.4102
-TOW2 50140M001        001  2011 09 23 00 00 00                       LEICA GRX1200GGPRO                          999999  LEIAR25.R3      NONE                        999999    0.0000    0.0000    0.0033  Cape Ferguson, AU       igss 4593
+TOW2 50140M001        001  2011 09 23 00 00 00  2015 08 23 23 59 59  LEICA GRX1200GGPRO                          999999  LEIAR25.R3      NONE                        999999    0.0000    0.0000    0.0033  Cape Ferguson, AU       igss 4593
+TOW2 50140M001        001  2015 08 24 00 00 00                       SEPT POLARXS                                999999  LEIAR25.R3      NONE                        999999    0.0000    0.0000    0.0033  Cape Ferguson, AU       igss 4593
 TRAB 20808M001        001                                            ASHTECH Z-XII3                              999999  ASH700936D_M    SNOW                        999999    0.0000    0.0000    0.0610  Trabzon, TR             IGS.SNX
 TRO1 10302M006        001                       2004 07 12 23 59 59  AOA BENCHMARK ACT                           999999  ASH701073.1     SCIS                        999999    0.0000    0.0000    0.0000  Tromsoe, NO             HTR+TRN
 TRO1 10302M006        001  2004 07 13 00 00 00  2007 08 22 23 59 59  AOA BENCHMARK ACT                           999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0000  Tromsoe, NO             HTR+TRN
@@ -1983,7 +2154,9 @@ TSKB 21730S005        001  2011 07 01 00 00 00  2011 08 29 23 59 59  AOA BENCHMA
 TSKB 21730S005        001  2011 08 30 00 00 00  2013 10 14 23 59 59  AOA BENCHMARK ACT                           999999  AOAD/M_T        DOME                        999999    0.0000    0.0000    0.0000  Tsukuba, JP             tskb_20110830.log
 TSKB 21730S005        001  2013 10 15 00 00 00                       TRIMBLE NETR9                               999999  AOAD/M_T        DOME                        999999    0.0000    0.0000    0.0000  Tsukuba, JP             tskb_20131017.log
 TUMG                  001                                            DICOM GTR50                                 999999  ASH701945E_M    SNOW                        999999    0.0000    0.0000    0.0000  Munich, DE              NEW
+TUVA 51101M001        001                                            TRIMBLE NETR9                               999999  TRM59800.00     NONE                        999999    0.0000    0.0000    0.0000  Funafuti, TV            From tuva_20140710.log
 TWTF 23603S002        001                                            ASHTECH Z-XII3T                             999999  ASH701945C_M    SCIS                        999999    0.0000    0.0000    0.0000  Taoyuan, TW             NEW
+UCAL 49106M001        001                                            TRIMBLE NETR9                               999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.1500  Calgary, CA             From ucal_20130830.log
 UCLU 40140M001        001                       2001 11 13 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_T        SCIS                        999999    0.0000    0.0000    0.1000  Ucluelet, CA            HTR+TRN
 UCLU 40140M001        001  2001 11 14 00 00 00  2001 12 05 23 59 59  AOA SNR-8000 ACT                            999999  AOAD/M_T        SCIS                        999999    0.0000    0.0000    0.1000  Ucluelet, CA            RINEX info changed
 UCLU 40140M001        001  2001 12 06 00 00 00  2006 04 11 23 59 59  LEICA CRS1000                               999999  LEIAT504        SCIS                        999999    0.0000    0.0000    0.1000  Ucluelet, CA            IGSMAIL.3638
@@ -1997,10 +2170,12 @@ UNB1 40146S001        001                       2006 08 15 23 59 59  TPS LEGACY 
 UNB3 40146M002        001                       2012 06 01 13 59 59  TRIMBLE NETR5                               999999  JPSREGANT_DD_E1 NONE                        999999    0.0000    0.0000    0.3001  Fredericton, CA         NEW
 UNB3 40146M002        001  2012 06 01 14 00 00  2012 06 14 14 29 59  TRIMBLE NETR5                               999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.3145  Fredericton, CA         NEW
 UNB3 40146M002        001  2012 06 14 14 30 00                       TRIMBLE NETR9                               999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.3145  Fredericton, CA         NEW
+UNBD 40146M003        001                                            JAVAD TRE_G2T DELTA                         999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0000  Fredericton, CA         From unbd_20130814.log
 UNBJ 40146M002        001  2006 08 16 00 00 00  2012 06 01 13 59 59  TPS LEGACY                                  999999  JPSREGANT_DD_E1 NONE                        999999    0.0000    0.0000    0.3001  Fredericton, CA         HTR+TRN
 UNBJ 40146M002        001  2012 06 01 14 00 00                       TPS LEGACY                                  999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.3145  Fredericton, CA         HTR+TRN
 UNBN 40146M002        001                       2012 06 01 13 59 59  NOV OEMV3                                   999999  JPSREGANT_DD_E1 NONE                        999999    0.0000    0.0000    0.3001  Fredericton, CA         NEW
 UNBN 40146M002        001  2012 06 01 14 00 00                       NOV OEMV3                                   999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.3145  Fredericton, CA         NEW
+UNBS 40146M003        001                                            SEPT POLARXS                                999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0000  Fredericton, CA         From unbs_20120910.log
 UNBT 40146M002        001                       2012 06 01 13 59 59  TPS NETG3                                   999999  JPSREGANT_DD_E1 NONE                        999999    0.0000    0.0000    0.3001  Fredericton, CA         NEW
 UNBT 40146M002        001  2012 06 01 14 00 00                       TPS NETG3                                   999999  TRM57971.00     NONE                        999999    0.0000    0.0000    0.3145  Fredericton, CA         NEW
 UNSA 41514M001        001                       2001 07 10 23 59 59  ASHTECH Z-XII3                              999999  ASH700936C_M    SNOW                        999999    0.0000    0.0000    0.0460  Salta, AR               HTR+TRN
@@ -2010,13 +2185,19 @@ UNSA 41514M001        001  2008 07 24 00 00 00  2015 04 29 13 15 00  SEPT POLARX
 UNSA 41514M001        001  2015 04 30 12 00 00                       JAVAD TRE_G3TH DELTA                        999999  JAV_RINGANT_G3T NONE                        999999    0.0000    0.0000    0.1300  Salta, AR               unsa_20150430.lgo 
 UNTR 12785M001        001  2012 02 23 12 05 00  2012 04 17 10 12 59  TPS NETG3                                   999999  TPSCR.G3        TPSH                        999999    0.0000    0.0000    0.1000  Terni, IT               untr_20120309.log (EPN)
 UNTR 12785M001        001  2012 04 17 10 53 00                       TPS NET-G3A                                 999999  TPSCR.G3        TPSH                        999999    0.0000    0.0000    0.1000  Terni, IT               untr_20120418.log (EPN)
+UNX2 50190M002        001                                            JAVAD TRE_G3TH DELTA                        999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0000  Sydney, AU              From unx2_20121226.log
+UNX3 50190M002        001                                            SEPT ASTERX3                                999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0000  Sydney, AU              From unx3_20130118.log
 UPAD 12750M002        001                       1997 12 21 23 59 59   *** UNDEFINED ***                          999999   *** UNDEFINED ***                          999999    0.0000    0.0000    1.9620  Padova, IT              HTR
 UPAD 12750M002        001  1997 12 22 00 00 00  2001 11 21 23 59 59  TRIMBLE 4000SSI                             999999  TRM29659.00     NONE                        999999    0.0000    0.0000    1.9620  Padova, IT              HTR+TRN
 URUM 21612M001        001                       2008 09 16 23 59 59  AOA SNR-8000 ACT                            999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0460  Urumqi, CN              HTR+TRN
 URUM 21612M001        001  2008 09 17 00 00 00                       TPS NETG3                                   999999  TPSCR3_GGD      NONE                        999999    0.0000    0.0000    0.0460  Urumqi, CN              HTR+TRN
 URUS 41802M001        001                                            LEICA GRX1200+GNSS                          999999  LEIAT504GG      LEIS                        999999    0.0000    0.0000    0.0000  Oruro, BO               
 USN1 40451S006        001                                            ASHTECH Z-XII3T                             999999  3S-02-TSADM     NONE                        999999    0.0000    0.0000    0.0000  Washington, US          usn1_20020709.log
-USN3 40451S007        001                       2014 11 12 10 00 00  ASHTECH Z-XII3T                             999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0000  Washington, US          usn3_20040721.log
+USN3 40451S007        001                       2014 11 12 10 59 59  ASHTECH Z-XII3T                             999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0000  Washington, US          usn3_20040721.log
+USN4 40451S007        001                       2014 11 12 10 59 59  SEPT POLARX4TR                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0000  Washington, US          From usn4_20120508.log
+USN4 40451S009        001  2014 12 03 00 00 00                       SEPT POLARX4TR                              999999  TPSCR.G5        TPSH                        999999    0.0000    0.0000    0.0000  Washington, US          From USN43370.14D.Z
+USN5 40451S007        001                       2014 11 12 10 59 59  NOV OEM6                                    999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0000  Washington, US          From usn5_20120508.log
+USN5 40451S009        001  2014 12 03 00 00 00                       NOV OEM6                                    999999  TPSCR.G5        TPSH                        999999    0.0000    0.0000    0.0000  Washington, US          From USN53370.14D.Z
 USN7 40451S009        001  2014 11 12 11 00 00                       ASHTECH Z-XII3T                             999999  TPSCR.G5        TPSH                        999999    0.0000    0.0000    0.0000  Washington, US          usn7_20141204.log
 USNB                  001                       2000 05 14 23 59 59  ASHTECH Z-XII3                              999999  DORNE MARGOLIN A                            999999    0.0000    0.0000    0.0000                          HTR+TRN
 USNB                  001  2000 05 16 00 00 00  2000 06 18 23 59 59  ASHTECH Z-XII3                              999999  DORNE MARGOLIN A                            999999    0.0000    0.0000    0.0000                          HTR+TRN
@@ -2027,7 +2208,8 @@ USUD 21729S007        001                       2008 12 16 23 59 59  ASHTECH Z-X
 USUD 21729S007        001  2008 12 17 00 00 00                       ASHTECH UZ-12                               999999  AOAD/M_T        JPLA                        999999    0.0000    0.0000   -0.0350  Usuda, JP               IGSSTATION.2723
 VAAS 10511M001        001                                            ASHTECH Z-XII3                              999999  ASH700936A_M    SNOW                        999999    0.0000    0.0000    0.0000  Vaasa, FI               HTR+TRN
 VACO 11516M001        001                       2012 11 02 11 59 59  ASHTECH Z18                                 999999  ASH701946.2     SNOW                        999999    0.0000    0.0000    0.0770  Strakonice Region, CZ   Z18
-VACO 11516M001        001  2012 11 02 12 00 00                       ASHTECH Z-XII3                              999999  ASH701946.2     SNOW                        999999    0.0000    0.0000    0.0770  Strakonice Region, CZ   Z18
+VACO 11516M001        001  2012 11 02 12 00 00  2015 08 17 11 59 59  ASHTECH Z-XII3                              999999  ASH701946.2     SNOW                        999999    0.0000    0.0000    0.0770  Strakonice Region, CZ   Z18
+VACO 11516M001        001  2015 08 17 12 00 00                       TPS NETG3                                   999999  ASH701946.2     SNOW                        999999    0.0000    0.0000    0.0770  Strakonice Region, CZ   vaco_20150819.log
 VALA 13463M002        001                       2011 01 02 23 59 59  LEICA GRX1200+GNSS                          999999  LEIAR25         NONE                        999999    0.0000    0.0000    0.0000  Valladolid, ES          NEW
 VALA 13463M002        001  2011 01 03 00 00 00                       LEICA GRX1200+GNSS                          999999  LEIAR25.R3      NONE                        999999    0.0000    0.0000    0.0083  Valladolid, ES          NEW
 VALD 40156M001        001                       2009 07 17 23 59 59  AOA BENCHMARK ACT                           999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.1000  Val d'Or, CA            IGSSTATION.3208
@@ -2057,6 +2239,7 @@ VIS0 10423M001        001  2002 03 15 00 00 00  2003 08 18 23 59 59  ASHTECH Z18
 VIS0 10423M001        001  2003 08 19 00 00 00  2007 05 22 14 50 00  JPS E_GGD                                   999999  AOAD/M_T        OSOD                        999999    0.0000    0.0000    0.0710  Visby, Sweden           vis0_20080515.log
 VIS0 10423M001        001  2007 05 22 16 55 00  2014 05 22 13 59 59  JPS EGGDT                                   999999  AOAD/M_T        OSOD                        999999    0.0000    0.0000    0.0710  Visby, Sweden           vis0_20080515.log
 VIS0 10423M001        001  2014 05 22 14 00 00                       JAVAD TRE_G3TH DELTA                        999999  AOAD/M_T        OSOD                        999999    0.0000    0.0000    0.0710  Visby, Sweden           vis0_20140522.log
+VOIM 33303M001        001                                            JAVAD TR_G3TH                               999999  JAV_RINGANT_G3T NONE                        999999    0.0000    0.0000    0.1300  Ambalavao, MG           From voim_20130805.log
 VSLD 13502M008        001                                            3SNAV R100-40T 12                           999999  3S-02-TSADM     NONE                        999999    0.0000    0.0000    0.1630  Delft, NL               HTR+TRN
 WAB1 14014M001        001                       2009 07 08 23 59 59  ASHTECH Z-XII3T                             999999  ASH700936D_M    SNOW                        999999    0.0000    0.0000    1.2850  Wabern, CH              HTR+TRN
 WAB1 14014M001        001  2009 07 09 00 00 00                       SEPT POLARX2                                999999  ASH700936D_M    SNOW                        999999    0.0000    0.0000    1.2850  Wabern, CH              e-mail
@@ -2064,11 +2247,13 @@ WAB1?14014M001        001  2009 07 09 00 00 00                       SEPT POLARX
 WAB2 14014M002        001                                            ASHTECH Z-XII3T                             999999  ASH700936F_C    SNOW                        999999    0.0000    0.0000    1.2860  Wabern, CH              HTR+TRN
 WAB3                  001                                            ASHTECH Z-XII3                              999999  AOAD/M_T                                    999999    0.0000    0.0000    1.3200  Wabern, CH              HTR+TRN
 WABA                  001                                            ASHTECH Z-XII3                              999999   *** UNDEFINED ***                          999999    0.0000    0.0000    0.0000  Wabern, CH              HTR+TRN
-WARN 14277M002        001                       2003 10 21 23 59 59  JPS LEGACY                                  999999  TPSCR3_GGD      CONE                        999999    0.0000    0.0000    0.1750                          From WARN264N00.07O
-WARN 14277M002        001  2003 10 22 00 00 00  2004 08 12 23 59 59  JPS LEGACY                                  999999  TPSCR3_GGD      CONE  70159                  70159    0.0000    0.0000    0.1750                          From WARN264N00.07O
-WARN 14277M002        001  2004 08 13 00 00 00  2005 02 28 23 59 59  JPS LEGACY                                  999999  TPSCR3_GGD      CONE  70159                  70159    0.0000    0.0000    0.0686                          From WARN264N00.07O
-WARN 14277M002        001  2005 03 01 00 00 00  2010 09 15 09 00 00  JPS LEGACY                                  999999  TPSCR3_GGD      CONE  70159                  70159    0.0000    0.0000    0.0690                          From WARN264N00.07O
-WARN 14277M002        001  2010 09 15 09 30 00                       JPS LEGACY                                  999999  LEIAR25.R3      LEIT  50002                  50002    0.0000    0.0000    0.0690                          From WARN264N00.07O
+WARK 50243M001        001                                            TRIMBLE NETR9                               999999  TRM55971.00     NONE                        999999    0.0000    0.0000    0.0020  Warkworth, NZ           From wark_20130502.log
+WARN 14277M002        001                       2003 10 21 23 59 59  JPS LEGACY                                  999999  TPSCR3_GGD      CONE                        999999    0.0000    0.0000    0.1750  Rostock-Warnemuende,DE  From WARN264N00.07O
+WARN 14277M002        001  2003 10 22 00 00 00  2004 08 12 23 59 59  JPS LEGACY                                  999999  TPSCR3_GGD      CONE  70159                  70159    0.0000    0.0000    0.1750  Rostock-Warnemuende,DE  From WARN264N00.07O
+WARN 14277M002        001  2004 08 13 00 00 00  2005 02 28 23 59 59  JPS LEGACY                                  999999  TPSCR3_GGD      CONE  70159                  70159    0.0000    0.0000    0.0686  Rostock-Warnemuende,DE  From WARN264N00.07O
+WARN 14277M002        001  2005 03 01 00 00 00  2010 09 15 09 00 00  JPS LEGACY                                  999999  TPSCR3_GGD      CONE  70159                  70159    0.0000    0.0000    0.0690  Rostock-Warnemuende,DE  From WARN264N00.07O
+WARN 14277M002        001  2010 09 15 09 30 00  2015 07 07 08 59 59  JPS LEGACY                                  999999  LEIAR25.R3      LEIT  50002                  50002    0.0000    0.0000    0.0690  Rostock-Warnemuende,DE  From WARN264N00.07O
+WARN 14277M002        001  2015 07 07 09 00 00                       JAVAD TRE_G3TH DELTA                        999999  LEIAR25.R3      LEIT  50002                  50002    0.0000    0.0000    0.0690  Rostock-Warnemuende,DE  warn_20150713.log
 WES2 40440S020        001                       2001 07 26 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0000  Westford, US            HTR+TRN
 WES2 40440S020        001  2001 07 27 00 00 00  2002 10 09 23 59 59  ASHTECH UZ-12                               999999  AOAD/M_TA_NGS   NONE                        999999    0.0000    0.0000    0.0000  Westford, US            HTR+TRN
 WES2 40440S020        001  2002 10 10 00 00 00  2007 09 21 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_TA_NGS   NONE                        999999    0.0000    0.0000    0.0000  Westford, US            IGSSTATION.1803
@@ -2095,6 +2280,8 @@ WROC 12217M001        001  2006 04 29 00 00 00  2007 04 13 23 59 59  ASHTECH Z18
 WROC 12217M001        001  2007 04 14 00 00 00  2012 10 22 11 00 59  LEICA GRX1200GGPRO                          999999  LEIAT504GG      LEIS                        999999    0.0000    0.0000    0.0000  Wroclaw, PL             IGSSTATION.1535
 WROC 12217M001        001  2012 10 22 11 01 00                       LEICA GR25                                  999999  LEIAR25.R4      LEIT  25270                  25270    0.0000    0.0000    0.0000  Wroclaw, PL             wroc_20121023.log
 WSRT 13506M005        001                                            AOA SNR-12 ACT                              999999  AOAD/M_T        DUTD                        999999    0.0000    0.0000    0.3888  Westerbork, NL          HTR+TRN
+WTZ2 14201M015        001                                            LEICA GR25                                  999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0560  Bad Koetzting, DE       From wtz2_20130513.log
+WTZ3 14201M015        001                                            JAVAD TRE_G3TH DELTA                        999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0560  Bad Koetzting, DE       From wtz3_20130522.log
 WTZA 14201M013        001                                            ASHTECH Z-XII3T                             999999  ASH700936C_M    SNOW                        999999    0.0000    0.0000    0.0770  Koetzting, DE           wtza_20030623.log
 WTZG 14201M012        001                                            3SNAV R101 OLD                              999999  3S-02-TSATE     NONE                        999999    0.0000    0.0000    0.0890  Koetzting, DE           HTR+TRN
 WTZJ 14201M012        001  2001 07 03 00 00 00  2005 08 02 23 59 59  JPS LEGACY                                  999999  JPSREGANT_SD_E2 NONE                        999999    0.0000    0.0000    0.0740  Koetzting, DE           HTR+TRN
@@ -2124,9 +2311,10 @@ WTZZ 14201M014        001  2003 06 10 00 00 00  2003 11 06 23 59 59  JPS LEGACY 
 WTZZ 14201M014        001  2003 11 07 00 00 00  2005 05 04 23 59 59  JPS E_GGD                                   999999  TPSCR3_GGD      CONE                        999999    0.0000    0.0000    0.2150  Koetzting, DE           HTR+TRN
 WTZZ 14201M014        001  2005 05 05 00 00 00  2011 02 04 09 59 59  TPS E_GGD                                   999999  TPSCR3_GGD      CONE                        999999    0.0000    0.0000    0.2150  Koetzting, DE           HTR+TRN
 WTZZ 14201M014        001  2011 02 04 10 00 00  2011 02 15 23 59 59  TPS E_GGD                                   999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0450  Koetzting, DE           HTR+TRN
-WTZZ 14201M014        001  2011 02 16 00 00 00                       JAVAD TRE_G3TH DELTA                        999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0450  Koetzting, DE           HTR+TRN
-WUH2                  001  2002 05 02 00 00 00  2011 06 07 23 59 59  AOA BENCHMARK ACT                           999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0460  Wuhan City, CN          From WUH21120.04O
-WUH2                  001  2011 06 08 12 00 00                       JAVAD TRE_G3TH DELTA                        999999  JAV_RINGANT_G3T NONE                        999999    0.0000    0.0000    0.1206  Wuhan City, CN          MGEX,From wuh2_20120103.log
+WTZZ 14201M014        001  2011 02 16 00 00 00  2015 07 13 09 59 59  JAVAD TRE_G3TH DELTA                        999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.0450  Koetzting, DE           HTR+TRN
+WTZZ 14201M014        001  2015 07 13 10 00 00                       JAVAD TRE_G3TH DELTA                        999999  LEIAR25.R3      LEIT                        999999    0.0000    0.0000    0.2840  Koetzting, DE           wtzz_20150713.log 
+WUH2 21602M007        001  2002 05 02 00 00 00  2011 06 07 23 59 59  AOA BENCHMARK ACT                           999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0460  Wuhan City, CN          From WUH21120.04O
+WUH2 21602M007        001  2011 06 08 12 00 00                       JAVAD TRE_G3TH DELTA                        999999  JAV_RINGANT_G3T NONE                        999999    0.0000    0.0000    0.1206  Wuhan City, CN          MGEX,From wuh2_20120103.log
 WUHN 21602M001        001                       2011 03 22 23 59 59  ASHTECH Z-XII3                              999999  ASH700936E      ENCL                        999999   -0.0094   -0.0022    2.3610  Wuhan City, CN          HTR+TRN
 WUHN 21602M001        001  2011 03 23 00 00 00  2013 11 18 09 00 00  TRIMBLE NETR8                               999999  TRM59800.00     ENCL                        999999   -0.0094   -0.0022    2.3612  Wuhan City, CN          station log
 WUHN 21602M001        001  2013 11 18 09 10 00                       TRIMBLE NETR9                               999999  TRM59900.00     ENCL                        999999   -0.0094   -0.0022    2.3612  Wuhan, CN               From wuhn.log.txt (NGS)
@@ -2157,6 +2345,7 @@ YEBE 13420M001        001  1999 05 19 00 00 00  1999 10 13 23 59 59  TRIMBLE 400
 YEBE 13420M001        001  1999 10 14 00 00 00  1999 11 17 23 59 59  TRIMBLE 4000SSE                             999999  TRM22020.00+GP  NONE                        999999    0.0000    0.0000    0.0000  Yebes, Spain            
 YEBE 13420M001        001  1999 11 18 00 00 00  2007 07 26 23 59 59  TRIMBLE 4000SSI                             999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.0000  Yebes, Spain            
 YEBE 13420M001        001  2007 07 27 00 00 00                       TRIMBLE NETRS                               999999  TRM29659.00     NONE                        999999    0.0000    0.0000    0.0000  Yebes, Spain            
+YEL2 40127M006        001                                            SEPT POLARX4TR                              999999  LEIAR25.R4      NONE                        999999    0.0000    0.0000    0.0500  Yellowknife, CA         From yel2_20130916.log
 YELL 40127M003        001                       1992 03 19 23 59 59  ROGUE SNR-8                                 999999  AOAD/M_B        NONE                        999999    0.0000    0.0000    0.1110  Yellowknife, CA         HTR
 YELL 40127M003        001  1992 03 20 00 00 00  1994 03 16 23 59 59  ROGUE SNR-8C                                999999  AOAD/M_B        NONE                        999999    0.0000    0.0000    0.1170  Yellowknife, CA         HTR
 YELL 40127M003        001  1994 03 17 00 00 00  1994 10 13 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0820  Yellowknife, CA         HTR
@@ -2175,7 +2364,8 @@ YOGY                  001                                            AOA BENCHMA
 YONS 23906M001        001                                            TRIMBLE NETR9                               999999  TRM59800.00     SCIS                        999999    0.0000    0.0000    0.0000  Seoul, KR               yons_20120307.log
 YSSK 12329M003        001                                            ASHTECH Z-XII3                              999999  ASH701933B_M    DOME                        999999    0.0000    0.0000    0.0798  Yuzhno-Sakhalinsk, RU   HTR+TRN
 ZAMB 34601M001        001                       2011 11 19 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0540  Lusaka, ZM              HTR+TRN
-ZAMB 34601M001        001  2011 11 20 00 00 00                       ASHTECH Z-XII3                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0540  Lusaka, ZM              Receiver change?
+ZAMB 34601M001        001  2011 11 20 00 00 00  2015 06 07 23 59 59  ASHTECH Z-XII3                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0540  Lusaka, ZM              Receiver change?
+ZAMB 34601M001        001  2015 08 07 18 30 00                       ASHTECH UZ-12                               999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0540  Lusaka, ZM              zamb_20150818.log
 ZECK 12351M001        001                       2001 07 10 23 59 59  ROGUE SNR-8000                              999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0450  Zelenchukskaya, RU      HTR+TRN
 ZECK 12351M001        001  2001 07 12 00 00 00  2006 07 29 23 59 59  AOA SNR-8000 ACT                            999999  AOAD/M_T        NONE                        999999    0.0000    0.0000    0.0450  Zelenchukskaya, RU      HTR+TRN
 ZECK 12351M001        001  2006 07 30 00 00 00  2010 06 08 10 29 00  ASHTECH Z-XII3                              999999  ASH700936D_M    SNOW                        999999    0.0000    0.0000    0.0450  Zelenchukskaya, RU      zeck_20060802
@@ -2235,6 +2425,7 @@ STATION NAME          FLG          FROM                   TO         REMARK
 ****************      ***  YYYY MM DD HH MM SS  YYYY MM DD HH MM SS  ************************************************************
 RINEX exclusions:     001                                            
 ABMF 97103M001        003  2014 07 22 00 00 00  2014 07 25 23 59 59  %RNX_CRX: PPPFIN indicates serious data problems
+ABMF 97103M001        003  2015 06 18 00 00 00  2015 07 03 23 59 59  %RNX_CRX: outlier (PPPFIN)
 AFKB                  001  2010 08 18 00 00 00  2010 08 19 23 59 59  %RNX_CRX: Very significant antenna shift
 ALBH 40129M003        001  1994 04 14 00 00 00  1994 04 14 23 59 59  %RNX_CRX: Ant Change LOG
 ALBH 40129M003        001  2003 09 08 00 00 00  2003 09 08 23 59 59  %RNX_CRX: Radome Change LOG
@@ -2473,10 +2664,15 @@ ZIMJ 14001M006        001  2010 01 26 00 00 00  2010 01 26 23 59 59  %RNX_CRX: D
 ZIMJ?14001M006        001  2010 02 08 00 00 00  2010 02 09 23 59 59  %RNX_CRX: Data unusable
 ZIMJ?14001M006        001  2010 02 11 00 00 00  2010 02 12 23 59 59  %RNX_CRX: Data unusable
 ZIMJ 14001M006        001  2015 01 17 00 00 00  2015 01 23 23 59 59  %RNX_CRX: Snow problem
+WTZZ 14201M014        001  2015 07 13 00 00 00  2015 07 13 23 59 59  %RNX_CRX: problems in F3 (big problems)
 IGS_CRX exclusions:   003
 ABMF_97103M001        003  2013 11 20 00 00 00  2013 11 20 23 59 59  %IGS_CRX: poor repeatability
 ABMF_97103M001        003  2014 03 20 00 00 00  2014 03 25 23 59 59  %IGS_CRX: outlier (PPPFIN)
-ABMF_97103M001        003  2015 06 04 00 00 00  2015 06 15 23 59 59  %IGS_CRX: outlier (PPPFIN)
+ABMF_97103M001        003  2015 06 04 00 00 00  2015 07 03 23 59 59  %IGS_CRX: outlier (PPPFIN)
+ABMF_97103M001        003  2015 08 20 00 00 00  2015 08 20 23 59 59  %IGS_CRX: outlier (PPPFIN)
+ABMF_97103M001        003  2015 08 24 00 00 00  2015 08 24 23 59 59  %IGS_CRX: outlier (PPPFIN)
+ABMF_97103M001        003  2015 08 28 00 00 00  2015 08 28 23 59 59  %IGS_CRX: pppfin outlier
+ADIS_31502M001        003  2015 07 24 00 00 00  2015 07 24 23 59 59  %IGS_CRX: outlier (PPPFIN)
 ALBH_40129M003        003  2014 04 24 00 00 00  2014 04 24 23 59 59  %IGS_CRX: outlier (PPPFIN)
 ALGO_40104M002        003  2003 11 29 00 00 00  2003 12 14 23 59 59  %IGS_CRX: receiver problem
 ALGO_40104M002        003  2004 12 04 00 00 00  2004 12 10 23 59 59  %IGS_CRX: Data problem
@@ -2529,6 +2725,7 @@ ASPA_50503S006        003  2015-02-18 00:00:00  2015-02-19 23:59:59  %IGS_CRX: O
 ASPA_50503S006        003  2015 03 25 00 00 00  2015 03 25 23 59 59  %IGS_CRX: Outlier (pppfin)
 ASPA_50503S006        003  2015 04 09 00 00 00  2015 04 09 23 59 59  %IGS_CRX: Outlier (pppfin)
 ASPA_50503S006        003  2015 06 13 00 00 00  2015 06 13 23 59 59  %IGS_CRX: Outlier (pppfin)
+ASPA_50503S006        003  2015 06 21 00 00 00  2015 06 21 23 59 59  %IGS_CRX: Outlier (pppfin)
 AUCK_50209M001        003  2001 10 28 00 00 00  2001 10 28 23 59 59  %IGS_CRX:
 AUCK_50209M001        003  2005 10 29 00 00 00  2005 11 06 23 59 59  %IGS_CRX: mid-week antenna change
 AZGB_49541S001        003  2011 03 12 00 00 00  2011 03 14 23 59 59  %IGS_CRX: only 1 day
@@ -2623,6 +2820,10 @@ BRFT_41602M002        003  2011 11 21 00 00 00  2011 11 21 23 59 59  %IGS_CRX: b
 BRFT_41602M002        003  2015 04 03 00 00 00  2015 04 05 23 59 59  %IGS_CRX: Outlier in U (pppfin)
 BRFT_41602M002        003  2015 05 18 00 00 00  2015 05 18 23 59 59  %IGS_CRX: pppfin outlier
 BRFT_41602M002        003  2015 06 01 00 00 00  2015 06 02 23 59 59  %IGS_CRX: pppfin outlier
+BRFT_41602M002        003  2015 08 11 00 00 00  2015 08 11 23 59 59  %IGS_CRX: pppfin outlier
+BRFT_41602M002        003  2015 08 27 00 00 00  2015 08 27 23 59 59  %IGS_CRX: pppfin outlier
+BRFT_41602M002        003  2015 09 05 00 00 00  2015 09 05 23 59 59  %IGS_CRX: pppfin outlier
+BRFT_41602M002        003  2015 09 08 00 00 00  2015 09 08 23 59 59  %IGS_CRX: pppfin outlier
 BRMU_42501S004        003  2001 03 28 00 00 00  2001 03 29 23 59 59  %IGS_CRX:
 BRST_10004M004        003  2003 02 22 00 00 00  2003 02 22 23 59 59  %IGS_CRX: unverified
 BRST_10004M004        003  2005 05 06 00 00 00  2005 05 08 23 59 59  %IGS_CRX:
@@ -2657,6 +2858,8 @@ CHPI_41609M003        003  2015 03 17 00 00 00  2015 03 17 23 59 59  %IGS_CRX: o
 CHUR_40128M002        003  1998 10 03 00 00 00  1998 10 11 23 59 59  %IGS_CRX:
 CHUR_40128M002        003  2008 02 19 00 00 00  2008 02 19 23 59 59  %IGS_CRX: Bad repeat in up
 CNMR_50512M001        003  2014 04 15 00 00 00  2014 04 15 23 59 59  %IGS_CRX: Jump in U (pppfin)
+CNMR_50512M001        003  2015 07 11 00 00 00  2015 07 11 23 59 59  %IGS_CRX: huge jump in U (pppfin)
+CNMR_50512M001        003  2015 09 07 00 00 00  2015 09 07 23 59 59  %IGS_CRX: huge jump in U (pppfin)
 COCO_50127M001        003  1998 11 06 00 00 00  1998 11 08 23 59 59  %IGS_CRX:
 COCO_50127M001        003  1999 06 11 00 00 00  1999 06 13 23 59 59  %IGS_CRX:
 COCO_50127M001        003  1999 06 18 00 00 00  1999 06 20 23 59 59  %IGS_CRX:
@@ -2670,6 +2873,7 @@ COCO_50127M001        003  2001 11 04 00 00 00  2001 11 04 23 59 59  %IGS_CRX: r
 COCO_50127M001        003  2011 06 19 00 00 00  2011 06 19 23 59 59  %IGS_CRX: outlier in N
 COCO_50127M001        003  2012 04 10 00 00 00  2012 04 15 23 59 59  %IGS_CRX: jump in N
 COCO_50127M001        003  2014 05 22 00 00 00  2014 05 23 23 59 59  %IGS_CRX: outlier in UU (pppfin)
+COCO_50127M001        003  2015 06 24 00 00 00  2015 06 24 23 59 59  %IGS_CRX: outlier in E (pppfin)
 CONZ_41719M002        003  2005 05 14 00 00 00  2005 05 14 23 59 59  %IGS_CRX: Outlier
 CONZ_41719M002        003  2005 05 15 00 00 00  2005 05 22 23 59 59  %IGS_CRX: Antenna change (not confirmed)
 CONZ_41719M002        003  2009 04 25 00 00 00  2009 05 03 23 59 59  %IGS_CRX: Receiver change
@@ -2706,11 +2910,13 @@ CTWN_                 003  2010 03 15 00 00 00  2010 03 17 23 59 59  %IGS_CRX: o
 CTWN_                 003  2011 07 22 00 00 00  2011 07 24 23 59 59  %IGS_CRX: outliers in N+U
 CTWN_                 003  2011 11 20 00 00 00  2011 11 26 23 59 59  %IGS_CRX: jump in N+U
 CTWN_                 003  2012 04 20 00 00 00  2012 04 23 23 59 59  %IGS_CRX: Outlier in U
+CTWN                  003  2015 06 27 00 00 00  2015 07 06 23 59 59  %RNX_CRX: Outliers
 DAEJ_23902M002        003  1999 09 24 00 00 00  1999 09 26 23 59 59  %IGS_CRX:
 DAEJ_23902M002        003  2002 02 02 00 00 00  2002 02 03 23 59 59  %IGS_CRX: only 1 day
 DAEJ_23902M002        003  2005 08 06 00 00 00  2005 08 14 23 59 59  %IGS_CRX: height problem
 DAEJ_23902M002        003  2011 03 11 00 00 00  2011 03 13 23 59 59  %IGS_CRX: Japan Earthquake
 DAEJ_23902M002        003  2011 06 22 00 00 00  2011 06 22 23 59 59  %IGS_CRX: U outlier
+DAEJ_23902M002        003  2015 08 02 00 00 00  2015 08 02 23 59 59  %IGS_CRX: outlier E, U
 DAKA_34106M001        003  2003 11 23 00 00 00  2003 11 24 23 59 59  %IGS_CRX: outlier
 DARW_50134M001        003  1999 11 07 00 00 00  1999 11 11 23 59 59  %IGS_CRX:
 DARW_50134M001        003  2001 02 17 00 00 00  2001 02 18 23 59 59  %IGS_CRX:
@@ -2780,6 +2986,9 @@ FALE_50601S001        003  2015 06 15 00 00 00  2015 06 15 23 59 59  %IGS_CRX: o
 FLIN_40135M001        003  2011 11 11 00 00 00  2011 11 12 23 59 59  %IGS_CRX: outlier in U
 FLIN_40135M001        003  2012 02 16 00 00 00  2012 02 18 23 59 59  %IGS_CRX: outlier in N
 FLIN_40135M001        003  2015 03 10 00 00 00  2015 03 23 23 59 59  %IGS_CRX: outlier in N (pppfin)
+FLIN_40135M001        003  2015 07 07 00 00 00  2015 07 07 23 59 59  %IGS_CRX: outlier pppfin
+FLIN_40135M001        003  2015 07 10 00 00 00  2015 07 10 23 59 59  %IGS_CRX: outlier pppfin
+FLIN_40135M001        003  2015 07 12 00 00 00  2015 07 13 23 59 59  %IGS_CRX: outlier pppfin
 FLRS_31907M001        003  2009 06 07 00 00 00  2009 06 13 23 59 59  %IGS_CRX: Big RMS for the whole week
 FLRS_31907M001        003  2009 07 09 00 00 00  2009 07 11 23 59 59  %IGS_CRX: outlier
 FLRS_31907M001        003  2010 11 12 00 00 00  2010 11 12 23 59 59  %IGS_CRX: Outlier
@@ -2809,6 +3018,12 @@ FLRS 31907M001        003  2014 08 09 00 00 00  2014 08 09 23 59 59  %IGS_CRX: O
 FLRS 31907M001        003  2014 08 24 00 00 00  2014 08 25 23 59 59  %IGS_CRX: Outliers in E (PPPFIN + F71)
 FLRS_31907M001        003  2014 10 14 00 00 00  2014 10 16 23 59 59  %IGS_CRX: Outliers in E,U (PPPFIN)
 FLRS_31907M001        003  2014 10 28 00 00 00  2014 10 29 23 59 59  %IGS_CRX: Outliers in E,U (PPPFIN)
+FLRS_31907M001        003  2015 06 24 00 00 00  2015 06 24 23 59 59  %IGS_CRX: Outlier in E,U
+FLRS_31907M001        003  2015 07 02 00 00 00  2015 07 02 23 59 59  %IGS_CRX: Outliers in E (PPPFIN)
+FLRS_31907M001        003  2015 07 18 00 00 00  2015 07 19 23 59 59  %IGS_CRX: Outlier in E,U
+FLRS_31907M001        003  2015 07 28 00 00 00  2015 07 28 23 59 59  %IGS_CRX: Outlier in E
+FLRS_31907M001        003  2015 08 01 00 00 00  2015 08 01 23 59 59  %IGS_CRX: Outlier in E,U
+FLRS_31907M001        003  2015 08 26 00 00 00  2015 08 26 23 59 59  %IGS_CRX: Outlier in E
 FRDN 40146M001        003  2014 11 02 00 00 00  2014 11 03 23 59 59  %IGS_CRX: Outliers in E,U (PPPFIN)
 FRDN 40146M001        003  2015-02-18 20:00:00  2015-02-18 23:59:30  %IGS_CRX: Outlier in U (PPPFIN)
 FORT_41602M001        003  1999 06 26 00 00 00  1999 07 04 23 59 59  %IGS_CRX:
@@ -2914,6 +3129,7 @@ GUAM_50501M002        003  2013 09 03 00 00 00  2013 09 03 23 59 59  %IGS_CRX: o
 GUAM_50501M002        003  2013 09 07 00 00 00  2013 09 07 23 59 59  %IGS_CRX: outlier in U
 GUAM_50501M002        003  2013 09 18 00 00 00  2013 09 18 23 59 59  %IGS_CRX: Outlier
 GUAM_50501M002        003  2013 10 07 00 00 00  2013 10 07 23 59 59  %IGS_CRX: Outlier in U
+GUAM_50501M002        003  2015 08 15 00 00 00  2015 08 15 23 59 59  %IGS_CRX: Outlier in U
 GUAO_21612M003        003  2014 11 12 00 00 00  2014 11 12 23 59 59  %IGS_CRX: Outlier in E
 GUAT_40901S001        003  2008 08 10 00 00 00  2008 08 10 23 59 59  %IGS_CRX: only one day
 GUAT_40901S001        003  2008 11 13 00 00 00  2008 11 16 23 59 59  %IGS_CRX: only one day
@@ -2921,6 +3137,7 @@ GUAT_40901S001        003  2011 09 08 00 00 00  2011 09 11 23 59 59  %IGS_CRX: O
 GUAT_40901S001        003  2011 09 30 00 00 00  2011 09 30 23 59 59  %IGS_CRX: Outlier in U
 GUAT_40901S001        003  2011 11 26 00 00 00  2011 12 04 23 59 59  %IGS_CRX: Jump in U
 GUAT_40901S001        003  2014 12 13 00 00 00  2014 12 16 23 59 59  %IGS_CRX: Outlier (PPPFIN)
+GUAT_40901S001        003  2015 08 29 00 00 00  2015 08 29 23 59 59  %IGS_CRX: pppfin outlier
 GUUG_82301M001        003  2012 03 01 00 00 00  2012 03 03 23 59 59  %IGS_CRX: Outlier in N
 GUUG_82301M001        003  2014 02 03 00 00 00  2014 02 03 23 59 59  %IGS_CRX: Outlier in E
 HARK_30302M007        003  2000 03 17 00 00 00  2000 03 19 23 59 59  %IGS_CRX:
@@ -2944,6 +3161,7 @@ HFLK?11006S003        003  2002 12 28 00 00 00  2003 01 05 23 59 59  %IGS_CRX:
 HFLK_11006S003        003  2005 01 22 00 00 00  2005 01 30 23 59 59  %IGS_CRX:
 HFLK_11006S003        003  2007 06 29 00 00 00  2007 07 02 23 59 59  %IGS_CRX: antenna change
 HLFX_40120M001        003  2014 01 19 00 00 00  2014 01 19 23 59 59  %IGS_CRX: Outlier U (pppfin)
+HLFX_40120M001        003  2015 07 23 00 00 00  2015 07 23 23 59 59  %IGS_CRX: Outlier U (pppfin)
 HOB2_50116M004        003  2001 08 04 00 00 00  2001 08 05 23 59 59  %IGS_CRX:
 HOB2_50116M004        003  2001 08 12 00 00 00  2001 08 19 23 59 59  %IGS_CRX:
 HOB2_50116M004        003  2013 05 25 00 00 00  2013 05 26 23 59 59  %IGS_CRX: Outlier in E
@@ -2959,6 +3177,7 @@ HRAO_30302M004        003  2000 03 18 00 00 00  2000 03 20 23 59 59  %IGS_CRX:
 HYDE_22307M001        003  2011 03 17 00 00 00  2011 03 19 23 59 59  %IGS_CRX: only 2 days
 HYDE_22307M001        003  2012 04 10 00 00 00  2012 04 15 23 59 59  %IGS_CRX: Earthquake
 HYDE_22307M001        003  2012 08 25 00 00 00  2012 08 25 23 59 59  %IGS_CRX: Outlier
+HYDE_22307M001        003  2015 06 21 00 00 00  2015 06 21 23 59 59  %IGS_CRX: Outlier in N
 IDDR_49451M001        003  2011 05 08 00 00 00  2011 05 14 23 59 59  %IGS_CRX: bad repeatability
 IENG_12724S001        003  2015 02 05 00 00 00  2015 02 05 23 59 59  %IGS_CRX: pppfinal: E 
 IISC_22306M002        003  1999 04 08 00 00 00  1999 04 11 23 59 59  %IGS_CRX:
@@ -3000,10 +3219,13 @@ IRKT_12313M001        003  2012 01 14 00 00 00  2012 01 21 23 59 59  %IGS_CRX: T
 IRKT_12313M001        003  2013 07 18 00 00 00  2013 07 19 23 59 59  %IGS_CRX: Jump in E
 ISBA_20308M001        003  2011 10 08 00 00 00  2011 10 09 23 59 59  %IGS_CRX: outlier F7
 ISBA_20308M001        003  2012 04 21 00 00 00  2012 04 23 23 59 59  %IGS_CRX: Outlier in N/E
+ISBA_20308M001        003  2015 07 04 00 00 00  2015 07 04 23 59 59  %IGS_CRX: Outlier in E (pppfin)
 ISPA_41703M007        003  2011 09 17 00 00 00  2011 09 17 23 59 59  %IGS_CRX: outlier
 ISPA_41703M007        003  2012 03 24 00 00 00  2012 03 28 23 59 59  %IGS_CRX: jump in U
 ISPA_41703M007        003  2014 12 20 00 00 00  2014 12 20 23 59 59  %IGS_CRX: outlier in E (pppfin)
 ISPA_41703M007        003  2014 12 26 00 00 00  2014 12 26 23 59 59  %IGS_CRX: outlier in E (pppfin)
+ISPA_41703M007        003  2015 08 03 00 00 00  2015 08 03 23 59 59  %IGS_CRX: outlier in E (pppfin)
+ISPA_41703M007        003  2015 08 15 00 00 00  2015 08 15 23 59 59  %IGS_CRX: outlier in E (pppfin)
 JAB1_50136M001        003  1998 12 11 00 00 00  1998 12 13 23 59 59  %IGS_CRX:
 JAB1_50136M001        003  1999 04 23 00 00 00  1999 04 25 23 59 59  %IGS_CRX:
 JAB1_50136M001        003  1999 08 18 00 00 00  1999 08 29 23 59 59  %IGS_CRX:
@@ -3139,6 +3361,7 @@ KOUR_97301M210        003  2004 08 26 00 00 00  2004 08 26 23 59 59  %IGS_CRX: o
 KOUR_97301M210        003  2005 09 02 00 00 00  2005 09 02 23 59 59  %IGS_CRX:
 KOUR_97301M210        003  2006 08 10 00 00 00  2006 08 12 23 59 59  %IGS_CRX:
 KOUR_97301M210        003  2007 06 20 00 00 00  2007 06 20 23 59 59  %IGS_CRX: receiver/antenna change
+KOUR_97301M210        003  2015 08 14 00 00 00  2015 08 14 23 59 59  %IGS_CRX: outlier NEU
 KSTU_12349M002        003  1999 10 13 00 00 00  1999 10 17 23 59 59  %IGS_CRX:
 KSTU_12349M002        003  2001 08 18 00 00 00  2001 08 20 23 59 59  %IGS_CRX:
 KSTU_12349M002        003  2001 09 08 00 00 00  2001 09 09 23 59 59  %IGS_CRX:
@@ -3290,6 +3513,7 @@ MEDI_12711M003        003  2008 03 01 00 00 00  2008 03 09 23 59 59  %IGS_CRX: B
 MEDI_12711M003        003  2008 05 17 00 00 00  2008 05 17 23 59 59  %IGS_CRX: Bad repeatibility
 MEDI_12711M003        003  2008 09 12 00 00 00  2008 09 13 23 59 59  %IGS_CRX: jump, bad repeatability
 MEDI_12711M003        003  2008 12 06 00 00 00  2008 12 14 23 59 59  %IGS_CRX: jump, bad repeatability
+MEDI_12711M003        003  2015 08 13 00 00 00  2015 08 13 23 59 59  %IGS_CRX: outlier in pppfin
 METS_10503S011        003  2000 03 03 00 00 00  2000 03 05 23 59 59  %IGS_CRX:
 METS_10503S011        003  2004 02 16 00 00 00  2004 02 16 23 59 59  %IGS_CRX: only 1 day, no confirmation
 METS_10503S011        003  2011 07 22 00 00 00  2011 07 24 23 59 59  %IGS_CRX: outlier in N
@@ -3367,6 +3591,7 @@ NLIB_40465M001        003  2001 06 10 00 00 00  2001 06 16 23 59 59  %IGS_CRX:
 NLIB_40465M001        003  2001 08 23 00 00 00  2001 08 25 23 59 59  %IGS_CRX:
 NLIB_40465M001        003  2008 12 19 00 00 00  2008 12 20 23 59 59  %IGS_CRX: Outliers
 NLIB_40465M001        003  2009 08 22 00 00 00  2009 08 30 23 59 59  %IGS_CRX: outiers in N
+NLIB_40465M001        003  2015 07 08 00 00 00  2015 07 08 23 59 59  %IGS_CRX: outlier pppfin
 NOT1_12717M004        003  2007 05 27 00 00 00  2007 05 28 23 59 59  %IGS_CRX: Large outlier in U
 NOT1_12717M004        003  2011 04 16 00 00 00  2011 04 16 23 59 59  %IGS_CRX: outlier
 NOT1_12717M004        003  2013 10 05 00 00 00  2013 10 05 23 59 59  %IGS_CRX: outlier
@@ -3498,8 +3723,10 @@ ONSA_10402M004        003  2001 02 24 00 00 00  2001 03 04 23 59 59  %IGS_CRX:
 ONSA_10402M004        003  2013 10 20 00 00 00  2013 10 20 23 59 59  %IGS_CRX: Outlier in N
 OPMT_10001S006        003  2002 09 20 00 00 00  2002 09 22 23 59 59  %IGS_CRX: new station in W7, only 2 days
 OPMT_10001S006        003  2015-05-06 00:00:00  2015-05-06 23:59:59  %IGS_CRX: Outlier (pppfin)
+OPMT_10001S006        003  2015 06 24 00:00:00  2015 06 24 23:59:59  %IGS_CRX: Outlier (pppfin)
 OUAG_33101M001        003  2011 04 09 00 00 00  2011 04 10 23 59 59  %IGS_CRX: only 1 day
 PADO_12750S001        003  2013 12 11 00 00 00  2013 12 12 23 59 59  %IGS_CRX: Outlier in U
+PADO_12750S001        003  2015 07 06 00 00 00  2015 07 06 23 59 59  %IGS_CRX: pppfin outlier
 PARK_50108M001        003  2011 08 06 00 00 00  2011 08 21 23 59 59  %IGS_CRX: outliers
 PARK_50108M001        003  2012 06 16 00 00 00  2012 06 16 23 59 59  %IGS_CRX: Outlier in E
 PARK_50108M001        003  2012 07 07 00 00 00  2012 07 15 23 59 59  %IGS_CRX: Bad N/E repeat.
@@ -3518,12 +3745,22 @@ PARK_50108M001        003  2015 04 09 00 00 00  2015 04 09 23 59 59  %IGS_CRX: O
 PARK_50108M001        003  2015 05 10 00 00 00  2015 05 11 23 59 59  %IGS_CRX: Outlier in pppfin
 PARK_50108M001        003  2015 05 30 00 00 00  2015 06 04 23 59 59  %IGS_CRX: Outlier in pppfin
 PARK_50108M001        003  2015 06 15 00 00 00  2015 06 15 23 59 59  %IGS_CRX: Outlier in pppfin
+PARK_50108M001        003  2015 06 19 00 00 00  2015 06 19 23 59 59  %IGS_CRX: Outlier in pppfin
+PARK_50108M001        003  2015 06 21 00 00 00  2015 06 21 23 59 59  %IGS_CRX: Outlier in pppfin
+PARK_50108M001        003  2015 07 05 00 00 00  2015 07 05 23 59 59  %IGS_CRX: Outlier in pppfin
+PARK_50108M001        003  2015 07 10 00 00 00  2015 07 10 23 59 59  %IGS_CRX: Outlier in pppfin
+PARK_50108M001        003  2015 07 14 00 00 00  2015 07 18 23 59 59  %IGS_CRX: Outlier in pppfin
+PARK_50108M001        003  2015 08 04 00 00 00  2015 08 06 23 59 59  %IGS_CRX: Outlier in pppfin
+PARK_50108M001        003  2015 09 04 00 00 00  2015 09 06 23 59 59  %IGS_CRX: Outlier in pppfin
 PBR2?22308M002        003  2012 02 25 00 00 00  2012 02 26 23 59 59  %IGS_CRX: only 1 day
 PBR2_22308M002        003  2012 04 10 00 00 00  2012 04 15 23 59 59  %IGS_CRX: Earthquake, N
 PBR2_22308M002        003  2012 06 24 00 00 00  2012 06 24 23 59 59  %IGS_CRX: Outlier in E
 PBRI?22308M001        003  2012 02 25 00 00 00  2012 02 26 23 59 59  %IGS_CRX: only 1 day
 PBRI_22308M001        003  2012 04 10 00 00 00  2012 04 15 23 59 59  %IGS_CRX: Earthquake, N
 PBRI_22308M001        003  2012 06 24 00 00 00  2012 06 24 23 59 59  %IGS_CRX: Outlier in E
+PBRI_22308M001        003  2015 08 10 00 00 00  2015 08 11 23 59 59  %IGS_CRX: Outlier in pppfin
+PBRI_22308M001        003  2015 08 16 00 00 00  2015 08 16 23 59 59  %IGS_CRX: Outlier EU
+PBRI_22308M001        003  2015 08 23 00 00 00  2015 08 25 23 59 59  %IGS_CRX: Outlier EU
 PDEL_31906M004        003  2001 11 06 00 00 00  2001 11 06 23 59 59  %IGS_CRX: only 1 day in this week
 PDEL_31906M004        003  2002 01 31 00 00 00  2002 01 31 23 59 59  %IGS_CRX: only 1 day in this week
 PDEL?31906M004        003  2002 12 28 00 00 00  2003 01 05 23 59 59  %IGS_CRX:
@@ -3564,6 +3801,7 @@ PIMO_22003M001        003  2002 02 02 00 00 00  2002 02 17 23 59 59  %IGS_CRX: F
 PIMO_22003M001        003  2002 02 22 00 00 00  2002 02 24 23 59 59  %IGS_CRX: Only 2 days this week
 PIMO_22003M001        003  2002 11 23 00 00 00  2002 11 30 23 59 59  %IGS_CRX: Bad repeat
 PIMO_22003M001        003  2002 12 07 00 00 00  2002 12 15 23 59 59  %IGS_CRX: Jump midweek
+PIMO_22003M001        003  2015 08 12 00 00 00  2015 08 13 23 59 59  %IGS_CRX: Outlier U
 POL2_12348M001        003  2000 03 25 00 00 00  2000 03 27 23 59 59  %IGS_CRX:
 POL2_12348M001        003  2006 01 07 00 00 00  2006 01 15 23 59 59  %IGS_CRX: bad repeatibility
 POL2_12348M001        003  2010 10 23 00 00 00  2010 10 25 23 59 59  %IGS_CRX: outlier
@@ -3631,6 +3869,11 @@ RBAY_30315M001        003  2015 04 23 00 00 00  2015 05 06 23 59 59  %IGS_CRX: p
 RBAY_30315M001        003  2015 05 08 00 00 00  2015 05 21 23 59 59  %IGS_CRX: pppfin
 RBAY_30315M001        003  2015 05 23 00 00 00  2015 06 03 23 59 59  %IGS_CRX: pppfin
 RBAY_30315M001        003  2015 06 12 00 00 00  2015 06 14 23 59 59  %IGS_CRX: pppfin
+RBAY_30315M001        003  2015 06 17 00 00 00  2015 06 20 23 59 59  %IGS_CRX: pppfin
+RBAY_30315M001        003  2015 06 25 00 00 00  2015 07 03 23 59 59  %IGS_CRX: pppfin
+RBAY 30315M001        003  2015 06 30 00 00 00  2015 07 05 23 59 59  %RNX_CRX: pppfin
+RBAY 30315M001        003  2015 07 06 00 00 00  2015 07 06 23 59 59  %IGS_CRX: pppfin
+RBAY_30315M001        003  2015 07 10 00 00 00  2015 07 15 23 59 59  %IGS_CRX: pppfin
 RCMN_33203M001        003  2012 06 25 00 00 00  2012 06 25 23 59 30  %IGS_CRX: only 1 day, no verification
 RCMN_33203M001        003  2013 08 14 00 00 00  2013 08 14 23 59 59  %IGS_CRX: u outlier from pppfin
 RECF_41617M001        003  2013 10 27 00 00 00  2013 10 27 23 59 30  %IGS_CRX: u outlier (pppfin)
@@ -3664,6 +3907,8 @@ SALU_41640M001        003  2011 05 19 00 00 00  2011 05 22 23 59 59  %IGS_CRX: J
 SALU_41640M001        003  2013 07 01 00 00 00  2013 07 04 23 59 59  %IGS_CRX: Outlier in U
 SALU_41640M001        003  2015 03 22 00 00 00  2015 03 22 23 59 59  %IGS_CRX: MAUPRP issue
 SALU_41640M001        003  2015 04 05 00 00 00  2015 04 05 23 59 59  %IGS_CRX: Outlier in E,U
+SALU_41640M001        003  2015 06 30 00 00 00  2015 07 03 23 59 59  %IGS_CRX: Outliers pppfin
+SALU 41640M001        003  2015 06 30 00 00 00  2015 07 03 23 59 59  %IGS_CRX: Outliers pppfin
 SANT_41705M003        003  1999 09 28 00 00 00  1999 10 02 23 59 59  %IGS_CRX:
 SANT_41705M003        003  1999 10 20 00 00 00  1999 10 24 23 59 59  %IGS_CRX:
 SANT_41705M003        003  1999 11 19 00 00 00  1999 11 21 23 59 59  %IGS_CRX:
@@ -3687,8 +3932,15 @@ SCUB_40701M001        003  2015 03 12 00 00 00  2015 03 12 23 59 59  %IGS_CRX: U
 SCUB_40701M001        003  2015 04 08 00 00 00  2015 04 08 23 59 59  %IGS_CRX: U outlier (pppfin)
 SCUB_40701M001        003  2015 04 13 00 00 00  2015 04 13 23 59 59  %IGS_CRX: U outlier (pppfin)
 SCUB_40701M001        003  2015 04 30 00 00 00  2015 05 01 23 59 59  %IGS_CRX: outlier (pppfin)
+SCUB_40701M001        003  2015 07 05 00 00 00  2015 07 05 23 59 59  %IGS_CRX: pppfin outlier
+SCUB_40701M001        003  2015 07 07 00 00 00  2015 07 07 23 59 59  %IGS_CRX: pppfin outlier
+SCUB_40701M001        003  2015 07 09 00 00 00  2015 07 11 23 59 59  %IGS_CRX: pppfin outlier
+SCUB_40701M001        003  2015 07 17 00 00 00  2015 07 17 23 59 59  %IGS_CRX: pppfin outlier
+SCUB_40701M001        003  2015 08 05 00 00 00  2015 08 05 23 59 59  %IGS_CRX: pppfin outlier
+SCUB_40701M001        003  2015 08 09 00 00 00  2015 08 09 23 59 59  %IGS_CRX: pppfin outlier
 SCRZ_41801M001        003  2015 01 06 00 00 00  2015 01 11 23 59 59  %IGS_CRX: E outlier (pppfin)
 SCRZ_41801M001        003  2015 02 05 00 00 00  2015 02 05 23 59 59  %IGS_CRX: E outlier (pppfin)
+SCRZ_41801M001        003  2015 09 03 00 00 00  2015 09 03 23 59 59  %IGS_CRX: E outlier (pppfin)
 SELE_12352M001        003  1998 11 13 00 00 00  1998 11 15 23 59 59  %IGS_CRX:
 SELE_12352M001        003  2009 04 28 00 00 00  2009 04 30 23 59 59  %IGS_CRX: outlier in F7
 SELE_12352M001        003  2010 01 03 00 00 00  2010 01 04 23 59 59  %IGS_CRX: Bad repeat.
@@ -3724,6 +3976,7 @@ SEY1_39801M001        003  2014 01 15 00 00 00  2014 01 15 23 59 59  %IGS_CRX: O
 SEY1_39801M001        003  2014 03 21 00 00 00  2014 03 21 23 59 59  %IGS_CRX: Outlier in U (pppfin)
 SEY1_39801M001        003  2014 10 19 00 00 00  2014 10 19 23 59 59  %IGS_CRX: Outlier in U (F71)
 SEY1_39801M001        003  2014 11 30 00 00 00  2014 11 30 23 59 59  %IGS_CRX: Outlier in E (pppfin)
+SEY1_39801M001        003  2015 07 02 00 00 00  2015 07 02 23 59 59  %IGS_CRX: Outlier in NEU (pppfin)
 SFER_13402M004        003  2013 10 23 00 00 00  2013 10 24 23 59 59  %IGS_CRX: Outlier in E
 SFER_13402M004        003  2014 01 03 00 00 00  2014 01 04 23 59 59  %IGS_CRX: Outlier in U
 SFER_13402M004        003  2014 01 14 00 00 00  2014 01 14 23 59 59  %IGS_CRX: Outlier (PPPFIN)
@@ -3742,11 +3995,12 @@ SJDV_10090M001        003  1999 07 03 00 00 00  1999 07 05 23 59 59  %IGS_CRX:
 SJDV_10090M001        003  2001 01 27 00 00 00  2001 01 29 23 59 59  %IGS_CRX:
 SJDV_10090M001        003  2001 10 28 00 00 00  2001 10 29 23 59 59  %IGS_CRX:
 SJDV_10090M001        003  2002 02 01 00 00 00  2002 02 03 23 59 59  %IGS_CRX: only 2 days
-SMST_21726M001        003  2011 03 11 00 00 00  2011 03 13 23 59 59  %IGS_CRX: bad repeatibility in E 
+SMST_21726M001        003  2011 03 11 00 00 00  2011 03 13 23 59 59  %IGS_CRX: bad repeatibility in E
 SMST_21726M001        003  2012 03 11 00 00 00  2012 03 17 23 59 59  %IGS_CRX: jump in H (EQ)
 SMST_21726M001        003  2012 04 21 00 00 00  2012 04 23 23 59 59  %IGS_CRX: Outlier in N/U
 SMST_21726M001        003  2012 09 01 00 00 00  2012 09 09 23 59 59  %IGS_CRX: antenna dome wrong
 SMST_21726M001        003  2015 05 12 00 00 00  2015 05 12 23 59 59  %IGS_CRX: outlier
+SMST_21726M001        003  2015 07 02 00 00 00  2015 07 02 23 59 59  %IGS_CRX: outlier in U (pppfin)
 SOFI_11101M002        003  2005 12 17 00 00 00  2005 12 24 23 59 59  %IGS_CRX: very bad repeatability F7
 SOFI_11101M002        003  2006 01 07 00 00 00  2006 01 14 23 59 59  %IGS_CRX: bad repeatibility
 SOFI_11101M002        003  2009 12 25 00 00 00  2009 12 25 23 59 59  %IGS_CRX: bad repeatibility
@@ -3760,6 +4014,7 @@ SSIA_41401S001        003  2002 09 06 00 00 00  2002 09 06 23 59 59  %IGS_CRX: o
 SSIA_41401S001        003  2014 07 16 00 00 00  2014 07 17 23 59 59  %IGS_CRX: Poor repeatability (PPPFIN)
 STHL 30606M003        003  2014 12 17 00 00 00  2014 12 17 23 59 59  %IGS_CRX: outlier in E
 STJO_40101M001        003  2000 12 02 00 00 00  2000 12 10 23 59 59  %IGS_CRX:
+STK2_21731S004        003  2015 07 28 00 00 00  2015 07 28 23 59 59  %IGS_CRX: Outlier in E
 SUNM_50143M001        003  2003 06 21 00 00 00  2003 06 23 23 59 59  %IGS_CRX: corrected PCV values
 SUTH_30314M002        003  2000 03 09 00 00 00  2000 03 12 23 59 59  %IGS_CRX:
 SUTH_30314M002        003  2001 01 12 00 00 00  2001 01 14 23 59 59  %IGS_CRX:
@@ -3791,6 +4046,7 @@ SYOG_66006S002        003  2002 02 16 00 00 00  2002 02 24 23 59 59  %IGS_CRX: b
 TABL_49901M001        003  2015 01 30 00 00 00  2015 01 30 23 59 59  %IGS_CRX: Outlier in U (pppfin)
 TABV_49901M001        003  2014 01 06 00 00 00  2014 01 08 23 59 59  %IGS_CRX: Outlier in U (pppfin)
 TABV_49901M001        003  2015 01 30 00 00 00  2015 01 30 23 59 59  %IGS_CRX: Outlier in U (pppfin)
+TABV_49901M001        003  2015 06 25 00 00 00  2015 06 26 23 59 59  %IGS_CRX: Outlier in E (pppfin)
 TASH 12327M001        003  2014 01 31 00 00 00  2014 02 01 23 59 59  %IGS_CRX: Outlier in U (pppfin)
 TASH 12327M001        003  2015 01 11 00 00 00  2015 01 11 23 59 59  %IGS_CRX: Outlier in U (pppfin)
 TASH 12327M001        003  2015 02 01 00 00 00  2015 02 01 23 59 59  %IGS_CRX: Outlier in E F71
@@ -3828,6 +4084,7 @@ THTI_92201M009        003  2004 01 10 00 00 00  2004 01 12 23 59 59  %IGS_CRX: a
 THTI_92201M009        003  2015 02 21 00 00 00  2015 02 21 23 59 59  %IGS_CRX: Outlier in U,E (pppfin)
 THTI_92201M009        003  2015 02 25 00 00 00  2015 02 25 23 59 59  %IGS_CRX: Outlier in U (pppfin)
 THTI_92201M009        003  2015 04 22 00 00 00  2015 04 23 23 59 59  %IGS_CRX: Outlier in E (pppfin)
+THTI_92201M009        003  2015 08 08 00 00 00  2015 08 08 23 59 59  %IGS_CRX: Outlier in E (pppfin)
 THU1?43001M001        003  2001 09 14 00 00 00  2001 09 16 23 59 59  %IGS_CRX:
 THU1_43001M001        003  2001 09 29 00 00 00  2001 10 07 23 59 59  %IGS_CRX:
 THU1_43001M001        003  2001 10 20 00 00 00  2001 10 28 23 59 59  %IGS_CRX:
@@ -3887,6 +4144,7 @@ TXES_49512M001        003  2011 03 06 00 00 00  2011 03 06 23 59 59  %IGS_CRX: r
 TXES_49512M001        003  2011 03 12 00 00 00  2011 03 14 23 59 59  %IGS_CRX: outlier in U
 TXES_49512M001        003  2011 10 22 00 00 00  2011 10 22 23 59 59  %IGS_CRX: outlier in E
 TXES_49512M001        003  2012 02 11 00 00 00  2012 02 13 23 59 59  %IGS_CRX: outlier in E
+TXES_49512M001        003  2015 08 20 00 00 00  2015 08 20 23 59 59  %IGS_CRX: outlier pppfin
 ULAB_24201M001        003  2011 11 17 00 00 00  2011 11 19 23 59 59  %IGS_CRX: jump in N/E/U
 ULAB_24201M001        003  2011 11 20 00 00 00  2011 11 26 23 59 59  %IGS_CRX: jump in N/E/U
 ULAB_24201M001        003  2015 03 27 00 00 00  2015 03 27 23 59 59  %IGS_CRX: outlier
@@ -3896,6 +4154,7 @@ UNB3_40146M002        003  2011 04 21 00 00 00  2011 04 21 23 59 59  %IGS_CRX: O
 UNB3_40146M002        003  2013 12 03 00 00 00  2013 12 03 23 59 59  %IGS_CRX: Outlier in U (pppfin)
 UNB3_40146M002        003  2014 12 03 00 00 00  2014 12 03 23 59 59  %IGS_CRX: U outlier in F71
 UNB3_40146M002        003  2014 12 06 00 00 00  2014 12 07 23 59 59  %IGS_CRX: U outlier in F71
+UNB3_40146M002        003  2015 06 27 00 00 00  2015 06 27 23 59 59  %IGS_CRX: outlier in U (pppfin)
 UNBJ_40146M002        003  2011 04 21 00 00 00  2011 04 21 23 59 59  %IGS_CRX: Outlier
 UNBJ_40146M002        003  2013 12 03 00 00 00  2013 12 03 23 59 59  %IGS_CRX: Outlier in U (pppfin)
 UNBJ_40146M002        003  2014 12 06 00 00 00  2014 12 07 23 59 59  %IGS_CRX: U outlier in F71
@@ -3921,6 +4180,7 @@ UNSA_41514M001        003  2015 02 26 00 00 00  2015 02 26 23 59 59  %IGS_CRX: o
 UNSA_41514M001        003  2015 03 26 00 00 00  2015 03 26 23 59 59  %IGS_CRX: pppfin
 UNSA_41514M001        003  2015 03 28 00 00 00  2015 03 28 23 59 59  %IGS_CRX: pppfin
 UNSA_41514M001        003  2015 05 21 00 00 00  2015 05 21 23 59 59  %IGS_CRX: pppfin
+UNSA_41514M001        003  2015 07 14 00 00 00  2015 07 14 23 59 59  %IGS_CRX: pppfin
 UPAD_12750M002        003  1998 12 05 00 00 00  1998 12 07 23 59 59  %IGS_CRX:
 UPAD_12750M002        003  2001 03 28 00 00 00  2001 04 01 23 59 59  %IGS_CRX:
 URUM_21612M001        003  1999 09 24 00 00 00  1999 09 26 23 59 59  %IGS_CRX:
@@ -4006,6 +4266,7 @@ USUD_21729S007        003  2015 02 25 00 00 00  2015 02 26 23 59 59  %IGS_CRX: U
 USUD_21729S007        003  2015 03 21 00 00 00  2015 03 21 23 59 59  %IGS_CRX: outlier in E
 USUD_21729S007        003  2015 05 12 00 00 00  2015 05 12 23 59 59  %IGS_CRX: outlier
 USUD_21729S007        003  2015 05 15 00 00 00  2015 05 15 23 59 59  %IGS_CRX: outlier
+USUD_21729S007        003  2015 07 21 00 00 00  2015 07 21 23 59 59  %IGS_CRX: outlier
 VALD_40156M001        003  2010 11 20 00 00 00  2010 11 30 23 59 59  %IGS_CRX: IGSSTATION-4150
 VESL_66009M001        003  1998 11 06 00 00 00  1998 11 08 23 59 59  %IGS_CRX:
 VESL_66009M001        003  1999 07 03 00 00 00  1999 07 18 23 59 59  %IGS_CRX:
@@ -4042,6 +4303,7 @@ WHIT?40136M001        003  2002 08 10 00 00 00  2002 08 18 23 59 59  %IGS_CRX:
 WHIT_40136M001        003  2005 02 05 00 00 00  2005 02 13 23 59 59  %IGS_CRX: jump?
 WHIT_40136M001        003  2011 10 14 00 00 00  2011 10 15 23 59 59  %IGS_CRX: outlier
 WILL_40134M001        003  2008 12 05 00 00 00  2008 12 06 23 59 59  %IGS_CRX: outlier
+WSRT_13506M005        003  2015 08 25 00 00 00  2015 08 25 23 59 59  %IGS_CRX: E outlier (pppfin)
 WTZJ_14201M012        003  2009 12 12 00 00 00  2009 12 20 23 59 59  %IGS_CRX: equipment change
 WTZL_14201M022        003  2007 12 01 00 00 00  2007 12 09 23 59 59  %IGS_CRX: antenna change
 WTZL_14201M022        003  2008 07 19 00 00 00  2008 07 26 23 59 59  %IGS_CRX: antenna change
@@ -4082,6 +4344,7 @@ YAKT_12353M002        003  2012 01 14 00 00 00  2012 01 21 23 59 59  %IGS_CRX: D
 YAKT_12353M002        003  2015 03 15 00 00 00  2015 03 15 23 59 59  %IGS_CRX: Outlier in E
 YAKT_12353M002        003  2015 03 20 00 00 00  2015 03 21 23 59 59  %IGS_CRX: Outlier in U
 YAKT_12353M002        003  2015 03 23 00 00 00  2015 03 23 23 59 59  %IGS_CRX: outlier in N
+YAKT_12353M002        003  2015 08 01 00 00 00  2015 08 01 23 59 59  %IGS_CRX: outlier in N & E
 YAR1_50107M004        003  2001 05 30 00 00 00  2001 06 18 23 59 59  %IGS_CRX:
 YAR1_50107M004        003  2001 07 12 00 00 00  2001 07 13 23 59 59  %IGS_CRX:
 YAR1_50107M004        003  2001 08 25 00 00 00  2001 09 02 23 59 59  %IGS_CRX:
@@ -4141,6 +4404,7 @@ ZWE2_12330M003        003  2007 06 09 00 00 00  2007 06 17 23 59 59  %IGS_CRX: r
 ZWE2_12330M003        003  2008 06 04 00 00 00  2008 06 04 23 59 59  %IGS_CRX: Outlier
 ZWE2_12330M003        003  2010 02 24 00 00 00  2010 02 27 23 59 59  %IGS_CRX: Outlier
 ZWE2_12330M003        003  2011 02 26 00 00 00  2011 03 08 23 59 59  %IGS_CRX: Poor repeat.
+WTZZ 14201M014        003  2015 07 12 00 00 00  2015 07 12 23 59 59  %IGS_CRX: antenna change
 IGS_SNX exclusions:   003
 ALME_13437M001        003  2000 01 01 00 00 00                       ?IGS_SNX
 AMU2_66040M002        003                                            %IGS_SNX
@@ -4284,6 +4548,10 @@ FLRS_31907M001        003  2014 06 26 00 00 00  2014 06 26 23 59 59  %EPN_CRX: O
 FLRS_31907M001        003  2014 10 28 00 00 00  2014 10 30 23 59 59  %EPN_CRX: Outlier E,U
 FLRS_31907M001        003  2015 02 28 00 00 00  2015 02 28 23 59 59  %EPN_CRX: Outlier E
 FLRS_31907M001        003  2015 03 01 00 00 00  2015 03 01 23 59 59  %EPN_CRX: Outlier E
+FLRS_31907M001        003  2015 06 05 00 00 00  2015 06 06 23 59 59  %EPN_CRX: Outlier in E
+FLRS_31907M001        003  2015 06 21 00 00 00  2015 06 27 23 59 59  %EPN_CRX: Outlier
+FLRS_31907M001        003  2015 07 19 00 00 00  2015 07 22 23 59 59  %EPN_CRX: Outlier EU
+FLRS_31907M001        003  2015 07 25 00 00 00  2015 08 01 23 59 59  %EPN_CRX: Outlier U
 FUNC_13911S001        003  2008 10 29 00 00 00  2008 10 29 23 59 59  %EPN_CRX: Outlier
 FUNC_13911S001        003  2009 06 14 00 00 00  2009 06 17 23 59 59  %EPN_CRX: Outliers N/E/U
 FUNC_13911S001        003  2010 08 13 00 00 00  2010 08 13 23 59 59  %EPN_CRX: Outlier N
@@ -4291,6 +4559,7 @@ FUNC_13911S001        003  2013 09 30 00 00 00  2013 10 01 23 59 59  %EPN_CRX: O
 FUNC_13911S001        003  2013 10 18 00 00 00  2013 10 18 23 59 59  %EPN_CRX: Outlier
 FUNC_13911S001        003  2014 01 17 00 00 00  2014 01 18 23 59 59  %EPN_CRX: Outlier
 FUNC_13911S001        003  2015 03 24 00 00 00  2015 03 24 23 59 59  %EPN_CRX: Outlier
+FUNC_13911S001        003  2015 07 23 00 00 00  2015 07 23 23 59 59  %EPN_CRX: Outlier U
 GANP_11515M001        003  2006 12 08 00 00 00  2006 12 09 23 59 59  %EPN_CRX: Outliers
 GANP_11515M001        003  2007 01 24 00 00 00  2007 01 24 23 59 59  %EPN_CRX: Outlier
 GANP_11515M001        003  2007 03 21 00 00 00  2007 03 21 23 59 59  %EPN_CRX: Outlier
@@ -4383,6 +4652,7 @@ LAMA_12209M001        003  2000 09 24 00 00 00  2000 10 07 23 59 59  %EPN_CRX:
 LAMA_12209M001        003  2000 10 06 00 00 00  2000 10 07 23 59 59  %EPN_CRX:
 LAMA_12209M001        003  2002 01 29 00 00 00  2002 01 29 23 59 59  %EPN_CRX: Bad repeat in E7
 LPAL_81701M001        003  2002 12 16 00 00 00  2002 12 16 23 59 59  %EPN_CRX: Outlier in E7
+MAR6_10405M002        003  2015 05 31 00 00 00  2015 06 13 23 59 59  %EPN_CRX: Unconsidered new antenna
 MAS1_31303M002        003  2001 06 08 00 00 00  2001 06 08 23 59 59  %EPN_CRX:
 MAS1_31303M002        003  2001 08 26 00 00 00  2001 08 28 23 59 59  %EPN_CRX:
 MAS1_31303M002        003  2006 12 10 00 00 00  2006 12 10 23 59 59  %EPN_CRX: Outlier
@@ -4470,6 +4740,7 @@ PENC_11206M006        003  2003 12 18 00 00 00  2003 12 18 23 59 59  %EPN_CRX:
 PENC_11206M006        003  2003 12 21 00 00 00  2003 12 23 23 59 59  %EPN_CRX:
 PENC_11206M006        003  2003 12 28 00 00 00  2004 01 10 23 59 59  %EPN_CRX: Mist
 PENC_11206M006        003  2001 08 17 00 00 00  2001 08 17 23 59 59  %EPN_CRX:
+PFA2_11005M003        003  2015 06 06 00 00 00  2015 06 06 23 59 59  %EPN_CRX: Outlier in U
 POTS_14106M003        003  2006 02 10 00 00 00  2006 02 10 23 59 59  %EPN_CRX: Outlier in E7
 PTBB_14234M001        003  2002 03 17 00 00 00  2002 03 23 23 59 59  %EPN_CRX: Antenna change
 QAQ1_43007M001        003  2005 03 12 00 00 00  2005 03 12 23 59 59  %EPN_CRX: Only one day in E7

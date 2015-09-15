@@ -15,6 +15,8 @@ usage                 : Python routine to
 
 exit code(s)          : 0 -> success
                       : 1 -> error
+                      : 2 -> station missing (from one or both .STA files)
+                      : 3 -> found 1 or more discrepancies
 
 description           :
 
@@ -44,6 +46,7 @@ DDEBUG = True
 stations            = []
 reference_sta       = ''
 local_sta           = ''
+split_output        = False
 
 ## help function
 def help (i):
@@ -51,14 +54,49 @@ def help (i):
   print ""
   sys.exit(i)
 
+def print_incosistency(itype, station, l1, fn1, l2, fn2):
+  ''' Print discrepancies in some Type.
+
+      :param itype:   The type for which to report the discrepancies (1, or 2)
+      :param station: The name of the station
+      :param l1:      The list cointaining the Type 00x records for this stations
+        from the first file (i.e. ``fn1``)
+      :param fn1:     The name of the first .STA file
+      :param l2:      The list cointaining the Type 00x records for this stations
+        from the second file (i.e. ``fn2``)
+      :param fn2:     The name of the second .STA file
+
+      .. warning:: If the global variable ``split_output`` is ``True``, then this
+        function will report the discrepancies in a station-specific file, named
+        ``station``.stadf; else all output is written to stdout
+
+  '''
+  if split_output == True:
+    print 'Redirecting to %s.stadf' %station
+    fn = '%s.stadf' %station
+    temp = sys.stdout #store original stdout object for later
+    sys.stdout = open(fn, 'w')
+
+  print 'INCONSISTENCY FOR STATION %s' %station
+  print 'File %s contains the Type %03i records:' %(fn1, itype)
+  for i in l1:
+    print '[%s]' %i
+  print 'File %s contains the Type %03i records:' %(fn2, itype)
+  for i in l2:
+    print '[%s]' %i
+
+  if split_output == True:
+    sys.stdout.close()
+    sys.stdout = temp #restore print commands to interactive prompt
+
 ## Resolve command line arguments
-def main (argv):
+def main(argv):
 
   if len(argv) < 1:
     help(1)
 
   try:
-    opts, args = getopt.getopt(argv,'hs:r:l:',['help', 'stations=', 'reference-sta=', 'local-sta='])
+    opts, args = getopt.getopt(argv,'hs:r:l:',['help', 'stations=', 'reference-sta=', 'local-sta=', 'splitout'])
   except getopt.GetoptError:
     help(1)
 
@@ -75,6 +113,9 @@ def main (argv):
     elif opt in ('-l', '--local-sta'):
       global local_sta
       local_sta = arg
+    elif opt in ('--splitout'):
+      global split_output
+      split_output = True
     else:
       print >> sys.stderr, 'Invalid command line argument: %s' %opt
 
@@ -85,7 +126,7 @@ if __name__ == "__main__":
 ## check if local .STA file exists
 if not os.path.isfile(local_sta):
    print >> sys.stderr, 'Error. Cannot find local .STA file : %s' %local_sta
-   os.exit(1)
+   sys.exit(1)
 
 ##  check for the reference .STA; if not present, try to download it from
 ##+ CODE's ftp
@@ -104,6 +145,22 @@ locsta = bernutils.bsta.StaFile(local_sta)
 ref_dict_01 = refsta.__match_type_001__(stations)
 loc_dict_01 = locsta.__match_type_001__(stations)
 
+EXITS_STATUS = 0
+
+## find missing stations
+missing_from_d1 = [ x for x in ref_dict_01 if len(ref_dict_01[x]) == 0 ]
+missing_from_d2 = [ x for x in loc_dict_01 if len(loc_dict_01[x]) == 0 ]
+if len(missing_from_d1) > 0:
+  for i in missing_from_d1:
+    print 'Station %s not found in sta file: %s' %(i, reference_sta)
+    EXITS_STATUS = 2
+    del ref_dict_01[i]
+if len(missing_from_d2) > 0:
+  for i in missing_from_d2:
+    print 'Station %s not found in sta file: %s' %(i, local_sta)
+    EXITS_STATUS = 2
+    del ref_dict_02[i]
+
 ## read Type002 info (as dictionary) from both .STA files
 ref_dict_02 = refsta.__match_type_002__(ref_dict_01)
 loc_dict_02 = locsta.__match_type_002__(loc_dict_01)
@@ -116,8 +173,12 @@ for key1, val1 in ref_dict_01.iteritems():
   if len(__val2) > len(__val1):
     __val1, __val2 = __val2, __val1
   for rc1 in __val1:
+    #mismatch = False
     if not any(bernutils.bsta.loose_compare_type1(rc1, rc2) for rc2 in __val2):
-      print '!!Mismatch!! Station %s, Type 001, record: [%s]' %(key1, rc1)
+      #mismatch = True
+      print_incosistency(1, key1, val1, reference_sta, val2, local_sta)
+      EXITS_STATUS = 3
+      break
 
 ## do the comparisson; first match Type 002 records
 for key1, val1 in ref_dict_02.iteritems():
@@ -128,7 +189,9 @@ for key1, val1 in ref_dict_02.iteritems():
     __val1, __val2 = __val2, __val1
   for rc1 in __val1:
     if not any(bernutils.bsta.loose_compare_type2(rc1, rc2) for rc2 in __val2):
-      print '!!Mismatch!! Station %s.\n Type 002, record: [%s]' %(key1, rc1)
+      print_incosistency(2, key1, val1, reference_sta, val2, local_sta)
+      EXITS_STATUS = 3
+      break
 
 ## all done; exit
 sys.exit(0)

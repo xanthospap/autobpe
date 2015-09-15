@@ -16,9 +16,9 @@ class Type001:
     ''' Initialize a :py:class:`bernutils.bsta.type001` instance using a type 001
         information line. This will set the start and stop date and the 
         station name.
-        
+
         An example of a .STA file type 001 info line follows::
-        
+
           STATION NAME          FLG          FROM                   TO         OLD STATION NAME      REMARK
           ****************      ***  YYYY MM DD HH MM SS  YYYY MM DD HH MM SS  ********************  ************************
           AIRA 21742S001        001  1980 01 06 00 00 00  2099 12 31 00 00 00  AIRA*                 MGEX,aira_20120821.log
@@ -39,7 +39,7 @@ class Type001:
         self.__start_date = datetime.datetime.strptime(t_str.strip(), '%Y %m %d %H %M %S')
       except:
         raise RuntimeError('Invalid date format at line [%s]' %line.strip())
-    
+
     ## resolve stop date (or set to now)
     t_str = line[48:67].strip()
     if len(t_str) == 0:
@@ -74,7 +74,7 @@ class Type001:
     t1 = 'start of operation'
     if self.__start_date != MIN_STA_DATE:
       t1 = self.__start_date.strftime('%Y-%m-%d')
-    
+
     t2 = 'today'
     if self.__stop_date != MAX_STA_DATE:
       t2 = self.__stop_date.strftime('%Y-%m-%d')
@@ -112,9 +112,9 @@ class Type002:
     ''' Initialize a :py:class:`bernutils.bsta.type002` instance using a type 002
         information line. This will set the start and stop date and the 
         station name.
-        
+
         An example of a .STA file type 002 info line follows::
-        
+
           STATION NAME          FLG          FROM                   TO         RECEIVER TYPE         RECEIVER SERIAL NBR   REC #   ANTENNA TYPE          ANTENNA SERIAL NBR    ANT #    NORTH      EAST      UP      DESCRIPTION             REMARK
           ****************      ***  YYYY MM DD HH MM SS  YYYY MM DD HH MM SS  ********************  ********************  ******  ********************  ********************  ******  ***.****  ***.****  ***.****  **********************  ************************
           AFKB                  001                                            LEICA GRX1200GGPRO                          999999  LEIAT504GG      LEIS                        999999    0.0000    0.0000    0.0000  Kabul, AF               NEW
@@ -146,7 +146,7 @@ class Type002:
         self.__start_date = datetime.datetime.strptime(t_str.strip(), '%Y %m %d %H %M %S')
       except:
         raise RuntimeError('Invalid date format at line [%s]' %line.strip())
-    
+
     ## resolve stop date (or set to now)
     t_str = line[48:67].strip()
     if len(t_str) == 0:
@@ -159,24 +159,34 @@ class Type002:
 
   def station_name(self):
     return self.__sta_name
+
   def flag(self):
     return self.__flag
+
   def receiver_type(self):
     return self.__receiver_t
+
   def receiver_serial_nr(self):
     return self.__receiver_sn
+
   def receiver_nr(self):
     return self.__receiver_nr
+
   def antenna_type(self):
     return self.__antenna_t
+
   def antenna_serial_nr(self):
     return self.__antenna_sn
+
   def antenna_nr(self):
     return self.__antenna_nr
+
   def north(self):
     return self.__north
+
   def east(self):
     return self.__east
+
   def up(self):
     return self.__up
 
@@ -203,11 +213,11 @@ class Type002:
   def __match_t1__(self, t1):
     ''' Check if (this) Type 002 entry matches a Type 001 entry. Will check the
         following:
-        
+
         * self.__sta_name   =  t1.station_name
         * self.__start_date >= t1.start
         * self.__stop_date  <= t1.stop
-        
+
         :param t1: A ``Type001`` instance.
 
     '''
@@ -226,7 +236,7 @@ class StaFile:
     if not os.path.isfile(filen):
       raise RuntimeError('Cannot find .STA file [%s]' %filen)
     fin = open(filen, 'r')
-      
+
     ## search for the places in the file, where 'TYPE XXX' starts
     self.__type_pos = {}
     line = fin.readline()
@@ -235,7 +245,7 @@ class StaFile:
       if rgx.match(line):
         self.__type_pos[int(line[7])] = fin.tell()
       line = fin.readline()
-    
+
     ## add a dummy mark at the end of the dictionary
     self.__type_pos[max(self.__type_pos.keys())+1] = fin.tell()
 
@@ -246,7 +256,7 @@ class StaFile:
     if 1 not in self.__type_pos or 2 not in self.__type_pos:
       fin.close()
       raise RuntimeError('Invalid sta file. Type001 and/or Type002 not found')
-      
+
     ## assign the filename
     self.__filename = filen
     self.__stream   = fin
@@ -268,7 +278,7 @@ class StaFile:
         Type 001 block and populate a dictionary where the key is the station name
         (actually the old station name) and the vaues are lists containing
         ype001 instances.
-        
+
         :param end_of_block: The position (i the input file) where the Type 001
                              block ends.
 
@@ -308,11 +318,11 @@ class StaFile:
   def __match_type_001__(self, stations=[]):
     ''' Given a list of stations, search in Type 001 to find them, and return
         the information.
-        
+
         .. note:: The comparisson (i.e. if a certain station in the ``stations``
           list matches a given record), is performed using the ``OLD STATION NAME``
           column, using UNIX shell-type wildcards.
-        
+
         :param stations: A list of stations to match (if possible) in the Type 001
                          block. If an empty list is passed instead, the function
                          will return information for all stations listed in
@@ -332,7 +342,7 @@ class StaFile:
 
     ## go to the begining of the block
     self.__stream.seek(from_p)
-    
+
     ## there should be an extra 4 lines ...
     for i in range(0, 4): line = self.__stream.readline()
 
@@ -340,12 +350,12 @@ class StaFile:
     ##+ let the help function do the work ...
     if len(stations) == 0:
       return self.__match_type_001__help__(to_p)
-    
+
     ## the dictionary to be returned
     ## for each station in the list, add an entry
     sta_tp1 = {}
     for sta in stations: sta_tp1[sta] = []
-    
+
     ## read all stations ...
     line = self.__stream.readline()
     while line and  self.__stream.tell() < to_p:
@@ -369,11 +379,11 @@ class StaFile:
         instances, this function will search through the block Type 002 and return
         a dictionary with the same keys as the original, but with values the 
         corresponding Type 002 entries.
-        
+
         :param dictnr: A dictionary with key (old) station names and values 
           lists of Type001 instances, e.g. like the one returned from the function
           :func:`__match_type_001__`.
-        
+
         :returns: A dictionary with the same keys as the original, but with values
           the corresponding Type 002 entries.
 
@@ -382,12 +392,12 @@ class StaFile:
     from_p, to_p = self.__type_range__(2)
     self.__stream.seek(from_p)
     for i in range(0, 4): line = self.__stream.readline()
-    
+
     ## the dictionary to be returned
     ## for each station in the dictionary, add an entry
     sta_tp2 = {}
     for sta in dictnr: sta_tp2[sta] = []
-    
+
     ## walk through all entries of type 002
     line = self.__stream.readline()
     while line and len(line)>10 and self.__stream.tell() < to_p:
@@ -401,12 +411,12 @@ class StaFile:
             archived = True
             break
       line = self.__stream.readline()
-      
+
     return sta_tp2
 
   def match_old_name(self, stations):
     ''' given a station name, 
-    
+
         .. warning:: Note that Type001 records, with a flag = '003' are not used
           to extract information. They only triger a warning message.
     '''
@@ -419,7 +429,7 @@ class StaFile:
 
     ## go to the begining of the block
     self.__stream.seek(from_p)
-    
+
     ## there should be an extra 4 lines ...
     for i in range(0, 4): line = self.__stream.readline()
 
