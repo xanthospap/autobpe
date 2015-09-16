@@ -16,6 +16,7 @@ Contents:
    bcrd
    bgps
    bsta
+   bpcf
    gpstime
    products
    webutils

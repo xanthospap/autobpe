@@ -432,6 +432,8 @@ class StaFile:
 
         .. warning:: Note that Type001 records, with a flag = '003' are not used
           to extract information. They only triger a warning message.
+
+        .. warning:: DEPRECATED FUNCTION. DO NOT USE
     '''
 
     ## we'll make some changes to station_list later on ..
