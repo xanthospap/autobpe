@@ -210,7 +210,7 @@ class Type002:
   def __str__(self):
     return self.__str_format__()
 
-  def __match_t1__(self, t1):
+  def __match_t1__(self, t1, no_marker_number=False):
     ''' Check if (this) Type 002 entry matches a Type 001 entry. Will check the
         following:
 
@@ -220,8 +220,17 @@ class Type002:
 
         :param t1: A ``Type001`` instance.
 
+        :param no_marker_number: If set to true, then the comparisson for name
+          equality is performed using only the first 4 chars of the station name
+          (i.e. the station id).
+
     '''
-    return self.__sta_name == t1.station_name() \
+    str1 = self.__sta_name
+    str2 = t1.station_name()
+    if no_marker_number == True:
+      str1 = str1[0:4]
+      str2 = str2[0:4]
+    return str1 == str2 \
       and (self.__start_date >= t1.start() or  self.__start_date == MIN_STA_DATE) \
       and (self.__stop_date <= t1.stop() or self.__stop_date == MAX_STA_DATE)
 
@@ -374,7 +383,7 @@ class StaFile:
 
     return sta_tp1
 
-  def __match_type_002__(self, dictnr):
+  def __match_type_002__(self, dictnr, no_marker_number=False):
     ''' Given a dictionay with key (old) station names and values lists of Type001
         instances, this function will search through the block Type 002 and return
         a dictionary with the same keys as the original, but with values the 
@@ -383,6 +392,10 @@ class StaFile:
         :param dictnr: A dictionary with key (old) station names and values 
           lists of Type001 instances, e.g. like the one returned from the function
           :func:`__match_type_001__`.
+
+        :param no_marker_number: If set to true, then the comparisson for name
+          equality is performed using only the first 4 chars of the station name
+          (i.e. the station id).
 
         :returns: A dictionary with the same keys as the original, but with values
           the corresponding Type 002 entries.
@@ -406,7 +419,7 @@ class StaFile:
       for sta in dictnr:
         if archived: break
         for tp1 in dictnr[sta]:
-          if t2.__match_t1__(tp1):
+          if t2.__match_t1__(tp1, no_marker_number):
             sta_tp2[sta].append(t2)
             archived = True
             break

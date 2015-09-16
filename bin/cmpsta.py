@@ -100,7 +100,7 @@ def print_incosistency(itype, station, l1, fn1, l2, fn2):
     else:
       sys.stdout = open(fn, 'w')
 
-  print 'INCONSISTENCY FOR STATION %s' %station
+  print 'INCONSISTENCY FOR STATION %s TYPE %1i' %(station, itype)
   print 'File %s contains the Type %03i records:' %(fn1, itype)
   for i in l1:
     print '[%s]' %i
@@ -177,18 +177,12 @@ EXIT_STATUS = 0
 ##  find missing stations; we only care if the station is missing from the local
 ##+ sta file **NOT** the remote one.
 missing_from_d1 = [ x for x in ref_dict_01 if len(ref_dict_01[x]) == 0 ]
-#missing_from_d2 = [ x for x in loc_dict_01 if len(loc_dict_01[x]) == 0 ]
 if len(missing_from_d1) > 0:
   for i in missing_from_d1:
     print '[WARNING] Station %s not found in reference sta file: %s; Station will not be compared.' %(i, reference_sta)
     del ref_dict_01[i]
     if i in loc_dict_01:
       del loc_dict_01[i]
-#if len(missing_from_d2) > 0:
-#  for i in missing_from_d2:
-#    print 'Station %s not found in sta file: %s' %(i, local_sta)
-#    EXIT_STATUS = 2
-#    #del loc_dict_01[i]
 
 ## Note! All stations in ref_dict_01 must exist in ref_dict_02 even empty
 for i in ref_dict_01:
@@ -196,8 +190,8 @@ for i in ref_dict_01:
     loc_dict_01[i] = []
 
 ## read Type002 info (as dictionary) from both .STA files
-ref_dict_02 = refsta.__match_type_002__(ref_dict_01)
-loc_dict_02 = locsta.__match_type_002__(loc_dict_01)
+ref_dict_02 = refsta.__match_type_002__(ref_dict_01, no_marker_numbers)
+loc_dict_02 = locsta.__match_type_002__(loc_dict_01, no_marker_numbers)
 
 ## do the comparisson; first match Type 001 records
 for key1, val1 in ref_dict_01.iteritems():
