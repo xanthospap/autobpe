@@ -119,7 +119,7 @@ def main(argv):
     help(1)
 
   try:
-    opts, args = getopt.getopt(argv,'hs:r:l:',['help', 'stations=', 'reference-sta=', 'local-sta=', 'splitout', 'no-station-number'])
+    opts, args = getopt.getopt(argv,'hs:r:l:',['help', 'stations=', 'reference-sta=', 'local-sta=', 'splitout', 'no-marker-numbers'])
   except getopt.GetoptError:
     help(1)
 
@@ -139,7 +139,7 @@ def main(argv):
     elif opt in ('--splitout'):
       global split_output
       split_output = True
-    elif opt in ('--no-station-number'):
+    elif opt in ('--no-marker-numbers'):
       global no_marker_numbers
       no_marker_numbers = True
     else:
