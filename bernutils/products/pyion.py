@@ -101,3 +101,97 @@ def __cod_ion_all_prediction__(str_id='P5'):
     raise RuntimeError('Invalid ION prediction flag %s.', str_id)
 
   return [[ FILENAME, COD_HOST, COD_DIR ]]
+
+def getCodIon(datetm, out_dir=None):
+  ''' This function is responsible for downloading an optimal, valid ion file
+      for a given date.
+
+      :param datetm:          The date(time) for wich we want the erp information, as
+                              a Python ``datetime.datetime`` or ``dadtetime.date``
+                              instance.
+
+      :param out_dir:         (Optional) Directory where the downloaded file is
+                              to be saved.
+
+      :returns:               A list containing saved file and the remote file.
+
+      .. note::
+        #. The options here should **exactly match** the ones described in
+           the ``products.rst`` file.
+        #. This functions uses :func:`bernutils.products.pyion.__cod_ion_all_final__`,
+           :func:`bernutils.products.pyion.__cod_ion_all_rapid__`,
+           :func:`bernutils.products.pyion.__cod_ion_all_ultra_rapid__` and
+           :func:`bernutils.products.pyion.__cod_ion_all_prediction__`.
+
+  '''
+  ## output dir must exist
+  if out_dir and not os.path.isdir(out_dir):
+    raise RuntimeError('Invalid directory: %s -> getCodIon.' %out_dir)
+
+  ## transform date to datetime (if needed)
+  if type(datetm) == datetime.date:
+    datetm = datetime.datetime.combine(datetm, datetime.datetime.min.time())
+
+  ## compute delta time (in days) from today
+  dt = datetime.datetime.today() - datetm
+  dt = dt.days + (dt.seconds // 3600) /24.0
+
+  options = []
+
+  ## depending on deltatime, get a list of optional erp files
+  if dt >= 15:
+    options =   __cod_ion_all_final__()
+  elif dt >= 4:
+    options  =  __cod_ion_all_final__()
+    options +=  __cod_ion_all_rapid__()
+  elif dt >= 1:
+    options  = __cod_ion_all_rapid__()
+    options += __cod_ion_all_ultra_rapid__()
+  elif dt > -1:
+    options  = __cod_ion_all_ultra_rapid__()
+    options += __cod_ion_all_prediction__()
+  elif dt > -3:
+    options  = __cod_ion_all_prediction__()
+  else:
+    raise RuntimeError('DeltaTime two far in the future %+03.1f' %dt)
+
+  ## compute the needed date formats
+  week, sow = bernutils.gpstime.pydt2gps(datetm)
+  dow       = int(datetm.strftime('%w'))
+  iyear     = int(datetm.strftime('%Y'))
+
+  ## need to replace the dates
+  options = [ i.replace('yyyy', ('%04i' %iyear)).replace('wwwwd', ('%04i%01i' %(week, dow))) for slst in options for i in slst ]
+  options = [ options[x:x+3] for x in xrange(0, len(options), 3) ]
+
+  if __DEBUG_MODE__ == True:
+    print 'Delta days is : %+04.1f' %dt
+    for i in options:
+      print 'will try: ', i
+
+  ## the successeful triple is ..
+  ret_list = []
+  nr_tries = 0
+
+  ##  for every possible  erp file, see if we can download it. we stop at the
+  ##+ first successeful download.
+  for triple in options:
+    nr_tries += 1
+    try:
+      if out_dir: 
+        saveas = os.path.join(out_dir, triple[0])
+      else:
+        saveas = triple[0]
+      info = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
+      ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0])]
+      break
+    except:
+      pass
+
+  if len(ret_list) == 0:
+    raise RuntimeError('Failed to download ion file (0/%1i)' %len(options))
+
+  if __DEBUG_MODE__ == True:
+    print 'Tries: %1i/%1i Downloaded %s to %s' %(nr_tries, len(options), ret_list[1], ret_list[0])
+
+  return ret_list

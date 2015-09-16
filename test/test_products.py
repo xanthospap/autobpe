@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-import bernutils.products.pysp3
+import bernutils.products.pyion
 import datetime
 
 # set a datetime and a date
@@ -13,4 +13,5 @@ today = datetime.datetime.today()
 dir = '/home/xanthos/Downloads'
 
 
-print bernutils.products.pysp3.getNav(dtm, 'G', dir)
+#print bernutils.products.pysp3.getNav(dtm, 'G', dir)
+print bernutils.products.pyion.getCodIon(dtm, dir)
