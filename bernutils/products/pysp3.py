@@ -1,3 +1,4 @@
+import sys
 import os
 import datetime
 import ftplib
@@ -5,6 +6,7 @@ import ftplib
 import bernutils.gpstime
 import bernutils.webutils
 import bernutils.products.prodgen
+import bernutils.products.pysp3_mrg
 
 __DEBUG_MODE__ = True
 
@@ -553,3 +555,30 @@ def getNav(datetm, sat_sys='G', out_dir=None, station=None, hour=None):
     return info
   except:
     raise RuntimeError('Failed to fetch navigation file: %s' %(HOST+DIR+NAVFILE))
+
+def merge_sp3_GR(gps_sp3, glo_sp3, out_sp3=None):
+  ''' This function will merge two sp3 files, of the same date, holding different
+      satellite systems; ``'gps_sp3'`` should be a GPS-only sp3 file, while
+      ``'glo_sp3'`` should be a GLONASS-only sp3 file.
+      The merged output is directed either to stdout or to a specified file, 
+      depending on the parameter ``out_sp3``.
+
+      :param gps_sp3: name of the gps-only sp3 file
+
+      :param glo_sp3: name of the glonass-only sp3 file
+
+      :param out_sp3: if specified, the filename of the merged file.
+
+  '''
+  if out_sp3 != None:
+    temp       = sys.stdout
+    sys.stdout = open(out_sp3, 'w')
+
+  try:
+    bernutils.products.pysp3_mrg. __merge_igl_igs__(gps_sp3, glo_sp3)
+  except:
+    raise
+
+  if out_sp3 != None:
+    sys.stdout.close()
+    sys.stdout = temp

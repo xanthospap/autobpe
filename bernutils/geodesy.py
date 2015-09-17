@@ -100,7 +100,7 @@ def cartesian2ellipsoidal(x, y, z, ellipsoid=None):
   if ellipsoid == None:
     ellipsoid = Ellipsoid('GRS80')
 
-  // Functions of ellipsoid parameters.
+  ## Functions of ellipsoid parameters.
   a     = ellipsoid.semiMajorAxis()
   f     = ellipsoid.flattening()
   aeps2 = a*a*1e-32
@@ -118,15 +118,15 @@ def cartesian2ellipsoidal(x, y, z, ellipsoid=None):
   p2 = x*x + y*y
 
   ## Compute longitude lon
-  if p2 != .0e0
+  if p2 != .0e0:
     lon = math.atan2(y, x)
   else:
-    lon = .0e0;
+    lon = .0e0
 
   ## Ensure that Z-coordinate is unsigned.
   absz = math.abs(z)
 
-  if p2 > aeps2 ## Continue unless at the poles
+  if p2 > aeps2: ## Continue unless at the poles
 
     ## Compute distance from polar axis.
     p = math.sqrt(p2)

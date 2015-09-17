@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
 import bernutils.products.pyion
+import bernutils.products.pysp3
 import datetime
 
 # set a datetime and a date
@@ -14,4 +15,7 @@ dir = '/home/xanthos/Downloads'
 
 
 #print bernutils.products.pysp3.getNav(dtm, 'G', dir)
-print bernutils.products.pyion.getCodIon(dtm, dir)
+#print bernutils.products.pyion.getCodIon(dtm, dir)
+
+bernutils.products.pysp3.merge_sp3_GR('igs17545.sp3', 'igl17545.sp3', 'merged.sp3')
+
