@@ -18,6 +18,7 @@ Contents:
    bsta
    bpcf
    gpstime
+   geodesy
    products
    webutils
 
