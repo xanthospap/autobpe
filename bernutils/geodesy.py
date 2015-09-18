@@ -55,41 +55,41 @@ class Ellipsoid:
     else:
       raise RuntimeError('Invalid ellipsoid initialization')
 
-    def semiMajorAxis(self):
-      ''' return the Semi-Major Axis (i.e. parameter ``a``)
-      '''
-      return self.__a
+  def semiMajorAxis(self):
+    ''' return the Semi-Major Axis (i.e. parameter ``a``)
+    '''
+    return self.__a
 
-    def flattening(self):
-      ''' return the Flattening (i.e. parameter ``f``)
-      '''
-      return self.__f
+  def flattening(self):
+    ''' return the Flattening (i.e. parameter ``f``)
+    '''
+    return self.__f
 
-    def name(self):
-      ''' return the ellipsoid's name
-      '''
-      return self.__name
+  def name(self):
+    ''' return the ellipsoid's name
+    '''
+    return self.__name
 
-    def eccentricitySquared(self):
-      ''' return the Eccentricity squared (i.e. parameter ``e**2``)
-      '''
-      return ( 2.0e0 - self.__f ) * self.__f
+  def eccentricitySquared(self):
+    ''' return the Eccentricity squared (i.e. parameter ``e**2``)
+    '''
+    return ( 2.0e0 - self.__f ) * self.__f
 
-    def semiMinorAxis(self):
-      ''' return the Semi-Minor Axis (i.e. parameter ``b``)
-      '''
-      return self.__a - self.eccentricitySquared() * self.__a
+  def semiMinorAxis(self):
+    ''' return the Semi-Minor Axis (i.e. parameter ``b``)
+    '''
+    return self.__a - self.eccentricitySquared() * self.__a
 
-    def radiusOfCurvature(self, lat):
-      ''' Compute the normal radious of curvature at a given latitude. See
-          Physical Geodesy, p. 194
-      '''
-      cosf  = math.cos(lat)
-      sinf  = math.sin(lat)
-      acosf = self.__a * cosf
-      bsinf = self.semiMinorAxis() * sinf
-      den   = math.sqrt(acosf*acosf + bsinf*bsinf)
-      return (self.__a * self.__a) / den
+  def radiusOfCurvature(self, lat):
+    ''' Compute the normal radious of curvature at a given latitude. See
+        Physical Geodesy, p. 194
+    '''
+    cosf  = math.cos(lat)
+    sinf  = math.sin(lat)
+    acosf = self.__a * cosf
+    bsinf = self.semiMinorAxis() * sinf
+    den   = math.sqrt(acosf*acosf + bsinf*bsinf)
+    return (self.__a * self.__a) / den
 
 def cartesian2ellipsoidal(x, y, z, ellipsoid=None):
   ''' Given a set of geocentric, cartesian coordinates and optionaly a reference
@@ -124,7 +124,7 @@ def cartesian2ellipsoidal(x, y, z, ellipsoid=None):
     lon = .0e0
 
   ## Ensure that Z-coordinate is unsigned.
-  absz = math.abs(z)
+  absz = abs(z)
 
   if p2 > aeps2: ## Continue unless at the poles
 

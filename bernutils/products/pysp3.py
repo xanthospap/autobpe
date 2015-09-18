@@ -16,6 +16,7 @@ COD_DIR       = bernutils.products.prodgen.COD_DIR
 COD_DIR_2013  = bernutils.products.prodgen.COD_DIR_2013
 IGS_DIR       = bernutils.products.prodgen.IGS_DIR
 IGS_DIR_REP2  = bernutils.products.prodgen.IGS_DIR_REP2
+IGS_DIR_GLO   = bernutils.products.prodgen.IGS_DIR_GLO
 
 def __igs_sp3_all_final__(igs_repro2=False):
   ''' Utility function; do not use as standalone. This function will return the
@@ -25,6 +26,7 @@ def __igs_sp3_all_final__(igs_repro2=False):
 
       :param igs_repro2: Use IGS repro2 (2nd reprocessing campaign) erp products.
 
+      .. warning:: handles gps-only sp3 files.
   '''
   HOST     = IGS_HOST
   if igs_repro2 == True:
@@ -36,10 +38,22 @@ def __igs_sp3_all_final__(igs_repro2=False):
 
   return [[ FILENAME, HOST, DIR ]]
 
+def __igs_sp3_all_final_glo__():
+  ''' Utility function; do not use as standalone. This function will return the
+      filename, host, and hostdir of a valid final igs-generated sp3 file.
+      These information can be later used to download the file.
+
+      .. warning:: handles glonass-only sp3 files.
+
+  '''
+  return [[ 'iglwwwwd.sp3.Z', IGS_HOST, IGS_DIR_GLO+ '/wwww/' ]]
+
 def __igs_sp3_all_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
       filename, host, and hostdir of a valid rapid igs-generated sp3 file.These 
       information can be later used to download the file.
+
+      .. warning:: handles gps-only sp3 files.
 
   '''
   return [[ 'igrwwwwd.sp3.Z', IGS_HOST, IGS_DIR + '/wwww/' ]]
@@ -49,10 +63,25 @@ def __igs_sp3_all_ultra_rapid__():
       filename, host, and hostdir of a valid ultra-rapid igs-generated sp3 file.
       These information can be later used to download the file.
 
+      .. warning:: handles gps-only sp3 files.
+
   '''
   ret_list = []
   for i in xrange(0, 24, 6):
     ret_list.append(['iguwwwwd_%02i.sp3.Z'%i, IGS_HOST, IGS_DIR+ '/wwww/'])
+  return ret_list
+
+def __igs_sp3_all_ultra_rapid_glo__():
+  ''' Utility function; do not use as standalone. This function will return the
+      filename, host, and hostdir of a valid ultra-rapid igs-generated sp3 file.
+      These information can be later used to download the file.
+
+    .. warning:: handles glonass-only sp3 files.
+
+  '''
+  ret_list = []
+  for i in xrange(0, 24, 6):
+    ret_list.append(['igvwwwwd_%02i.sp3.Z'%i, IGS_HOST, IGS_DIR_GLO+ '/wwww/'])
   return ret_list
 
 def __igs_sp3_all_prediction__():
@@ -213,7 +242,7 @@ def __cod_sp3_all_prediction__(str_id='5D'):
 
   return [[ FILENAME, COD_HOST, COD_DIR ]]
 
-def getIgsSp3(datetm, out_dir=None, igs_repro2=False):
+def getIgsSp3Gps(datetm, out_dir=None, igs_repro2=False):
   ''' This function is responsible for downloading an optimal, valid sp3 file
       for a given date. The user-defined input variables can further narrow
       down the possible choices.
@@ -230,15 +259,17 @@ def getIgsSp3(datetm, out_dir=None, igs_repro2=False):
 
       :returns:               A list containing saved file and the remote file.
 
+      .. warning::            handles gps-only sp3 files.
+
       .. note:: 
         #. Parameter ``igs_repro2`` is only relevant to final products
            (else it'll be ignored).
         #. The options here should **exactly match** the ones described in
            the ``products.rst`` file.
-        #. This functions uses :func:`bernutils.products.pyerp.__igs_sp3_all_final__`,
-           :func:`bernutils.products.pyerp.__igs_sp3_all_rapid__`,
-           :func:`bernutils.products.pyerp.__igs_sp3_all_ultra_rapid__` and
-           :func:`bernutils.products.pyerp.__igs_sp3_all_prediction__`.
+        #. This functions uses :func:`bernutils.products.pysp3.__igs_sp3_all_final__`,
+           :func:`bernutils.products.pysp3.__igs_sp3_all_rapid__`,
+           :func:`bernutils.products.pysp3.__igs_sp3_all_ultra_rapid__` and
+           :func:`bernutils.products.pysp3.__igs_sp3_all_prediction__`.
 
   '''
   ## output dir must exist
@@ -313,6 +344,153 @@ def getIgsSp3(datetm, out_dir=None, igs_repro2=False):
     print 'Tries: %1i/%1i Downloaded %s to %s' %(nr_tries, len(options), ret_list[1], ret_list[0])
 
   return ret_list
+
+def getIgsSp3Glo(datetm, out_dir=None):
+  ''' This function is responsible for downloading an optimal, valid sp3 file
+      for a given date. The user-defined input variables can further narrow
+      down the possible choices.
+
+      :param datetm:          The date(time) for wich we want the sp3 information,
+                              as a Python ``datetime.datetime`` or ``dadtetime.date``
+                              instance.
+
+      :param out_dir:         (Optional) Directory where the downloaded file is
+                              to be saved.
+
+      :returns:               A list containing saved file and the remote file.
+
+      .. warning:: handles gps-only sp3 files.
+
+      .. note:: 
+        #. The options here should **exactly match** the ones described in
+           the ``products.rst`` file.
+        #. This functions uses :func:`bernutils.products.pysp3.__igs_sp3_all_final_glo__`,
+           :func:`bernutils.products.pysp3.__igs_sp3_all_ultra_rapid_glo__`.
+
+  '''
+  ## output dir must exist
+  if out_dir and not os.path.isdir(out_dir):
+    raise RuntimeError('Invalid directory: %s -> getIgsSp3.' %out_dir)
+
+  ## transform date to datetime (if needed)
+  if type(datetm) == datetime.date:
+    datetm = datetime.datetime.combine(datetm, datetime.datetime.min.time())
+
+  ## compute delta time (in days) from today
+  dt = datetime.datetime.today() - datetm
+  dt = dt.days + (dt.seconds // 3600) /24.0
+
+  options = []
+
+  ## depending on deltatime, get a list of optional erp files
+  if dt >= 15:
+    options =  __igs_sp3_all_final_glo__()
+  elif dt > -1:
+    options  = __igs_sp3_all_ultra_rapid_glo__()
+  else:
+    raise RuntimeError('DeltaTime two far in the future %+03.1f' %dt)
+
+  ## compute the needed date formats
+  week, sow = bernutils.gpstime.pydt2gps(datetm)
+  dow       = int(datetm.strftime('%w'))
+  iyear     = int(datetm.strftime('%Y'))
+  yy        = int(datetm.strftime('%y'))
+
+  ## need to replace the dates
+  options = [ i.replace('yyyy', ('%04i' %iyear)).replace('wwwwd', ('%04i%01i' %(week, dow))).replace('wwww', ('%04i' %week)).replace('yy', ('%02i' %yy)) for slst in options for i in slst ]
+  options = [ options[x:x+3] for x in xrange(0, len(options), 3) ]
+
+  if __DEBUG_MODE__ == True:
+    print 'Delta days is : %+04.1f' %dt
+    for i in options:
+      print 'will try: ', i
+
+  ## the successeful triple is ..
+  ret_list = []
+  nr_tries = 0
+
+  ##  for every possible sp3 file, see if we can download it. we stop at the
+  ##+ first successeful download.
+  for triple in options:
+    nr_tries += 1
+    try:
+      if out_dir:
+        saveas = os.path.join(out_dir, triple[0])
+      else:
+        saveas = triple[0]
+      info = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
+      ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0])]
+      break
+    except:
+      pass
+
+  if len(ret_list) == 0:
+    raise RuntimeError('Failed to download sp3 file (0/%1i)' %len(options))
+
+  if __DEBUG_MODE__ == True:
+    print 'Tries: %1i/%1i Downloaded %s to %s' %(nr_tries, len(options), ret_list[1], ret_list[0])
+
+  return ret_list
+
+def getIgsSp3(datetm, out_dir=None, use_glonass=False, igs_repro2=False):
+  ''' This function is responsible for downloading an optimal, valid sp3 file
+      for a given date. The user-defined input variables can further narrow
+      down the possible choices.
+
+      :param datetm:          The date(time) for wich we want the sp3 information,
+                              as a Python ``datetime.datetime`` or ``dadtetime.date``
+                              instance.
+
+      :param out_dir:         (Optional) Directory where the downloaded file is
+                              to be saved.
+
+      :param use_glonass:     (Optional) If set to ``True``, then the function will
+                              download both a gps-sp3 file and a glo-sp3 file. The
+                              two will be uncompressed and merged, to a new
+                              file named as the gps-sp3 file, with the exception
+                              that the three first characters will be 'igc' (and
+                              not 'igs', or 'igu', or ...)
+
+      :param igs_repro2:      (Optional) Use IGS 2nd reprocessing campaign 
+                              product files.
+
+      :returns:               A list containing saved file and the remote file(s).
+
+      .. note:: 
+        #. Parameter ``igs_repro2`` is only relevant to final products
+           (else it'll be ignored).
+        #. The options here should **exactly match** the ones described in
+           the ``products.rst`` file.
+
+  '''
+  answer_gps = getIgsSp3Gps(datetm, out_dir, igs_repro2)
+
+  if not use_glonass: return answer_gps
+
+  answer_glo = getIgsSp3Glo(datetm, out_dir)
+
+  gps_sp3_Z = answer_gps[0]
+  gps_sp3   = gps_sp3_Z[0:-2]
+  glo_sp3_Z = answer_glo[0]
+  glo_sp3   = glo_sp3_Z[0:-2]
+
+  # uncompress the files
+  print 'BEFORE DMP'
+  print 'gps file : %s' % gps_sp3_Z
+  bernutils.webutils.de_compress_file(gps_sp3_Z)
+  print 'glo file : %s' % glo_sp3_Z
+  bernutils.webutils.de_compress_file(glo_sp3_Z)
+  print 'AFTER DMP'
+
+  # merge them
+  igs_sp3 = gps_sp3.replace(gps_sp3[0:3], 'igc')
+  merge_sp3_GR(gps_sp3, glo_sp3, igs_sp3)
+
+  # remove individual files
+  os.remove(gps_sp3)
+  os.remove(glo_sp3)
+
+  return [ igs_sp3, [answer_gps[1], answer_glo[1]] ]
 
 def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, igs_repro2=False):
   ''' This function is responsible for downloading an optimal, valid sp3 file
@@ -426,7 +604,7 @@ def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
 
   return ret_list
 
-def getOrb(datetm, ac='cod', out_dir=None, use_repro_13=False, use_one_day_sol=False, igs_repro2=False):
+def getOrb(datetm, ac='cod', out_dir=None, use_glonass=False, use_repro_13=False, use_one_day_sol=False, igs_repro2=False):
   ''' This function is responsible for downloading an optimal, valid sp3/brdc file
       for a given date. The user-defined input variables can further narrow
       down the possible choices.
@@ -443,6 +621,16 @@ def getOrb(datetm, ac='cod', out_dir=None, use_repro_13=False, use_one_day_sol=F
 
       :param out_dir:         (Optional) Directory where the downloaded file is
                               to be saved.
+
+      :param use_glonass:     (Optional) If set to ``True`` and the ac is set to 
+                              ``'igs'``, then the function will
+                              download both a gps-sp3 file and a glo-sp3 file. The
+                              two will be uncompressed and merged, to a new
+                              file named as the gps-sp3 file, with the exception
+                              that the three first characters will be 'igc' (and
+                              not 'igs', or 'igu', or ...). If the ac is ``'cod'``
+                              then this option is skipped, cause CODE sp3 products
+                              include by default glonass orbit information.
 
       :param use_repro_13:    (Optional) Use (or not) REPRO_2013 products (only 
                               an option for final sp3 when the ac is CODE).
@@ -468,7 +656,7 @@ def getOrb(datetm, ac='cod', out_dir=None, use_repro_13=False, use_one_day_sol=F
   if ac == 'cod':
     return getCodSp3(datetm, out_dir, use_repro_13, use_one_day_sol, igs_repro2)
   elif ac == 'igs':
-    return getIgsSp3(datetm, out_dir, igs_repro2)
+    return getIgsSp3(datetm, out_dir, use_glonass, igs_repro2)
   else:
     raise RuntimeError('Invalid Analysis Center: %s.' %ac)
 

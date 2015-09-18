@@ -1,6 +1,8 @@
+import os
 import ftplib
 import urllib2
-import os
+import gzip
+import shutil
 
 def grabHttpFile(url, files, saveas):
   ''' Download file(s) from an http webserver.
@@ -95,3 +97,21 @@ def grabFtpFile(host, dirn, filen, saveas=None, username=None, password=None):
   localfile.close()
 
   return os.path.abspath(saveas), '%s%s%s'%(host, dirn, filen)
+
+# one go (de)compress of files
+def de_compress_file(source_file):
+    ''' compress or decompress a file (in one go);
+        depending on the filename extension, ".gz" is appended to or deleted
+        from the filename
+    '''
+    if source_file[-3:] == ".gz" or source_file[-2:] == ".Z":
+        dst = source_file[:source_file.index(".", -4)]
+        with gzip.open(source_file, 'rb') as input_file, \
+                open(source_file[:-3], 'wb') as output_file:
+            shutil.copyfileobj(input_file, output_file)
+    else:
+        with open(source_file, 'rb') as input_file, \
+                gzip.open('.'.join((source_file, 'gz')), 'wb') as output_file:
+            shutil.copyfileobj(input_file, output_file)
+
+    return 0

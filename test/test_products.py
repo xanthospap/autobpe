@@ -17,5 +17,6 @@ dir = '/home/xanthos/Downloads'
 #print bernutils.products.pysp3.getNav(dtm, 'G', dir)
 #print bernutils.products.pyion.getCodIon(dtm, dir)
 
-bernutils.products.pysp3.merge_sp3_GR('igs17545.sp3', 'igl17545.sp3', 'merged.sp3')
+#bernutils.products.pysp3.merge_sp3_GR('igs17545.sp3', 'igl17545.sp3', 'merged.sp3')
 
+bernutils.products.pysp3.getOrb(dtm, 'igs', dir, use_glonass=True)
