@@ -65,7 +65,7 @@ Class ambfile
 
 
 Examples
-----------
+=========
 
 .. code-block:: python
 
