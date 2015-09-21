@@ -1,0 +1,124 @@
+\subsection{adnq2html}
+\label{adnq2html}
+
+\subsubsection{Purpose}
+\texttt{adnq2html.py} is a Python script to collect information off from a Bernese v5.2
+\texttt{ADDNEQ2} output/summary file and translate it to html format. The result
+should be a self-explanatory, complete html file/page.
+
+The script will read various records and report a lot of information, including
+reference frame, solution statistics, general information, station-specific coordinates,
+etc. The bigest part of the output, is a table holding station entries (e.g. coordinates,
+coordinate corrections, etc).
+
+\subsubsection{Usage}
+\texttt{adnq2html -f [ADDNEQ2 FILE] [OPTIONS]}\\
+at least \texttt{-f} must be specified as command line argument.\\
+
+Switches:
+\begin{itemize}
+\item \texttt{-f --addneq-file=}[ADDNEQ2 FILE]\\
+A valid ADDNEQ2 output file, to extract information from.
+\item \texttt{-t --table-entries=}[FORMAT\_STRING]\\
+This switch (if used) controlls what station-specific information are going to be
+translated and recorded to the output (html) table. The format of this option,
+(i.e. the \texttt{FORMAT\_STRING}) is very strict; a collection of comma-seperated
+substrings is expected, each of which describes a field to appear on the table 
+(in that specific order). The names of the valid substrings is listed in 
+\autoref{tab:format_str}. 
+\underline{Default value is 'latcor,dn,loncor,de,hgtcor,du'}.
+\textbf{example} : \texttt{adnq2html [...] -t latcor,dn,loncor,de,hgtcor,du} will
+create (among other html output) a table with 7 columns, where the first column
+will be the station name, the second the correction (i.e. a-priori $-$ a-posteriori)
+for the Latitude component, the third the correction for Longtitude, the forth
+the correction for Height; the fifth column will hold the dNorth (toppocentric),
+the sixth the dEast and the last the dUp.
+\item \texttt{-w --warnings-str=}[FORMAT\_STRING]\\
+This switch (if used) will trigger warning messages to appear, if a station record
+is outside a given limit. \textit{Of-course, this is only helpful for station-specific 
+fields like coordinate corections, or coordinate sigmas, etc}. The format of this option,
+(i.e. the \texttt{FORMAT\_STRING}) is very strict; it should be created from 
+comma-seperated substrings, each of which describes a field to be checked against 
+a given value. These sub-strings are made-up of thwo parts:
+\begin{enumerate}
+\item the name of a valid field to check, and
+\item limit to check against
+\end{enumerate}
+The two parts are seperated by a \texttt{'='} char. The names of the valid fields 
+to check are listed in \autoref{tab:format_str}.
+\textbf{example} : \texttt{adnq2html [...] -w dn=.001,de=.002,du=.003} will produce a
+warning message, for each station if the dNorth (for the vector a-priori $-$ a-posteriori)
+is larger in \textbf{absolute value} than .001 meters, or if dEast is larger than
+.002 meters of if the dUp is larger than .003 meters.
+\item \texttt{-h --help}\\
+Display (this) help message and exit.
+\item \texttt{-v --version}\\
+Dsiplay version and exit.
+\end{itemize}
+
+\subsubsection{Prerequisites}
+\begin{itemize}
+\item \texttt{bernutils.badnq} Python (library) module.
+\item If enabled, the warning messages emmited from the script use the 
+\href{http://getbootstrap.com/2.3.2/index.html}{Bootstrap framework}
+to produce nice-looking warning boxes. Nothing is needed to do this actually as all required
+elements are just written in the html header, and accessed directly from the browser when
+the file is opened.
+\end{itemize}
+
+\subsubsection{Exit Status}
+On sucess, the program returns \texttt{0}.\\
+Else, the return status is $>$0.
+
+\subsubsection{ToDo}
+\begin{tabular}{l l l}
+Date & What & Status\\
+\hline \\
+SEP, 2015 & We should produce warnings for more entries, not just station-specific info. E.g. a-posteriori rms & \\
+\end{tabular}
+
+\subsubsection{Bugs}
+See \autoref{subsec:bugs1}.
+
+\subsubsection{Format Strings}
+
+\begin{tabular}{l l}\label{tab:format_str}
+String & Meaning \\
+\hline\\
+\texttt{x}   & X-component (estimated)\\
+\texttt{xapr}& X-component (a-priori value)\\
+\texttt{xcor}& X-component (estimated $-$ a-priori)\\
+\texttt{xrms}& X-component (rms)\\
+\hline\\
+\texttt{y}   & Y-component (estimated)\\
+\texttt{yapr}& Y-component (a-priori value)\\
+\texttt{ycor}& Y-component (estimated $-$ a-priori)\\
+\texttt{yrms}& Y-component (rms)\\
+\hline\\
+\texttt{z}   & Z-component (estimated)\\
+\texttt{zapr}& Z-component (a-priori value)\\
+\texttt{zcor}& Z-component (estimated $-$ a-priori)\\
+\texttt{zrms}& Z-component (rms)\\
+\hline\\
+\texttt{lat}   & (ellipsoidal) latitude (estimated)\\
+\texttt{latapr}& latitude (a-priori value)\\
+\texttt{latcor}& latitude (estimated $-$ a-priori)\\
+\texttt{latrms}& latitude (rms)\\
+\hline\\
+\texttt{lon}   & (ellipsoidal) longtitude (estimated)\\
+\texttt{lonapr}& longtitude (a-priori value)\\
+\texttt{loncor}& longtitude (estimated $-$ a-priori)\\
+\texttt{lonrms}& longtitude (rms)\\
+\hline\\
+\texttt{hgt}   & (ellipsoidal) height (estimated)\\
+\texttt{hgtapr}& height (a-priori value)\\
+\texttt{hgtcor}& height (estimated $-$ a-priori)\\
+\texttt{hgtrms}& height (rms)\\
+\hline\\
+\texttt{adj}   & Adjustment option (i.e. Fixed, Free, ...)\\
+\hline\\
+\texttt{dn}    & North (estimated $-$ a-priori)\\
+\texttt{de}    & East (estimated $-$ a-priori)\\
+\texttt{du}    & Up (estimated $-$ a-priori)\\
+\hline
+\end{tabular}
