@@ -749,7 +749,11 @@ class AddneqFile:
       print '<tr>'
       print '<th>%s</th>' %sta
       for frm in format_str.split(','):
-        print '<th>%s</th>' %func_dict[frm](val)
+        param = func_dict[frm](val)
+        if type(param) != str:
+          print '<th>%.4f</th>' %func_dict[frm](val)
+        else:
+          print '<th>%s</th>' %func_dict[frm](val)
       print '</tr>'
 
     print "\t</tbody>"
