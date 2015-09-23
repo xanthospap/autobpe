@@ -77,7 +77,6 @@ ses_identifiers = {
 def executeShellCmd(command):
   ''' This function will execute a shell-like command
   '''
-  
   try:
     p = subprocess.Popen(command, shell=True,
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -86,46 +85,57 @@ def executeShellCmd(command):
   # print >> sys.stderr, output
   # print >> sys.stderr, err
   except:
-    raise ValueError('ERROR. Cannot execute command: ['+command+'].')
+    raise ValueError('ERROR. Cannot execute command: [%s].'%command)
   if returncode:
-    raise ValueError('ERROR. Command failed: ['+command+'].')
+    raise ValueError('ERROR. Command failed: [%s].'%command)
 
-def UnixUncompress(inputf, outputf = '0'):
-  ''' Uncompress the UNIX-compressed file inputf to outputf
+def UnixUncompress(inputf, outputf=None):
+  ''' Uncompress the UNIX-compressed file 'inputf' to 'outputf'
+      Return the uncompressed file-name
   '''
-
-  if outputf == '0':
-    sys_command = 'uncompress -f ' + inputf
+  if not outputf:
+    sys_command = 'uncompress -f %s'%inputf
+    dotZfile    = '%s'%inputf[:-2]
   else:
-    sys_command = 'uncompress -f -c ' + inputf + ' > ' + outputf
+    sys_command = 'uncompress -f -c %s > %s'%(inputf, outputf)
+    dotZfile    = '%s'%outputf
 
   try:
     p = subprocess.Popen(sys_command, shell=True,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, err = p.communicate()
-    returncode = p.returncode
+    returncode  = p.returncode
   except:
-    raise ValueError('ERROR. Cannot uncompress file:'+inputf)
-  if returncode:
-    raise ValueError('ERROR. Cannot uncompress file:'+inputf)
+    raise ValueError('ERROR. Cannot uncompress file: %s'%inputf)
 
-def UnixCompress(inputf, outputf = '0'):
-  ''' Compress the file inputf to outputf using UNIX-compress
+  if returncode:
+    raise ValueError('ERROR. Cannot uncompress file: %s'%inputf)
+
+  return dotZfile
+
+def UnixCompress(inputf, outputf=None):
+  ''' Compress the file inputf to outputf using UNIX-compress.
+      The function will return the name of the compressed file.
   '''
+  sys_command = 'compress -f %s'%inputf
+  dotZfile    = '%s.Z'%inputf
 
-  sys_command = 'compress -f' + inputf
-  if (outputf != inputf) + '.Z' and (outputf != '0') :
-    sys_command += '; mv ' + inputf + '.Z ' + outputf
+  if outputf:
+    sys_command += '; mv %s.Z %s'%(inputf, outputf)
+    dotZfile    = '%s'%outputf
 
   try:
     p = subprocess.Popen(sys_command, shell=True,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, err = p.communicate()
-    returncode = p.returncode
+    returncode  = p.returncode
   except:
-    raise ValueError('ERROR. Cannot compress file:'+inputf)
+    raise ValueError('ERROR. Cannot compress file: %s'%inputf)
+
   if returncode:
-    raise ValueError('ERROR. Cannot compress file:'+inputf)
+    raise ValueError('ERROR. Cannot compress file: %s'%inputf)
+
+  return dotZfile
 
 def getRinexMarkerName(filename):
   ''' Given a rinex filename, this function will search the
@@ -137,74 +147,73 @@ def getRinexMarkerName(filename):
   ufilename = filename
 
   if filename[-2:] == '.Z':
-    ufilename = filename[0:len(filename)-2]
-    UnixUncompress(filename,ufilename)
+    ufilename = UnixUncompress(filename)
 
-  with open(ufilename,'r') as fin:
+  with open(ufilename, 'r') as fin:
     for line in fin.readlines():
-      if line.strip()[60:] == 'MARKER NAME':
+      if line.strip()[60:71] == 'MARKER NAME':
         return line[0:4]
 
-  fin.close()
-  raise ValueError('ERROR. No MARKER NAME in Rinex file:'+ufilename)
+  raise ValueError('ERROR. No MARKER NAME in Rinex file: %s'%ufilename)
 
-def setDownloadCommand(infolist,year='',doy='',month='',dom='',hour='',
-        odir='',toUpperCase=False):
+def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False):
   ''' Given a list (of information) as returned by the database query (for one
-        station), this function will examine the fields and compile the
-        download command and the file to be saved. I.e the return type is
-        [download_command, saved_file], both string elements.
-        The saved file is included in the command (as argument in the '-O' switch,
-        but it is also returned as the second element of the list for ease of use.
+      station), this function will examine the fields and compile the
+      download command and the file to be saved. I.e the return type is
+      [download_command, saved_file], both string elements.
+      The saved file is included in the command (as argument in the '-O' switch,
+      but it is also returned as the second element of the list for ease of use.
 
-        Input params :
-        year = 4-digit year (string)
-        doy  = 3-digit day of year (string)
-        month= 3-digit month (string), e.g. 'Jan'
-        dom  = 2-digit day of month
-        hour = 2-digit hour of day
-        odir = path to where the file is to be saved (string) e.g. /home/bpe/foo/bar
-        toUpperCase = truncate the saved file to uppercase characters
+      Input params :
+      year = 4-digit year (string)
+      doy  = 3-digit day of year (string)
+      month= 3-digit month (string), e.g. 'Jan'
+      dom  = 2-digit day of month
+      hour = 2-digit hour of day
+      odir = path to where the file is to be saved (string) e.g. /home/bpe/foo/bar
+      toUpperCase = truncate the saved file to uppercase characters
 
-        The input array, must have the following fields:
-        [0]  station_id (long int)
-        [1]  station_name_DSO (4-char)
-        [2]  station_name_OFF (4-char), i.e. official name
-        [3]  station_name (long name/location), useful for URANUS network
-        [4]  server_name (string)
-        [5]  server_protocol (char), e.g. ftp, http, ssh
-        [6]  server_domain
-        [7]  path_to_30sec_rnx
-        [8]  path_to_01sec_rnx
-        [9]  username
-        [10] password
-        [11] network
-        e.g. (29L, 'akyr', 'akyr', '', 'NTUA', 'ssh', '147.102.110.69', '/media/WD/data/COMET/_YYYY_/_DDD_/', '/media/WD/data/COMET/_YYYY_/_DDD_/', 'gpsdata', 'gevdais;ia')
+      The input array, must have the following fields:
+      [0]  station_id (long int)
+      [1]  station_name_DSO (4-char)
+      [2]  station_name_OFF (4-char), i.e. official name
+      [3]  station_name (long name/location), useful for URANUS network
+      [4]  server_name (string)
+      [5]  server_protocol (char), e.g. ftp, http, ssh
+      [6]  server_domain
+      [7]  path_to_30sec_rnx
+      [8]  path_to_01sec_rnx
+      [9]  username
+      [10] password
+      [11] network
+      e.g. (29L, 'akyr', 'akyr', '', 'NTUA', 'ssh', '147.102.110.69', '/media/WD/data/COMET/_YYYY_/_DDD_/', '/media/WD/data/COMET/_YYYY_/_DDD_/', 'gpsdata', 'gevdais;ia')
     '''
   ## validate the number of fields
   if len(infolist) != 12:
-    raise ValueError('ERROR. Invalid info list:'+infolist)
+    raise ValueError('ERROR. Invalid info list: [%s]'%str(infolist))
+
+  year, doy, month, dom = dtime.strftime('%Y-%j-%b-%d').split('-')
 
   ## depending on protocol, use scp or wget
-  if infolist[5] == "ssh":
-    command_ = "scp"
-    if infolist[4] == "NTUA": command_ += " -P2754"
+  if infolist[5] == 'ssh':
+    command_ = 'scp'
+    if infolist[4] == 'NTUA': command_ += " -P2754"
   else:
-    command_ = "wget"
+    command_ = 'wget'
     if infolist[9]  != '': command_ += (' --user=' + infolist[9])
     if infolist[10] != '': command_ += (' --password=' + infolist[10])
 
   ## depending on protocol, set the server id
-  if infolist[5] == "ssh":
+  if infolist[5] == 'ssh':
     host_ = infolist[9] + '@' + infolist[6]
-  elif infolist[5] == "ftp":
+  elif infolist[5] == 'ftp':
     host_ = 'ftp://' + infolist[6]
-  elif infolist[5] == "http":
+  elif infolist[5] == 'http':
     host_ = 'http://' + infolist[6]
-  elif infolist[5] == "https":
+  elif infolist[5] == 'https':
     host_ = 'https://' + infolist[6]
   else:
-    raise ValueError('ERROR. Invalid server protocol:'+infolist[5])
+    raise ValueError('ERROR. Invalid server protocol: [%s]'%infolist[5])
   # remove last "/" in host (if any)
   if host_[-1] == '/' : host_ = host_[:-1]
 
@@ -220,14 +229,13 @@ def setDownloadCommand(infolist,year='',doy='',month='',dom='',hour='',
       path_ = path_.replace('_MMMM_',month)
       path_ = path_.replace('_DOM_',dom)
     except:
-      raise ValueError('ERROR. Failed to make URANUS path:'
-         +infolist+' at '+year+'-'+month+'-'+dom)
+      raise ValueError('ERROR. Failed to make URANUS path: [%s]'%(infolist))
 
   ## set the filename (to download)
   session_identifier = '0'
-  if hour != '':
+  if hour != None:
     if not hour in ses_identifiers :
-      raise ValueError('ERROR. Invalid hour of day:', hour)
+      raise ValueError('ERROR. Invalid hour of day: %s'%hour)
     else:
       session_identifier = ses_identifiers[hour];
   filename_ = infolist[2] + doy + session_identifier + '.' + year[2:] + 'd.Z'
@@ -377,14 +385,7 @@ if __name__ == "__main__":
   svfiles  = []
   for row in station_info:
     try:
-      cmd, svfl = setDownloadCommand(row,
-                Year,
-                DoY,
-                sMon,
-                DoM,
-                '',
-                outputdir,
-                touppercase)
+      cmd, svfl = setDownloadCommand(row, dt, None, outputdir, touppercase)
       commands.append(cmd)
       svfiles.append(svfl)
     except ValueError as e:
@@ -392,7 +393,7 @@ if __name__ == "__main__":
 
   ## Now, execute each command in the commands array to actually download
   ## the data.
-  for cmd, sf in zip(commands,svfiles):
+  for cmd, sf in zip(commands, svfiles):
     ## replace variables (_YYYY_, _DDD_ )
     cmd = cmd.replace('_YYYY_', Year)
     cmd = cmd.replace('_DDD_', DoY);

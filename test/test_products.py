@@ -2,6 +2,7 @@
 
 import bernutils.products.pyion
 import bernutils.products.pysp3
+import bernutils.webutils
 import datetime
 
 # set a datetime and a date
@@ -11,7 +12,7 @@ yesterday = datetime.date.today() - datetime.timedelta(1)
 today = datetime.datetime.today()
 
 # path to download files
-dir = '/home/xanthos/Downloads'
+# dir = '/home/xanthos/Downloads'
 
 
 #print bernutils.products.pysp3.getNav(dtm, 'G', dir)
@@ -19,4 +20,12 @@ dir = '/home/xanthos/Downloads'
 
 #bernutils.products.pysp3.merge_sp3_GR('igs17545.sp3', 'igl17545.sp3', 'merged.sp3')
 
-bernutils.products.pysp3.getOrb(dtm, 'igs', dir, use_glonass=True)
+#bernutils.products.pysp3.getOrb(dtm, 'igs', dir, use_glonass=True)
+
+host  = 'ftp.unibe.ch/aiub/'
+dirn  = 'aiub/CODE'
+filen = 'P1C1.DCB'
+
+x = bernutils.webutils.grabFtpFile(host, dirn, filen)
+print x
+
