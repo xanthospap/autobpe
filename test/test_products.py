@@ -12,7 +12,7 @@ yesterday = datetime.date.today() - datetime.timedelta(1)
 today = datetime.datetime.today()
 
 # path to download files
-# dir = '/home/xanthos/Downloads'
+mydir = '/home/xanthos/Downloads'
 
 
 #print bernutils.products.pysp3.getNav(dtm, 'G', dir)
@@ -22,10 +22,10 @@ today = datetime.datetime.today()
 
 #bernutils.products.pysp3.getOrb(dtm, 'igs', dir, use_glonass=True)
 
-host  = 'ftp.unibe.ch/aiub/'
-dirn  = 'aiub/CODE'
-filen = 'P1C1.DCB'
+host  = 'ftp.unibe.ch'
+dirn  = [ 'aiub/CODE', 'aiub/CODE', 'aiub/CODE/2015', 'aiub/BSWUSER52/STA/', 'aiub/CODE']
+filen = ['P1C1.DCB', 'COD.EPH_5D', 'COD18591.TRO.Z', 'IGS.STA', 'P1C1_RINEX.DCB']
+dirs  = mydir
 
-x = bernutils.webutils.grabFtpFile(host, dirn, filen)
+x = bernutils.webutils.grabFtpFile(host, dirn, filen, mydir)
 print x
-

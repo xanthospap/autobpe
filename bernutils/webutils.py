@@ -56,11 +56,14 @@ def grabFtpFile(host, dirn, filen, saveas=None, username=None, password=None):
 
       .. note::
         #. The (input) parameters ``dirn``, ``filen`` and ``saveas`` can be lists,
-           in case we need to download multiple files from a common host. ``filen``
-           and ``saveas`` **MUST** have the same size; if ``dirn`` has only one
-           element, it is supposed that all files to download are placed in the
-           same remote directory; else the size of ``dirn`` must match that of
-           ``filen`` and ``saveas``.
+           in case we need to download multiple files from a common host. if 
+           ``dirn`` has only one element, it is supposed that all files to 
+           download are placed in the same remote directory; else the size of 
+           ``dirn`` must match that of ``filen`` (and maybe ``saveas``). If 
+           ``saveas`` is a string or a list with only one element (if 
+           ``len(filen) > 1``) then it is treated as a **directory**
+           and not a filename, i.e. the file are going to be saved as:
+           os.path.join(saveas, filen[0]), os.path.join(saveas, filen[1]), ...
         #. See the documentation API for a detailed table of valid ``stype``
                 values.
 
@@ -81,11 +84,14 @@ def grabFtpFile(host, dirn, filen, saveas=None, username=None, password=None):
     else:
       if type(saveas) is list and len(saveas) == len(filen):
         pass
+      elif type(saveas) == str or (type(saveas) is list and len(saveas) == 1):
+        saveas = [ os.path.join(saveas, x) for x in filen ]
       else:
-        raise RuntimeError('Invalid arguments for ftp download')
+        raise RuntimeError('Invalid arguments for ftp download (EX1)')
     if type(dirn) is list:
       if len(dirn) != len(filen):
-        raise RuntimeError('Invalid arguments for ftp download')
+        print 'length of dirn=%1i length of filen=%1i' %(len(dirn),len(filen))
+        raise RuntimeError('Invalid arguments for ftp download (EX2)')
     else:
       dirn = len(filen)*[dirn]
   else:
@@ -120,5 +126,9 @@ def grabFtpFile(host, dirn, filen, saveas=None, username=None, password=None):
         raise RuntimeError('Failed to download file: %s' %(host + dir_f + src_f))
 
   ftp.quit()
+
+  ##  protect legacy code in case all input arguments are strings
+  if type(filen) != list:
+    return sucess_dwl[0], sucess_rmt[0]
 
   return sucess_dwl, sucess_rmt
