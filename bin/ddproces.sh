@@ -236,6 +236,7 @@ else
     fi
   else
     echoerr "ERROR. Failed to load variable file: ${B_LOADGPS}"
+    exit 1
   fi
 fi
 
@@ -263,5 +264,5 @@ if ! test -d "${TABLES_DIR}" ; then
 else
   if ! check_tables ${TABLES_DIR} ${CAMPAIGN}; then
     exit 1
-  if
+  fi
 fi
