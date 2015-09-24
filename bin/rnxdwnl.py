@@ -234,6 +234,7 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
   ## set the filename (to download)
   session_identifier = '0'
   if hour != None:
+    print '[WARNING] Using hour-dependent info!'
     if not hour in ses_identifiers :
       raise ValueError('ERROR. Invalid hour of day: %s'%hour)
     else:
@@ -252,7 +253,7 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
   if infolist[5] == "ssh": ## scp -> saved file at the end (no -O switch)
     return (command_ + ' ' + host_ + path_ + filename_ + ' ' + savef_), savef_
   else:
-    return (command_ + ' -O' + savef_ + ' ' + host_ + path_ + filename_), savef_
+    return (command_ + ' -O ' + savef_ + ' ' + host_ + path_ + filename_), savef_
 
 ## Resolve command line arguments
 def main (argv):
@@ -319,7 +320,7 @@ if __name__ == "__main__":
   ## Month as 2-char, e.g. 01 (iMon)
   ## Day of month as 2-char, e.g. 05 (DoM)
   ## Day of year a 3-char, e.g. 157 (DoY)
-  Year, sMon, iMon, DoM, DoY = dt.strftime('%Y-%b-%m-%d-%j').split('-')
+  Year, Cent, sMon, iMon, DoM, DoY = dt.strftime('%Y-%y-%b-%m-%d-%j').split('-')
 
   ##  This list is going to hold station-specific info, for every station to
   ##+ be downloaded
@@ -387,6 +388,7 @@ if __name__ == "__main__":
     ## replace variables (_YYYY_, _DDD_ )
     cmd = cmd.replace('_YYYY_', Year)
     cmd = cmd.replace('_DDD_', DoY);
+    cmd = cmd.replace('_YY_', Cent);
 
     ## Execute the command
     ## WAIT !! do not download the file if it already exists AND has
@@ -397,7 +399,7 @@ if __name__ == "__main__":
       else:
          print '## File %s already exists. Skipping download.'%sf
     else:
-      ## print 'Command = [',cmd,']'
+      ## print 'Command = [%s], station=%s'%(cmd, sf)
       try:
         executeShellCmd(cmd)
       except ValueError as e:

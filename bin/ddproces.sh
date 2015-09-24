@@ -8,7 +8,7 @@
 echoerr () { echo "$@" 1>&2; }
 
 ##  print help message
-help () 
+help ()
 {
 echo "
 /******************************************************************************/
@@ -90,7 +90,6 @@ Switches: -a --analysis-center= specify the analysis center; this can be e.g.
 
           -v --version display version and exit
 /******************************************************************************/"
-
 }
 
 ## validate entries in the TABLES_DIR directory
@@ -120,10 +119,13 @@ DEBUG_MODE=NO
 # DOY=
 # B_LOADGPS=
 # CAMPAIGN=
+# LOGFILE=
 
 ## optional parameters; may be changes via cmd arguments
 SAT_SYS=GPS
 TABLES_DIR=${HOME}/tables
+
+export PATH=${PATH}:/home/bpe2/src/autobpe/bin
 
 # //////////////////////////////////////////////////////////////////////////////
 # GET/EXPAND COMMAND LINE ARGUMENTS
@@ -139,7 +141,7 @@ getopt -T > /dev/null ## check getopt version
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
   ARGS=`getopt -o hvy:d:b:c:s:g: \
--l  help,version,year:,doy:,debug,bern-loadgps:,campaign:,satellite-system:,tables-dir: \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile: \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -169,6 +171,10 @@ do
       ;;
     --debug)
       DEBUG_MODE=YES
+      ;;
+    --logfile)
+      LOGFILE="${2}"
+      shift
       ;;
     -d|--doy) ## remove any leading zeros
       DOY=`echo "${2}" | sed 's|^0||g'`
@@ -268,10 +274,47 @@ else
 fi
 
 # //////////////////////////////////////////////////////////////////////////////
+#  LOGFILE, STDERR & STDOUT
+#  -----------------------------------------------------------------------------
+#  if a logfile is specified, redirect stderr to logfile
+# //////////////////////////////////////////////////////////////////////////////
+if test -z ${LOGFILE+x}; then
+  :
+else
+  # Close STDERR FD
+  exec 2<&-
+  # Open STDERR as $LOGFILE file for read and write.
+  exec 2>&1
+fi
+
+# //////////////////////////////////////////////////////////////////////////////
 #  DOWNLOAD RINEX FILES
 #  -----------------------------------------------------------------------------
 #  Use the program rnxdwnl.py to download all available rinex files for
-#  the selcted network. The downloaded files are going to be located at the
+#  the selected network. The downloaded files are going to be located at the
 #  DATAPOOL area. Note that some of them may already exist.
 # //////////////////////////////////////////////////////////////////////////////
+if ! rnxdwnl.py \
+              --networks=${CAMPAIGN} \
+              --year=${YEAR} \
+              --doy=${DOY} \
+              --path=${D} \
+              1>&2; then
+  echoerr "ERROR. Failed to download RINEX files -> [rnxdwnl.py]"
+  exit 1
+fi
 
+if ! validate_ntwrnx.py \
+            --year=${YEAR} \
+            --doy=${DOY} \
+            --fix-file=/home/bpe2/tables/fix/IGB08.FIX \
+            --no-marker-numbers \
+            --network=${CAMPAIGN} \
+            --rinex-path=${D} \
+            --no-marker-numbers \
+            1>&2 | tee .rnxsta.dat ; then
+  echoerr "ERROR. Failed to compile rinex/station summary -> [validate_ntwrnx.py]"
+  exit 1
+fi
+
+exit 0

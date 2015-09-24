@@ -37,5 +37,5 @@ m_password='gevdais;ia'
 dirn=['~/tables/sta/', '~/tables/atx/']
 filen=['toadd', 'ash111661.atx' ]
 
-x = bernutils.webutils.grabSshFile(m_host, dirn, filen, saveas='/home/xanthos/Downloads', s_username=m_username, s_password=m_password, s_port=m_port)
+x = bernutils.webutils.grabSshFile(m_host, dirn, filen, saveas='/home/bpe2/cron', s_username=m_username, s_password=m_password, s_port=m_port)
 print x
