@@ -3,10 +3,9 @@ import ftplib
 import urllib2
 import gzip
 import shutil
-
 ## paramiko for ssh/scp
-## from paramiko import SSHClient
-## from scp import SCPClient
+from paramiko import SSHClient
+from scp import SCPClient
 
 def grabHttpFile(url, files, saveas):
   ''' Download file(s) from an http webserver.
@@ -37,6 +36,47 @@ def grabHttpFile(url, files, saveas):
     return_list.append([webfile, os.path.abspath(j)])
 
   return return_list
+
+def grabSshFile(host, dirn, filen, saveas=None, s_username=None, s_password=None, s_port=None):
+  '''
+  '''
+  client = SSHClient()
+  client.load_system_host_keys()
+  #client.set_missing_host_key_policy(AutoAddPolicy())
+  client.connect(host, username=s_username, password=s_password, port=s_port)
+
+  if type(filen) is list:
+    if not saveas:
+      saveas = filen
+    else:
+      if type(saveas) is list and len(saveas) == len(filen):
+        pass
+      elif type(saveas) == str or (type(saveas) is list and len(saveas) == 1):
+        saveas = [ os.path.join(saveas, x) for x in filen ]
+      else:
+        raise RuntimeError('Invalid arguments for ssh download (EX1)')
+    if type(dirn) is list:
+      if len(dirn) != len(filen):
+        print 'length of dirn=%1i length of filen=%1i' %(len(dirn),len(filen))
+        raise RuntimeError('Invalid arguments for ssh download (EX2)')
+    else:
+      dirn = len(filen)*[dirn]
+  else:
+    filen = [ filen ]
+    dirn  = [ dirn ]
+    if not saveas:
+      saveas = filen
+    else:
+      saveas = [ saveas ]
+  ##  now we should have:
+  ##+ three lists (filen, saveas, dirn), all with the same # of elements, or
+
+  sucess_dwl = []
+  sucess_rmt = []
+
+  with SCPClient(ssh.get_transport()) as m_scp:
+    for src_f, dst_f, dir_f in zip(filen, saveas, dirn):
+      m_scp.get(os.path.join(dir_f, src_f))
 
 def grabFtpFile(host, dirn, filen, saveas=None, username=None, password=None):
   ''' Download a file from an ftp server.
@@ -130,5 +170,5 @@ def grabFtpFile(host, dirn, filen, saveas=None, username=None, password=None):
   ##  protect legacy code in case all input arguments are strings
   if type(filen) != list:
     return sucess_dwl[0], sucess_rmt[0]
-
-  return sucess_dwl, sucess_rmt
+  else:
+    return [ [x,y] for x,y in zip(sucess_dwl, sucess_rmt) ]

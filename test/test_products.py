@@ -22,10 +22,20 @@ mydir = '/home/xanthos/Downloads'
 
 #bernutils.products.pysp3.getOrb(dtm, 'igs', dir, use_glonass=True)
 
-host  = 'ftp.unibe.ch'
-dirn  = [ 'aiub/CODE', 'aiub/CODE', 'aiub/CODE/2015', 'aiub/BSWUSER52/STA/', 'aiub/CODE']
-filen = ['P1C1.DCB', 'COD.EPH_5D', 'COD18591.TRO.Z', 'IGS.STA', 'P1C1_RINEX.DCB']
-dirs  = mydir
+#host  = 'ftp.unibe.ch'
+#dirn  = [ 'aiub/CODE', 'aiub/CODE', 'aiub/CODE/2015', 'aiub/BSWUSER52/STA/', 'aiub/CODE']
+#filen = ['P1C1.DCB', 'COD.EPH_5D', 'COD18591.TRO.Z', 'IGS.STA', 'P1C1_RINEX.DCB']
+#dirs  = mydir
 
-x = bernutils.webutils.grabFtpFile(host, dirn, filen, mydir)
-print x
+#x = bernutils.webutils.grabFtpFile(host, dirn, filen, mydir)
+#print x
+
+m_host='147.102.110.69'
+m_port=2754
+m_username='bpe2'
+m_password='gevdais;ia'
+dirn='~/tables/sta/'
+filen='toadd'
+
+bernutils.webutils.grabSshFile(m_host, dirn, filen, saveas=None, s_username=m_username, s_password=m_password, s_port=m_port)
+

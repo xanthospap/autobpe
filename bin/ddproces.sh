@@ -266,3 +266,12 @@ else
     exit 1
   fi
 fi
+
+# //////////////////////////////////////////////////////////////////////////////
+#  DOWNLOAD RINEX FILES
+#  -----------------------------------------------------------------------------
+#  Use the program rnxdwnl.py to download all available rinex files for
+#  the selcted network. The downloaded files are going to be located at the
+#  DATAPOOL area. Note that some of them may already exist.
+# //////////////////////////////////////////////////////////////////////////////
+

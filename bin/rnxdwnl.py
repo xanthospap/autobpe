@@ -286,19 +286,9 @@ def main (argv):
     elif opt in ('-y', '--year'):
       global year
       year = arg
-      #try:
-      #  year = int(arg)
-      #  except:
-      #    print >> sys.stderr, 'Invalid year: %s'%arg
-      #    sys.exit(1)
     elif opt in ('-d', '--doy'):
       global doy
       doy = arg
-      #try:
-      #  doy = int(arg)
-      #except:
-      #  print >> sys.stderr, 'Invalid day of year: %s', %arg
-      #  sys.exit(1)
     elif opt in ('-u', '--uppercase'):
       global touppercase
       touppercase = True
