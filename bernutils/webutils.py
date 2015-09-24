@@ -4,7 +4,7 @@ import urllib2
 import gzip
 import shutil
 ## paramiko for ssh/scp
-from paramiko import SSHClient
+import paramiko
 from scp import SCPClient
 
 def grabHttpFile(url, files, saveas):
@@ -40,9 +40,9 @@ def grabHttpFile(url, files, saveas):
 def grabSshFile(host, dirn, filen, saveas=None, s_username=None, s_password=None, s_port=None):
   '''
   '''
-  client = SSHClient()
+  client = paramiko.SSHClient()
   client.load_system_host_keys()
-  #client.set_missing_host_key_policy(AutoAddPolicy())
+  client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
   client.connect(host, username=s_username, password=s_password, port=s_port)
 
   if type(filen) is list:
@@ -74,9 +74,13 @@ def grabSshFile(host, dirn, filen, saveas=None, s_username=None, s_password=None
   sucess_dwl = []
   sucess_rmt = []
 
-  with SCPClient(ssh.get_transport()) as m_scp:
+  with SCPClient(client.get_transport()) as m_scp:
     for src_f, dst_f, dir_f in zip(filen, saveas, dirn):
-      m_scp.get(os.path.join(dir_f, src_f))
+      m_scp.get(os.path.join(dir_f, src_f), dst_f)
+      sucess_dwl.append(os.path.abspath(dst_f))
+      sucess_rmt.append(('%s@'%s_username) + os.path.join(host, dir_f, src_f))
+
+  return [ [x,y] for x,y in zip(sucess_dwl, sucess_rmt) ]
 
 def grabFtpFile(host, dirn, filen, saveas=None, username=None, password=None):
   ''' Download a file from an ftp server.

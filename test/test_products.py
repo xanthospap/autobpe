@@ -34,8 +34,8 @@ m_host='147.102.110.69'
 m_port=2754
 m_username='bpe2'
 m_password='gevdais;ia'
-dirn='~/tables/sta/'
-filen='toadd'
+dirn=['~/tables/sta/', '~/tables/atx/']
+filen=['toadd', 'ash111661.atx' ]
 
-bernutils.webutils.grabSshFile(m_host, dirn, filen, saveas=None, s_username=m_username, s_password=m_password, s_port=m_port)
-
+x = bernutils.webutils.grabSshFile(m_host, dirn, filen, saveas='/home/xanthos/Downloads', s_username=m_username, s_password=m_password, s_port=m_port)
+print x

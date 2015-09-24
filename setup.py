@@ -12,7 +12,8 @@ config = {
     'version': '0.1',
     'packages': ['bernutils', 'bernutils.products'],
     'scripts': [],
-    'name': 'bernpy'
+    'name': 'bernpy',
+    'install_requires': ['paramiko', 'scp']
 }
 
 setup(**config)
