@@ -45,9 +45,9 @@ HOST_NAME     = '147.102.110.73'
 USER_NAME     = 'bpe2'
 PASSWORD      = 'webadmin'
 DB_NAME       = 'procsta'
-NETWORK       = ''
-YEAR          = 0
-DOY           = 0
+NETWORK       = None
+YEAR          = None
+DOY           = None
 FIX_FILE      = '/home/bpe2/tables/fix/IGb08.FIX'
 PTH2RNX       = '/home/bpe2/data/DATAPOOL'
 SESSION       = '0'
@@ -118,6 +118,9 @@ if __name__ == "__main__":
   if len(SESSION) != 1:
     print >>sys.stderr, 'Invalid session identifier: %s'%(SESSION)
     sys.exit(1)
+  if not NETWORK:
+     print >>sys.stderr, 'ERROR. Need to specify network name'
+     sys.exit(1)
 
   ## read all lines from the .FIX file
   with open(FIX_FILE, 'r') as f:

@@ -127,9 +127,9 @@ TABLES_DIR=${HOME}/tables
 
 export PATH=${PATH}:/home/bpe2/src/autobpe/bin
 
-# //////////////////////////////////////////////////////////////////////////////
-# GET/EXPAND COMMAND LINE ARGUMENTS
-# //////////////////////////////////////////////////////////////////////////////
+## ////////////////////////////////////////////////////////////////////////////
+## GET/EXPAND COMMAND LINE ARGUMENTS
+## ////////////////////////////////////////////////////////////////////////////
 
 ##  we nee to have at least some cmd arguments
 if test $# -eq "0"; then help; fi
@@ -213,9 +213,9 @@ do
   shift
 done
 
-# //////////////////////////////////////////////////////////////////////////////
-# VALIDATE COMMAND LINE ARGUMENTS
-# //////////////////////////////////////////////////////////////////////////////
+## ////////////////////////////////////////////////////////////////////////////
+## VALIDATE COMMAND LINE ARGUMENTS
+## ////////////////////////////////////////////////////////////////////////////
 
 ##  year must be set
 if test -z ${YEAR+x}; then
@@ -273,27 +273,39 @@ else
   fi
 fi
 
-# //////////////////////////////////////////////////////////////////////////////
-#  LOGFILE, STDERR & STDOUT
-#  -----------------------------------------------------------------------------
-#  if a logfile is specified, redirect stderr to logfile
-# //////////////////////////////////////////////////////////////////////////////
+## ////////////////////////////////////////////////////////////////////////////
+##  LOGFILE, STDERR & STDOUT
+##  ---------------------------------------------------------------------------
+##  if a logfile is specified, redirect stderr to logfile
+## ////////////////////////////////////////////////////////////////////////////
 if test -z ${LOGFILE+x}; then
   :
 else
-  # Close STDERR FD
+  # Close STDERR fd
   exec 2<&-
   # Open STDERR as $LOGFILE file for read and write.
   exec 2>&1
 fi
 
-# //////////////////////////////////////////////////////////////////////////////
-#  DOWNLOAD RINEX FILES
-#  -----------------------------------------------------------------------------
-#  Use the program rnxdwnl.py to download all available rinex files for
-#  the selected network. The downloaded files are going to be located at the
-#  DATAPOOL area. Note that some of them may already exist.
-# //////////////////////////////////////////////////////////////////////////////
+## ////////////////////////////////////////////////////////////////////////////
+##  DOWNLOAD RINEX FILES
+##  ---------------------------------------------------------------------------
+##  Use the program rnxdwnl.py to download all available rinex files for
+##  the selected network. The downloaded files are going to be located at the
+##  DATAPOOL area. Note that some of them may already exist (in which case they
+##  are not going to be re-downloaded but they will be used).
+##
+##  The validate_ntwrnx.py script is then used to produce an informative table;
+##  this table is used to filter/crete arrays holding the available rinex files
+##  and the respective station names.
+##
+##  Lastly, copy and uncompress the files in the campaign directory.
+## ////////////////////////////////////////////////////////////////////////////
+
+>.rnxsta.dat ## temporary file
+
+##  download the rinex files for the input network; the database knows 
+##+ the details .... Call rnxdwnl.py
 if ! rnxdwnl.py \
               --networks=${CAMPAIGN} \
               --year=${YEAR} \
@@ -304,6 +316,8 @@ if ! rnxdwnl.py \
   exit 1
 fi
 
+##  make a table with available rinex/station names, reference stations, etc ..
+##  dump output to the .rnxsta.dat file (filter it later on)
 if ! validate_ntwrnx.py \
             --year=${YEAR} \
             --doy=${DOY} \
@@ -312,9 +326,42 @@ if ! validate_ntwrnx.py \
             --network=${CAMPAIGN} \
             --rinex-path=${D} \
             --no-marker-numbers \
-            1>&2 | tee .rnxsta.dat ; then
+            1> .rnxsta.dat; then
   echoerr "ERROR. Failed to compile rinex/station summary -> [validate_ntwrnx.py]"
   exit 1
 fi
+
+declare -a RNX_ARRAY     ##  array to hold available rinex files;
+                         ##+ no path; compressed
+declare -a STA_ARRAY     ##  array to hold available station names
+declare -a REF_STA_ARRAY ##  array to hold available reference stations
+MAX_NET_STA=             ##  nr of stations in the network
+
+mapfile -t STA_ARRAY < <(filter_available_stations.awk .rnxsta.dat)
+mapfile -t RNX_ARRAY < <(filter_available_rinex.awk .rnxsta.dat)
+mapfile -t REF_STA_ARRAY < <(filter_available_reference.awk .rnxsta.dat)
+MAX_NET_STA=$(cat .rnxsta.dat | tail -n+2 | wc -l)
+
+## basic validation; make sure nothing went terribly wrong!
+if [[ $MAX_NET_STA -lt 0 \
+      || ${#STA_ARRAY[@]} -ne ${#RNX_ARRAY[@]} \
+      || ! -f .rnxsta.dat ]]; then
+  echoerr "ERROR! Error in handling rinex files/station names!"
+  exit 1
+fi
+
+rm .rnxsta.dat ## remove temporary; no longer needed
+
+## make sure number reference stations > 4
+if test ${#REF_STA_ARRAY[@]} -lt 5; then
+  echoerr "ERROR. Two few reference stations (${#REF_STA_ARRAY[@]}); \
+    processing stoped."
+  exit 1
+fi
+
+echo "Number of stations available: ${#STA_ARRAY[@]}/${MAX_NET_STA}"
+echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
+
+
 
 exit 0
