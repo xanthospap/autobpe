@@ -20,7 +20,8 @@ mydir = '/home/bpe2/src'
 
 #bernutils.products.pysp3.merge_sp3_GR('igs17545.sp3', 'igl17545.sp3', 'merged.sp3')
 
-x = bernutils.products.pysp3.getOrb(dtm, ac='igs', out_dir=mydir, use_glonass=True)
+#x = bernutils.products.pysp3.getOrb(date=dtm, ac='igs', out_dir=mydir, use_glonass=True)
+x = bernutils.products.pysp3.getOrb(year=2015, doy=1, ac='igs', out_dir=mydir, use_glonass=True)
 print x
 
 #host  = 'ftp.unibe.ch'

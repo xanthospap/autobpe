@@ -1,5 +1,8 @@
-#! /usr/bin/python
+#! /bin/bash
 
+echo "Hallo from bash!"
+
+python - <<END
 class Foo:
 
   def __init__(self, i=1):
@@ -18,3 +21,7 @@ def use_member_fun(f_str='f1'):
   mf_dict[f_str](f)
 
 use_member_fun()
+END
+
+echo "Exit from Python ok!"
+exit 0

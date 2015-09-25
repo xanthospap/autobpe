@@ -8,7 +8,7 @@ import bernutils.webutils
 import bernutils.products.prodgen
 import bernutils.products.pysp3_mrg
 
-__DEBUG_MODE__ = True
+__DEBUG_MODE__ = False
 
 COD_HOST      = bernutils.products.prodgen.COD_HOST
 IGS_HOST      = bernutils.products.prodgen.IGS_HOST
@@ -603,7 +603,7 @@ def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
 
   return ret_list
 
-def getOrb(datetm, ac='cod', out_dir=None, use_glonass=False, use_repro_13=False, use_one_day_sol=False, igs_repro2=False):
+def obsolete_getOrb(datetm, ac='cod', out_dir=None, use_glonass=False, use_repro_13=False, use_one_day_sol=False, igs_repro2=False):
   ''' This function is responsible for downloading an optimal, valid sp3/brdc file
       for a given date. The user-defined input variables can further narrow
       down the possible choices.
@@ -658,6 +658,73 @@ def getOrb(datetm, ac='cod', out_dir=None, use_glonass=False, use_repro_13=False
     return getIgsSp3(datetm, out_dir, use_glonass, igs_repro2)
   else:
     raise RuntimeError('Invalid Analysis Center: %s.' %ac)
+
+def getOrb(**kwargs):
+  ''' This function is responsible for downloading an optimal, valid sp3/brdc file
+      for a given date. The user-defined input variables can further narrow
+      down the possible choices.
+
+      :param datetm:          The date(time) for wich we want the orbit information,
+                              as a Python ``datetime.datetime`` or ``dadtetime.date``
+                              instance.
+
+      :param ac:             (Optional) Choose the Analysis Center; default is
+                              ``'cod'``. The valid string for this option are:
+
+                              * ``'cod'`` is CODE analysis center
+                              * ``'igs'`` is IGS
+
+      :param out_dir:         (Optional) Directory where the downloaded file is
+                              to be saved.
+
+      :param use_glonass:     (Optional) If set to ``True`` and the ac is set to 
+                              ``'igs'``, then the function will
+                              download both a gps-sp3 file and a glo-sp3 file. The
+                              two will be uncompressed and merged, to a new
+                              file named as the gps-sp3 file, with the exception
+                              that the three first characters will be 'igc' (and
+                              not 'igs', or 'igu', or ...). If the ac is ``'cod'``
+                              then this option is skipped, cause CODE sp3 products
+                              include by default glonass orbit information.
+
+      :param use_repro_13:    (Optional) Use (or not) REPRO_2013 products (only 
+                              an option for final sp3 when the ac is CODE).
+
+      :param use_one_day_sol: (Optional) Use the clean, one-day-solution (only 
+                              an option for final sp3 when the ac is CODE).
+
+      :param igs_repro2:      (Optional) Use IGS 2nd reprocessing campaign 
+                              product files.
+
+      :returns:               A list containing saved file and the remote file.
+
+      .. note::
+
+        #. Parameters ``use_repro_13``, ``use_one_day_sol`` and ``igs_repro2``
+           are only relevant to final products (else they'll be ignored).
+        #. Final, one-day-solutions and igs repro2 erp's are only available at
+           the CDDIS ftp host.
+
+  '''
+  _args = { 'ac': 'cod', 'out_dir': None, 'use_glonass': False, 'use_repro_13': False, 'use_one_day_sol': False, 'igs_repro2': False }
+  _args.update(**kwargs)
+
+  if 'date' in kwargs:
+    datetm = kwargs['date']
+  else:
+    if 'year' not in kwargs or 'doy' not in kwargs:
+      raise RuntimeError('Should provide YEAR and DoY.')
+    else:
+      datetm = datetime.datetime.strptime('%s-%s'%(kwargs['year'], kwargs['doy']), '%Y-%j').date()
+
+  ## Do nothing :) just pass arguments to the ac-specific function
+  if _args['ac'].lower() == 'cod':
+    return getCodSp3(datetm, _args['out_dir'], _args['use_repro_13'], _args['use_one_day_sol'], _args['igs_repro2'])
+  elif _args['ac'].lower() == 'igs':
+    return getIgsSp3(datetm, _args['out_dir'], _args['use_glonass'], _args['igs_repro2'])
+  else:
+    raise RuntimeError('Invalid Analysis Center: %s.' %_args['ac'])
+
 
 def getNav(datetm, sat_sys='G', out_dir=None, station=None, hour=None):
   ''' This function will download a broadcast orbit file, either an accumulated one

@@ -124,6 +124,7 @@ DEBUG_MODE=NO
 ## optional parameters; may be changes via cmd arguments
 SAT_SYS=GPS
 TABLES_DIR=${HOME}/tables
+AC=COD
 
 export PATH=${PATH}:/home/bpe2/src/autobpe/bin
 
@@ -161,6 +162,10 @@ while true
 do
   case "$1" in
 
+    -a|--analysis-center)
+      AC="${2}"
+      shift
+      ;;
     -b|--bern-loadgps)
       B_LOADGPS="${2}"
       shift
@@ -386,8 +391,43 @@ echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
 ##
 ## ////////////////////////////////////////////////////////////////////////////
 
-## download the sp3 file
+## download the sp3, erp file
 python - <<END
+import sys
+import bernutils.products.pysp3
+import bernutils.products.pyerp
+import datetime
 
+try:
+  datetm = datetime.datetime.strptime('%s-%s'%('${YEAR}', '${DOY}'), \
+    '%Y-%j').date()
+except:
+  print >>sys.stderr, 'ERROR. Failed to parse date!.'
+  sys.exit(1)
+
+ussr = True
+if '$SAT_SYS' == 'gps' or '$SAT_SYS' == 'GPS':
+  ussr = False
+
+try:
+  info_list_sp3 = bernutils.products.pysp3.getOrb(date=datetm, \
+    ac='${AC}', \
+    out_dir='${D}', \
+    use_glonass=ussr)
+except:
+  print >>sys.stderr, 'ERROR. Failed to download orbit information.'
+  sys.exit(1)
+
+try:
+  info_list_erp = bernutils.products.pyerp.getErp(year='${YEAR}', \
+    doy='${DOY}', \
+    ac='${AC}', \
+    out_dir='${D}')
+except:
+  print >>sys.stderr, 'ERROR. Failed to download erp information.'
+  sys.exit(1)
+
+sys.exit(0)
+END
 
 exit 0
