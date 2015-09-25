@@ -12,7 +12,7 @@ NR==1 {
   if (answ == "Yes")
   {
     rinex = substr($0, 0, 16)
-    gsub(/[[:blank:]]+$/, "", rinex)
-    printf "%-15s\n", rinex
+    gsub(/ *$/, "", rinex)
+    print rinex
   }
 }

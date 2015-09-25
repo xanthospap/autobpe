@@ -12,7 +12,7 @@ NR==1 {
   if (answ == "Yes")
   {
     name = substr($0, 17, 16)
-    gsub(/[[:blank:]]+$/, "", name)
-    printf "%-16s\n", name
+    gsub(/ *$/, "", name)
+    print name
   }
 }

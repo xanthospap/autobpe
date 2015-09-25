@@ -359,6 +359,17 @@ if test ${#REF_STA_ARRAY[@]} -lt 5; then
   exit 1
 fi
 
+## transfer all available rinex to RAW/ and uncompress them
+for i in "${RNX_ARRAY[@]}"; do
+  RNX=${i}
+  cp ${D}/${RNX} ${P}/${CAMPAIGN}/RAW/            ## copy to RAW/
+  uncompress -f ${P}/${CAMPAIGN}/RAW/${RNX}       ## uncompress (strip .Z)
+  crx2rnx ${P}/${CAMPAIGN}/RAW/${RNX%.Z}          ## crx2rnx change d^ to o^
+  j=${RNX/%d.Z/o}                                 ## new rinex name ...
+  j=${j^^}                                        ## .. to uppercase
+  mv ${P}/${CAMPAIGN}/RAW/${RNX/%d.Z/o} ${P}/${CAMPAIGN}/RAW/${j}
+done
+
 echo "Number of stations available: ${#STA_ARRAY[@]}/${MAX_NET_STA}"
 echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
 
