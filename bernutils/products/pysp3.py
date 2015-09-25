@@ -470,27 +470,26 @@ def getIgsSp3(datetm, out_dir=None, use_glonass=False, igs_repro2=False):
   answer_glo = getIgsSp3Glo(datetm, out_dir)
 
   gps_sp3_Z = answer_gps[0]
-  gps_sp3   = gps_sp3_Z[0:-2]
   glo_sp3_Z = answer_glo[0]
-  glo_sp3   = glo_sp3_Z[0:-2]
 
   # uncompress the files
-  print 'BEFORE DMP'
-  print 'gps file : %s' % gps_sp3_Z
-  bernutils.webutils.de_compress_file(gps_sp3_Z)
-  print 'glo file : %s' % glo_sp3_Z
-  bernutils.webutils.de_compress_file(glo_sp3_Z)
-  print 'AFTER DMP'
+  gps_sp3 = bernutils.webutils.UnixUncompress(gps_sp3_Z)
+  glo_sp3 = bernutils.webutils.UnixUncompress(glo_sp3_Z)
 
   # merge them
-  igs_sp3 = gps_sp3.replace(gps_sp3[0:3], 'igc')
+  _basename = os.path.basename(gps_sp3)
+  _dir      = os.path.dirname(gps_sp3)
+  igs_sp3   = os.path.join(_dir, _basename.replace(_basename[0:3], 'igc'))
   merge_sp3_GR(gps_sp3, glo_sp3, igs_sp3)
 
   # remove individual files
   os.remove(gps_sp3)
   os.remove(glo_sp3)
 
-  return [ igs_sp3, [answer_gps[1], answer_glo[1]] ]
+  # compress the merged file
+  igs_sp3_dotZ = bernutils.webutils.UnixCompress(igs_sp3)
+
+  return [ igs_sp3_dotZ, [answer_gps[1], answer_glo[1]] ]
 
 def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, igs_repro2=False):
   ''' This function is responsible for downloading an optimal, valid sp3 file

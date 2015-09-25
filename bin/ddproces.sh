@@ -299,7 +299,8 @@ fi
 ##  this table is used to filter/crete arrays holding the available rinex files
 ##  and the respective station names.
 ##
-##  Lastly, copy and uncompress the files in the campaign directory.
+##  Lastly, copy and uncompress (.Z && crx2rnx) the files in the campaign
+##  directory /RAW.
 ## ////////////////////////////////////////////////////////////////////////////
 
 >.rnxsta.dat ## temporary file
@@ -361,18 +362,32 @@ fi
 
 ## transfer all available rinex to RAW/ and uncompress them
 for i in "${RNX_ARRAY[@]}"; do
-  RNX=${i}
-  cp ${D}/${RNX} ${P}/${CAMPAIGN}/RAW/            ## copy to RAW/
-  uncompress -f ${P}/${CAMPAIGN}/RAW/${RNX}       ## uncompress (strip .Z)
-  crx2rnx ${P}/${CAMPAIGN}/RAW/${RNX%.Z}          ## crx2rnx change d^ to o^
-  j=${RNX/%d.Z/o}                                 ## new rinex name ...
-  j=${j^^}                                        ## .. to uppercase
-  mv ${P}/${CAMPAIGN}/RAW/${RNX/%d.Z/o} ${P}/${CAMPAIGN}/RAW/${j}
+  if RNX=${i} \
+        && cp ${D}/${RNX} ${P}/${CAMPAIGN}/RAW/ \
+        && uncompress -f ${P}/${CAMPAIGN}/RAW/${RNX} \
+        && crx2rnx -f ${P}/${CAMPAIGN}/RAW/${RNX%.Z} \
+        && j=${RNX/%d.Z/o} \
+        && j=${j^^} \
+        && mv ${P}/${CAMPAIGN}/RAW/${RNX/%d.Z/o} ${P}/${CAMPAIGN}/RAW/${j}
+  then
+    :
+  else
+    echoerr "ERROR. Failed to manipulate rinex file ${RNX}"
+    exit 1
+  fi
 done
 
 echo "Number of stations available: ${#STA_ARRAY[@]}/${MAX_NET_STA}"
 echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
 
+## ////////////////////////////////////////////////////////////////////////////
+##  DOWNLOAD PRODUCTS
+##  ---------------------------------------------------------------------------
+##
+## ////////////////////////////////////////////////////////////////////////////
+
+## download the sp3 file
+python - <<END
 
 
 exit 0

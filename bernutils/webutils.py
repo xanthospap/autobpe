@@ -6,6 +6,8 @@ import shutil
 ## paramiko for ssh/scp
 import paramiko
 from scp import SCPClient
+## system calls
+import subprocess
 
 def grabHttpFile(url, files, saveas):
   ''' Download file(s) from an http webserver.
@@ -176,3 +178,51 @@ def grabFtpFile(host, dirn, filen, saveas=None, username=None, password=None):
     return sucess_dwl[0], sucess_rmt[0]
   else:
     return [ [x,y] for x,y in zip(sucess_dwl, sucess_rmt) ]
+
+def UnixUncompress(inputf, outputf=None):
+  ''' Uncompress the UNIX-compressed file 'inputf' to 'outputf'
+      Return the uncompressed file-name
+  '''
+  if not outputf:
+    sys_command = 'uncompress -f %s'%inputf
+    dotZfile    = '%s'%inputf[:-2]
+  else:
+    sys_command = 'uncompress -f -c %s > %s'%(inputf, outputf)
+    dotZfile    = '%s'%outputf
+
+  try:
+    p = subprocess.Popen(sys_command, shell=True,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, err = p.communicate()
+    returncode  = p.returncode
+  except:
+    raise ValueError('ERROR. Cannot uncompress file: %s (1)'%inputf)
+
+  if returncode:
+    raise ValueError('ERROR. Cannot uncompress file: %s (2)'%inputf)
+
+  return dotZfile
+
+def UnixCompress(inputf, outputf=None):
+  ''' Compress the file inputf to outputf using UNIX-compress.
+      The function will return the name of the compressed file.
+  '''
+  sys_command = 'compress -f %s'%inputf
+  dotZfile    = '%s.Z'%inputf
+
+  if outputf:
+    sys_command += '; mv %s.Z %s'%(inputf, outputf)
+    dotZfile    = '%s'%outputf
+
+  try:
+    p = subprocess.Popen(sys_command, shell=True,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, err = p.communicate()
+    returncode  = p.returncode
+  except:
+    raise ValueError('ERROR. Cannot compress file: %s (1)'%inputf)
+
+  if returncode:
+    raise ValueError('ERROR. Cannot compress file: %s (2)'%inputf)
+
+  return dotZfile
