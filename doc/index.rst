@@ -15,9 +15,11 @@ Contents:
    bamb
    bcrd
    bgps
+   badnq
    bsta
    bpcf
    gpstime
+   geodesy
    products
    webutils
 

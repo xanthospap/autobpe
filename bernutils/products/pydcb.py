@@ -136,8 +136,13 @@ def getCodDcb(stype, datetm, out_dir=None):
     saveas   = filename
     if out_dir: saveas = os.path.join(out_dir, filename)
     try:
-      localfile, webfile = _getFinalDcb_(iyear,filename,saveas)
-      return localfile, webfile
+      ## we should get answer of type: [ [localfile, webfile] ]
+      ret_list = _getFinalDcb_(iyear,filename,saveas)
+      if len(ret_list) != 1:
+        raise RuntimeError('ERROR. got more files than expected!')
+      localfile  = ret_list[0][0]
+      remotefile = ret_list[0][1]
+      return localfile, remotefile
     except:
       raise
   else:

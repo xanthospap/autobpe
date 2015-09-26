@@ -1,12 +1,11 @@
 import os
 import datetime
 import ftplib
-
 import bernutils.gpstime
 import bernutils.webutils
 import bernutils.products.prodgen
 
-__DEBUG_MODE__ = True
+__DEBUG_MODE__ = False
 
 erp_type = {'d': 'CODwwww7.ERP.Z',
   'f': 'cofwwww7.erp.Z',
@@ -482,7 +481,7 @@ def getCodErp(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
 
   return ret_list
 
-def getErp(datetm, ac='cod', out_dir=None, use_repro_13=False, use_one_day_sol=False, igs_repro2=False):
+def getErp(**kwargs):
   ''' This function is responsible for downloading an optimal, valid erp file
       for a given date. The user-defined input variables can further narrow
       down the possible choices.
@@ -519,10 +518,21 @@ def getErp(datetm, ac='cod', out_dir=None, use_repro_13=False, use_one_day_sol=F
 
   '''
 
-  ## Do nothing :) just pass arguments to the ac-specific function
-  if ac == 'cod':
-    return getCodErp(datetm, out_dir, use_repro_13, use_one_day_sol, igs_repro2)
-  elif ac == 'igs':
-    return getIgsErp(datetm, out_dir, igs_repro2)
+  _args = { 'ac': 'cod', 'out_dir': None, 'use_repro_13': False, 'use_one_day_sol': False, 'igs_repro2': False }
+  _args.update(**kwargs)
+
+  if 'date' in kwargs:
+    datetm = kwargs['date']
   else:
-    raise RuntimeError('Invalid Analysis Center: %s.' %ac)
+    if 'year' not in kwargs or 'doy' not in kwargs:
+      raise RuntimeError('Should provide YEAR and DoY.')
+    else:
+      datetm = datetime.datetime.strptime('%s-%s'%(kwargs['year'], kwargs['doy']), '%Y-%j').date()
+
+  ## Do nothing :) just pass arguments to the ac-specific function
+  if _args['ac'].lower() == 'cod':
+    return getCodErp(datetm, _args['out_dir'], _args['use_repro_13'], _args['use_one_day_sol'], _args['igs_repro2'])
+  elif _args['ac'].lower() == 'igs':
+    return getIgsErp(datetm, _args['out_dir'], _args['igs_repro2'])
+  else:
+    raise RuntimeError('Invalid Analysis Center: %s.' %_args['ac'])

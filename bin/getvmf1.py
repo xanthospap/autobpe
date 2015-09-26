@@ -123,8 +123,6 @@ saveas_list = list(request_list)
 if OUT_DIR != '':
     for i, f in enumerate(saveas_list):
         saveas_list[i] = os.path.join(OUT_DIR,f)
-print request_list
-print saveas_list
 try:
     retlist = bernutils.webutils.grabHttpFile(URL,request_list,saveas_list)
 except Exception, e:

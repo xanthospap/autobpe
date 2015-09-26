@@ -337,6 +337,8 @@ Available sp3-formated files from CODE are (see [aiub-ftp-readme]_):
     #. **cf2wwww7.eph.Z** from (CDDIS)/repro2/wwww/, and
     #. **co22wwww7.eph.Z** from (CDDIS)/repro2/wwww/
 
+.. note:: CODE's sp3 orbit files include GLONASS information.
+
 The function used to download a CODE-generated erp is 
 :func:`bernutils.products.pysp3.getCodSp3`.
 
@@ -375,16 +377,25 @@ The function used to download a CODE-generated erp is
 IGS AC
 -------
 
+.. warning:: IGS sp3 products are not multi-gnss; that means that glonass and gps
+  sp3 files are different (they have different names).
+
+Gps - Sp3
+________________________________________________________________________________
+
 Available SP3 files from IGS are (see [igs-products]_):
 
 * **Ultra-Rapid** (predicted half) iguwwwwd_[00|06|12|18].sp3.Z
 * **Ultra-Rapid** (observed half) iguwwwwd_[00|06|12|18].sp3.Z
 * **Rapid** igrwwwwd.sp3.Z
-* **Final** igswwwwd.sp.Z
+* **Final** igswwwwd.sp3.Z
 * **ig2yyPwwwwd.sp3.Z** igs repro2 sp3 files (in /products/repro2 area)
 
-The function used to download an igs-generated erp file is 
-:func:`bernutils.products.pysp3.getIgsSp3`.
+  .. warning:: These files, i.e. ig2yyPwwwwd.sp3.Z are (at least for now) not
+    available.
+
+The function used to download an igs-generated gps-specific sp3 file is 
+:func:`bernutils.products.pysp3.getIgsSp3Gps`.
 
 +-------------------+--------------------+--------+---------------------------------------------+
 |                   |                    | FLAGS  |                                             |
@@ -409,6 +420,37 @@ The function used to download an igs-generated erp file is
 +-------------------+--------------------+--------+---------------------------------------------+
 | [-15, -1)         |                        -                                                  |
 +-------------------+--------------------+--------+---------------------------------------------+
+
+Glonass - Sp3
+________________________________________________________________________________
+
+Available SP3 files from IGS are (see [igs-products]_):
+
+* **Ultra-Rapid** igvwwwwd_[00|06|12|18].sp3.Z
+* **Final** igvwwwwd.sp3.Z
+
+The function used to download an igs-generated glonass-specific sp3 file is 
+:func:`bernutils.products.pysp3.getIgsSp3Glo`.
+
++-------------------+--------------------+---------------------------------------------+
+| today - dt (days) | File to download   |  HOST + DIR                                 |
++===================+====================+=============================================+
+| >= 15.0           | iglwwwwd.sp3.Z     | (CDDIS)/wwww/                               |
++-------------------+--------------------+--------+------------------------------------+
+| [-1, 15)          | First search for a valid final sp3 (as above)                    |
+|                   +--------------------+---------------------------------------------+
+|                   | igvwwwwd._HH.sp3.Z | (CDDIS)/wwww/                               |
++-------------------+--------------------+---------------------------------------------+
+
+Mixed - Sp3
+________________________________________________________________________________
+
+To download mixed sp3 files (i.e. containing both GPS and GLONASS records), use the
+funvtion :func:`bernutils.products.pysp3.getIgsSp3`. This function will use the
+satellite-system-specific functions (:func:`bernutils.products.pysp3.getIgsSp3Gps`
+and :func:`bernutils.products.pysp3.getIgsSp3Glo`) to download the two files (the 
+gps-only and the glonass-only) and then will merge the two files in a new file
+designated with the characters **'igc'**.
 
 
 Broadcast Satellite Orbit files (NAV)
