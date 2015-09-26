@@ -296,16 +296,16 @@ fi
 ##  DOWNLOAD RINEX FILES
 ##  ---------------------------------------------------------------------------
 ##  Use the program rnxdwnl.py to download all available rinex files for
-##  the selected network. The downloaded files are going to be located at the
-##  DATAPOOL area. Note that some of them may already exist (in which case they
-##  are not going to be re-downloaded but they will be used).
+##+ the selected network. The downloaded files are going to be located at the
+##+ DATAPOOL area. Note that some of them may already exist (in which case they
+##+ are not going to be re-downloaded but they will be used).
 ##
 ##  The validate_ntwrnx.py script is then used to produce an informative table;
-##  this table is used to filter/crete arrays holding the available rinex files
-##  and the respective station names.
+##+ this table is used to filter/crete arrays holding the available rinex files
+##+ and the respective station names.
 ##
 ##  Lastly, copy and uncompress (.Z && crx2rnx) the files in the campaign
-##  directory /RAW.
+##+ directory /RAW.
 ## ////////////////////////////////////////////////////////////////////////////
 
 >.rnxsta.dat ## temporary file
@@ -388,18 +388,24 @@ echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD PRODUCTS
 ##  ---------------------------------------------------------------------------
+##  Just call Python to do the job!
 ##
+##  If any product fails, then trigger an error and exit (!=0).
+##
+##  Depending on the time-lag between today and the day we are processing,
+##+ the following will download the best possible products; for more info, see
+##+ the bernutils module documentation.
 ## ////////////////////////////////////////////////////////////////////////////
 
-## download the sp3, erp file
+## download the sp3, erp, dcb file
 python - <<END
-import sys
+import sys, datetime, traceback
 import bernutils.products.pysp3
 import bernutils.products.pyerp
-import datetime
+import bernutils.products.pydcb
 
 try:
-  datetm = datetime.datetime.strptime('%s-%s'%('${YEAR}', '${DOY}'), \
+  py_date = datetime.datetime.strptime('%s-%s'%('${YEAR}', '${DOY}'), \
     '%Y-%j').date()
 except:
   print >>sys.stderr, 'ERROR. Failed to parse date!.'
@@ -409,25 +415,76 @@ ussr = True
 if '$SAT_SYS' == 'gps' or '$SAT_SYS' == 'GPS':
   ussr = False
 
+error_at = 0
 try:
-  info_list_sp3 = bernutils.products.pysp3.getOrb(date=datetm, \
+  info_list_sp3 = bernutils.products.pysp3.getOrb(date=py_date, \
     ac='${AC}', \
     out_dir='${D}', \
     use_glonass=ussr)
-except:
-  print >>sys.stderr, 'ERROR. Failed to download orbit information.'
-  sys.exit(1)
+  error_at += 1
 
-try:
-  info_list_erp = bernutils.products.pyerp.getErp(year='${YEAR}', \
-    doy='${DOY}', \
+  info_list_erp = bernutils.products.pyerp.getErp(date=py_date, \
     ac='${AC}', \
     out_dir='${D}')
-except:
-  print >>sys.stderr, 'ERROR. Failed to download erp information.'
+  error_at += 1
+
+  info_list_dcb = bernutils.products.pydcb.getCodDcb(stype='c1_rnx', \
+    datetm=py_date, \
+    out_dir='${D}')
+  error_at += 1
+
+except Exception, e:
+  ## where was the exception thrown ?
+  if error_at == 0:
+    print >>sys.stderr, 'ERROR. Failed to download orbit information.'
+  elif error_at == 1:
+    print >>sys.stderr, 'ERROR. Failed to download erp information.'
+  elif error_at == 2:
+    print >>sys.stderr, 'ERROR. Failed to download dcb information.'
+  else:
+    print >>sys.stderr, 'WTF! Should have come been here!'
+  ## log exception/stack call
+  print >>sys.stderr,'*** Stack Rewind:'
+  exc_type, exc_value, exc_traceback = sys.exc_info()
+  traceback.print_exception(exc_type, exc_value, exc_traceback, \
+    limit=10, file=sys.stderr)
+  print >>sys.stderr,'*** End'
+  ## exit with error
   sys.exit(1)
 
 sys.exit(0)
 END
+
+## ////////////////////////////////////////////////////////////////////////////
+##  DOWNLOAD VMF1 GRID
+##  ---------------------------------------------------------------------------
+##  Just call Python to do the job (again)!
+##
+##  Download 5 grid files: 4 for the day we are processing and one for the
+##+ first 6 hours of the next day (a bernese thing). We need to merge all
+##+ files to a final one.
+## ////////////////////////////////////////////////////////////////////////////
+
+## temporary file to hold getvmf1.py output
+TMP_FL=.vmf1-${YEAR}${DOY}.dat
+
+if ! getvmf1.py --year=${YEAR} --doy=${DOY} --outdir=${D} 1> ${TMP_FL}; then
+  echoerr "ERROR. Failed to get VMF1 grid file(s)"
+  exit 1
+fi
+
+##  grid files are downloaded to ${D} as individual files; merge them and move
+##+ to /GRID
+if ! mapfile -t VMF_FL_ARRAY < <(filter_local_vmf1.awk ${TMP_FL}) ; then
+  echoerr "ERROR. Failed to merge VMF1 grid file(s)"
+  exit 1
+else
+  MERGED_VMF_FILE=${P}/${CAMPAIGN}/GRD/VMF1_${YEAR}${DOY}.
+  >${MERGED_VMF_FILE}
+  for fl in ${VMF_FL_ARRAY[@]}; do
+    cat ${fl} >> ${MERGED_VMF_FILE}
+  done
+fi
+
 
 exit 0

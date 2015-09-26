@@ -173,11 +173,7 @@ def grabFtpFile(host, dirn, filen, saveas=None, username=None, password=None):
 
   ftp.quit()
 
-  ##  protect legacy code in case all input arguments are strings
-  if type(filen) != list:
-    return sucess_dwl[0], sucess_rmt[0]
-  else:
-    return [ [x,y] for x,y in zip(sucess_dwl, sucess_rmt) ]
+  return [ [x,y] for x,y in zip(sucess_dwl, sucess_rmt) ]
 
 def UnixUncompress(inputf, outputf=None):
   ''' Uncompress the UNIX-compressed file 'inputf' to 'outputf'
