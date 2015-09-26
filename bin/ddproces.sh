@@ -125,6 +125,7 @@ DEBUG_MODE=NO
 SAT_SYS=GPS
 TABLES_DIR=${HOME}/tables
 AC=COD
+STATIONS_PER_CLUSTER=3
 
 export PATH=${PATH}:/home/bpe2/src/autobpe/bin
 
@@ -142,7 +143,7 @@ getopt -T > /dev/null ## check getopt version
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
   ARGS=`getopt -o hvy:d:b:c:s:g: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile: \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -195,6 +196,18 @@ do
       ;;
     -s|--satellite-system)
       SAT_SYS="${2^^}"
+      if test ${SAT_SYS} != "GPS" && test ${SAT_SYS} != "MIXED" ; then
+        echoerr "ERROR. Invalid satellite system : ${SAT_SYS}"
+        exit 1
+      fi
+      shift
+      ;;
+    --stations-per-cluster)
+      STATIONS_PER_CLUSTER="${2}"
+      if ! [[ $STATIONS_PER_CLUSTER =~ ^[0-9]+$ ]] ; then
+        echoerr "ERROR. stations-per-cluster must be a positive integer!"
+        exit 1
+      fi
       shift
       ;;
     -v|--version)
@@ -234,8 +247,8 @@ if test -z ${DOY+x}; then
   exit 1
 fi
 
-##  bernese-variable file must be set; if it is, check that it exists and source
-##+ it.
+##  bernese-variable file must be set; if it is, check that it exists 
+##+ and source it.
 if test -z ${B_LOADGPS+x}; then
   echoerr "ERROR. LOADGPS.setvar must be set!"
   exit 1
@@ -263,10 +276,6 @@ else
   fi
 fi
 
-if test ${SAT_SYS} != "GPS" && test ${SAT_SYS} != "MIXED" ; then
-  echoerr "ERROR. Invalid satellite system : ${SAT_SYS}"
-  exit 1
-fi
 
 ##  check the tables dir and its entries
 if ! test -d "${TABLES_DIR}" ; then
@@ -382,6 +391,11 @@ for i in "${RNX_ARRAY[@]}"; do
   fi
 done
 
+##  dump all (available) station names to a file for later use; one station
+##+ per line.
+>.station-names.dat
+for sta in "${STA_ARRAY[@]}"; do echo $sta >> .station-names.dat; done
+
 echo "Number of stations available: ${#STA_ARRAY[@]}/${MAX_NET_STA}"
 echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
 
@@ -396,7 +410,7 @@ echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
 ##+ the following will download the best possible products; for more info, see
 ##+ the bernutils module documentation.
 ## ////////////////////////////////////////////////////////////////////////////
-
+if test 1 -eq 2; then
 ## download the sp3, erp, dcb file
 python - <<END
 import sys, datetime, traceback
@@ -454,7 +468,7 @@ except Exception, e:
 
 sys.exit(0)
 END
-
+fi
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD VMF1 GRID
 ##  ---------------------------------------------------------------------------
@@ -464,7 +478,7 @@ END
 ##+ first 6 hours of the next day (a bernese thing). We need to merge all
 ##+ files to a final one.
 ## ////////////////////////////////////////////////////////////////////////////
-
+if test 1 -eq 2; then
 ## temporary file to hold getvmf1.py output
 TMP_FL=.vmf1-${YEAR}${DOY}.dat
 
@@ -485,6 +499,23 @@ else
     cat ${fl} >> ${MERGED_VMF_FILE}
   done
 fi
+fi
+rm ${TMP_FL} ## remove temporary file
 
+## ////////////////////////////////////////////////////////////////////////////
+##  MAKE THE CLUSTER FILE
+##  ---------------------------------------------------------------------------
+##  Using the array holding the stations names of all available stations (i.e.
+##+ STA_ARRAY), we will create the cluster file: NETWORK_NAME.CLU placed in
+##+ the /STA folder.
+##
+##  Each cluster cannot have more than STATIONS_PER_CLUSTER stations.
+## ////////////////////////////////////////////////////////////////////////////
+
+CLUSTER_FILE=${P}/${CAMPAIGN}/STA/${CAMPAIGN}.CLU
+
+awk -v num_of_clu=${STATIONS_PER_CLUSTER} -f \
+  make_cluster_file.awk .station-names.dat \
+  1>${CLUSTER_FILE}
 
 exit 0
