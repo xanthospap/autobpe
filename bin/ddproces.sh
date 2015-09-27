@@ -120,12 +120,17 @@ DEBUG_MODE=NO
 # B_LOADGPS=
 # CAMPAIGN=
 # LOGFILE=
+# SOLUTION_ID=
+# SAVE_DIR=
 
 ## optional parameters; may be changes via cmd arguments
 SAT_SYS=GPS
 TABLES_DIR=${HOME}/tables
 AC=COD
 STATIONS_PER_CLUSTER=3
+FILES_PER_CLUSTER=7
+ELEVATION_ANGLE=3
+PCF_FILE=NTUA_DDP.PCF
 
 export PATH=${PATH}:/home/bpe2/src/autobpe/bin
 
@@ -142,8 +147,8 @@ getopt -T > /dev/null ## check getopt version
 
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
-  ARGS=`getopt -o hvy:d:b:c:s:g: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster \
+  ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e: \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle: \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -163,6 +168,14 @@ while true
 do
   case "$1" in
 
+    -r|--save-dir)
+      SAVE_DIR="${2}"
+      shift
+      ;;
+    -i|--solution-id)
+      SOLUTION_ID="${2}"
+      shift
+      ;;
     -a|--analysis-center)
       AC="${2}"
       shift
@@ -206,6 +219,22 @@ do
       STATIONS_PER_CLUSTER="${2}"
       if ! [[ $STATIONS_PER_CLUSTER =~ ^[0-9]+$ ]] ; then
         echoerr "ERROR. stations-per-cluster must be a positive integer!"
+        exit 1
+      fi
+      shift
+      ;;
+    --files-per-cluster)
+      FILES_PER_CLUSTER="${2}"
+      if ! [[ $FILES_PER_CLUSTER =~ ^[0-9]+$ ]]; then
+        echoerr "ERROR. files-per-cluster must be a positive integer!"
+        exit 1
+      fi
+      shift
+      ;;
+    -e|--elevation-angle)
+      ELEVATION_ANGLE="${2}"
+      if ! [[ $ELEVATION_ANGLE =~ ^[0-9]+$ ]]; then
+        echoerr "ERROR. Elevation angle must be a positive integer!"
         exit 1
       fi
       shift
@@ -284,6 +313,25 @@ if ! test -d "${TABLES_DIR}" ; then
 else
   if ! check_tables ${TABLES_DIR} ${CAMPAIGN}; then
     exit 1
+  fi
+fi
+
+##  solution id must be set
+if test -z ${SOLUTION_ID+x}; then
+  echoerr "ERROR. Solution identifier must be set!"
+  exit 1
+fi
+
+##  save directoy must be set; if it doesn't exist, try to create it
+if test -z ${SAVE_DIR+x}; then
+  echoerr "ERROR. Save directory must be set!"
+  exit 1
+else
+  if ! test -d ${SAVE_DIR}; then
+    if ! mkdir -p ${SAVE_DIR}; then
+      echoerr "ERROR. Failed to create directory ${SAVE_DIR}"
+      exit 1
+    fi
   fi
 fi
 
@@ -517,5 +565,86 @@ CLUSTER_FILE=${P}/${CAMPAIGN}/STA/${CAMPAIGN}.CLU
 awk -v num_of_clu=${STATIONS_PER_CLUSTER} -f \
   make_cluster_file.awk .station-names.dat \
   1>${CLUSTER_FILE}
+
+## ////////////////////////////////////////////////////////////////////////////
+##  SET SOLUTION IDENTIFIERS
+##  ---------------------------------------------------------------------------
+##  The solution id provided by the user will be reserved for the final,
+##+ ambiguity-fixed results; hence, we need to name two more kinds of results,
+##+ 1. the preliminary (ambiguity-float) and
+##+ 2. the size-reduced
+##
+##  Preliminary results are going to be named exactly as the final ones,
+##+ except for the last character which will be changed to 'P'. If this is 
+##+ already the last character of the final solution id, then append '1'.
+##
+##  Size-reduced results are going to be named exactly as the final ones,
+##+ except for the last character which will be changed to 'R'. If this is 
+##+ already the last character of the final solution id, then append '1'.
+##
+##  e.g. --solution-id=FFG will result to:
+##+      FINAL_SOLUTION_ID   = 'FFG'
+##+      PRELIM_SOLUTION_ID  = 'FFP'
+##+      REDUCED_SOLUTION_ID = 'FFR'
+##
+##  e.g. --solution-id=FFR will result to:
+##+      FINAL_SOLUTION_ID   = 'FFR'
+##+      PRELIM_SOLUTION_ID  = 'FFP'
+##+      REDUCED_SOLUTION_ID = 'FFR1'
+## ////////////////////////////////////////////////////////////////////////////
+
+##  Final (ambiguity-fixed) results
+FINAL_SOLUTION_ID="${SOLUTION_ID}"
+
+##  Preliminary (ambiguity-float) results
+if test "${FINAL_SOLUTION_ID:(-1)}" == "P"; then
+  echoerr -n "WARNING. Last char of final solution is 'P'."
+  PRELIM_SOLUTION_ID="${SOLUTION_ID%?}P1"
+  echoerr "Truncating Preliminary to $PRELIM_SOLUTION_ID"
+else
+  PRELIM_SOLUTION_ID="${SOLUTION_ID%?}P"
+fi
+
+##  Size-reduced NEQ information
+if test "${FINAL_SOLUTION_ID:(-1)}" == "R"; then
+  echoerr -n "WARNING. Last char of final solution is 'R'."
+  REDUCED_SOLUTION_ID="${SOLUTION_ID%?}R1"
+  echoerr "Truncating Size-reduced to $REDUCED_SOLUTION_ID"
+else
+  REDUCED_SOLUTION_ID="${SOLUTION_ID%?}R"
+fi
+
+## ////////////////////////////////////////////////////////////////////////////
+##  SET VARIABLES IN THE PCF FILE
+##  ---------------------------------------------------------------------------
+## ////////////////////////////////////////////////////////////////////////////
+
+##  Bernese has no 'MIXED' satellite system; this defaults to 'GPS/GLO'.
+if test "${SAT_SYS}" == "MIXED"; then
+  BERN_SAT_SYS="GPS/GLO"
+else 
+  BERN_SAT_SYS="${SAT_SYS}"
+fi
+
+if ! test -f ${U}/PCF/${PCF_FILE}; then
+  echoerr "ERROR. Invalid pcf file ${U}/PCF/${PCF_FILE}"
+  exit 1
+fi
+
+if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" \
+        B="${AC^^}" \
+        C="${PRELIM_SOLUTION_ID}" \
+        E="${FINAL_SOLUTION_ID}" \
+        F="${REDUCED_SOLUTION_ID}" \
+        BLQINF="${CAMPAIGN}" \
+        ATLINF="${CAMPAIGN}" \
+        SATSYS="${BERN_SAT_SYS}" \
+        PCV="I08" \
+        PCVINF="PCV_${CAMPAIGN:0:3}" \
+        ELANG="${ELEVATION_ANGLE}" \
+        CLU="${FILES_PER_CLUSTER}"; then
+  echoerr "ERROR. Failed to set variables in PCF file."
+  exit 1
+fi
 
 exit 0
