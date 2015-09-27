@@ -120,12 +120,17 @@ DEBUG_MODE=NO
 # B_LOADGPS=
 # CAMPAIGN=
 # LOGFILE=
+# SOLUTION_ID=
+# SAVE_DIR=
 
 ## optional parameters; may be changes via cmd arguments
 SAT_SYS=GPS
 TABLES_DIR=${HOME}/tables
 AC=COD
 STATIONS_PER_CLUSTER=3
+FILES_PER_CLUSTER=7
+ELEVATION_ANGLE=3
+PCF_FILE=NTUA_DDP.PCF
 
 export PATH=${PATH}:/home/bpe2/src/autobpe/bin
 
@@ -142,8 +147,8 @@ getopt -T > /dev/null ## check getopt version
 
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
-  ARGS=`getopt -o hvy:d:b:c:s:g: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster \
+  ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e: \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle: \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -163,6 +168,14 @@ while true
 do
   case "$1" in
 
+    -r|--save-dir)
+      SAVE_DIR="${2}"
+      shift
+      ;;
+    -i|--solution-id)
+      SOLUTION_ID="${2}"
+      shift
+      ;;
     -a|--analysis-center)
       AC="${2}"
       shift
@@ -206,6 +219,22 @@ do
       STATIONS_PER_CLUSTER="${2}"
       if ! [[ $STATIONS_PER_CLUSTER =~ ^[0-9]+$ ]] ; then
         echoerr "ERROR. stations-per-cluster must be a positive integer!"
+        exit 1
+      fi
+      shift
+      ;;
+    --files-per-cluster)
+      FILES_PER_CLUSTER="${2}"
+      if ! [[ $FILES_PER_CLUSTER =~ ^[0-9]+$ ]]; then
+        echoerr "ERROR. files-per-cluster must be a positive integer!"
+        exit 1
+      fi
+      shift
+      ;;
+    -e|--elevation-angle)
+      ELEVATION_ANGLE="${2}"
+      if ! [[ $ELEVATION_ANGLE =~ ^[0-9]+$ ]]; then
+        echoerr "ERROR. Elevation angle must be a positive integer!"
         exit 1
       fi
       shift
@@ -287,6 +316,25 @@ else
   fi
 fi
 
+##  solution id must be set
+if test -z ${SOLUTION_ID+x}; then
+  echoerr "ERROR. Solution identifier must be set!"
+  exit 1
+fi
+
+##  save directoy must be set; if it doesn't exist, try to create it
+if test -z ${SAVE_DIR+x}; then
+  echoerr "ERROR. Save directory must be set!"
+  exit 1
+else
+  if ! test -d ${SAVE_DIR}; then
+    if ! mkdir -p ${SAVE_DIR}; then
+      echoerr "ERROR. Failed to create directory ${SAVE_DIR}"
+      exit 1
+    fi
+  fi
+fi
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  LOGFILE, STDERR & STDOUT
 ##  ---------------------------------------------------------------------------
@@ -316,7 +364,7 @@ fi
 ##  Lastly, copy and uncompress (.Z && crx2rnx) the files in the campaign
 ##+ directory /RAW.
 ## ////////////////////////////////////////////////////////////////////////////
-
+if test 1 -eq 2; then
 >.rnxsta.dat ## temporary file
 
 ##  download the rinex files for the input network; the database knows 
@@ -398,7 +446,7 @@ for sta in "${STA_ARRAY[@]}"; do echo $sta >> .station-names.dat; done
 
 echo "Number of stations available: ${#STA_ARRAY[@]}/${MAX_NET_STA}"
 echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
-
+fi
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD PRODUCTS
 ##  ---------------------------------------------------------------------------
@@ -410,65 +458,19 @@ echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
 ##+ the following will download the best possible products; for more info, see
 ##+ the bernutils module documentation.
 ## ////////////////////////////////////////////////////////////////////////////
-if test 1 -eq 2; then
-## download the sp3, erp, dcb file
-python - <<END
-import sys, datetime, traceback
-import bernutils.products.pysp3
-import bernutils.products.pyerp
-import bernutils.products.pydcb
-
-try:
-  py_date = datetime.datetime.strptime('%s-%s'%('${YEAR}', '${DOY}'), \
-    '%Y-%j').date()
-except:
-  print >>sys.stderr, 'ERROR. Failed to parse date!.'
-  sys.exit(1)
-
-ussr = True
-if '$SAT_SYS' == 'gps' or '$SAT_SYS' == 'GPS':
-  ussr = False
-
-error_at = 0
-try:
-  info_list_sp3 = bernutils.products.pysp3.getOrb(date=py_date, \
-    ac='${AC}', \
-    out_dir='${D}', \
-    use_glonass=ussr)
-  error_at += 1
-
-  info_list_erp = bernutils.products.pyerp.getErp(date=py_date, \
-    ac='${AC}', \
-    out_dir='${D}')
-  error_at += 1
-
-  info_list_dcb = bernutils.products.pydcb.getCodDcb(stype='c1_rnx', \
-    datetm=py_date, \
-    out_dir='${D}')
-  error_at += 1
-
-except Exception, e:
-  ## where was the exception thrown ?
-  if error_at == 0:
-    print >>sys.stderr, 'ERROR. Failed to download orbit information.'
-  elif error_at == 1:
-    print >>sys.stderr, 'ERROR. Failed to download erp information.'
-  elif error_at == 2:
-    print >>sys.stderr, 'ERROR. Failed to download dcb information.'
-  else:
-    print >>sys.stderr, 'WTF! Should have come been here!'
-  ## log exception/stack call
-  print >>sys.stderr,'*** Stack Rewind:'
-  exc_type, exc_value, exc_traceback = sys.exc_info()
-  traceback.print_exception(exc_type, exc_value, exc_traceback, \
-    limit=10, file=sys.stderr)
-  print >>sys.stderr,'*** End'
-  ## exit with error
-  sys.exit(1)
-
-sys.exit(0)
-END
+if test 1 -eq 1; then
+if ! handle_dd_products.py \
+        --year="${YEAR}" \
+        --doy="${DOY}" \
+        --analysis-center="${AC}" \
+        --datapool="${D}" \
+        --destination="${P}/${CAMPAIGN}/ORB" \
+        --satellite-system="${SAT_SYS}" ; then
+  echoerr "ERROR. Failed to download/copy/uncompress products."
+  exit 1
 fi
+fi
+exit 0
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD VMF1 GRID
 ##  ---------------------------------------------------------------------------
@@ -517,5 +519,86 @@ CLUSTER_FILE=${P}/${CAMPAIGN}/STA/${CAMPAIGN}.CLU
 awk -v num_of_clu=${STATIONS_PER_CLUSTER} -f \
   make_cluster_file.awk .station-names.dat \
   1>${CLUSTER_FILE}
+
+## ////////////////////////////////////////////////////////////////////////////
+##  SET SOLUTION IDENTIFIERS
+##  ---------------------------------------------------------------------------
+##  The solution id provided by the user will be reserved for the final,
+##+ ambiguity-fixed results; hence, we need to name two more kinds of results,
+##+ 1. the preliminary (ambiguity-float) and
+##+ 2. the size-reduced
+##
+##  Preliminary results are going to be named exactly as the final ones,
+##+ except for the last character which will be changed to 'P'. If this is 
+##+ already the last character of the final solution id, then append '1'.
+##
+##  Size-reduced results are going to be named exactly as the final ones,
+##+ except for the last character which will be changed to 'R'. If this is 
+##+ already the last character of the final solution id, then append '1'.
+##
+##  e.g. --solution-id=FFG will result to:
+##+      FINAL_SOLUTION_ID   = 'FFG'
+##+      PRELIM_SOLUTION_ID  = 'FFP'
+##+      REDUCED_SOLUTION_ID = 'FFR'
+##
+##  e.g. --solution-id=FFR will result to:
+##+      FINAL_SOLUTION_ID   = 'FFR'
+##+      PRELIM_SOLUTION_ID  = 'FFP'
+##+      REDUCED_SOLUTION_ID = 'FFR1'
+## ////////////////////////////////////////////////////////////////////////////
+
+##  Final (ambiguity-fixed) results
+FINAL_SOLUTION_ID="${SOLUTION_ID}"
+
+##  Preliminary (ambiguity-float) results
+if test "${FINAL_SOLUTION_ID:(-1)}" == "P"; then
+  echoerr -n "WARNING. Last char of final solution is 'P'."
+  PRELIM_SOLUTION_ID="${SOLUTION_ID%?}P1"
+  echoerr "Truncating Preliminary to $PRELIM_SOLUTION_ID"
+else
+  PRELIM_SOLUTION_ID="${SOLUTION_ID%?}P"
+fi
+
+##  Size-reduced NEQ information
+if test "${FINAL_SOLUTION_ID:(-1)}" == "R"; then
+  echoerr -n "WARNING. Last char of final solution is 'R'."
+  REDUCED_SOLUTION_ID="${SOLUTION_ID%?}R1"
+  echoerr "Truncating Size-reduced to $REDUCED_SOLUTION_ID"
+else
+  REDUCED_SOLUTION_ID="${SOLUTION_ID%?}R"
+fi
+
+## ////////////////////////////////////////////////////////////////////////////
+##  SET VARIABLES IN THE PCF FILE
+##  ---------------------------------------------------------------------------
+## ////////////////////////////////////////////////////////////////////////////
+
+##  Bernese has no 'MIXED' satellite system; this defaults to 'GPS/GLO'.
+if test "${SAT_SYS}" == "MIXED"; then
+  BERN_SAT_SYS="GPS/GLO"
+else 
+  BERN_SAT_SYS="${SAT_SYS}"
+fi
+
+if ! test -f ${U}/PCF/${PCF_FILE}; then
+  echoerr "ERROR. Invalid pcf file ${U}/PCF/${PCF_FILE}"
+  exit 1
+fi
+
+if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" \
+        B="${AC^^}" \
+        C="${PRELIM_SOLUTION_ID}" \
+        E="${FINAL_SOLUTION_ID}" \
+        F="${REDUCED_SOLUTION_ID}" \
+        BLQINF="${CAMPAIGN}" \
+        ATLINF="${CAMPAIGN}" \
+        SATSYS="${BERN_SAT_SYS}" \
+        PCV="I08" \
+        PCVINF="PCV_${CAMPAIGN:0:3}" \
+        ELANG="${ELEVATION_ANGLE}" \
+        CLU="${FILES_PER_CLUSTER}"; then
+  echoerr "ERROR. Failed to set variables in PCF file."
+  exit 1
+fi
 
 exit 0

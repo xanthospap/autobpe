@@ -38,7 +38,7 @@ class PcfVar:
         self.__val = ''
 
   def _sformat_(self):
-    return '%-8s %-40s %-30s' %('V_'+self.__var, self.__dsc, self.__val)
+    return '%-8s %-40s %-s' %('V_'+self.__var, self.__dsc, self.__val)
 
   def __str__(self):
     return self._sformat_()
@@ -149,13 +149,11 @@ class PcfFile:
     ## inserting-list-elements-not-only-to-the-end/7376026#7376026
     lines_in[idx:idx] = var_list
 
-    tmp_file = '.%s_scratch' %self.__filename
-    try:
-      fout = open(tmp_file, 'w')
-    except:
-      raise RuntimeError('Cannot open .PCF file [%s] for writing' %self.__filename)
-
-    for i in lines_in: print >>fout, i,
+    pcf_base = os.path.basename(self.__filename)
+    pcf_dir  = os.path.dirname(self.__filename)
+    tmp_file = os.path.join(pcf_dir, ".%s_scratch"%pcf_base)
+    with open(tmp_file, 'w') as fout:
+      for i in lines_in: print >>fout, i,
 
     try:
       os.rename(tmp_file, self.__filename)
