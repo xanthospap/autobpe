@@ -364,7 +364,7 @@ fi
 ##  Lastly, copy and uncompress (.Z && crx2rnx) the files in the campaign
 ##+ directory /RAW.
 ## ////////////////////////////////////////////////////////////////////////////
-
+if test 1 -eq 2; then
 >.rnxsta.dat ## temporary file
 
 ##  download the rinex files for the input network; the database knows 
@@ -446,7 +446,7 @@ for sta in "${STA_ARRAY[@]}"; do echo $sta >> .station-names.dat; done
 
 echo "Number of stations available: ${#STA_ARRAY[@]}/${MAX_NET_STA}"
 echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
-
+fi
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD PRODUCTS
 ##  ---------------------------------------------------------------------------
@@ -458,65 +458,19 @@ echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
 ##+ the following will download the best possible products; for more info, see
 ##+ the bernutils module documentation.
 ## ////////////////////////////////////////////////////////////////////////////
-if test 1 -eq 2; then
-## download the sp3, erp, dcb file
-python - <<END
-import sys, datetime, traceback
-import bernutils.products.pysp3
-import bernutils.products.pyerp
-import bernutils.products.pydcb
-
-try:
-  py_date = datetime.datetime.strptime('%s-%s'%('${YEAR}', '${DOY}'), \
-    '%Y-%j').date()
-except:
-  print >>sys.stderr, 'ERROR. Failed to parse date!.'
-  sys.exit(1)
-
-ussr = True
-if '$SAT_SYS' == 'gps' or '$SAT_SYS' == 'GPS':
-  ussr = False
-
-error_at = 0
-try:
-  info_list_sp3 = bernutils.products.pysp3.getOrb(date=py_date, \
-    ac='${AC}', \
-    out_dir='${D}', \
-    use_glonass=ussr)
-  error_at += 1
-
-  info_list_erp = bernutils.products.pyerp.getErp(date=py_date, \
-    ac='${AC}', \
-    out_dir='${D}')
-  error_at += 1
-
-  info_list_dcb = bernutils.products.pydcb.getCodDcb(stype='c1_rnx', \
-    datetm=py_date, \
-    out_dir='${D}')
-  error_at += 1
-
-except Exception, e:
-  ## where was the exception thrown ?
-  if error_at == 0:
-    print >>sys.stderr, 'ERROR. Failed to download orbit information.'
-  elif error_at == 1:
-    print >>sys.stderr, 'ERROR. Failed to download erp information.'
-  elif error_at == 2:
-    print >>sys.stderr, 'ERROR. Failed to download dcb information.'
-  else:
-    print >>sys.stderr, 'WTF! Should have come been here!'
-  ## log exception/stack call
-  print >>sys.stderr,'*** Stack Rewind:'
-  exc_type, exc_value, exc_traceback = sys.exc_info()
-  traceback.print_exception(exc_type, exc_value, exc_traceback, \
-    limit=10, file=sys.stderr)
-  print >>sys.stderr,'*** End'
-  ## exit with error
-  sys.exit(1)
-
-sys.exit(0)
-END
+if test 1 -eq 1; then
+if ! handle_dd_products.py \
+        --year="${YEAR}" \
+        --doy="${DOY}" \
+        --analysis-center="${AC}" \
+        --datapool="${D}" \
+        --destination="${P}/${CAMPAIGN}/ORB" \
+        --satellite-system="${SAT_SYS}" ; then
+  echoerr "ERROR. Failed to download/copy/uncompress products."
+  exit 1
 fi
+fi
+exit 0
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD VMF1 GRID
 ##  ---------------------------------------------------------------------------
