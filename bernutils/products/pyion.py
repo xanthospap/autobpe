@@ -6,7 +6,7 @@ import bernutils.gpstime
 import bernutils.webutils
 import bernutils.products.prodgen
 
-__DEBUG_MODE__ = True
+__DEBUG_MODE__ = False
 
 COD_HOST      = bernutils.products.prodgen.COD_HOST
 IGS_HOST      = bernutils.products.prodgen.IGS_HOST

@@ -1,5 +1,10 @@
 #! /bin/bash
 
+NAME=ddprocess
+VERSION="0.90"
+REVISION="-10"
+LAST_UPDATE="Sep 2015"
+
 # //////////////////////////////////////////////////////////////////////////////
 # FUNCTIONS
 # //////////////////////////////////////////////////////////////////////////////
@@ -114,7 +119,7 @@ check_tables () {
 # //////////////////////////////////////////////////////////////////////////////
 DEBUG_MODE=NO
 
-## following variables should be set via cmd arguments (else error!)
+##  following variables should be set via cmd arguments (else error!)
 # YEAR=
 # DOY=
 # B_LOADGPS=
@@ -123,7 +128,7 @@ DEBUG_MODE=NO
 # SOLUTION_ID=
 # SAVE_DIR=
 
-## optional parameters; may be changes via cmd arguments
+##  optional parameters; may be changes via cmd arguments
 SAT_SYS=GPS
 TABLES_DIR=${HOME}/tables
 AC=COD
@@ -131,6 +136,10 @@ STATIONS_PER_CLUSTER=3
 FILES_PER_CLUSTER=7
 ELEVATION_ANGLE=3
 PCF_FILE=NTUA_DDP.PCF
+
+##  Ntua's product area
+MY_PRODUCT_AREA=/media/Seagate/solutions52 ## add yyyy/ddd later on
+# MY_PRODUCT_ID optionaly set via cmd, if we are going to search our products
 
 export PATH=${PATH}:/home/bpe2/src/autobpe/bin
 
@@ -147,8 +156,8 @@ getopt -T > /dev/null ## check getopt version
 
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
-  ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle: \
+  ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e:a: \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products: \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -168,6 +177,10 @@ while true
 do
   case "$1" in
 
+    --use-ntua-products)
+      MY_PRODUCT_ID="${2}"
+      shift
+      ;;
     -r|--save-dir)
       SAVE_DIR="${2}"
       shift
@@ -197,6 +210,7 @@ do
       ;;
     -d|--doy) ## remove any leading zeros
       DOY=`echo "${2}" | sed 's|^0||g'`
+      DOY_3C=$( printf "%03i\n" $DOY )
       shift
       ;;
     -g|--tables-dir)
@@ -447,6 +461,35 @@ for sta in "${STA_ARRAY[@]}"; do echo $sta >> .station-names.dat; done
 echo "Number of stations available: ${#STA_ARRAY[@]}/${MAX_NET_STA}"
 echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
 fi
+
+## ////////////////////////////////////////////////////////////////////////////
+##  DOWNLOAD IONOSPHERIC MODEL FILE
+##  ---------------------------------------------------------------------------
+##  If the user has specified a local solution id, then search through ntua's
+##+ product area to find a fitting ionospheric file (.ION); by fitting i mean
+##+ that both the solution identifier and the date match.
+##
+##  If such a file does not exist, download CODE's ionospheric file.
+## ////////////////////////////////////////////////////////////////////////////
+ION_DOWNLOADED=0
+if ! test -z ${MY_PRODUCT_ID+x}; then
+  if ! test -d ${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C}; then
+    echoerr "WARNING. Local product area ${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C} does not exist."
+    echoerr "Skipping local ionosphere products."
+  else
+    for id in "${MY_PRODUCT_ID}" "${MY_PRODUCT_ID%?}R" "${MY_PRODUCT_ID%?}P"; do
+      ion_file="${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C}/${id}${YEAR:2:4}${DOY_3C}0.ION.Z"
+      ion_base=$( basename $ion_file )
+      if test -f ${ion_file} \
+                && cp ${ion_file} ${P}/${CAMPAIGN}/ATM/ \
+                && uncompress -f ${P}/${CAMPAIGN}/ATM/${ion_base} ; then
+          ION_DOWNLOADED=1
+          break
+      fi
+    done
+  fi
+fi
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD PRODUCTS
 ##  ---------------------------------------------------------------------------
@@ -459,7 +502,24 @@ fi
 ##+ the bernutils module documentation.
 ## ////////////////////////////////////////////////////////////////////////////
 if test 1 -eq 1; then
-if ! handle_dd_products.py \
+
+##  will we need an ion file ?
+if test ${ION_DOWNLOADED} -eq 1; then
+  ion_switch=""
+else
+  ion_switch="--download-ion"
+fi
+
+echo "ion switch = ${ion_switch}"
+echo "handle_dd_products.py "${ion_switch}" \
+        --year="${YEAR}" \
+        --doy="${DOY}" \
+        --analysis-center="${AC}" \
+        --datapool="${D}" \
+        --destination="${P}/${CAMPAIGN}/ORB" \
+        --satellite-system="${SAT_SYS}""
+
+if ! handle_dd_products.py "${ion_switch}" \
         --year="${YEAR}" \
         --doy="${DOY}" \
         --analysis-center="${AC}" \
