@@ -275,7 +275,43 @@ do
 done
 
 ## ////////////////////////////////////////////////////////////////////////////
-## VALIDATE COMMAND LINE ARGUMENTS
+##  LOGFILE, STDERR & STDOUT
+##  ---------------------------------------------------------------------------
+##  if a logfile is specified, redirect stderr to logfile
+## ////////////////////////////////////////////////////////////////////////////
+if test -z ${LOGFILE+x}; then
+  :
+else
+  # Close STDERR fd
+  exec 2<&-
+  # Open STDERR as $LOGFILE file for read and write.
+  exec 2>&1
+fi
+
+## ////////////////////////////////////////////////////////////////////////////
+##  VALIDATE COMMAND LINE ARGUMENTS
+##  ---------------------------------------------------------------------------
+##  Note that we set the following variables:
+##
+##  1. 'DOY_3C' this is the 3-digit doy, whereas 'DOY' is not zero padded.
+##  e.g. given day of year=3, the $DOY='3' and $DOY_3C='003'
+##
+##  2. All variable from the LOADGPS.setvar file are loaded (exported). This
+##  file defines a lot of variables, which we should NOT override; some of
+##  the most used ones are:
+##    a. ${P} -> campaign directory,
+##    b. ${D} -> datapool directory,
+##    c. ${VERSION} -> the bernese version
+##
+##  3. The $CAMPAIGN variable is the one specified in the command line argument,
+##  translated to UPPERCASE. Note that this is only the campaign name not 
+##  including the path (see bullet 2.)
+##
+##  This section also call the check_tables() function, which validates that
+##  all campaign-specific files are located in the $TABLES directory.
+##
+##  The directory specified for saving the results is checked for existance; if
+##  it does not exist, it is created.
 ## ////////////////////////////////////////////////////////////////////////////
 
 ##  year must be set
@@ -319,7 +355,6 @@ else
   fi
 fi
 
-
 ##  check the tables dir and its entries
 if ! test -d "${TABLES_DIR}" ; then
   echoerr "ERROR. Cannot find tables directory: $TABLES_DIR"
@@ -347,20 +382,6 @@ else
       exit 1
     fi
   fi
-fi
-
-## ////////////////////////////////////////////////////////////////////////////
-##  LOGFILE, STDERR & STDOUT
-##  ---------------------------------------------------------------------------
-##  if a logfile is specified, redirect stderr to logfile
-## ////////////////////////////////////////////////////////////////////////////
-if test -z ${LOGFILE+x}; then
-  :
-else
-  # Close STDERR fd
-  exec 2<&-
-  # Open STDERR as $LOGFILE file for read and write.
-  exec 2>&1
 fi
 
 ## ////////////////////////////////////////////////////////////////////////////
@@ -472,23 +493,30 @@ fi
 ##  If such a file does not exist, download CODE's ionospheric file.
 ## ////////////////////////////////////////////////////////////////////////////
 ION_DOWNLOADED=0
-if ! test -z ${MY_PRODUCT_ID+x}; then
-  if ! test -d ${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C}; then
-    echoerr "WARNING. Local product area ${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C} does not exist."
-    echoerr "Skipping local ionosphere products."
-  else
-    for id in "${MY_PRODUCT_ID}" "${MY_PRODUCT_ID%?}R" "${MY_PRODUCT_ID%?}P"; do
-      ion_file="${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C}/${id}${YEAR:2:4}${DOY_3C}0.ION.Z"
-      ion_base=$( basename $ion_file )
-      if test -f ${ion_file} \
-                && cp ${ion_file} ${P}/${CAMPAIGN}/ATM/ \
-                && uncompress -f ${P}/${CAMPAIGN}/ATM/${ion_base} ; then
-          ION_DOWNLOADED=1
-          break
-      fi
-    done
-  fi
-fi
+
+## TODO ::
+## The following block should be obsolete; ask the database if the ion file
+## exists and do what needs to be done.
+##
+## ______________________________________________________________________SKIP__
+#if ! test -z ${MY_PRODUCT_ID+x}; then
+#  if ! test -d ${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C}; then
+#    echoerr "WARNING. Local product area ${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C} does not exist."
+#    echoerr "Skipping local ionosphere products."
+#  else
+#    for id in "${MY_PRODUCT_ID}" "${MY_PRODUCT_ID%?}R" "${MY_PRODUCT_ID%?}P"; do
+#      ion_file="${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C}/${id}${YEAR:2:4}${DOY_3C}0.ION.Z"
+#      ion_base=$( basename $ion_file )
+#      if test -f ${ion_file} \
+#                && cp ${ion_file} ${P}/${CAMPAIGN}/ATM/ \
+#                && uncompress -f ${P}/${CAMPAIGN}/ATM/${ion_base} ; then
+#          ION_DOWNLOADED=1
+#          break
+#      fi
+#    done
+#  fi
+#fi
+## ____________________________________________________________________________
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD PRODUCTS
@@ -501,36 +529,33 @@ fi
 ##+ the following will download the best possible products; for more info, see
 ##+ the bernutils module documentation.
 ## ////////////////////////////////////////////////////////////////////////////
-if test 1 -eq 1; then
 
 ##  will we need an ion file ?
 if test ${ION_DOWNLOADED} -eq 1; then
-  ion_switch=""
+  if ! handle_dd_products.py \
+          --year="${YEAR}" \
+          --doy="${DOY}" \
+          --analysis-center="${AC}" \
+          --datapool="${D}" \
+          --destination="${P}/${CAMPAIGN}/ORB" \
+          --satellite-system="${SAT_SYS}" ; then
+    echoerr "ERROR. Failed to download/copy/uncompress products."
+    exit 1
+  fi
 else
-  ion_switch="--download-ion"
+  if ! handle_dd_products.py \
+          --year="${YEAR}" \
+          --doy="${DOY}" \
+          --analysis-center="${AC}" \
+          --datapool="${D}" \
+          --destination="${P}/${CAMPAIGN}/ORB" \
+          --satellite-system="${SAT_SYS}" \
+          --download-ion ; then
+    echoerr "ERROR. Failed to download/copy/uncompress products."
+    exit 1
+  fi
 fi
 
-echo "ion switch = ${ion_switch}"
-echo "handle_dd_products.py "${ion_switch}" \
-        --year="${YEAR}" \
-        --doy="${DOY}" \
-        --analysis-center="${AC}" \
-        --datapool="${D}" \
-        --destination="${P}/${CAMPAIGN}/ORB" \
-        --satellite-system="${SAT_SYS}""
-
-if ! handle_dd_products.py "${ion_switch}" \
-        --year="${YEAR}" \
-        --doy="${DOY}" \
-        --analysis-center="${AC}" \
-        --datapool="${D}" \
-        --destination="${P}/${CAMPAIGN}/ORB" \
-        --satellite-system="${SAT_SYS}" ; then
-  echoerr "ERROR. Failed to download/copy/uncompress products."
-  exit 1
-fi
-fi
-exit 0
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD VMF1 GRID
 ##  ---------------------------------------------------------------------------
@@ -572,6 +597,10 @@ rm ${TMP_FL} ## remove temporary file
 ##+ the /STA folder.
 ##
 ##  Each cluster cannot have more than STATIONS_PER_CLUSTER stations.
+##
+##  Note that the .PCF file may hold a different variable called V_CLU which
+##+ holds the *FILES* per cluster (i.e. baselines) and not the *STATIONS*
+##+ per cluster
 ## ////////////////////////////////////////////////////////////////////////////
 
 CLUSTER_FILE=${P}/${CAMPAIGN}/STA/${CAMPAIGN}.CLU
@@ -660,5 +689,11 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" \
   echoerr "ERROR. Failed to set variables in PCF file."
   exit 1
 fi
+
+## ////////////////////////////////////////////////////////////////////////////
+##  PROCESS THE DATA
+##  ---------------------------------------------------------------------------
+##  Call the perl script which ignites the BPE via the PCF :)
+## ////////////////////////////////////////////////////////////////////////////
 
 exit 0
