@@ -12,6 +12,37 @@ LAST_UPDATE="Sep 2015"
 ##  echo to stderr
 echoerr () { echo "$@" 1>&2; }
 
+##  control perl script output
+##  argv1 -> path to BPE
+##  argv2 -> status filename (no path)
+##  argv3 -> output filename (no path)
+check_run () {
+
+  bpe_path="$1"
+  status_f="${bpe_path}/${2}"
+  outout_f="${bpe_path}/${3}"
+
+  if ! test -f ${status_f}; then
+    echoerr "ERROR. Cannot find status file $status_f"
+    exit 1
+  fi
+
+  ## grep for error
+  if grep "error" ${status_f} &>/dev/null ; then
+    if ! test -d ${bpe_path}; then
+      echoerr "ERROR. Invalid /BPE folder: $bpe_path"
+      exit 1
+    fi
+    for i in `ls ${bpe_path}/*.LOG`; do
+      cat ${i} >&2
+    done
+    cat ${outout_f} >&2
+    exit 1
+  else ## no error hurray !!!!
+    exit 0
+  fi
+}
+
 ##  print help message
 help ()
 {
@@ -399,7 +430,6 @@ fi
 ##  Lastly, copy and uncompress (.Z && crx2rnx) the files in the campaign
 ##+ directory /RAW.
 ## ////////////////////////////////////////////////////////////////////////////
-if test 1 -eq 2; then
 >.rnxsta.dat ## temporary file
 
 ##  download the rinex files for the input network; the database knows 
@@ -481,7 +511,6 @@ for sta in "${STA_ARRAY[@]}"; do echo $sta >> .station-names.dat; done
 
 echo "Number of stations available: ${#STA_ARRAY[@]}/${MAX_NET_STA}"
 echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
-fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD IONOSPHERIC MODEL FILE
@@ -565,7 +594,6 @@ fi
 ##+ first 6 hours of the next day (a bernese thing). We need to merge all
 ##+ files to a final one.
 ## ////////////////////////////////////////////////////////////////////////////
-if test 1 -eq 2; then
 ## temporary file to hold getvmf1.py output
 TMP_FL=.vmf1-${YEAR}${DOY}.dat
 
@@ -585,7 +613,6 @@ else
   for fl in ${VMF_FL_ARRAY[@]}; do
     cat ${fl} >> ${MERGED_VMF_FILE}
   done
-fi
 fi
 rm ${TMP_FL} ## remove temporary file
 
@@ -695,5 +722,21 @@ fi
 ##  ---------------------------------------------------------------------------
 ##  Call the perl script which ignites the BPE via the PCF :)
 ## ////////////////////////////////////////////////////////////////////////////
+
+BERN_TASK_ID="${CAMPAIGN:0:1}DD"
+
+##  run the perl script to ignite the PCF
+${U}/SCRIPT/ntua_pcs.pl ${YEAR} ${DOY_3C}0 NTUA_DDP USER ${CAMPAIGN} ${BERN_TASK_ID}
+
+##  check the status
+if ! check_run \
+      ${P}/${CAMPAIGN}/BPE \
+      "${CAMPAIGN:0:3}_${BERN_TASK_ID}.RUN" \
+      "${CAMPAIGN:0:3}_${BERN_TASK_ID}.OUT" ; then
+  echoerr "ERROR. Fatal, processing stoped."
+  exit 1
+else
+  echo "Succeseful processing."
+fi
 
 exit 0
