@@ -1,0 +1,162 @@
+\subsection{Protocol Control File ntua\_ddp.pcf}
+\label{ntuaddppcf}
+
+\subsubsection{Copy required files \& Coordinates}\label{ddp-crfc}
+\begin{verbatim}
+3** 8******* 8******* 8******* 8******* 1 3** 3** 3** 3** 3** 3** 3** 3** 3** 3**
+#
+# Copy required files
+# -------------------
+## 001 NDP_COP  NDP_GEN           ANY      1
+## 002 ATX2PCV  NDP_GEN           ANY      1 001
+## 003 COOVEL   NDP_GEN           ANY      1 001
+004 COOVEL   NDP_GE2           ANY      1
+005 CRDMERGE NDP_GEN           ANY      1 004
+## 011 RNX_COP  NDP_GEN           ANY      1 001
+## 021 OBSMRGAP NDP_GEN           ANY      1 011
+## 022 OBSMRG_P NDP_GEN           ANY      1 021
+## 031 ION_MRG  NDP_GEN           ANY      1 011
+## 099 DUMMY    NDP_GEN           ANY      1 002 005 022 031
+\end{verbatim}
+
+\begin{itemize}
+  \item \texttt{COOVEL (NDP\_GE2)} \underline{Extrapolate Coordinates - COOVEL}
+    Give the input coordinate file \texttt{\$(REFINF)\_R.CRD} and the velocity
+    file \texttt{\$(REFINF)\_R.VEL} extrapolate the coordinates (to the epoch
+    currently set) to the coordinate file \texttt{REF\$YSS+0.CRD}.
+  \item \texttt{CRDMERGE (NDP\_GEN)} \underline{Merge Coordinate/Velocity Files - CRDMERGE}
+    Given the coordinate file \texttt{REF\$YSS+0.CRD} and the (coordinate) file
+    \texttt{REG\$YSS+0.CRD}, merge the coordinates to the resulting file
+    \texttt{\$A\$YSS+0.CRD}. Will also produce the file \texttt{REF\$YSS+0.FIX}.
+    Note that the default flag priority is used, i.e. the sequence: 
+    \texttt{\{R, C, U, T, P, M, A, W, N, I\}}. Flag \texttt{I} is used for the
+    creation of the station selection file.
+\end{itemize}
+
+\subsubsection{Prepare Orbit \& Pole}\label{ddp-poap}
+\begin{verbatim}
+# Prepare the orbits
+# ------------------
+101 POLUPDH  NDP_GEN           ANY      1 005
+## 111 ORBMRGH  NDP_GEN           ANY      1 101
+## 112 PRETAB   NDP_GEN           ANY      1 111
+112 PRETAB   NDP_GEN           ANY      1 101
+113 ORBGENH  NDP_GEN           ANY      1 112
+## 199 DUMMY    NO_OPT            ANY      1 113
+\end{verbatim}
+
+\begin{itemize}
+  
+  \item \texttt{POLUPDH (NDP\_GEN)} \underline{Convert IERS pole to Bernese format - POLUPDH}
+    \begin{bclogo}[logo=\bcattention, couleurBarre=red, noborder=true, couleur=Peach]{Important!}
+      Depending on the Analysis Center, this input panel should hold different
+      value, or better, different text edit windows should be filled.
+    \end{bclogo}
+    Given an input \texttt{erp} file this program will convert the file to a
+    Bernse-formated \texttt{erp} file \texttt{\$B\$YSS+0.ERP}. In case a CODE
+    \texttt{erp} file is used, then the program expects as input a file named
+    \texttt{\$B\$WD+0.ERP}. In case a foreign-formated \texttt{erp} file is
+    given, it is expected as \texttt{\$B\$WD+0.IEP}.
+  
+  \item \texttt{PRETAB (NDP\_GEN)} \underline{Create Tabular Orbits - PRETAB}
+    Given the input precise ephemeris file \texttt{\$B\$WD+0.SP3}, the pole file
+    \texttt{\$B\$YSS+0.ERP}, ocean loading corrections \texttt{\$(BLQINF).BLQ}
+    and atmospheric loading corrections \texttt{\$(ATLINF).ATL}, produce the
+    tabular file \texttt{\$B\$YSS+0.TAB} and the satellite clock file 
+    \texttt{\$B\$YSS+0.CLK}. Also needs the satellite problem file \texttt{\$(SATCRX).CRX}.
+
+
+    \textcolor{Cerulean}{Note that the files \texttt{\$(ATLINF).ATL} and 
+    \texttt{\$(BLQINF).BLQ} are needed for Center of Mass Corrections. In PANEL
+    \texttt{PRETAB 2: General Options}, there is an option 
+    \texttt{Apply CMC correction} for \texttt{BLQ} and/or \texttt{ATL}.}
+
+  \item \texttt{ORBGENH (NDP\_GEN)} \underline{Create Standard Orbits - ORBGEN}
+    Given the tabular orbit \texttt{\$B\$YSS+0.TAB} the pole file \texttt{\$B\$YSS+0.ERP},
+    and ocean and atmospheric loading corrections, \texttt{\$(BLQINF).BLQ} and
+    \texttt{\$(ATLINF).ATL}, this program will produce the standard orbit file:
+    \texttt{\$B\$YSS+0.STD}. The output summary file \texttt{ORB\$YSS+0.LST} is
+    created.
+
+    General input files include, the satellite problem file \texttt{\$(SATCRX).CRX},
+    and the satellite inormation file \texttt{\$(SATINF).\$(PCV)}.
+
+    See note above (PRETAB) for loading corrections; the same holds here and should
+    be consistent.
+\end{itemize}
+
+\subsubsection{Preprocess}\label{ddp-prepro}
+\begin{verbatim}
+# Preprocess, convert, and synchronize observation data
+# -----------------------------------------------------
+201 RNXGRA   NDP_GEN           ANY      1 004
+## 211 RNXSMTAP NDP_GEN           ANY      1 201
+## 212 RNXSMT_H NDP_GEN           ANY      1 211
+221 RXOBV3AP NDP_GEN           ANY      1 201
+222 RXOBV3_H NDP_GEN           ANY      1 221
+231 CODSPPAP NDP_GEN           ANY      1 113 222
+232 CODSPP_P NDP_GEN           ANY      1 231
+233 CODXTR   NDP_GEN           ANY      1 232
+## 299 DUMMY    NO_OPT            ANY      1 233
+\end{verbatim}
+\begin{itemize}
+  \item \texttt{RNXGRA (NDP\_GEN)} \underline{Create Observation Statistics - RNXGRA}
+  The program input is all RINEX files \texttt{????\$S+0.\$YY+0O}. It outputs
+  the summary file \texttt{GRA\$YSS+0.SMC}. Needs the station information file
+  \texttt{\$(CRDINF).STA}. \textcolor{Cerulean}{W T F ? ? Giati to exoume auto ??}
+
+  \item \texttt{RXOBV3AP (NDP\_GEN)} \underline{Rinex to Bernese format - RXOBV3}
+    The program input is all RINEX files \texttt{????\$S+0.\$YY+0O} and the
+    station information file \texttt{\$(CRDINF).STA}. 
+
+    Other required input files include, the satellite problem file 
+    \texttt{\$(SATCRX).CRX}, the satellite inormation file \texttt{\$(SATINF).\$(PCV)},
+    the phase center offset file \texttt{\$(PCVINF).\$(PCV)}, and the abbreviation
+    file \texttt{\$(CRDINF).ABB}.
+
+    Note that, this program uses also the variable: \texttt{\$SATSYS} (which
+    satellite system to be extracted from RINEX).
+
+    \textcolor{OrangeRed}{Open Issues:}
+    \begin{enumerate}
+      \item gather station names from \texttt{MARKER NAME} or \texttt{MARKER DOME}?
+      \item if station not in abbrevioation list : \texttt{UPDATE} or \texttt{ERROR} ?
+      \item sampling interval is set to 30 seconds; maybe make this a variable,
+        so that we can handle differently different occasions, e.g. hourly
+        processing.
+      \item There is a minimum required number of epochs for each RINEX (set to
+        10 epochs). Is this ok with both 24hour and 1hour processing?
+      \item handling of known inconsistencies -> \texttt{\$(CRXINF)} ??
+    \end{enumerate}
+
+  \item \texttt{CODSPPAP (NDP\_GEN)} \underline{Code Based Clock Synchronization - CODSPP}
+    Given a standard orbit file \texttt{\$B\$YSS+0.STD}, the satellite clock file
+    \texttt{\$B\$YSS+0.CLK}, the code observation files of type \texttt{????\$S+0.CZH},
+    the pole file \texttt{\$B\$YSS+0.ERP}, the dcb file \texttt{P1C1\$M+0.DCB} and
+    the a-priori coordinate file \texttt{\$A\$YSS+0.CRD}, estimate the receiver
+    clock corrections.
+
+    No station information file used; we need  the satellite problem file 
+    \texttt{\$(SATCRX).CRX}, the satellite inormation file \texttt{\$(SATINF).\$(PCV)},
+    the phase center offset file \texttt{\$(PCVINF).\$(PCV)}.
+
+    Runs in cluster mode, no coordinates estimates, troposphere modelling = GMF.
+    Minimun elevation = 10$^{\circ}$.
+    
+    \textcolor{OrangeRed}{Open Issues:}
+    \begin{enumerate}
+      \item save residuals (ascii/zipped) ??
+      \item develop a program to plot clock RINEX
+    \end{enumerate}
+
+  \item \texttt{CODXTR (NDP\_GEN)} \underline{Extract CODSPP Output - CODXTR}
+    Given the output file(s) \texttt{SPP\$S+0???.OUT}, it produces the summary
+    file \texttt{SPP\$YSS+0.OUT}.
+
+    \textcolor{OrangeRed}{Open Issues:}
+    \begin{enumerate}
+      \item program to plot the output file (already have one ??)
+      \item program to convert the output file to html
+    \end{enumerate}
+
+\end{itemize}

@@ -1,3 +1,4 @@
+\PassOptionsToPackage{usenames,dvipsnames}{xcolor}
 \documentclass{article}
 \usepackage{tikz}
 \usetikzlibrary{shapes,shapes.geometric, arrows}
@@ -8,10 +9,10 @@
 \usepackage{natbib}   % Required to change bibliography style to APA
 \usepackage{amsmath}  % Required for some math elements
 \usepackage{graphicx}
-\usepackage{xcolor}
 \usepackage{listings}
 \usepackage{enumitem}
 \usepackage{makeidx}
+\usepackage[tikz]{bclogo} % Pretty formating of warning blocks
 
 \setlength\parindent{0pt} % Removes all indentation from paragraphs
 
@@ -131,6 +132,10 @@ ac      & a, analysis center & cod | igs\\
 \input{getvmf1.tex}
 \input{cmpsta.tex}
 \input{adnq2html.tex}
+\clearpage
+
+\section{Processing}
+\input{ntua_ddp.tex}
 \clearpage
 
 \section{Bugs}\label{bugs}
