@@ -10,6 +10,7 @@ import bernutils.gpstime
 import bernutils.products.pysp3
 import bernutils.products.pyerp
 import bernutils.products.pydcb
+import bernutils.products.pyion
 
 ##  globals
 YEAR     = None
@@ -18,6 +19,7 @@ DATAPOOL = None
 DEST_ORB = None
 AC       = None
 SAT_SYS  = 'GPS'
+DWNL_ION = False
 
 def isUnixCompressed(fn): return len(fn) > 2 and fn[-2:] == '.Z'
 
@@ -25,8 +27,8 @@ def isUnixCompressed(fn): return len(fn) > 2 and fn[-2:] == '.Z'
 def main(argv):
 
   try:
-    opts, args = getopt.getopt(argv,'y:d:p:o:a:s:',[
-      'year=', 'doy=', 'datapool=', 'destination=', 'analysis-center=','satellite-system='])
+    opts, args = getopt.getopt(argv,'y:d:p:o:a:s:i',[
+      'year=', 'doy=', 'datapool=', 'destination=', 'analysis-center=','satellite-system=', 'download-ion'])
   except getopt.GetoptError:
     print>>sys.stderr,"ERROR. Getopt error ",argv
     sys.exit(1)
@@ -46,10 +48,13 @@ def main(argv):
       DEST_ORB = arg
     elif opt in ('-a', '--analysis-center'):
       global AC
-      AC = arg
+      AC = arg.upper()
     elif opt in ('-s', '--satellite-system'):
       global SAT_SYS
       SAT_SYS = arg
+    elif opt in ('-i', '--download-ion'):
+      global DWNL_ION
+      DWNL_ION = True
     else:
       print >> sys.stderr, 'Invalid command line argument: %s'%opt
 
@@ -74,23 +79,28 @@ ussr = True
 if SAT_SYS == 'gps' or SAT_SYS == 'GPS':
   ussr = False
 
+info_dict = {}
+
 error_at = 0
 try:
-  info_list_sp3 = bernutils.products.pysp3.getOrb(date=py_date, \
+  info_dict['sp3'] = bernutils.products.pysp3.getOrb(date=py_date, \
     ac=AC, \
     out_dir=DATAPOOL, \
     use_glonass=ussr)
   error_at += 1
 
-  info_list_erp = bernutils.products.pyerp.getErp(date=py_date, \
+  info_dict['erp'] = bernutils.products.pyerp.getErp(date=py_date, \
     ac=AC, \
     out_dir=DATAPOOL)
   error_at += 1
 
-  info_list_dcb = bernutils.products.pydcb.getCodDcb(stype='c1_rnx', \
+  info_dict['dcb'] = bernutils.products.pydcb.getCodDcb(stype='c1_rnx', \
     datetm=py_date, \
     out_dir=DATAPOOL)
   error_at += 1
+
+  if DWNL_ION:
+    info_dict['ion'] = bernutils.products.pyion.getCodIon(py_date, DATAPOOL)
 
   ##  Alright! all products downloaded! now we need to make an easy list to
   ##+ pass to bash, to link the downloaded files from directory D to the /ORB
@@ -104,28 +114,33 @@ try:
 
   sp3file = os.path.join(DEST_ORB,\
     ("%s%4i%1i.SP3"%(AC, gpsw, int(dow))))
-  if isUnixCompressed(info_list_sp3[0]):
+  if isUnixCompressed(info_dict['sp3'][0]):
     sp3file += '.Z'
-  print "cp %s %s"%(info_list_sp3[0], sp3file)
+  info_dict['sp3'].append(sp3file)
 
   erpfile = os.path.join(DEST_ORB,\
     "%s%4i%1i.ERP"%(AC, gpsw, int(dow)))
-  if isUnixCompressed(info_list_erp[0]):
+  if isUnixCompressed(info_dict['erp'][0]):
     erpfile += '.Z'
-  print "cp %s %s"%(info_list_erp[0], erpfile)
+  info_dict['erp'].append(erpfile)
 
   dcbfile = os.path.join(DEST_ORB,\
     "P1C1%s%s.DCB"%(yr2, mnth))
-  if isUnixCompressed(info_list_dcb[0]):
+  if isUnixCompressed(info_dict['dcb'][0]):
     dcbfile += '.Z'
-  print "cp %s %s"%(info_list_dcb[0], dcbfile)
+  info_dict['dcb'].append(dcbfile)
 
-  for src, dst in zip([info_list_sp3[0], info_list_erp[0], info_list_dcb[0]], \
-      [sp3file, erpfile, dcbfile]):
-    shutil.copy(src, dst)
-    if isUnixCompressed(dst):
-      bernutils.webutils.UnixUncompress(dst)
-    print 'file',dst,'done'
+  if DWNL_ION:
+    ionfile = os.path.join(DEST_ORB.replace('/ORB', '/ATM'),\
+        "COD%4i%1i.ION"%(gpsw, int(dow)))
+    if isUnixCompressed(info_dict['ion'][0]):
+      ionfile += '.Z'
+    info_dict['ion'].append(ionfile)
+
+  for i, j in info_dict.iteritems():
+    shutil.copy(j[0], j[2])
+    if isUnixCompressed(j[2]):
+      bernutils.webutils.UnixUncompress(j[2])
 
 except Exception, e:
   ## where was the exception thrown ?

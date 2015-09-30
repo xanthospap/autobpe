@@ -1,11 +1,47 @@
 #! /bin/bash
 
+NAME=ddprocess
+VERSION="0.90"
+REVISION="-10"
+LAST_UPDATE="Sep 2015"
+
 # //////////////////////////////////////////////////////////////////////////////
 # FUNCTIONS
 # //////////////////////////////////////////////////////////////////////////////
 
 ##  echo to stderr
 echoerr () { echo "$@" 1>&2; }
+
+##  control perl script output
+##  argv1 -> path to BPE
+##  argv2 -> status filename (no path)
+##  argv3 -> output filename (no path)
+check_run () {
+
+  bpe_path="$1"
+  status_f="${bpe_path}/${2}"
+  outout_f="${bpe_path}/${3}"
+
+  if ! test -f ${status_f}; then
+    echoerr "ERROR. Cannot find status file $status_f"
+    exit 1
+  fi
+
+  ## grep for error
+  if grep "error" ${status_f} &>/dev/null ; then
+    if ! test -d ${bpe_path}; then
+      echoerr "ERROR. Invalid /BPE folder: $bpe_path"
+      exit 1
+    fi
+    for i in `ls ${bpe_path}/*.LOG`; do
+      cat ${i} >&2
+    done
+    cat ${outout_f} >&2
+    exit 1
+  else ## no error hurray !!!!
+    exit 0
+  fi
+}
 
 ##  print help message
 help ()
@@ -114,7 +150,7 @@ check_tables () {
 # //////////////////////////////////////////////////////////////////////////////
 DEBUG_MODE=NO
 
-## following variables should be set via cmd arguments (else error!)
+##  following variables should be set via cmd arguments (else error!)
 # YEAR=
 # DOY=
 # B_LOADGPS=
@@ -123,7 +159,7 @@ DEBUG_MODE=NO
 # SOLUTION_ID=
 # SAVE_DIR=
 
-## optional parameters; may be changes via cmd arguments
+##  optional parameters; may be changes via cmd arguments
 SAT_SYS=GPS
 TABLES_DIR=${HOME}/tables
 AC=COD
@@ -131,6 +167,10 @@ STATIONS_PER_CLUSTER=3
 FILES_PER_CLUSTER=7
 ELEVATION_ANGLE=3
 PCF_FILE=NTUA_DDP.PCF
+
+##  Ntua's product area
+MY_PRODUCT_AREA=/media/Seagate/solutions52 ## add yyyy/ddd later on
+# MY_PRODUCT_ID optionaly set via cmd, if we are going to search our products
 
 export PATH=${PATH}:/home/bpe2/src/autobpe/bin
 
@@ -147,8 +187,8 @@ getopt -T > /dev/null ## check getopt version
 
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
-  ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle: \
+  ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e:a: \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products: \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -168,6 +208,10 @@ while true
 do
   case "$1" in
 
+    --use-ntua-products)
+      MY_PRODUCT_ID="${2}"
+      shift
+      ;;
     -r|--save-dir)
       SAVE_DIR="${2}"
       shift
@@ -197,6 +241,7 @@ do
       ;;
     -d|--doy) ## remove any leading zeros
       DOY=`echo "${2}" | sed 's|^0||g'`
+      DOY_3C=$( printf "%03i\n" $DOY )
       shift
       ;;
     -g|--tables-dir)
@@ -261,7 +306,43 @@ do
 done
 
 ## ////////////////////////////////////////////////////////////////////////////
-## VALIDATE COMMAND LINE ARGUMENTS
+##  LOGFILE, STDERR & STDOUT
+##  ---------------------------------------------------------------------------
+##  if a logfile is specified, redirect stderr to logfile
+## ////////////////////////////////////////////////////////////////////////////
+if test -z ${LOGFILE+x}; then
+  :
+else
+  # Close STDERR fd
+  exec 2<&-
+  # Open STDERR as $LOGFILE file for read and write.
+  exec 2>&1
+fi
+
+## ////////////////////////////////////////////////////////////////////////////
+##  VALIDATE COMMAND LINE ARGUMENTS
+##  ---------------------------------------------------------------------------
+##  Note that we set the following variables:
+##
+##  1. 'DOY_3C' this is the 3-digit doy, whereas 'DOY' is not zero padded.
+##  e.g. given day of year=3, the $DOY='3' and $DOY_3C='003'
+##
+##  2. All variable from the LOADGPS.setvar file are loaded (exported). This
+##  file defines a lot of variables, which we should NOT override; some of
+##  the most used ones are:
+##    a. ${P} -> campaign directory,
+##    b. ${D} -> datapool directory,
+##    c. ${VERSION} -> the bernese version
+##
+##  3. The $CAMPAIGN variable is the one specified in the command line argument,
+##  translated to UPPERCASE. Note that this is only the campaign name not 
+##  including the path (see bullet 2.)
+##
+##  This section also call the check_tables() function, which validates that
+##  all campaign-specific files are located in the $TABLES directory.
+##
+##  The directory specified for saving the results is checked for existance; if
+##  it does not exist, it is created.
 ## ////////////////////////////////////////////////////////////////////////////
 
 ##  year must be set
@@ -305,7 +386,6 @@ else
   fi
 fi
 
-
 ##  check the tables dir and its entries
 if ! test -d "${TABLES_DIR}" ; then
   echoerr "ERROR. Cannot find tables directory: $TABLES_DIR"
@@ -336,20 +416,6 @@ else
 fi
 
 ## ////////////////////////////////////////////////////////////////////////////
-##  LOGFILE, STDERR & STDOUT
-##  ---------------------------------------------------------------------------
-##  if a logfile is specified, redirect stderr to logfile
-## ////////////////////////////////////////////////////////////////////////////
-if test -z ${LOGFILE+x}; then
-  :
-else
-  # Close STDERR fd
-  exec 2<&-
-  # Open STDERR as $LOGFILE file for read and write.
-  exec 2>&1
-fi
-
-## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD RINEX FILES
 ##  ---------------------------------------------------------------------------
 ##  Use the program rnxdwnl.py to download all available rinex files for
@@ -364,7 +430,6 @@ fi
 ##  Lastly, copy and uncompress (.Z && crx2rnx) the files in the campaign
 ##+ directory /RAW.
 ## ////////////////////////////////////////////////////////////////////////////
-if test 1 -eq 2; then
 >.rnxsta.dat ## temporary file
 
 ##  download the rinex files for the input network; the database knows 
@@ -446,7 +511,42 @@ for sta in "${STA_ARRAY[@]}"; do echo $sta >> .station-names.dat; done
 
 echo "Number of stations available: ${#STA_ARRAY[@]}/${MAX_NET_STA}"
 echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
-fi
+
+## ////////////////////////////////////////////////////////////////////////////
+##  DOWNLOAD IONOSPHERIC MODEL FILE
+##  ---------------------------------------------------------------------------
+##  If the user has specified a local solution id, then search through ntua's
+##+ product area to find a fitting ionospheric file (.ION); by fitting i mean
+##+ that both the solution identifier and the date match.
+##
+##  If such a file does not exist, download CODE's ionospheric file.
+## ////////////////////////////////////////////////////////////////////////////
+ION_DOWNLOADED=0
+
+## TODO ::
+## The following block should be obsolete; ask the database if the ion file
+## exists and do what needs to be done.
+##
+## ______________________________________________________________________SKIP__
+#if ! test -z ${MY_PRODUCT_ID+x}; then
+#  if ! test -d ${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C}; then
+#    echoerr "WARNING. Local product area ${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C} does not exist."
+#    echoerr "Skipping local ionosphere products."
+#  else
+#    for id in "${MY_PRODUCT_ID}" "${MY_PRODUCT_ID%?}R" "${MY_PRODUCT_ID%?}P"; do
+#      ion_file="${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C}/${id}${YEAR:2:4}${DOY_3C}0.ION.Z"
+#      ion_base=$( basename $ion_file )
+#      if test -f ${ion_file} \
+#                && cp ${ion_file} ${P}/${CAMPAIGN}/ATM/ \
+#                && uncompress -f ${P}/${CAMPAIGN}/ATM/${ion_base} ; then
+#          ION_DOWNLOADED=1
+#          break
+#      fi
+#    done
+#  fi
+#fi
+## ____________________________________________________________________________
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD PRODUCTS
 ##  ---------------------------------------------------------------------------
@@ -458,19 +558,33 @@ fi
 ##+ the following will download the best possible products; for more info, see
 ##+ the bernutils module documentation.
 ## ////////////////////////////////////////////////////////////////////////////
-if test 1 -eq 1; then
-if ! handle_dd_products.py \
-        --year="${YEAR}" \
-        --doy="${DOY}" \
-        --analysis-center="${AC}" \
-        --datapool="${D}" \
-        --destination="${P}/${CAMPAIGN}/ORB" \
-        --satellite-system="${SAT_SYS}" ; then
-  echoerr "ERROR. Failed to download/copy/uncompress products."
-  exit 1
+
+##  will we need an ion file ?
+if test ${ION_DOWNLOADED} -eq 1; then
+  if ! handle_dd_products.py \
+          --year="${YEAR}" \
+          --doy="${DOY}" \
+          --analysis-center="${AC}" \
+          --datapool="${D}" \
+          --destination="${P}/${CAMPAIGN}/ORB" \
+          --satellite-system="${SAT_SYS}" ; then
+    echoerr "ERROR. Failed to download/copy/uncompress products."
+    exit 1
+  fi
+else
+  if ! handle_dd_products.py \
+          --year="${YEAR}" \
+          --doy="${DOY}" \
+          --analysis-center="${AC}" \
+          --datapool="${D}" \
+          --destination="${P}/${CAMPAIGN}/ORB" \
+          --satellite-system="${SAT_SYS}" \
+          --download-ion ; then
+    echoerr "ERROR. Failed to download/copy/uncompress products."
+    exit 1
+  fi
 fi
-fi
-exit 0
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD VMF1 GRID
 ##  ---------------------------------------------------------------------------
@@ -480,7 +594,6 @@ exit 0
 ##+ first 6 hours of the next day (a bernese thing). We need to merge all
 ##+ files to a final one.
 ## ////////////////////////////////////////////////////////////////////////////
-if test 1 -eq 2; then
 ## temporary file to hold getvmf1.py output
 TMP_FL=.vmf1-${YEAR}${DOY}.dat
 
@@ -501,7 +614,6 @@ else
     cat ${fl} >> ${MERGED_VMF_FILE}
   done
 fi
-fi
 rm ${TMP_FL} ## remove temporary file
 
 ## ////////////////////////////////////////////////////////////////////////////
@@ -512,6 +624,10 @@ rm ${TMP_FL} ## remove temporary file
 ##+ the /STA folder.
 ##
 ##  Each cluster cannot have more than STATIONS_PER_CLUSTER stations.
+##
+##  Note that the .PCF file may hold a different variable called V_CLU which
+##+ holds the *FILES* per cluster (i.e. baselines) and not the *STATIONS*
+##+ per cluster
 ## ////////////////////////////////////////////////////////////////////////////
 
 CLUSTER_FILE=${P}/${CAMPAIGN}/STA/${CAMPAIGN}.CLU
@@ -599,6 +715,28 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" \
         CLU="${FILES_PER_CLUSTER}"; then
   echoerr "ERROR. Failed to set variables in PCF file."
   exit 1
+fi
+
+## ////////////////////////////////////////////////////////////////////////////
+##  PROCESS THE DATA
+##  ---------------------------------------------------------------------------
+##  Call the perl script which ignites the BPE via the PCF :)
+## ////////////////////////////////////////////////////////////////////////////
+
+BERN_TASK_ID="${CAMPAIGN:0:1}DD"
+
+##  run the perl script to ignite the PCF
+${U}/SCRIPT/ntua_pcs.pl ${YEAR} ${DOY_3C}0 NTUA_DDP USER ${CAMPAIGN} ${BERN_TASK_ID}
+
+##  check the status
+if ! check_run \
+      ${P}/${CAMPAIGN}/BPE \
+      "${CAMPAIGN:0:3}_${BERN_TASK_ID}.RUN" \
+      "${CAMPAIGN:0:3}_${BERN_TASK_ID}.OUT" ; then
+  echoerr "ERROR. Fatal, processing stoped."
+  exit 1
+else
+  echo "Succeseful processing."
 fi
 
 exit 0

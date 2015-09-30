@@ -105,7 +105,7 @@ def getCodDcb(stype, datetm, out_dir=None):
     if out_dir: saveas = os.path.join(out_dir, filename)
     try:
       localfile, webfile = _getRunningDcb_(filename, saveas)
-      return localfile, webfile
+      return [localfile, webfile]
     except:
       raise
 
@@ -117,7 +117,7 @@ def getCodDcb(stype, datetm, out_dir=None):
     if out_dir:  saveas = os.path.join(out_dir, filename)
     try:
       localfile, webfile = _getFinalDcb_(iyear,filename,saveas)
-      return localfile, webfile
+      return [localfile, webfile]
     except:
       filename = generic_file.replace('yymm', '')
       saveas   = filename
@@ -125,7 +125,7 @@ def getCodDcb(stype, datetm, out_dir=None):
         saveas = os.path.join(out_dir, filename)
       try:
         localfile, webfile = _getRunningDcb_(filename,saveas)
-        return localfile, webfile
+        return [localfile, webfile]
       except:
         raise
 
@@ -142,7 +142,7 @@ def getCodDcb(stype, datetm, out_dir=None):
         raise RuntimeError('ERROR. got more files than expected!')
       localfile  = ret_list[0][0]
       remotefile = ret_list[0][1]
-      return localfile, remotefile
+      return [localfile, remotefile]
     except:
       raise
   else:
