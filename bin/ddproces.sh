@@ -135,6 +135,7 @@ check_tables () {
   for f in ${1}/pcv/${2} \
            ${1}/blq/${2}.BLQ \
            ${1}/atl/${2}.ATL \
+           ${1}/crd/${2}.CRD \
            ${1}/atl/${2}52.STA; do
     if ! test -f $i ; then
       echoerr "Missing file: $i"
@@ -430,6 +431,7 @@ fi
 ##  Lastly, copy and uncompress (.Z && crx2rnx) the files in the campaign
 ##+ directory /RAW.
 ## ////////////////////////////////////////////////////////////////////////////
+if test 1 -eq 2 ; then
 >.rnxsta.dat ## temporary file
 
 ##  download the rinex files for the input network; the database knows 
@@ -511,7 +513,7 @@ for sta in "${STA_ARRAY[@]}"; do echo $sta >> .station-names.dat; done
 
 echo "Number of stations available: ${#STA_ARRAY[@]}/${MAX_NET_STA}"
 echo "Number of reference stations: ${#REF_STA_ARRAY[@]}"
-
+fi
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD IONOSPHERIC MODEL FILE
 ##  ---------------------------------------------------------------------------
@@ -558,7 +560,7 @@ ION_DOWNLOADED=0
 ##+ the following will download the best possible products; for more info, see
 ##+ the bernutils module documentation.
 ## ////////////////////////////////////////////////////////////////////////////
-
+if test 1 -eq 2 ;  then
 ##  will we need an ion file ?
 if test ${ION_DOWNLOADED} -eq 1; then
   if ! handle_dd_products.py \
@@ -584,7 +586,7 @@ else
     exit 1
   fi
 fi
-
+fi
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD VMF1 GRID
 ##  ---------------------------------------------------------------------------
@@ -594,6 +596,7 @@ fi
 ##+ first 6 hours of the next day (a bernese thing). We need to merge all
 ##+ files to a final one.
 ## ////////////////////////////////////////////////////////////////////////////
+if test 1 -eq 2 ; then
 ## temporary file to hold getvmf1.py output
 TMP_FL=.vmf1-${YEAR}${DOY}.dat
 
@@ -615,7 +618,7 @@ else
   done
 fi
 rm ${TMP_FL} ## remove temporary file
-
+fi
 ## ////////////////////////////////////////////////////////////////////////////
 ##  MAKE THE CLUSTER FILE
 ##  ---------------------------------------------------------------------------
@@ -718,11 +721,50 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" \
 fi
 
 ## ////////////////////////////////////////////////////////////////////////////
+##  A-PRIORI COORDINATES FOR REGIONAL SITES
+##  ---------------------------------------------------------------------------
+## ////////////////////////////////////////////////////////////////////////////
+if ! awk -v FLAG=R -v REPLACE_ALL=NO -f \
+        change_crd_flags.awk ${TABLES_DIR}/crd/${CAMPAIGN}.CRD \
+        1>${P}/${CAMPAIGN}/STA/REG${YEAR:2:2}${DOY_3C}0.CRD; then
+  echoerr "ERROR. Could not create a-priori coordinate file."
+  exit 1
+fi
+
+## ////////////////////////////////////////////////////////////////////////////
 ##  PROCESS THE DATA
 ##  ---------------------------------------------------------------------------
 ##  Call the perl script which ignites the BPE via the PCF :)
 ## ////////////////////////////////////////////////////////////////////////////
 
+DB_USER=bpe2
+DB_PASSWORD=webadmin
+DB_DBNAME=procsta
+rm .procsta-answer.dat
+if mysql -h "147.102.110.73" --user="$DB_USER" \
+        --password="$DB_PASSWORD" \
+        --database="$DB_NAME" \
+        --execute="use procsta; \
+         SELECT product.pth2dir, product.filename \
+         FROM product \
+         JOIN prodtype \
+         ON product.prodtype_id=prodtype.prodtype_id \
+         JOIN network \
+         ON product.network_id=network.network_id \
+         WHERE prodtype.prodtype_name=\"IONEX\" \
+         AND network.network_name=\"GREECE\";" \
+      | grep -v "+----" \
+      | tail -n +2 \
+      | awk '{print $1$2}' > .procsta-answer.dat \
+    && grep "[a-z,A-Z]*" .procsta-answer.dat &>/dev/null ; then
+  echo "got file ok from database"
+  cat .procsta-answer.dat
+else
+  echoerr "ERROR. Database returns nothing"
+  exit 1
+fi
+
+exit 50
 BERN_TASK_ID="${CAMPAIGN:0:1}DD"
 
 ##  run the perl script to ignite the PCF
