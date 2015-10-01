@@ -146,6 +146,57 @@ check_tables () {
   return 0
 }
 
+##  year - doy to datetime in format '%Y-%m-%d %H-%M-%S'
+##  argv1 -> year
+##  argv2 -> (3-digit) doy
+##  argv3 -> (optional) hours
+##  argv4 -> (optional) minutes
+##  argv5 -> (optional) seconds (integer)
+ydoy2dt () {
+  if [ "$#" -ne 2 ] && [ "$#" -ne 5 ] ; then
+    echoerr "ERROR. Invalid argc in ydoy2dt(). Cannot parse date. ($#)"
+    return 1
+  fi
+
+  local year="$1"
+  local doy="$2"
+  local hour="00"
+  local min="00"
+  local sec="00"
+
+  if test "$#" -ne 2; then
+    hour="$3"
+    min="$4"
+    sec="$5"
+  fi
+
+  python - <<END
+
+import datetime
+import sys
+
+exit_status=0
+
+try:
+  # print "[python] trying to parse date [${year}-${doy} ${hour}:${min}:${sec}]"
+  print datetime.datetime.strptime('${year}-${doy} ${hour}:${min}:${sec}', \
+    '%Y-%j %H:%M:%S').strftime("%Y-%m-%d %H:%M:%S")
+except:
+  exit_status=1
+
+sys.exit(exit_status)
+END
+
+  if test "$?" -ne 0 ; then
+    date_str=
+    for i in "${*}"; do date_str="${date_str} ${i}"; done
+    echoerr "ERROR. Cannot resolve date: [${date_str}]"
+    return 1
+  else
+    return 0
+  fi
+}
+
 # //////////////////////////////////////////////////////////////////////////////
 # GLOBAL VARIABLES
 # //////////////////////////////////////////////////////////////////////////////
@@ -172,6 +223,12 @@ PCF_FILE=NTUA_DDP.PCF
 ##  Ntua's product area
 MY_PRODUCT_AREA=/media/Seagate/solutions52 ## add yyyy/ddd later on
 # MY_PRODUCT_ID optionaly set via cmd, if we are going to search our products
+
+##  database for local/user products
+export DB_HOST="147.102.110.73"
+export DB_USER="bpe2"
+export DB_PASSWORD="webadmin"
+export DB_DBNAME="procsta"
 
 export PATH=${PATH}:/home/bpe2/src/autobpe/bin
 
@@ -417,6 +474,23 @@ else
 fi
 
 ## ////////////////////////////////////////////////////////////////////////////
+##  DATETIME VARIABLES
+##  ---------------------------------------------------------------------------
+## ////////////////////////////////////////////////////////////////////////////
+if ! START_OF_DAY_STR=$(ydoy2dt "${YEAR}" "${DOY_3C}") ; then
+  echoerr "ERROR. Failed to parse date"
+  exit 1
+fi
+
+if ! END_OF_DAY_STR=$(ydoy2dt "${YEAR}" "${DOY_3C}" "23" "59" "30") ; then
+  echoerr "ERROR. Failed to parse date"
+  exit 1
+fi
+
+export YEAR="${YEAR}"
+export DOY_3C="${DOY}"
+
+## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD RINEX FILES
 ##  ---------------------------------------------------------------------------
 ##  Use the program rnxdwnl.py to download all available rinex files for
@@ -518,36 +592,36 @@ fi
 ##  DOWNLOAD IONOSPHERIC MODEL FILE
 ##  ---------------------------------------------------------------------------
 ##  If the user has specified a local solution id, then search through ntua's
-##+ product area to find a fitting ionospheric file (.ION); by fitting i mean
-##+ that both the solution identifier and the date match.
-##
+##  TODO :: mysql ...
 ##  If such a file does not exist, download CODE's ionospheric file.
 ## ////////////////////////////////////////////////////////////////////////////
 ION_DOWNLOADED=0
 
-## TODO ::
-## The following block should be obsolete; ask the database if the ion file
-## exists and do what needs to be done.
-##
-## ______________________________________________________________________SKIP__
-#if ! test -z ${MY_PRODUCT_ID+x}; then
-#  if ! test -d ${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C}; then
-#    echoerr "WARNING. Local product area ${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C} does not exist."
-#    echoerr "Skipping local ionosphere products."
-#  else
-#    for id in "${MY_PRODUCT_ID}" "${MY_PRODUCT_ID%?}R" "${MY_PRODUCT_ID%?}P"; do
-#      ion_file="${MY_PRODUCT_AREA}/${YEAR}/${DOY_3C}/${id}${YEAR:2:4}${DOY_3C}0.ION.Z"
-#      ion_base=$( basename $ion_file )
-#      if test -f ${ion_file} \
-#                && cp ${ion_file} ${P}/${CAMPAIGN}/ATM/ \
-#                && uncompress -f ${P}/${CAMPAIGN}/ATM/${ion_base} ; then
-#          ION_DOWNLOADED=1
-#          break
-#      fi
-#    done
-#  fi
-#fi
-## ____________________________________________________________________________
+if mysql -h "${DB_HOST}" \
+        --user="${DB_USER}" \
+        --password="${DB_PASSWORD}" \
+        --database="${DB_NAME}" \
+        --execute="use procsta; \
+         SELECT product.pth2dir, product.filename \
+         FROM product \
+         JOIN prodtype \
+         ON product.prodtype_id=prodtype.prodtype_id \
+         JOIN network \
+         ON product.network_id=network.network_id \
+         WHERE prodtype.prodtype_name=\"ION\" \
+         AND network.network_name=\"${CAMPAIGN}\" \
+         AND product.dateobs_start<=\"${START_OF_DAY_STR}\" \
+         AND product.dateobs_stop>=\"${END_OF_DAY_STR}\";" \
+      | grep -v "+----" \
+      | tail -n +2 \
+      | awk '{print $1$2}' > .procsta-answer.dat \
+    && grep "[a-z,A-Z]*" .procsta-answer.dat &>/dev/null ; then
+  my_ion_file=$(cat .procsta-answer.dat)
+  echoerr "ERROR. NTUA's ION filo found but ddprocess does not yet handle that!"
+  echoerr "Write more code bitch!"
+else
+  echoerr "[WARNING]. No NTUA .ION file found."
+fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD PRODUCTS
@@ -596,7 +670,7 @@ fi
 ##+ first 6 hours of the next day (a bernese thing). We need to merge all
 ##+ files to a final one.
 ## ////////////////////////////////////////////////////////////////////////////
-if test 1 -eq 2 ; then
+if test 1 -eq 1 ; then
 ## temporary file to hold getvmf1.py output
 TMP_FL=.vmf1-${YEAR}${DOY}.dat
 
@@ -611,7 +685,7 @@ if ! mapfile -t VMF_FL_ARRAY < <(filter_local_vmf1.awk ${TMP_FL}) ; then
   echoerr "ERROR. Failed to merge VMF1 grid file(s)"
   exit 1
 else
-  MERGED_VMF_FILE=${P}/${CAMPAIGN}/GRD/VMF1_${YEAR}${DOY}.
+  MERGED_VMF_FILE=${P}/${CAMPAIGN}/GRD/VMF${YEAR:2:2}${DOY_3C}0.GRD
   >${MERGED_VMF_FILE}
   for fl in ${VMF_FL_ARRAY[@]}; do
     cat ${fl} >> ${MERGED_VMF_FILE}
@@ -737,39 +811,16 @@ fi
 ##  Call the perl script which ignites the BPE via the PCF :)
 ## ////////////////////////////////////////////////////////////////////////////
 
-DB_USER=bpe2
-DB_PASSWORD=webadmin
-DB_DBNAME=procsta
-rm .procsta-answer.dat
-if mysql -h "147.102.110.73" --user="$DB_USER" \
-        --password="$DB_PASSWORD" \
-        --database="$DB_NAME" \
-        --execute="use procsta; \
-         SELECT product.pth2dir, product.filename \
-         FROM product \
-         JOIN prodtype \
-         ON product.prodtype_id=prodtype.prodtype_id \
-         JOIN network \
-         ON product.network_id=network.network_id \
-         WHERE prodtype.prodtype_name=\"IONEX\" \
-         AND network.network_name=\"GREECE\";" \
-      | grep -v "+----" \
-      | tail -n +2 \
-      | awk '{print $1$2}' > .procsta-answer.dat \
-    && grep "[a-z,A-Z]*" .procsta-answer.dat &>/dev/null ; then
-  echo "got file ok from database"
-  cat .procsta-answer.dat
-else
-  echoerr "ERROR. Database returns nothing"
-  exit 1
-fi
-
-exit 50
 BERN_TASK_ID="${CAMPAIGN:0:1}DD"
 
 ##  run the perl script to ignite the PCF
-${U}/SCRIPT/ntua_pcs.pl ${YEAR} ${DOY_3C}0 NTUA_DDP USER ${CAMPAIGN} ${BERN_TASK_ID}
-
+echo "___________________________________________________________BASH --> PERL"
+${U}/SCRIPT/ntua_pcs.pl ${YEAR} \
+          ${DOY_3C}0 \
+          NTUA_DDP USER \
+          ${CAMPAIGN} \
+          ${BERN_TASK_ID};
+echo "___________________________________________________________PERL --> BASH"
 ##  check the status
 if ! check_run \
       ${P}/${CAMPAIGN}/BPE \
@@ -780,5 +831,32 @@ if ! check_run \
 else
   echo "Succeseful processing."
 fi
+
+## ////////////////////////////////////////////////////////////////////////////
+##  REMOVE ALL FILES
+##  ---------------------------------------------------------------------------
+## ////////////////////////////////////////////////////////////////////////////
+
+## ATM
+## grep "^${sol_id:0:2}[GPR][1]*${year:2:4}${doy}0.TR[PO]"
+## grep "COD18254.ION"
+
+## BPE
+## grep "^${BERN_TASK_ID}${year:2:4}${doy}0_[0-9]*_[0-9]*.[PRT|LOG]"
+## ${CAMPAIGN:0:3}_${BERN_TASK_ID}.RUN
+## ${CAMPAIGN:0:3}_${BERN_TASK_ID}.OUT
+
+## GRD
+## grep "^VMF${year:2:4}${doy}0.GRD"
+
+## OBS
+## grep "^[A-Z,0-9,_]*${doy}0.[P|C][Z|S][H|O]"
+
+## ORB
+## grep "^[A-Z,0-9]*${doy}0.[CLK|ERP|STD|IEP|TAB|SP3]"
+## grep "^[A-Z,0-9]*${gpsw}${dow}.[CLK|ERP|STD|IEP|TAB|SP3]"
+## P1C11501.DCB
+
+## find ${P}/${CAMPAIGN}/ -newer
 
 exit 0
