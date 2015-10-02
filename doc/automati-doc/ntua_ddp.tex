@@ -160,3 +160,101 @@
     \end{enumerate}
 
 \end{itemize}
+
+\subsubsection{Form baselines \& pre-process phase data}\label{ddp-fbppd}
+\begin{verbatim}
+301 INIT_BSL NDP_GEN           ANY      1 233
+302 SNGDIF   NDP_GEN           ANY      1 301
+303 SNGDIF   NDP_GE2           ANY      1 302
+311 MAUPRPAP NDP_GEN           ANY      1 303
+312 MAUPRP_P NDP_GEN           ANY      1 311
+313 MPRXTR   NDP_GEN           ANY      1 312
+## 314 MAUPRPAP NDP_GE2           ANY      1 313
+## 315 MAUPRP_P NDP_GEN           ANY      1 314
+## 316 MPRXTR   NDP_GE2           ANY      1 315
+321 GPSEDTAP NDP_EDT           ANY      1 313
+322 GPSEDT_P NDP_EDT           ANY      1 321
+323 GPSXTR   NDP_EDT           ANY      1 322
+331 RES_SUM  NDP_GEN           ANY      1 322
+341 ADDNEQ2  NDP_GEN           ANY      1 331
+342 GPSXTR   NDP_GEN           ANY      1 341
+## 399 DUMMY    NO_OPT            ANY      1 303 323 342
+\end{verbatim}
+
+\begin{itemize}
+  \item \texttt{INIT\_BSL (NDP\_GEN)} \underline{Create Single Difference Files - SNGDIF}
+    Input files are all files of type \texttt{????\$S+0.PZH}. Algorithm to create
+    baselines is \texttt{SHORTEST}, stations must contain GPS observations. We
+    also need the satellite inormation file \texttt{\$(SATINF).\$(PCV)} and the
+    abbreviation file \texttt{\$(CRDINF).ABB}. The file \texttt{\$A\$YSS+0.CRD} is used
+    for a-priori coordinates and \texttt{\$(CRDINF).CLU} for cluster definition.
+
+    Result files are \texttt{BSL\$YSS+0.BSL}, which lists the baselines and
+    \texttt{\$YSS+0.CLB} which assigns baselines to clusters.
+
+    \begin{bclogo}[logo=\bcattention, couleurBarre=red, noborder=true, couleur=Peach]{Important!}
+      A second identical run is performed, i.e. \texttt{SNGDIF (NDP\_GE2)}, using
+      the already created file \texttt{BSL\$YSS+0.BSL} to create the same baselines
+      but for \textbf{CODE} observables. These may be needed in the ambiguity
+      resolution step.
+    \end{bclogo}
+
+  \item \texttt{MAUPRP (NDP\_GEN)} \underline{Phase Pre-Processing - MAUPRP}
+    Uses the obervation files of type \texttt{????\$S+0.PSH} with a-priori coordinates
+    from \texttt{\$A\$YSS+0.CRD}; other input files, include the standard orbits
+    \texttt{\$B\$YSS+0.STD}, the pole file \texttt{\$B\$YSS+0.ERP}, the station
+    information file \texttt{\$(CRDINF).STA}, the satellite inormation file
+    \texttt{\$(SATINF).\$(PCV)}, the satellite problem file \texttt{\$(SATCRX).CRX},
+    and the the phase center offset file \texttt{\$(PCVINF).\$(PCV)}.
+
+    New (estimated) coordinates are not saved, the screening mode is set to
+    \texttt{AUTO} and the troposphere mapping model is \texttt{GMF}.
+
+  \item \texttt{MPRXTR (NDP\_GEN)} \underline{Extract MAUPRP Program Output - MPRXTR}
+    Input files are \texttt{MPR\$S+0???.OUT}. Output files are \texttt{MPR\$YSS+0.OUT}
+    and a file deletion list named \texttt{MPR\$YSS+0.DEL}.
+
+  \item \texttt{GPSEDTAP (NDP\_EDT)} \underline{Parameter Estimation - GPSEST}
+    Uses the obervation files of type \texttt{????\$S+0.PSH} with a-priori coordinates
+    from \texttt{\$A\$YSS+0.CRD}; other input files, include the standard orbits
+    \texttt{\$B\$YSS+0.STD}, the pole file \texttt{\$B\$YSS+0.ERP}, the station
+    information file \texttt{\$(CRDINF).STA}, the satellite inormation file
+    \texttt{\$(SATINF).\$(PCV)}, the satellite problem file \texttt{\$(SATCRX).CRX},
+    and the the phase center offset file \texttt{\$(PCVINF).\$(PCV)}.
+
+    Also, we use ionospheric corrections, \texttt{\$B\$WD+0.ION}, and ocean and 
+    atmospheric tidal loading corrections \texttt{\$(BLQINF).BLQ} and \texttt{\$(ATLINF).ATL}.
+
+    We poduce the normal equation files \texttt{\$C\$(CLUSTER).NQ0} and the
+    residual files \texttt{ED\$(FL)\$(CLUSTER).RES}.
+
+    Other options include:
+
+    \begin{tabular}{p{3cm} p{3cm} p{4cm}  }
+      \hline\\
+      Parameter & Value & Comment\\
+      \hline\\
+      Satellite System & \texttt{\$SATSYS} &\\
+        Frequency & \texttt{L3} & \\
+        Cut-off Angle & \texttt{\$(ELANG)} & \\
+        Sampling Interval & \texttt{\$(SAMPL)} & \\
+        Troposphere M. & \texttt{GMF} & \textit{2-hour interval} \\
+        Ambiguitiy Resolution & \texttt{None} & \textit{pre-elimination} \texttt{PRIOR\_TO\_NEQ\_SAVING}\\
+        Datum Definition & \texttt{All coordinates constrained} & \textit{.01 meters} \\
+        Trposhperic Gradients & \texttt{CHENHER} & \textit{24hours} \\
+        Relative A-Priori Sigmas & \texttt{5.0 meters} & \textit{See Note}\\
+      \hline\\
+    \end{tabular}
+
+    \begin{bclogo}[logo=\bcattention, couleurBarre=red, noborder=true, couleur=Peach]{Relative A-Priori Sigmas for Tropospheric Params.}
+      In addition you may specify so-called 'relative' constraints on the 
+      differences between consecutive tropospheric parameters referring to the 
+      same station to model/limit the variation of tropospheric parameters in 
+      time. Relative constraining only make sense if the troposphere estimation 
+      interval is shorter than about 30 minutes. 
+      
+      \underline{Remark:} In order to avoid a format overflow in the troposphere
+      output file that may happen if a troposphere parameter is estimated based
+      on very few observations concentrated at one end of the interval of
+      parameter validity, a small relative sigma (e.g., 5 meter) may help.
+    \end{bclogo}
