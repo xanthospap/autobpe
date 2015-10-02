@@ -113,13 +113,17 @@ try:
   gpsw, sow = bernutils.gpstime.pydt2gps(py_date)
 
   sp3file = os.path.join(DEST_ORB,\
-    ("%s%4i%1i.SP3"%(AC, gpsw, int(dow))))
+    ("%s%4i%1i.PRE"%(AC, gpsw, int(dow))))
   if isUnixCompressed(info_dict['sp3'][0]):
     sp3file += '.Z'
   info_dict['sp3'].append(sp3file)
 
-  erpfile = os.path.join(DEST_ORB,\
-    "%s%4i%1i.ERP"%(AC, gpsw, int(dow)))
+  if AC.lower() == 'cod':
+    erpfile = os.path.join(DEST_ORB,\
+      "%s%4i%1i.ERP"%(AC, gpsw, int(dow)))
+  else:
+    erpfile = os.path.join(DEST_ORB,\
+      "%s%4i%1i.IEP"%(AC, gpsw, int(dow)))
   if isUnixCompressed(info_dict['erp'][0]):
     erpfile += '.Z'
   info_dict['erp'].append(erpfile)
