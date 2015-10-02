@@ -24,14 +24,13 @@ check_run () {
 
   if ! test -f ${status_f}; then
     echoerr "ERROR. Cannot find status file $status_f"
-    exit 1
+    return 1
   fi
-
   ## grep for error
   if grep "error" ${status_f} &>/dev/null ; then
     if ! test -d ${bpe_path}; then
       echoerr "ERROR. Invalid /BPE folder: $bpe_path"
-      exit 1
+      return 1
     fi
     for i in `ls ${bpe_path}/*.LOG`; do
       cat ${i} >&2
@@ -39,7 +38,7 @@ check_run () {
     cat ${outout_f} >&2
     exit 1
   else ## no error hurray !!!!
-    exit 0
+    return 0
   fi
 }
 
@@ -225,12 +224,12 @@ MY_PRODUCT_AREA=/media/Seagate/solutions52 ## add yyyy/ddd later on
 # MY_PRODUCT_ID optionaly set via cmd, if we are going to search our products
 
 ##  database for local/user products
-export DB_HOST="147.102.110.73"
-export DB_USER="bpe2"
-export DB_PASSWORD="webadmin"
-export DB_DBNAME="procsta"
+DB_HOST="147.102.110.73"
+DB_USER="bpe2"
+DB_PASSWORD="webadmin"
+DB_DBNAME="procsta"
 
-export PATH=${PATH}:/home/bpe2/src/autobpe/bin
+PATH=${PATH}:/home/bpe2/src/autobpe/bin
 
 ## ////////////////////////////////////////////////////////////////////////////
 ## GET/EXPAND COMMAND LINE ARGUMENTS
@@ -414,6 +413,10 @@ if test -z ${DOY+x}; then
   echoerr "ERROR. Day of year must be set!"
   exit 1
 fi
+if test "${#DOY_3C}" -ne 3; then
+  echoerr "ERROR. Something funny happened with doy ..."
+  exit 1
+fi
 
 ##  bernese-variable file must be set; if it is, check that it exists 
 ##+ and source it.
@@ -465,6 +468,7 @@ if test -z ${SAVE_DIR+x}; then
   echoerr "ERROR. Save directory must be set!"
   exit 1
 else
+  SAVE_DIR="${SAVE_DIR%/}"
   if ! test -d ${SAVE_DIR}; then
     if ! mkdir -p ${SAVE_DIR}; then
       echoerr "ERROR. Failed to create directory ${SAVE_DIR}"
@@ -486,9 +490,6 @@ if ! END_OF_DAY_STR=$(ydoy2dt "${YEAR}" "${DOY_3C}" "23" "59" "30") ; then
   echoerr "ERROR. Failed to parse date"
   exit 1
 fi
-
-export YEAR="${YEAR}"
-export DOY_3C="${DOY}"
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD RINEX FILES
@@ -634,7 +635,7 @@ fi
 ##+ the following will download the best possible products; for more info, see
 ##+ the bernutils module documentation.
 ## ////////////////////////////////////////////////////////////////////////////
-if test 1 -eq 2 ;  then
+if test 2 -eq 1 ;  then
 ##  will we need an ion file ?
 if test ${ION_DOWNLOADED} -eq 1; then
   if ! handle_dd_products.py \
@@ -670,7 +671,7 @@ fi
 ##+ first 6 hours of the next day (a bernese thing). We need to merge all
 ##+ files to a final one.
 ## ////////////////////////////////////////////////////////////////////////////
-if test 1 -eq 1 ; then
+if test 2 -eq 1 ; then
 ## temporary file to hold getvmf1.py output
 TMP_FL=.vmf1-${YEAR}${DOY}.dat
 
@@ -794,6 +795,26 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" \
   exit 1
 fi
 
+##  TODO:    This needs to change... fix the program / make new
+##  ---------------------------------------------------------------------------
+##  Depending on the AC, set the INP file POLUPD.INP to fill in the right
+##+ widget, using the script setpolupdh utility. But first, we have got to find
+##+ out which directory in the ${U}/OPT area holds the INP file. Note that only
+##+ one line containing the POLUPDH script is allowd in the PCF file.
+LNS=`/bin/grep POLUPDH ${U}/PCF/${PCF_FILE} | /bin/grep -v "#" | wc -l`
+if test "$LNS" -ne 1 ; then
+  echoerr "Non-unique line for POLUPDH in the PCF file; Don't know what to do!"
+  exit 1
+fi
+PAN=`/bin/grep POLUPDH ${U}/PCF/${PCF_FILE} | /bin/grep -v "#" | awk '{print $3}'`
+if ! setpolupdh.sh --bernese-loadvar=${B_LOADGPS} \
+        --analysis-center=${AC^^} \
+        --pan=${PAN}
+then
+  echo "bernese-loadvar=${B_LOADGPS}"
+  exit 1
+fi
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  A-PRIORI COORDINATES FOR REGIONAL SITES
 ##  ---------------------------------------------------------------------------
@@ -810,9 +831,9 @@ fi
 ##  ---------------------------------------------------------------------------
 ##  Call the perl script which ignites the BPE via the PCF :)
 ## ////////////////////////////////////////////////////////////////////////////
-
 BERN_TASK_ID="${CAMPAIGN:0:1}DD"
 
+if test 2 -eq 1; then
 ##  run the perl script to ignite the PCF
 echo "___________________________________________________________BASH --> PERL"
 ${U}/SCRIPT/ntua_pcs.pl ${YEAR} \
@@ -821,6 +842,7 @@ ${U}/SCRIPT/ntua_pcs.pl ${YEAR} \
           ${CAMPAIGN} \
           ${BERN_TASK_ID};
 echo "___________________________________________________________PERL --> BASH"
+fi
 ##  check the status
 if ! check_run \
       ${P}/${CAMPAIGN}/BPE \
@@ -830,6 +852,50 @@ if ! check_run \
   exit 1
 else
   echo "Succeseful processing."
+fi
+
+## ////////////////////////////////////////////////////////////////////////////
+##  COPY PRODUCTS TO HOST; UPDATE DATABASE ENTRIES
+##  ---------------------------------------------------------------------------
+## ////////////////////////////////////////////////////////////////////////////
+echo "updating database .."
+##  warning: in the db mixed := GPS+GLO
+if test "${SAT_SYS^^}" = "MIXED"; then
+  DB_SAT_SYS="GPS+GLO"
+else
+  DB_SAT_SYS=${SAT_SYS}
+fi
+
+##  create the directory ${SAVE_DIR}/YYYY/DDD (if it doesn't exist)
+if ! test -d "${SAVE_DIR}/${YEAR}/${DOY_3C}"; then
+  echo "Creating solution directory ${SAVE_DIR}/${YEAR}/${DOY_3C}/"
+  if ! mkdir -p "${SAVE_DIR}/${YEAR}/${DOY_3C}"; then
+    echoerr "ERROR. Failed to create directory ${SAVE_DIR}/${YEAR}/${DOY_3C}/"
+    exit 1
+  fi
+fi
+
+##  warning: dates have whitespace ('%Y-%m-%d %H:%M:%S'); replace whitespace
+##+ with underscore, i.e. '%Y-%m-%d_%H:%M:%S'
+
+##  final tropospheric sinex
+TRO_SINEX=${FINAL_SOLUTION_ID}${YEAR:2:2}${DOY_3C}0.TRO
+if cp ${P}/${CAMPAIGN}/ATM/${TRO_SINEX} ${SAVE_DIR}/${YEAR}/${DOY_3C}/${TRO_SINEX} \
+  && compress -f ${SAVE_DIR}/${YEAR}/${DOY_3C}/${TRO_SINEX} \
+  && add_products_2db.py \
+          --campaign-name=${CAMPAIGN} \
+          --satellite-system=${DB_SAT_SYS} \
+          --solution-type=DDFINAL \
+          --product-type=TRO_SNX \
+          --start-epoch="${START_OF_DAY_STR/ /_}" \
+          --end-epoch="${END_OF_DAY_STR/ /_}" \
+          --host-ip="147.102.110.69" \
+          --host-dir="${SOL_DIR}/${YEAR}/${DOY_3C}/" \
+          --product-filename="${TRO_SINEX}.Z" ; then
+  echo "Final Tropospheric Sinex saved/recorded: ${TRO_SINEX}.Z"
+else
+  echoerr "ERROR. Failed to save/record tropospheric sinex : ${TRO_SINEX}"
+  exit 1
 fi
 
 ## ////////////////////////////////////////////////////////////////////////////

@@ -30,7 +30,7 @@ report any bugs to    :
 '''
 
 ## Import libraries
-import sys
+import sys, os
 import datetime
 import getopt
 import glob
@@ -59,23 +59,41 @@ host_dir    = None
 filename    = None
 software    = 'BERN52'
 
+## database
+DB_HOST='147.102.110.73'
+DB_USER='bpe2'
+DB_PASSWORD='webadmin'
+DB_NAME='procsta'
+
 satsys_dict = {
-    'GPS': 'GPS',
-    'GPS+GLO': 'GPS+GLO'
+  'GPS'     : 'GPS',
+  'GLO'     :'GLONASS',
+  'GPS+GLO' : 'GPS+GLO'
 }
 
 soltype_dict = {
-    '': ''
+  'DDFINAL'  : 'DDFINAL',
+  'DDRAPID'  : 'DDRAPID',
+  'DDURAPID' : 'DDURAPID',
+  'PPP'      : 'PPP'
 }
 
 prodtype_dict = {
-    'SINEX': 'SINEX',
-    'IONEX': 'IONEX',
-    'TRO_SNX': '',
+  'SINEX'    : 'SINEX',
+  'NQ'       : 'NQ',
+  'IONEX'    : 'IONEX',
+  'ION'      : 'ION',
+  'TRP_SNX'  : 'TRP_SINEX',
+  'TRO_SNX'  : 'TRO_SINEX',
+  'CRD_FILE' : 'CRD_FILE'
 }
 
 software_dict = {
-    'BERN52': 'BERN52'
+  'BERN50' : 'BERN50',
+  'BERN52' : 'BERN52',
+  'GAMIT'  : 'GAMIT',
+  'GIPSY'  : 'GIPSY',
+  'NTUA'   : 'NTUA'
 }
 
 def to_datetime(date_str):
@@ -83,7 +101,7 @@ def to_datetime(date_str):
   ##                 %Y-%m-%d_%H:%M:%S
   date_fields = len(date_str.split('-'))
 
-  if date_fiels != 2 and date_fields != 3:
+  if date_fields != 2 and date_fields != 3:
     raise RuntimeError("Invalid input date [%s]"%date_str)
 
   try:
@@ -93,17 +111,17 @@ def to_datetime(date_str):
       return datetime.datetime.strptime(date_str, "%Y-%m-%d_%H:%M:%S")
   except:
     raise RuntimeError("Invalid input date [%s]"%date_str)
-    
 
 ## Resolve command line arguments
 def main (argv):
 
   try:
     opts, args = getopt.getopt(argv,'h',[
-      'help','campaign-name=','sattellite-system=','solution-type=','product-type=','start-epoch=',
+      'help','campaign-name=','satellite-system=','solution-type=','product-type=','start-epoch=',
       'end-epoch=','processed-at=','host-ip=','host-dir=','product-filename=', 'software='])
 
-  except getopt.GetoptError:
+  except getopt.GetoptError as err:
+    print >>sys.stderr, str(err)
     raise RuntimeError("ERROR. Cannot parse options!")
     sys.exit(1)
 
@@ -209,16 +227,14 @@ SQL_INSERT_CMD = "INSERT INTO product \
   dateobs_stop, \
   host_name, \
   pth2dir, \
-  filename, \
-  prcomment\
-)
-VALUES (\
+  filename \
+) \
+VALUES ( \
   (SELECT network_id FROM network WHERE network_name=\"%s\"), \
   (SELECT software_id FROM software WHERE software_name=\"%s\"), \
   (SELECT satsys_id FROM satsys WHERE satsys_name=\"%s\"), \
   (SELECT soltype_id FROM soltype WHERE soltype_name=\"%s\"), \
   (SELECT prodtype_id FROM prodtype WHERE prodtype_name=\"%s\"), \
-  \"%s\", \
   \"%s\", \
   \"%s\", \
   \"%s\", \
