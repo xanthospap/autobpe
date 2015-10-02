@@ -247,8 +247,6 @@ VALUES ( \
         stop_epoch.strftime("%Y-%m-%d %H:%M:%S"), \
         host_ip, host_dir, filename)
 
-print SQL_INSERT_CMD
-
 exit_status = 0
 ## try connecting to the database server
 try:
@@ -264,6 +262,7 @@ except:
         limit=10, file=sys.stderr)
   print >>sys.stderr,'*** End'
   db.rollback()
+  ## print SQL_INSERT_CMD
 
 db.close()
 

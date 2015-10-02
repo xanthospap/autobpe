@@ -231,10 +231,11 @@ save_n_update () {
     fi
   fi
  
-  local fl=${solution_id}${YEAR:2:2}${DOY_3C}0.${1}
+  local src_f=${solution_id}${YEAR:2:2}${DOY_3C}0.${1} ## source file
+  local trg_f=${solution_id}${YEAR:2:2}${DOY_3C}0${APND_SUFFIX}.${1} ## target
 
-  if cp ${P}/${CAMPAIGN}/${2}/${fl} ${SAVE_DIR}/${YEAR}/${DOY_3C}/${fl} \
-     && compress -f ${SAVE_DIR}/${YEAR}/${DOY_3C}/${fl} \
+  if cp ${P}/${CAMPAIGN}/${2}/${src_f} ${SAVE_DIR}/${YEAR}/${DOY_3C}/${trg_f} \
+     && compress -f ${SAVE_DIR}/${YEAR}/${DOY_3C}/${trg_f} \
      && add_products_2db.py \
           --campaign-name=${CAMPAIGN} \
           --satellite-system=${DB_SAT_SYS} \
@@ -244,11 +245,11 @@ save_n_update () {
           --end-epoch="${END_OF_DAY_STR/ /_}" \
           --host-ip="147.102.110.69" \
           --host-dir="${SOL_DIR}/${YEAR}/${DOY_3C}/" \
-          --product-filename="${fl}.Z" ; then
-  echo "Final ${3} saved/recorded: ${fl}.Z"
+          --product-filename="${trg_f}.Z" ; then
+  echo "Final ${3} saved/recorded: ${trg_f}.Z"
   return 0
 else
-  echoerr "ERROR. Failed to save/record ${1} sinex : ${fl}"
+  echoerr "ERROR. Failed to save/record ${1} sinex : ${trg_f}"
   return 1
 fi
 }
@@ -266,6 +267,7 @@ DEBUG_MODE=NO
 # LOGFILE=
 # SOLUTION_ID=
 # SAVE_DIR=
+# APND_SUFFIX=
 
 ##  optional parameters; may be changes via cmd arguments
 SAT_SYS=GPS
@@ -302,7 +304,7 @@ getopt -T > /dev/null ## check getopt version
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
   ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e:a: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products: \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix: \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -396,6 +398,10 @@ do
         echoerr "ERROR. Elevation angle must be a positive integer!"
         exit 1
       fi
+      shift
+      ;;
+    --append-suffix)
+      APND_SUFFIX="${2}"
       shift
       ;;
     -v|--version)
@@ -940,38 +946,19 @@ fi
 ##  argv3 -> product type (e.g. 'SINEX')
 
 ##  final tropospheric sinex
-save_n_update TRO ATM TRO_SINEX
+if ! save_n_update TRO ATM TRO_SNX ; then exit 1 ; fi
 
 ## final SINEX
-save_n_update SNX SOL SINEX
+if ! save_n_update SNX SOL SINEX ; then exit 1 ; fi
 
 ## final NQ0
-save_n_update NQ0 SOL NQ
+if ! save_n_update NQ0 SOL NQ ; then exit 1 ; fi
 
 ## reduced NQ0
-save_n_update NQ0 SOL NQ R
+if ! save_n_update NQ0 SOL NQ R ; then exit 1 ; fi
 
 ## final coordinates
-save_n_update CRD STA CRD_FILE
-
-#TRO_SINEX=${FINAL_SOLUTION_ID}${YEAR:2:2}${DOY_3C}0.TRO
-#if cp ${P}/${CAMPAIGN}/ATM/${TRO_SINEX} ${SAVE_DIR}/${YEAR}/${DOY_3C}/${TRO_SINEX} \
-#  && compress -f ${SAVE_DIR}/${YEAR}/${DOY_3C}/${TRO_SINEX} \
-#  && add_products_2db.py \
-#          --campaign-name=${CAMPAIGN} \
-#          --satellite-system=${DB_SAT_SYS} \
-#          --solution-type=DDFINAL \
-#          --product-type=TRO_SNX \
-#          --start-epoch="${START_OF_DAY_STR/ /_}" \
-#          --end-epoch="${END_OF_DAY_STR/ /_}" \
-#          --host-ip="147.102.110.69" \
-#          --host-dir="${SOL_DIR}/${YEAR}/${DOY_3C}/" \
-#          --product-filename="${TRO_SINEX}.Z" ; then
-#  echo "Final Tropospheric Sinex saved/recorded: ${TRO_SINEX}.Z"
-#else
-#  echoerr "ERROR. Failed to save/record tropospheric sinex : ${TRO_SINEX}"
-#  exit 1
-#fi
+if ! save_n_update CRD STA CRD_FILE ; then exit 1 ; fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  REMOVE ALL FILES
@@ -997,6 +984,13 @@ save_n_update CRD STA CRD_FILE
 ## grep "^[A-Z,0-9]*${doy}0.[CLK|ERP|STD|IEP|TAB|SP3]"
 ## grep "^[A-Z,0-9]*${gpsw}${dow}.[CLK|ERP|STD|IEP|TAB|SP3]"
 ## P1C11501.DCB
+
+## OUT
+## grep "^[A-Z,0-9,_]*${doy}0_[A-Z].[OUT]"
+## grep "^RES${doy}0[0-9]*.[EDT|OUT]"
+## grep "^SATMRK.L[0-9]"
+## grep "^[SPP|WRN]${doy}0[0-9]*.OUT"
+##
 
 ## find ${P}/${CAMPAIGN}/ -newer
 
