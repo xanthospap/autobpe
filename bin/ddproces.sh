@@ -196,6 +196,63 @@ END
   fi
 }
 
+##
+##  argv1 -> file extension (e.g. 'SNX')
+##  argv2 -> campaign dir (e.g. 'SOL')
+##  argv3 -> product type (e.g. 'SINEX')
+##  argv4 -> (optional) sol type, i.e 'F' for final, 'R' for size-reduced and
+##+          'P' for preliminery.
+save_n_update () {
+
+  local solution_id=
+
+  if test "$#" -eq 4 ; then
+    case "${4}" in
+      F|f)
+        solution_id=${FINAL_SOLUTION_ID}
+        ;;
+      R|r)
+        solution_id=${REDUCED_SOLUTION_ID}
+        ;;
+      P|p)
+        solution_id=${PRELIM_SOLUTION_ID}
+        ;;
+      *)
+        echoerr "Invalid one-char solution id!"
+        return 1
+        ;;
+    esac
+  else
+    if test "$#" -ne 3 ; then
+      echoerr "Invalid call to save_n_update()."
+      return 1
+    else
+      solution_id=${FINAL_SOLUTION_ID}
+    fi
+  fi
+ 
+  local fl=${solution_id}${YEAR:2:2}${DOY_3C}0.${1}
+
+  if cp ${P}/${CAMPAIGN}/${2}/${fl} ${SAVE_DIR}/${YEAR}/${DOY_3C}/${fl} \
+     && compress -f ${SAVE_DIR}/${YEAR}/${DOY_3C}/${fl} \
+     && add_products_2db.py \
+          --campaign-name=${CAMPAIGN} \
+          --satellite-system=${DB_SAT_SYS} \
+          --solution-type=DDFINAL \
+          --product-type="${3}" \
+          --start-epoch="${START_OF_DAY_STR/ /_}" \
+          --end-epoch="${END_OF_DAY_STR/ /_}" \
+          --host-ip="147.102.110.69" \
+          --host-dir="${SOL_DIR}/${YEAR}/${DOY_3C}/" \
+          --product-filename="${fl}.Z" ; then
+  echo "Final ${3} saved/recorded: ${fl}.Z"
+  return 0
+else
+  echoerr "ERROR. Failed to save/record ${1} sinex : ${fl}"
+  return 1
+fi
+}
+
 # //////////////////////////////////////////////////////////////////////////////
 # GLOBAL VARIABLES
 # //////////////////////////////////////////////////////////////////////////////
@@ -858,7 +915,7 @@ fi
 ##  COPY PRODUCTS TO HOST; UPDATE DATABASE ENTRIES
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-echo "updating database .."
+
 ##  warning: in the db mixed := GPS+GLO
 if test "${SAT_SYS^^}" = "MIXED"; then
   DB_SAT_SYS="GPS+GLO"
@@ -878,25 +935,43 @@ fi
 ##  warning: dates have whitespace ('%Y-%m-%d %H:%M:%S'); replace whitespace
 ##+ with underscore, i.e. '%Y-%m-%d_%H:%M:%S'
 
+##  argv1 -> file extension (e.g. 'SNX')
+##  argv2 -> campaign dir (e.g. 'SOL')
+##  argv3 -> product type (e.g. 'SINEX')
+
 ##  final tropospheric sinex
-TRO_SINEX=${FINAL_SOLUTION_ID}${YEAR:2:2}${DOY_3C}0.TRO
-if cp ${P}/${CAMPAIGN}/ATM/${TRO_SINEX} ${SAVE_DIR}/${YEAR}/${DOY_3C}/${TRO_SINEX} \
-  && compress -f ${SAVE_DIR}/${YEAR}/${DOY_3C}/${TRO_SINEX} \
-  && add_products_2db.py \
-          --campaign-name=${CAMPAIGN} \
-          --satellite-system=${DB_SAT_SYS} \
-          --solution-type=DDFINAL \
-          --product-type=TRO_SNX \
-          --start-epoch="${START_OF_DAY_STR/ /_}" \
-          --end-epoch="${END_OF_DAY_STR/ /_}" \
-          --host-ip="147.102.110.69" \
-          --host-dir="${SOL_DIR}/${YEAR}/${DOY_3C}/" \
-          --product-filename="${TRO_SINEX}.Z" ; then
-  echo "Final Tropospheric Sinex saved/recorded: ${TRO_SINEX}.Z"
-else
-  echoerr "ERROR. Failed to save/record tropospheric sinex : ${TRO_SINEX}"
-  exit 1
-fi
+save_n_update TRO ATM TRO_SINEX
+
+## final SINEX
+save_n_update SNX SOL SINEX
+
+## final NQ0
+save_n_update NQ0 SOL NQ
+
+## reduced NQ0
+save_n_update NQ0 SOL NQ R
+
+## final coordinates
+save_n_update CRD STA CRD_FILE
+
+#TRO_SINEX=${FINAL_SOLUTION_ID}${YEAR:2:2}${DOY_3C}0.TRO
+#if cp ${P}/${CAMPAIGN}/ATM/${TRO_SINEX} ${SAVE_DIR}/${YEAR}/${DOY_3C}/${TRO_SINEX} \
+#  && compress -f ${SAVE_DIR}/${YEAR}/${DOY_3C}/${TRO_SINEX} \
+#  && add_products_2db.py \
+#          --campaign-name=${CAMPAIGN} \
+#          --satellite-system=${DB_SAT_SYS} \
+#          --solution-type=DDFINAL \
+#          --product-type=TRO_SNX \
+#          --start-epoch="${START_OF_DAY_STR/ /_}" \
+#          --end-epoch="${END_OF_DAY_STR/ /_}" \
+#          --host-ip="147.102.110.69" \
+#          --host-dir="${SOL_DIR}/${YEAR}/${DOY_3C}/" \
+#          --product-filename="${TRO_SINEX}.Z" ; then
+#  echo "Final Tropospheric Sinex saved/recorded: ${TRO_SINEX}.Z"
+#else
+#  echoerr "ERROR. Failed to save/record tropospheric sinex : ${TRO_SINEX}"
+#  exit 1
+#fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  REMOVE ALL FILES
