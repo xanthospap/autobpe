@@ -961,6 +961,24 @@ if ! save_n_update NQ0 SOL NQ R ; then exit 1 ; fi
 if ! save_n_update CRD STA CRD_FILE ; then exit 1 ; fi
 
 ## ////////////////////////////////////////////////////////////////////////////
+##  COMPILE (NON-FATAL) ERROR/WARNINGS FILE
+##  ---------------------------------------------------------------------------
+## ////////////////////////////////////////////////////////////////////////////
+WRN_FILE=${P}/${CAMPAIGN}/LOG/wrn${YEAR}${DOY_3C}0.log
+
+if ! >${WRN_FILE} ; then
+  echoerr "ERROR. Failed to create warnings file ${WRN_FILE}"
+fi
+
+find ${P}/${CAMPAIGN}/OUT/WRN${DOY_3C}0*.SUM -not -empty -ls -exec \
+      cat {} 1>>${WRN_FILE} \; ## match files e.g 'WRN0010003.SUM'
+
+find ${P}/${CAMPAIGN}/OUT/*${YEAR}${DOY_3C}0.ERR -not -empty -ls -exec \
+      cat {} 1>>${WRN_FILE} \; ## match files e.g 'RNX150010.ERR'
+
+echo "Warnings file created as ${WRN_FILE}"
+
+## ////////////////////////////////////////////////////////////////////////////
 ##  REMOVE ALL FILES
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
