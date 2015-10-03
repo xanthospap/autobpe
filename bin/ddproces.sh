@@ -291,6 +291,17 @@ DB_DBNAME="procsta"
 PATH=${PATH}:/home/bpe2/src/autobpe/bin
 
 ## ////////////////////////////////////////////////////////////////////////////
+##  CREATE STAMP FILE
+## ////////////////////////////////////////////////////////////////////////////
+
+##  create/touch a file that won't do anything! It will just act as a time
+##+ stamp; i.e. all files in the campaign-specific folders created/modified
+##+ after this (the stamp file) are created/modified by the ddprocess script.
+TIME_STAMP_FILE=".ddprocess-ts-${BASHPID}"
+touch ${TIME_STAMP_FILE}
+date > ${TIME_STAMP_FILE}
+
+## ////////////////////////////////////////////////////////////////////////////
 ## GET/EXPAND COMMAND LINE ARGUMENTS
 ## ////////////////////////////////////////////////////////////////////////////
 
@@ -921,7 +932,7 @@ fi
 ##  COPY PRODUCTS TO HOST; UPDATE DATABASE ENTRIES
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-
+if test 1 -eq 2 ; then
 ##  warning: in the db mixed := GPS+GLO
 if test "${SAT_SYS^^}" = "MIXED"; then
   DB_SAT_SYS="GPS+GLO"
@@ -959,7 +970,7 @@ if ! save_n_update NQ0 SOL NQ R ; then exit 1 ; fi
 
 ## final coordinates
 if ! save_n_update CRD STA CRD_FILE ; then exit 1 ; fi
-
+fi
 ## ////////////////////////////////////////////////////////////////////////////
 ##  COMPILE (NON-FATAL) ERROR/WARNINGS FILE
 ##  ---------------------------------------------------------------------------
@@ -979,37 +990,15 @@ find ${P}/${CAMPAIGN}/OUT/*${YEAR}${DOY_3C}0.ERR -not -empty -ls -exec \
 echo "Warnings file created as ${WRN_FILE}"
 
 ## ////////////////////////////////////////////////////////////////////////////
-##  REMOVE ALL FILES
+##  REMOVE CAMPAIGN FILES
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-
-## ATM
-## grep "^${sol_id:0:2}[GPR][1]*${year:2:4}${doy}0.TR[PO]"
-## grep "COD18254.ION"
-
-## BPE
-## grep "^${BERN_TASK_ID}${year:2:4}${doy}0_[0-9]*_[0-9]*.[PRT|LOG]"
-## ${CAMPAIGN:0:3}_${BERN_TASK_ID}.RUN
-## ${CAMPAIGN:0:3}_${BERN_TASK_ID}.OUT
-
-## GRD
-## grep "^VMF${year:2:4}${doy}0.GRD"
-
-## OBS
-## grep "^[A-Z,0-9,_]*${doy}0.[P|C][Z|S][H|O]"
-
-## ORB
-## grep "^[A-Z,0-9]*${doy}0.[CLK|ERP|STD|IEP|TAB|SP3]"
-## grep "^[A-Z,0-9]*${gpsw}${dow}.[CLK|ERP|STD|IEP|TAB|SP3]"
-## P1C11501.DCB
-
-## OUT
-## grep "^[A-Z,0-9,_]*${doy}0_[A-Z].[OUT]"
-## grep "^RES${doy}0[0-9]*.[EDT|OUT]"
-## grep "^SATMRK.L[0-9]"
-## grep "^[SPP|WRN]${doy}0[0-9]*.OUT"
-##
-
-## find ${P}/${CAMPAIGN}/ -newer
+##  we are going to remove any file in the campaign-specific folders, newer
+##+ than .ddprocess-time-stamp (i.e. the stamp file), except from symlinks.
+find -P ${P}/${CAMPAIGN}/ \
+      -maxdepth 1 \
+      -type f \
+      -newer ${TIME_STAMP_FILE} \
+      ! name ${WRN_FILE}
 
 exit 0
