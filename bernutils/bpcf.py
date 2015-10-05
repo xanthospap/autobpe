@@ -122,6 +122,19 @@ class PcfFile:
 
     return var_list
 
+  def dump_to_json(self):
+    if len(self.__varlist) == 0:
+      var_list = self.load_variables()
+    else:
+      var_list = self.__varlist
+
+    print '{pcf_variables:['
+    for i in var_list:
+      var_str = '{\"var_name\":\"%s\", \"description\": \"%s\", \"value\": \"%s\" }'%(i.var(), i.description(), i.value())
+      print var_str
+    print ']}'
+
+
   def dump_to_html(self):
     ''' Dump the PCF's variables to stdout, in an html table format
     '''

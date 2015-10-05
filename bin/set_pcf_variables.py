@@ -37,7 +37,8 @@ import bernutils.bpcf
 DDEBUG_MODE = True
 
 ## flush to html
-HTML_OUT = True
+HTML_OUT = False
+JSON_OUT = True
 
 ## help function
 def help (i):
@@ -66,6 +67,7 @@ def main(argv):
   pcf.flush_variables()
 
   if HTML_OUT: pcf.dump_to_html()
+  if JSON_OUT: pcf.dump_to_json()
 
 ## Start main
 if __name__ == "__main__":

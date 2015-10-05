@@ -127,6 +127,10 @@ class FullStationRecord:
   def east(self)  : return self.__de
   def up(self)    : return self.__du
 
+  def tojson(self):
+    jstr = "{ \"xest\":%15.4f, \"yest\":%15.4f,\"zest\":%15.4f,\"xapr\":%15.4f,\"yapr\":%15.4f,\"zapr\":%15.4f,\"xcor\":%15.4f,\"ycor\":%15.4f,\"zcor\":%15.4f,\"xrms\":%15.4f,\"yrms\":%15.4f,\"zrms\":%15.4f,\"latest\":%15.4f,\"lonest\":%15.4f,\"hgtest\":%15.4f,\"latapr\":%15.4f,\"lonapr\":%15.4f,\"hgtapr\":%15.4f,\"latcor\":%15.4f,\"loncor\":%15.4f,\"hgtcor\":%15.4f,\"latrms\":%15.4f,\"lonrms\":%15.4f,\"hgtrms\":%15.4f,\"north\":%15.4f,\"east\":%15.4f,\"up\":%15.4f,\"adj\":\"%s\" }"%(self.xest(),self.yest(),self.zest(),self.xapr(),self.yapr(),self.zapr(),self.xcor(),self.ycor(),self.zcor(),self.xrms(),self.yrms(),self.zrms(),self.latest(),self.lonest(),self.hgtest(),self.latapr(),self.lonapr(),self.hgtapr(),self.latcor(),self.loncor(),self.hgtcor(),self.latrms(),self.lonrms(),self.hgtrms(),self.north(),self.east(),self.up(),self.adjtp())
+    return jstr;
+
 func_dict = { 'x': FullStationRecord.xest, 
   'xapr': FullStationRecord.xapr,
   'xcor': FullStationRecord.xcor,
@@ -704,6 +708,19 @@ class AddneqFile:
             '</div>' %(warn_str)
           else:
             print '[WARNING]', warn_str
+
+  def toJson(self):
+    lst1  = self.get_station_coordinates() ## in the old days, this was a list!
+    dict1 = self.get_apriori_coordinates()
+    ##  combine into a single dictionary, with name as key
+    ##+ and values of type FullStationRecord
+    for key, val in dict1.iteritems():
+      full_info = val + lst1[key]
+      dict1[key] = FullStationRecord(key, full_info)
+    print '{addneq_summary:['
+    for sta, val in dict1.iteritems():
+      print val.tojson()
+    print ']}'
 
   def toHtml(self, format_str, warnings_str=None):
     ''' Create an html table with adjustment information. The user can select the

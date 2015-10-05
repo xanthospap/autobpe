@@ -107,6 +107,10 @@ class AmbLine:
       raise RuntimeError('Invalid satellite system string %s' %sys)
     return sys, satsys_dict[sys]
 
+  def tojson(self):
+    jstr = "{\"baseline\":\"%s\", \"station1\":\"%s\", \"station1\":\"%s\", \"length\": %6.1f, \"method\": \"%s\", \"num_of_ambs\": %5i, \"precent\": %4.1f, \"satsys\": \"%s\" }"%(self.baseline(),self.station1(), self.station2(), self.length(), self.method(), self.ambsbefore()[0], self.percent(),self.satsys()[1])
+    return jstr
+
 class AmbFile:
   ''' A class to hold a Bernese ambiguity summary file (.SUM).
   '''
@@ -199,6 +203,27 @@ class AmbFile:
 
     ## return the filtered list.
     return ret_list
+
+  def toJson(self, sat_sys=None):
+ 
+    print '{amb_res_summary:['
+
+    ## For every resolution method posible ..
+    for ambmth in amb_dict:
+
+      ## create a list holding all baselines (for this method)
+      m_lines = self.method_lines(ambmth, sat_sys, include_summary_block=False)
+
+      ## for every ambiguity line (for current method) ..
+      for aline in m_lines:
+
+        ## cast the line to an AmbLine instance
+        ambline = AmbLine(aline)
+
+        ## print it in json format
+        print ambline.tojson()
+
+    print ']}'
 
   def toHtml(self, sat_sys=None):
     ''' Translate the ambiguity resolution information from this file to a

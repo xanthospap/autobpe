@@ -1,6 +1,7 @@
 import os
 import datetime
 import ftplib
+import json
 
 import bernutils.gpstime
 import bernutils.webutils

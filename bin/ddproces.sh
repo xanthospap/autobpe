@@ -761,7 +761,7 @@ if test ${ION_DOWNLOADED} -eq 1; then
           --datapool="${D}" \
           --destination="${P}/${CAMPAIGN}/ORB" \
           --satellite-system="${SAT_SYS}" \
-          --report=html; then
+          --report=json; then
     echoerr "ERROR. Failed to download/copy/uncompress products."
     exit 1
   fi
@@ -774,7 +774,7 @@ else
           --destination="${P}/${CAMPAIGN}/ORB" \
           --satellite-system="${SAT_SYS}" \
           --download-ion \
-          --report=html; then
+          --report=json; then
     echoerr "ERROR. Failed to download/copy/uncompress products."
     exit 1
   fi
@@ -793,7 +793,7 @@ if test 1 -eq 1 ; then
 ## temporary file to hold getvmf1.py output
 TMP_FL=.vmf1-${YEAR}${DOY}.dat
 
-if ! getvmf1.py --year=${YEAR} --doy=${DOY} --outdir=${D} 1> ${TMP_FL}; then
+if ! getvmf1.py --year=${YEAR} --doy=${DOY} --outdir=${D} --json=".vmf1.json" 1> ${TMP_FL}; then
   echoerr "ERROR. Failed to get VMF1 grid file(s)"
   exit 1
 fi
@@ -812,18 +812,18 @@ else
 fi
 
 ##  write a nice report like the one given by handle_products.
-if ! mapfile -t VMF_FL_ARRAY < <(cat ${TMP_FL} | awk '{print $2}') ; then
-  echoerr "ERROR. Failed to report VMF1 grid file(s). Strange !!"
-  exit 1
-fi
-let c=${#VMF_FL_ARRAY[@]}-1
-tmp_="<code>${VMF_FL_ARRAY[0]}"
-for i in `seq 1 $c`; do tmp_="${tmp_}, ${VMF_FL_ARRAY[${i}]}"; done
-tmp_="${tmp_}</code>"
-printf "<p>Product type: <strong>vmf1</strong> :\
-  downloaded file(s) %s ; moved to %s</p>\n" \
-      "$tmp_" "$MERGED_VMF_FILE"
-
+##if ! mapfile -t VMF_FL_ARRAY < <(cat ${TMP_FL} | awk '{print $2}') ; then
+##  echoerr "ERROR. Failed to report VMF1 grid file(s). Strange !!"
+##  exit 1
+##fi
+##let c=${#VMF_FL_ARRAY[@]}-1
+##tmp_="<code>${VMF_FL_ARRAY[0]}"
+##for i in `seq 1 $c`; do tmp_="${tmp_}, ${VMF_FL_ARRAY[${i}]}"; done
+##tmp_="${tmp_}</code>"
+##printf "<p>Product type: <strong>vmf1</strong> :\
+##  downloaded file(s) %s ; moved to %s</p>\n" \
+##      "$tmp_" "$MERGED_VMF_FILE"
+cat .vmf1.json 2>/dev/null
 rm ${TMP_FL} ## remove temporary file
 fi
 ## ////////////////////////////////////////////////////////////////////////////
@@ -895,9 +895,9 @@ else
 fi
 
 ##  report ..
-printf "<p><strong>Final Solution</strong>       : <var>%s</var><br>\n" "$FINAL_SOLUTION_ID"
-printf "<strong>Size-Reduced Solution</strong>: <var>%s</var><br>\n" "$REDUCED_SOLUTION_ID"
-printf "<strong>Preliminery Solution</strong> : <var>%s</var></p>\n" "$PRELIM_SOLUTION_ID"
+##printf "<p><strong>Final Solution</strong>       : <var>%s</var><br>\n" "$FINAL_SOLUTION_ID"
+##printf "<strong>Size-Reduced Solution</strong>: <var>%s</var><br>\n" "$REDUCED_SOLUTION_ID"
+##printf "<strong>Preliminery Solution</strong> : <var>%s</var></p>\n" "$PRELIM_SOLUTION_ID"
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  SET VARIABLES IN THE PCF FILE
@@ -1076,9 +1076,9 @@ python - <<END
 import sys, bernutils.bamb
 try:
   ambf = bernutils.bamb.AmbFile( "${AMBSM}" )
-  ambf.toHtml()
+  ambf.toJson()
 except:
-  print>>sys.stderr,'ERROR. Cannot translate amb file to html!'
+  print>>sys.stderr,'ERROR. Cannot translate amb file to json!'
   sys.exit(1)
 sys.exit(0)
 END
@@ -1087,9 +1087,20 @@ if test "$?" -ne 0 ; then exit 1 ; fi
 printf "<h2>ADDNEQ Summary</h2>"
 ##  the final ADDNEQ summary file should be
 ADNQ=${P}/${CAMPAIGN}/OUT/${FINAL_SOLUTION_ID}${YEAR:2:2}${DOY_3C}0.OUT
-adnq2html.py --addneq-file="${ADNQ}" \
-          --table-entries='latcor,loncor,hgtcor,dn,de,du,adj' \
-          --warnings-str='dn=.01,de=.01,du=.01'
+#adnq2html.py --addneq-file="${ADNQ}" \
+#          --table-entries='latcor,loncor,hgtcor,dn,de,du,adj' \
+#          --warnings-str='dn=.01,de=.01,du=.01'
+python - <<END
+import sys, bernutils.badnq
+#try:
+adnf = bernutils.badnq.AddneqFile( "${ADNQ}" )
+adnf.toJson()
+#except:
+#  print>>sys.stderr,'ERROR. Cannot translate addneq file to json!'
+sys.exit(1)
+sys.exit(0)
+END
+if test "$?" -ne 0 ; then exit 1 ; fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  REMOVE CAMPAIGN FILES

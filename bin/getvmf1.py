@@ -6,6 +6,7 @@ import datetime
 import getopt
 import bernutils.webutils
 import gzip
+import json
 
 ## help function
 def help (i):
@@ -21,6 +22,7 @@ OUT_DIR      = ''
 year         = None
 doy          = None
 hour         = None
+JSON_OUT     = None
 
 ## Resolve command line arguments
 def main (argv):
@@ -29,8 +31,8 @@ def main (argv):
         help(1)
 
     try:
-        opts, args = getopt.getopt(argv,'hy:d:r:o:',[
-            'help','year=','doy=','hour=','outdir='])
+      opts, args = getopt.getopt(argv,'hy:d:r:o:j:',[
+        'help','year=','doy=','hour=','outdir=','json='])
     except getopt.GetoptError:
         help(1)
 
@@ -49,6 +51,9 @@ def main (argv):
         elif opt in ('-o', '--outdir'):
             global OUT_DIR
             OUT_DIR = arg
+        elif opt in ('-j', '--json'):
+            global JSON_OUT
+            JSON_OUT = arg
         else:
             print >> sys.stderr, "Invalid command line argument:",opt
 
@@ -142,8 +147,21 @@ if iyear <= 2008:
             os.remove(gzfilename)
 
 # print results
-for i in retlist:
-    print 'Downloaded',i[0],'to',i[1]
+if JSON_OUT:
+    with open(JSON_OUT, 'w') as jout:
+        for i in retlist:
+            jdict = {
+              'info'    : 'Vienna Mapping Function 1 Grid',
+              'format'  : 'GRD (ascii grid file)',
+              'satsys'  : '',
+              'ac'      : 'tuwien',
+              'type'    : '',
+              'host'    : HOST,
+              'filename': i[0]
+            }
+            print>>jout, (json.dumps(jdict))
+
+for i in retlist: print 'Downloaded',i[0],'to',i[1]
 
 # exit with sucess
 sys.exit(EXIT_SUCCESS)
