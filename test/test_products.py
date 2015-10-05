@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
 import bernutils.products.pyion
+import bernutils.products.pyerp
 import bernutils.products.pysp3
 import bernutils.webutils
 import datetime
@@ -12,17 +13,25 @@ yesterday = datetime.date.today() - datetime.timedelta(1)
 today = datetime.datetime.today()
 
 # path to download files
-mydir = '/home/bpe2/src'
+mydir = '/home/xanthos/Desktop'
 
+##  How to download .ion files
+#print bernutils.products.pyion.getCodIon(dtm, mydir, True)
 
-#print bernutils.products.pysp3.getNav(dtm, 'G', dir)
-#print bernutils.products.pyion.getCodIon(dtm, dir)
+## How to download .erp files
+#print bernutils.products.pyerp.getErp(date=dtm, out_dir=mydir, ac='igs', tojson=True)
+#print bernutils.products.pyerp.getErp(date=yesterday, out_dir=mydir, ac='cod', tojson=True)
+
+## How to download .sp3 files
+#print bernutils.products.pysp3.getOrb(date=dtm, out_dir=mydir, ac='igs', tojson=True)
+#print bernutils.products.pysp3.getOrb(date=yesterday, out_dir=mydir, ac='cod', tojson=True)
+print bernutils.products.pysp3.getOrb(date=yesterday, out_dir=mydir, ac='igs', tojson=True, use_glonass=True)
 
 #bernutils.products.pysp3.merge_sp3_GR('igs17545.sp3', 'igl17545.sp3', 'merged.sp3')
-
-#x = bernutils.products.pysp3.getOrb(date=dtm, ac='igs', out_dir=mydir, use_glonass=True)
-x = bernutils.products.pysp3.getOrb(year=2015, doy=1, ac='igs', out_dir=mydir, use_glonass=True)
-print x
+#print bernutils.products.pysp3.getNav(dtm, 'G', dir)
+# x = bernutils.products.pysp3.getOrb(date=dtm, ac='igs', out_dir=mydir, use_glonass=True)
+# x = bernutils.products.pysp3.getOrb(year=2015, doy=1, ac='igs', out_dir=mydir, use_glonass=True)
+# print x
 
 #host  = 'ftp.unibe.ch'
 #dirn  = [ 'aiub/CODE', 'aiub/CODE', 'aiub/CODE/2015', 'aiub/BSWUSER52/STA/', 'aiub/CODE']

@@ -27,7 +27,8 @@ def _getRunningDcb_(filename, saveas):
   HOST = COD_HOST
   dirn = COD_DIR
   try:
-    return bernutils.webutils.grabFtpFile(HOST, dirn, filename, saveas)
+    ret_list = bernutils.webutils.grabFtpFile(HOST, dirn, filename, saveas)
+    return ret_list
   except:
     raise
 
@@ -39,11 +40,12 @@ def _getFinalDcb_(year, filename, saveas):
   HOST = COD_HOST
   dirn = '%s/%04i/' %(COD_DIR, year)
   try:
-    return bernutils.webutils.grabFtpFile(HOST,dirn,filename,saveas)
+    ret_list = bernutils.webutils.grabFtpFile(HOST,dirn,filename,saveas)
+    return ret_list
   except:
     raise
 
-def getCodDcb(stype, datetm, out_dir=None):
+def getCodDcb(stype, datetm, out_dir=None, tojson=False):
   ''' Download .DCB file from CODE's ftp webserver. Depending on the input date 
       (i.e. ``datetm``), one of the following will happen:
 
@@ -77,6 +79,16 @@ def getCodDcb(stype, datetm, out_dir=None):
         and :func:`bernutils.products.pydcb._getRunningDcb_`
 
   '''
+  jdict = {
+    'info'    : 'Differential Code Bias',
+    'format'  : 'DCB',
+    'satsys'  : '',
+    'ac'      : 'cod',
+    'type'    : '',
+    'host'    : COD_HOST,
+    'filename': ''
+  }
+
   ## output dir must exist
   if out_dir and not os.path.isdir(out_dir):
     raise RuntimeError('Invalid directory: %s -> getCodDcb.' %out_dir)
@@ -105,7 +117,8 @@ def getCodDcb(stype, datetm, out_dir=None):
     if out_dir: saveas = os.path.join(out_dir, filename)
     try:
       localfile, webfile = _getRunningDcb_(filename, saveas)
-      return [localfile, webfile]
+      ret_list = [localfile, webfile]
+      jdict['type'] = 'running (%s)'%stype
     except:
       raise
 
@@ -117,7 +130,8 @@ def getCodDcb(stype, datetm, out_dir=None):
     if out_dir:  saveas = os.path.join(out_dir, filename)
     try:
       localfile, webfile = _getFinalDcb_(iyear,filename,saveas)
-      return [localfile, webfile]
+      ret_list = [localfile, webfile]
+      jdict['type'] = 'final (%s)'%stype
     except:
       filename = generic_file.replace('yymm', '')
       saveas   = filename
@@ -125,7 +139,8 @@ def getCodDcb(stype, datetm, out_dir=None):
         saveas = os.path.join(out_dir, filename)
       try:
         localfile, webfile = _getRunningDcb_(filename,saveas)
-        return [localfile, webfile]
+        ret_list = [localfile, webfile]
+        jdict['type'] = 'running (%s)'%stype
       except:
         raise
 
@@ -142,8 +157,13 @@ def getCodDcb(stype, datetm, out_dir=None):
         raise RuntimeError('ERROR. got more files than expected!')
       localfile  = ret_list[0][0]
       remotefile = ret_list[0][1]
-      return [localfile, remotefile]
+      ret_list = [localfile, remotefile]
+      jdict['type'] = 'final (%s)'%stype
     except:
       raise
   else:
     raise RuntimeError('This date seems invalid (for dcb)')
+
+  if tojson: print(json.dumps(jdict))
+
+  return ret_list

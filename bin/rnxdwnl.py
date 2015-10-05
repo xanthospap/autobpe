@@ -259,7 +259,7 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
     return (command_ + ' -O ' + savef_ + ' ' + os.path.join(host_, path_, filename_)), savef_
 
 ## Resolve command line arguments
-def main (argv):
+def main(argv):
 
   if len(argv) < 1: help(1)
 

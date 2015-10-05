@@ -21,6 +21,7 @@ AC       = None
 SAT_SYS  = 'GPS'
 DWNL_ION = False
 REPORT   = None
+JSON_OUT = False
 
 def isUnixCompressed(fn): return len(fn) > 2 and fn[-2:] == '.Z'
 
@@ -62,6 +63,10 @@ def main(argv):
         REPORT = arg
       elif arg == 'html':
         REPORT = arg
+      elif arg == 'json':
+        REPORT = arg
+        global JSON_OUT
+        JSON_OUT = True
       else:
         raise RuntimeError('Invalid report option; can use either ascii or html')
     else:
@@ -95,21 +100,24 @@ try:
   info_dict['sp3'] = bernutils.products.pysp3.getOrb(date=py_date, \
     ac=AC, \
     out_dir=DATAPOOL, \
-    use_glonass=ussr)
+    use_glonass=ussr, \
+    tojson=JSON_OUT)
   error_at += 1
 
   info_dict['erp'] = bernutils.products.pyerp.getErp(date=py_date, \
     ac=AC, \
-    out_dir=DATAPOOL)
+    out_dir=DATAPOOL, \
+    tojson=JSON_OUT)
   error_at += 1
 
   info_dict['dcb'] = bernutils.products.pydcb.getCodDcb(stype='c1_rnx', \
     datetm=py_date, \
-    out_dir=DATAPOOL)
+    out_dir=DATAPOOL, \
+    tojson=JSON_OUT)
   error_at += 1
 
   if DWNL_ION:
-    info_dict['ion'] = bernutils.products.pyion.getCodIon(py_date, DATAPOOL)
+    info_dict['ion'] = bernutils.products.pyion.getCodIon(py_date, DATAPOOL, tojson=JSON_OUT)
 
   ##  Alright! all products downloaded! now we need to make an easy list to
   ##+ pass to bash, to link the downloaded files from directory D to the /ORB

@@ -2,6 +2,7 @@ import sys
 import os
 import datetime
 import ftplib
+import json
 
 import bernutils.gpstime
 import bernutils.webutils
@@ -18,6 +19,9 @@ IGS_DIR       = bernutils.products.prodgen.IGS_DIR
 IGS_DIR_REP2  = bernutils.products.prodgen.IGS_DIR_REP2
 IGS_DIR_GLO   = bernutils.products.prodgen.IGS_DIR_GLO
 
+JSON_INFO     = 'GPS/GNSS Orbit and Clock Information'
+JSON_FORMAT   = 'sp3'
+
 def __igs_sp3_all_final__(igs_repro2=False):
   ''' Utility function; do not use as standalone. This function will return the
       filename, host, and hostdir of a valid final igs-generated sp3 file, based
@@ -32,11 +36,13 @@ def __igs_sp3_all_final__(igs_repro2=False):
   if igs_repro2 == True:
     FILENAME = 'ig2yyPwwww.sp3.Z'
     DIR      = IGS_DIR_REP2 + '/wwww/'
+    descr    = 'final (repro2)'
   else:
     FILENAME = 'igswwwwd.sp3.Z'
     DIR      = IGS_DIR + '/wwww/'
+    descr    = 'final'
 
-  return [[ FILENAME, HOST, DIR ]]
+  return [[ FILENAME, HOST, DIR, descr ]]
 
 def __igs_sp3_all_final_glo__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -46,7 +52,7 @@ def __igs_sp3_all_final_glo__():
       .. warning:: handles glonass-only sp3 files.
 
   '''
-  return [[ 'iglwwwwd.sp3.Z', IGS_HOST, IGS_DIR_GLO+ '/wwww/' ]]
+  return [[ 'iglwwwwd.sp3.Z', IGS_HOST, IGS_DIR_GLO+ '/wwww/', 'final' ]]
 
 def __igs_sp3_all_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -56,7 +62,7 @@ def __igs_sp3_all_rapid__():
       .. warning:: handles gps-only sp3 files.
 
   '''
-  return [[ 'igrwwwwd.sp3.Z', IGS_HOST, IGS_DIR + '/wwww/' ]]
+  return [[ 'igrwwwwd.sp3.Z', IGS_HOST, IGS_DIR + '/wwww/', 'rapid' ]]
 
 def __igs_sp3_all_ultra_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -68,7 +74,7 @@ def __igs_sp3_all_ultra_rapid__():
   '''
   ret_list = []
   for i in xrange(0, 24, 6):
-    ret_list.append(['iguwwwwd_%02i.sp3.Z'%i, IGS_HOST, IGS_DIR+ '/wwww/'])
+    ret_list.append(['iguwwwwd_%02i.sp3.Z'%i, IGS_HOST, IGS_DIR+ '/wwww/', 'ultra-rapid'])
   return ret_list
 
 def __igs_sp3_all_ultra_rapid_glo__():
@@ -81,7 +87,7 @@ def __igs_sp3_all_ultra_rapid_glo__():
   '''
   ret_list = []
   for i in xrange(0, 24, 6):
-    ret_list.append(['igvwwwwd_%02i.sp3.Z'%i, IGS_HOST, IGS_DIR_GLO+ '/wwww/'])
+    ret_list.append(['igvwwwwd_%02i.sp3.Z'%i, IGS_HOST, IGS_DIR_GLO+ '/wwww/', 'ultra-rapid'])
   return ret_list
 
 def __igs_sp3_all_prediction__():
@@ -127,9 +133,11 @@ def __cod_sp3_all_final__(use_repro_13=False, use_one_day_sol=False, igs_repro2=
     ## One-day solution: (CDDIS)/repro2/wwww/cf2wwwwd.eph.Z
     if use_one_day_sol == True:
       FILENAME = 'cf2wwwwd.eph.Z'
+      descr    = 'final (repro2, one-day sol)'
     ## Normal erp (3-day) (CDDIS)/repro2/wwww/co2wwwwd.eph.Z
     else:
       FILENAME = 'co2wwwwd.eph.Z'
+      descr    = 'final (repro2)'
 
   else:
     ## One-day solution (CDDIS)/wwww/cofwwwwd.eph.Z
@@ -137,20 +145,23 @@ def __cod_sp3_all_final__(use_repro_13=False, use_one_day_sol=False, igs_repro2=
       FILENAME = 'cofwwwwd.eph.Z'
       HOST     = IGS_HOST
       DIR      = IGS_DIR + '/wwww/'
+      descr    = 'final (one-day sol)'
 
     ## CODE's 2013 re-processing (CODE)/REPRO_2013/CODE/yyyy/CODwwwwd.EPH.Z
     elif use_repro_13 == True:
       FILENAME = 'CODwwwwd.EPH.Z'
       HOST     = COD_HOST
       DIR      = COD_DIR_2013 + '/yyyy/'
+      descr    = 'final (repro 2013)'
 
     ## Normal, 3-day file (CODE)/CODE/yyyy/CODwwwwd.EPH.Z
     else:
       FILENAME = 'CODwwwwd.EPH.Z'
       HOST     = COD_HOST
       DIR      = COD_DIR + '/yyyy/'
+      descr    = 'final'
 
-  return [[ FILENAME, HOST, DIR ]]
+  return [[ FILENAME, HOST, DIR, descr ]]
 
 def __cod_sp3_all_final_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -180,8 +191,8 @@ def __cod_sp3_all_final_rapid__():
   HOST_FR2     = COD_HOST
   DIR_FR2      = COD_DIR
 
-  return  [[FILENAME_FR1, HOST_FR1, DIR_FR1], 
-           [FILENAME_FR2, HOST_FR2, DIR_FR2]]
+  return  [[FILENAME_FR1, HOST_FR1, DIR_FR1, 'rapid (final)'], 
+           [FILENAME_FR2, HOST_FR2, DIR_FR2, 'rapid (final)']]
 
 def __cod_sp3_all_early_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -195,7 +206,7 @@ def __cod_sp3_all_early_rapid__():
         the ``products.rst`` file.
 
   '''
-  return [[ 'CODwwwwd.EPH_R', COD_HOST, COD_DIR ]]
+  return [[ 'CODwwwwd.EPH_R', COD_HOST, COD_DIR, 'rapid (early)' ]]
 
 def __cod_sp3_all_ultra_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -209,7 +220,7 @@ def __cod_sp3_all_ultra_rapid__():
         the ``products.rst`` file.
 
   '''
-  return [[ 'COD.EPH_U', COD_HOST, COD_DIR ]]
+  return [[ 'COD.EPH_U', COD_HOST, COD_DIR, 'ultra-rapid' ]]
 
 def __cod_sp3_all_prediction__(str_id='5D'):
   ''' Utility function; do not use as standalone. This function will return the
@@ -240,7 +251,7 @@ def __cod_sp3_all_prediction__(str_id='5D'):
   else:
     raise RuntimeError('Invalid SP3 prediction flag %s.', str_id)
 
-  return [[ FILENAME, COD_HOST, COD_DIR ]]
+  return [[ FILENAME, COD_HOST, COD_DIR, 'prediction (%s)'%str_id ]]
 
 def getIgsSp3Gps(datetm, out_dir=None, igs_repro2=False):
   ''' This function is responsible for downloading an optimal, valid sp3 file
@@ -311,7 +322,7 @@ def getIgsSp3Gps(datetm, out_dir=None, igs_repro2=False):
 
   ## need to replace the dates
   options = [ i.replace('yyyy', ('%04i' %iyear)).replace('wwwwd', ('%04i%01i' %(week, dow))).replace('wwww', ('%04i' %week)).replace('yy', ('%02i' %yy)) for slst in options for i in slst ]
-  options = [ options[x:x+3] for x in xrange(0, len(options), 3) ]
+  options = [ options[x:x+4] for x in xrange(0, len(options), 4) ]
 
   if __DEBUG_MODE__ == True:
     print 'Delta days is : %+04.1f' %dt
@@ -332,7 +343,7 @@ def getIgsSp3Gps(datetm, out_dir=None, igs_repro2=False):
       else:
         saveas = triple[0]
       info = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
-      ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0])]
+      ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0]), triple[3]]
       break
     except:
       pass
@@ -398,7 +409,7 @@ def getIgsSp3Glo(datetm, out_dir=None):
 
   ## need to replace the dates
   options = [ i.replace('yyyy', ('%04i' %iyear)).replace('wwwwd', ('%04i%01i' %(week, dow))).replace('wwww', ('%04i' %week)).replace('yy', ('%02i' %yy)) for slst in options for i in slst ]
-  options = [ options[x:x+3] for x in xrange(0, len(options), 3) ]
+  options = [ options[x:x+4] for x in xrange(0, len(options), 4) ]
 
   if __DEBUG_MODE__ == True:
     print 'Delta days is : %+04.1f' %dt
@@ -419,7 +430,7 @@ def getIgsSp3Glo(datetm, out_dir=None):
       else:
         saveas = triple[0]
       info = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
-      ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0])]
+      ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0]), triple[3]]
       break
     except:
       pass
@@ -432,7 +443,7 @@ def getIgsSp3Glo(datetm, out_dir=None):
 
   return ret_list
 
-def getIgsSp3(datetm, out_dir=None, use_glonass=False, igs_repro2=False):
+def getIgsSp3(datetm, out_dir=None, use_glonass=False, igs_repro2=False, tojson=False):
   ''' This function is responsible for downloading an optimal, valid sp3 file
       for a given date. The user-defined input variables can further narrow
       down the possible choices.
@@ -464,10 +475,30 @@ def getIgsSp3(datetm, out_dir=None, use_glonass=False, igs_repro2=False):
 
   '''
   answer_gps = getIgsSp3Gps(datetm, out_dir, igs_repro2)
-
-  if not use_glonass: return answer_gps
+  jdict_gps = {
+    'info'    : JSON_INFO,
+    'format'  : JSON_FORMAT,
+    'satsys'  : 'gps',
+    'ac'      : 'igs',
+    'type'    : answer_gps[2],
+    'host'    : IGS_HOST,
+    'filename': answer_gps[1]
+  }
+  
+  if not use_glonass:  
+    if tojson: print(json.dumps(jdict_gps))
+    return answer_gps
 
   answer_glo = getIgsSp3Glo(datetm, out_dir)
+  jdict_glo = {
+    'info'    : JSON_INFO,
+    'format'  : JSON_FORMAT,
+    'satsys'  : 'glo',
+    'ac'      : 'igs',
+    'type'    : answer_glo[2],
+    'host'    : IGS_HOST,
+    'filename': answer_glo[1]
+  }
 
   gps_sp3_Z = answer_gps[0]
   glo_sp3_Z = answer_glo[0]
@@ -489,9 +520,13 @@ def getIgsSp3(datetm, out_dir=None, use_glonass=False, igs_repro2=False):
   # compress the merged file
   igs_sp3_dotZ = bernutils.webutils.UnixCompress(igs_sp3)
 
+  # print json
+  if tojson:
+    print(json.dumps(jdict_gps, jdict_glo))
+
   return [ igs_sp3_dotZ, [answer_gps[1], answer_glo[1]] ]
 
-def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, igs_repro2=False):
+def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, igs_repro2=False, tojson=False):
   ''' This function is responsible for downloading an optimal, valid sp3 file
       for a given date. The user-defined input variables can further narrow
       down the possible choices.
@@ -569,7 +604,7 @@ def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
 
   ## need to replace the dates
   options = [ i.replace('yyyy', ('%04i' %iyear)).replace('wwwwd', ('%04i%01i' %(week, dow))).replace('wwww', ('%04i' %week)) for slst in options for i in slst ]
-  options = [ options[x:x+3] for x in xrange(0, len(options), 3) ]
+  options = [ options[x:x+4] for x in xrange(0, len(options), 4) ]
 
   if __DEBUG_MODE__ == True:
     print 'Delta days is : %+04.1f' %dt
@@ -590,7 +625,7 @@ def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
       else:
         saveas = triple[0]
       info = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
-      ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0])]
+      ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0]), triple[3]]
       break
     except:
       pass
@@ -600,6 +635,18 @@ def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
 
   if __DEBUG_MODE__ == True:
     print 'Tries: %1i/%1i Downloaded %s to %s' %(nr_tries, len(options), ret_list[1], ret_list[0])
+
+  if tojson:
+    jdict = {
+        'info'    : JSON_INFO,
+        'format'  : JSON_FORMAT,
+        'satsys'  : 'gps+glo',
+        'ac'      : 'cod',
+        'type'    : ret_list[2],
+        'host'    : COD_HOST,
+        'filename': ret_list[1]
+    }
+    print(json.dumps(jdict))
 
   return ret_list
 
@@ -706,7 +753,7 @@ def getOrb(**kwargs):
            the CDDIS ftp host.
 
   '''
-  _args = { 'ac': 'cod', 'out_dir': None, 'use_glonass': False, 'use_repro_13': False, 'use_one_day_sol': False, 'igs_repro2': False }
+  _args = { 'ac': 'cod', 'out_dir': None, 'use_glonass': False, 'use_repro_13': False, 'use_one_day_sol': False, 'igs_repro2': False, 'tojson': False }
   _args.update(**kwargs)
 
   if 'date' in kwargs:
@@ -719,9 +766,9 @@ def getOrb(**kwargs):
 
   ## Do nothing :) just pass arguments to the ac-specific function
   if _args['ac'].lower() == 'cod':
-    return getCodSp3(datetm, _args['out_dir'], _args['use_repro_13'], _args['use_one_day_sol'], _args['igs_repro2'])
+    return getCodSp3(datetm, _args['out_dir'], _args['use_repro_13'], _args['use_one_day_sol'], _args['igs_repro2'], _args['tojson'])
   elif _args['ac'].lower() == 'igs':
-    return getIgsSp3(datetm, _args['out_dir'], _args['use_glonass'], _args['igs_repro2'])
+    return getIgsSp3(datetm, _args['out_dir'], _args['use_glonass'], _args['igs_repro2'], _args['tojson'])
   else:
     raise RuntimeError('Invalid Analysis Center: %s.' %_args['ac'])
 

@@ -1,6 +1,8 @@
 import os
 import datetime
 import ftplib
+import json
+
 import bernutils.gpstime
 import bernutils.webutils
 import bernutils.products.prodgen
@@ -25,6 +27,9 @@ COD_DIR       = bernutils.products.prodgen.COD_DIR
 COD_DIR_2013  = bernutils.products.prodgen.COD_DIR_2013
 IGS_DIR       = bernutils.products.prodgen.IGS_DIR
 IGS_DIR_REP2  = bernutils.products.prodgen.IGS_DIR_REP2
+
+JSON_INFO     = 'Earth Rotation Parameters'
+JSON_FORMAT   = 'erp'
 
 def erpTimeSpan(filen, as_mjd=True):
   ''' Given an ERP filename, this function will return the min
@@ -84,11 +89,13 @@ def __igs_erp_all_final__(igs_repro2=False):
   if igs_repro2 == True:
     FILENAME = 'ig2yyPwwww.erp.Z'
     DIR      = IGS_DIR_REP2 + '/wwww/'
+    descr    = 'final (repro2)'
   else:
     FILENAME = 'igswwww7.erp.Z'
     DIR      = IGS_DIR + '/wwww/'
+    descr    = 'final'
 
-  return [[ FILENAME, HOST, DIR ]]
+  return [[ FILENAME, HOST, DIR, descr ]]
 
 def __igs_erp_all_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -96,7 +103,7 @@ def __igs_erp_all_rapid__():
       information can be later used to download the file.
 
   '''
-  return [[ 'igrwwwwd.erp.Z', IGS_HOST, IGS_DIR + '/wwww/' ]]
+  return [[ 'igrwwwwd.erp.Z', IGS_HOST, IGS_DIR + '/wwww/', 'rapid' ]]
 
 def __igs_erp_all_ultra_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -106,7 +113,7 @@ def __igs_erp_all_ultra_rapid__():
   '''
   ret_list = []
   for i in xrange(0, 24, 6):
-    ret_list.append(['iguwwwwd_%02i.erp.Z'%i, IGS_HOST, IGS_DIR+ '/wwww/'])
+    ret_list.append(['iguwwwwd_%02i.erp.Z'%i, IGS_HOST, IGS_DIR+ '/wwww/', 'ultra-rapid'])
   return ret_list
 
 def __igs_erp_all_prediction__():
@@ -115,7 +122,7 @@ def __igs_erp_all_prediction__():
       These information can be later used to download the file.
 
   '''
-  return [[ 'igu00p01.erp.Z', IGS_HOST, IGS_DIR ]]
+  return [[ 'igu00p01.erp.Z', IGS_HOST, IGS_DIR, 'prediction' ]]
 
 def __cod_erp_all_final__(use_repro_13=False, use_one_day_sol=False, igs_repro2=False):
   ''' Utility function; do not use as standalone. This function will return the
@@ -152,9 +159,11 @@ def __cod_erp_all_final__(use_repro_13=False, use_one_day_sol=False, igs_repro2=
     ## One-day solution: (CDDIS)/repro2/wwww/cf2wwww7.erp.Z
     if use_one_day_sol == True:
       FILENAME = 'cf2wwww7.erp.Z'
+      descr    = 'final (repro2/one-day solution)'
     ## Normal erp (3-day) (CDDIS)/repro2/wwww/co2wwww7.erp.Z
     else:
       FILENAME = 'co2wwww7.erp.Z'
+      descr    = 'final (repro2)'
 
   else:
     ## One-day solution (CDDIS)/wwww/cofwwww7.erp.Z
@@ -162,20 +171,23 @@ def __cod_erp_all_final__(use_repro_13=False, use_one_day_sol=False, igs_repro2=
       FILENAME = 'cofwwww7.erp.Z'
       HOST     = IGS_HOST
       DIR      = IGS_DIR + '/wwww/'
+      descr    = 'final (one-day solution)'
 
     ## CODE's 2013 re-processing (CODE)/REPRO_2013/CODE/yyyy/CODwwwwd.ERP.Z
     elif use_repro_13 == True:
       FILENAME = 'CODwwwwd.ERP.Z'
       HOST     = COD_HOST
       DIR      = COD_DIR_2013 + '/yyyy/'
+      descr    = 'final (2013 re-processing)'
 
     ## Normal, 3-day file (CODE)/CODE/yyyy/CODwwwwd.ERP.Z
     else:
       FILENAME = 'CODwwww7.ERP.Z'
       HOST     = COD_HOST
       DIR      = COD_DIR + '/yyyy/'
+      descr    = 'final'
 
-  return [[ FILENAME, HOST, DIR ]]
+  return [[ FILENAME, HOST, DIR, descr ]]
 
 def __cod_erp_all_final_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -205,8 +217,8 @@ def __cod_erp_all_final_rapid__():
   HOST_FR2     = COD_HOST
   DIR_FR2      = COD_DIR
 
-  return  [[FILENAME_FR1, HOST_FR1, DIR_FR1], 
-           [FILENAME_FR2, HOST_FR2, DIR_FR2]]
+  return  [[FILENAME_FR1, HOST_FR1, DIR_FR1, 'rapid (final)'], 
+           [FILENAME_FR2, HOST_FR2, DIR_FR2, 'rapid (final)']]
 
 def __cod_erp_all_early_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -220,7 +232,7 @@ def __cod_erp_all_early_rapid__():
         the ``products.rst`` file.
 
   '''
-  return [[ 'CODwwwwd.ERP_R', COD_HOST, COD_DIR ]]
+  return [[ 'CODwwwwd.ERP_R', COD_HOST, COD_DIR, 'rapid (early)' ]]
 
 def __cod_erp_all_ultra_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -235,7 +247,7 @@ def __cod_erp_all_ultra_rapid__():
         file.
 
   '''
-  return [[ 'COD.ERP_U', COD_HOST, COD_DIR ]]
+  return [[ 'COD.ERP_U', COD_HOST, COD_DIR, 'ultra-rapid' ]]
 
 def __cod_erp_all_prediction__(str_id='5D'):
   ''' Utility function; do not use as standalone. This function will return the
@@ -266,9 +278,9 @@ def __cod_erp_all_prediction__(str_id='5D'):
   else:
     raise RuntimeError('Invalid ERP prediction flag %s.', str_id)
 
-  return [[ FILENAME, COD_HOST, COD_DIR ]]
+  return [[ FILENAME, COD_HOST, COD_DIR, 'prediction (%s)'%str_id ]]
 
-def getIgsErp(datetm, out_dir=None, igs_repro2=False):
+def getIgsErp(datetm, out_dir=None, igs_repro2=False, tojson=False):
   ''' This function is responsible for downloading an optimal, valid erp file
       for a given date. The user-defined input variables can further narrow
       down the possible choices.
@@ -335,7 +347,7 @@ def getIgsErp(datetm, out_dir=None, igs_repro2=False):
 
   ## need to replace the dates
   options = [ i.replace('yyyy', ('%04i' %iyear)).replace('wwwwd', ('%04i%01i' %(week, dow))).replace('wwww', ('%04i' %week)).replace('yy', ('%02i' %yy)) for slst in options for i in slst ]
-  options = [ options[x:x+3] for x in xrange(0, len(options), 3) ]
+  options = [ options[x:x+4] for x in xrange(0, len(options), 4) ]
 
   if __DEBUG_MODE__ == True:
     print 'Delta days is : %+04.1f' %dt
@@ -356,7 +368,7 @@ def getIgsErp(datetm, out_dir=None, igs_repro2=False):
       else:
         saveas = triple[0]
       info = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
-      ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0])]
+      ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0]), triple[3]]
       break
     except:
       pass
@@ -367,9 +379,21 @@ def getIgsErp(datetm, out_dir=None, igs_repro2=False):
   if __DEBUG_MODE__ == True:
     print 'Tries: %1i/%1i Downloaded %s to %s' %(nr_tries, len(options), ret_list[1], ret_list[0])
 
+  if tojson:
+    jdict = {
+        'info'    : JSON_INFO,
+        'format'  : JSON_FORMAT,
+        'satsys'  : '',
+        'ac'      : 'igs',
+        'type'    : ret_list[2],
+        'host'    : IGS_HOST,
+        'filename': ret_list[1]
+    }
+    print(json.dumps(jdict))
+
   return ret_list
 
-def getCodErp(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, igs_repro2=False):
+def getCodErp(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, igs_repro2=False, tojson=False):
   ''' This function is responsible for downloading an optimal, valid erp file
       for a given date. The user-defined input variables can further narrow
       down the possible choices.
@@ -447,7 +471,7 @@ def getCodErp(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
 
   ## need to replace the dates
   options = [ i.replace('yyyy', ('%04i' %iyear)).replace('wwwwd', ('%04i%01i' %(week, dow))).replace('wwww', ('%04i' %week)) for slst in options for i in slst ]
-  options = [ options[x:x+3] for x in xrange(0, len(options), 3) ]
+  options = [ options[x:x+4] for x in xrange(0, len(options), 4) ]
 
   if __DEBUG_MODE__ == True:
     print 'Delta days is : %+04.1f' %dt
@@ -468,7 +492,7 @@ def getCodErp(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
       else:
         saveas = triple[0]
       info = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
-      ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0])]
+      ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0]), triple[3]]
       break
     except:
       pass
@@ -479,6 +503,18 @@ def getCodErp(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
   if __DEBUG_MODE__ == True:
     print 'Tries: %1i/%1i Downloaded %s to %s' %(nr_tries, len(options), ret_list[1], ret_list[0])
 
+  if tojson:
+    jdict = {
+        'info'    : JSON_INFO,
+        'format'  : JSON_FORMAT,
+        'satsys'  : '',
+        'ac'      : 'cod',
+        'type'    : ret_list[2],
+        'host'    : COD_HOST,
+        'filename': ret_list[1]
+    }
+    print(json.dumps(jdict))
+  
   return ret_list
 
 def getErp(**kwargs):
@@ -508,6 +544,8 @@ def getErp(**kwargs):
       :param igs_repro2:      (Optional) Use IGS 2nd reprocessing campaign 
                               product files.
 
+      :tojson:                Ouput a json list describing the product
+
       :returns:               A list containing saved file and the remote file.
 
       .. note::
@@ -518,7 +556,7 @@ def getErp(**kwargs):
 
   '''
 
-  _args = { 'ac': 'cod', 'out_dir': None, 'use_repro_13': False, 'use_one_day_sol': False, 'igs_repro2': False }
+  _args = { 'ac': 'cod', 'out_dir': None, 'use_repro_13': False, 'use_one_day_sol': False, 'igs_repro2': False, 'tojson': False }
   _args.update(**kwargs)
 
   if 'date' in kwargs:
@@ -531,8 +569,8 @@ def getErp(**kwargs):
 
   ## Do nothing :) just pass arguments to the ac-specific function
   if _args['ac'].lower() == 'cod':
-    return getCodErp(datetm, _args['out_dir'], _args['use_repro_13'], _args['use_one_day_sol'], _args['igs_repro2'])
+    return getCodErp(datetm, _args['out_dir'], _args['use_repro_13'], _args['use_one_day_sol'], _args['igs_repro2'], _args['tojson'])
   elif _args['ac'].lower() == 'igs':
-    return getIgsErp(datetm, _args['out_dir'], _args['igs_repro2'])
+    return getIgsErp(datetm, _args['out_dir'], _args['igs_repro2'], _args['tojson'])
   else:
     raise RuntimeError('Invalid Analysis Center: %s.' %_args['ac'])
