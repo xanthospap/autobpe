@@ -36,6 +36,9 @@ import bernutils.bpcf
 ## Debug Mode
 DDEBUG_MODE = True
 
+## flush to html
+HTML_OUT = True
+
 ## help function
 def help (i):
     print ""
@@ -58,9 +61,11 @@ def main(argv):
 
   for vr, vl in var_dict.iteritems():
     pcf.set_variable(vr, val=vl)
-    print "Setting PCF variable [%s] to [%s]"%(vr, vl)
+    ## print "Setting PCF variable [%s] to [%s]"%(vr, vl)
 
   pcf.flush_variables()
+
+  if HTML_OUT: pcf.dump_to_html()
 
 ## Start main
 if __name__ == "__main__":

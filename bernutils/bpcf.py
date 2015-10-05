@@ -122,6 +122,28 @@ class PcfFile:
 
     return var_list
 
+  def dump_to_html(self):
+    ''' Dump the PCF's variables to stdout, in an html table format
+    '''
+    if len(self.__varlist) == 0:
+      var_list = self.load_variables()
+    else:
+      var_list = self.__varlist
+
+    print """<table style="width:100%" id="t01" border="1">"""
+    print "\t<thead>"
+    print "\t<tr>"
+    print "\t\t<th>Var Name</th><th>Description</th><th>Value</th>"
+    print "\t</tr>"
+    print "\t</thead>"
+    print "\t<tbody>"
+    for i in var_list:
+      print "\n\t<tr><td><var>%s</var></td><td><i>%s</i></td><td><code>%s</code></td></tr>"%(i.var(), i.description(), i.value())
+    print "\t</tbody>"
+    print "<caption>Variables in PCF file %s</caption>"%(self.__filename)
+    print "</table>"
+    return
+
   def flush_variables(self):
     ''' This function will re-write the PCF file, substituting the variables
         section with the variables this instance holds. The rest of the file

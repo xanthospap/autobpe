@@ -20,6 +20,7 @@ DEST_ORB = None
 AC       = None
 SAT_SYS  = 'GPS'
 DWNL_ION = False
+REPORT   = None
 
 def isUnixCompressed(fn): return len(fn) > 2 and fn[-2:] == '.Z'
 
@@ -27,8 +28,8 @@ def isUnixCompressed(fn): return len(fn) > 2 and fn[-2:] == '.Z'
 def main(argv):
 
   try:
-    opts, args = getopt.getopt(argv,'y:d:p:o:a:s:i',[
-      'year=', 'doy=', 'datapool=', 'destination=', 'analysis-center=','satellite-system=', 'download-ion'])
+    opts, args = getopt.getopt(argv,'y:d:p:o:a:s:ir:',[
+      'year=', 'doy=', 'datapool=', 'destination=', 'analysis-center=','satellite-system=', 'download-ion','report='])
   except getopt.GetoptError:
     print>>sys.stderr,"ERROR. Getopt error ",argv
     sys.exit(1)
@@ -55,6 +56,14 @@ def main(argv):
     elif opt in ('-i', '--download-ion'):
       global DWNL_ION
       DWNL_ION = True
+    elif opt in ('-r', '--report'):
+      global REPORT
+      if arg == 'ascii':
+        REPORT = arg
+      elif arg == 'html':
+        REPORT = arg
+      else:
+        raise RuntimeError('Invalid report option; can use either ascii or html')
     else:
       print >> sys.stderr, 'Invalid command line argument: %s'%opt
 
@@ -143,6 +152,13 @@ try:
 
   for i, j in info_dict.iteritems():
     shutil.copy(j[0], j[2])
+    dfiles_str = ( ', '.join(str(p) for p in [j[1]]) ).replace('[','').replace(']','')
+    if REPORT == 'ascii':
+      print '[PRODUCTS::%s] Downloaded file %s ; moved to %s'%(i, dfiles_str, j[2])
+    elif REPORT == 'html':
+      print '<p>Product type: <strong>%s</strong> : \
+          downloaded file(s) <code>%s</code> ; \
+          moved to <code>%s</code></p>'%(i, dfiles_str, j[2])
     if isUnixCompressed(j[2]):
       bernutils.webutils.UnixUncompress(j[2])
 
