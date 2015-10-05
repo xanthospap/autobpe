@@ -74,6 +74,9 @@ def resolve_date_line (line):
 def __merge_igl_igs__(igsf, iglf):
   """
   """
+  MIXED_GLONASS_SP3 = False
+  SKIP_GPS_SATS     = 0
+
   try:
     gin = open (igsf, 'r')
     rin = open (iglf, 'r')
@@ -156,6 +159,8 @@ def __merge_igl_igs__(igsf, iglf):
     raise RuntimeError('Error reading gps satellites for file [%s]' %igsf)
 
   # then for glonass
+  system_change = 0
+  prev_system   = 'X'
   rsats_s   = []
   line_r    = rin.readline().strip();
   rline_nr +=1
@@ -177,14 +182,27 @@ def __merge_igl_igs__(igsf, iglf):
   tl = [ sat_str[i:i+3] for i in range(0, len(sat_str), 3) ]
   for j in tl:
     if j != '  0':
-      if j[0] != 'R' :
+      ## diff +
+      if j[0] != 'R' and j[0] != 'G':
         __close_fs(gin, rin)
         raise RuntimeError('Error reading glonass satellite: [%s]; line nr %4i' %(j, rline_nr))
-      rsats_s.append (j)
+      if j[0] == 'G':
+        if prev_system == 'R':
+          __close_fs(gin, rin)
+          raise RuntimeError('Error reading glonass satellites: unordered gps/glo sats; line nr %4i' %(rline_nr))
+        print >>sys.stderr, '[WARNING] Skippig gps satellite [%s] from glonass sp3'%(j)
+        MIXED_GLONASS_SP3 = True
+        SKIP_GPS_SATS += 1
+        prev_system = 'G'
+      else:
+        rsats_s.append (j)
+        prev_system = 'R'
   # see that all satellites are resolved
-  if rsats != len (rsats_s):
+  if not MIXED_GLONASS_SP3 and rsats != len (rsats_s):
     __close_fs(gin, rin)
     raise RuntimeError('Error reading glonass satellites for file [%s]' %igsl)
+  elif MIXED_GLONASS_SP3 and rsats != len(rsats_s) + SKIP_GPS_SATS:
+    raise RuntimeError('Error reading glonass satellites for (mixed) file [%s]' %igsl)
 
   ##  AT THIS POINT THE LISTS gsats_s AND rsats_s CONTAIN ALL SATELLITES, GPS 
   ##+ PLUS GLONASS AS STRINGS
@@ -236,7 +254,7 @@ def __merge_igl_igs__(igsf, iglf):
   sat_str = ''
   # read the following 5 lines
   for i in range (0,5):
-    line_r = rin.readline ().strip ()
+    line_r = rin.readline().strip ()
     rline_nr+=1;
     if line_r[0:2] != '++' :
       __close_fs(gin, rin)
@@ -244,13 +262,16 @@ def __merge_igl_igs__(igsf, iglf):
     sat_str += line_r[9:]
   # resolve satellite accuracies from accumulated line
   tl = [ sat_str[i:i+3] for i in range(0, len(sat_str), 3) ]
+  code_nr = 0
   for j in tl:
     try:
       ij = int(j)
+      code_nr += 1
     except:
       __close_fs(gin, rin)
       raise RuntimeError('Error in line %4i' %rline_nr)
-    rsats_s.append (j)
+    if code_nr > SKIP_GPS_SATS:
+      rsats_s.append (j)
   # only save as many accuracies as the satellite number
   rsats_s = rsats_s[0:rsats]
 
@@ -291,10 +312,15 @@ def __merge_igl_igs__(igsf, iglf):
   # chech the systems
   if gps_sys != 'G':
     __close_fs(gin, rin)
-    raise RuntimeError('Error! Expected satellite system \"G\", found' %gps_sys)
-  if glo_sys != 'R':
-    __close_fs(gin, rin)
-    raise RuntimeError('Error! Expected satellite system \"R\", found' %glo_sys)
+    raise RuntimeError('Error! Expected satellite system \"G\", found %s' %gps_sys)
+  if MIXED_GLONASS_SP3:
+    if glo_sys != 'M':
+      __close_fs(gin, rin)
+      raise RuntimeError('Error! Expected satellite system \"M\", found %s' %glo_sys)
+  else:
+    if glo_sys != 'R':
+      __close_fs(gin, rin)
+      raise RuntimeError('Error! Expected satellite system \"R\", found %s' %glo_sys)
   if gps_tsys != glo_tsys:
     __close_fs(gin, rin)
     raise RuntimeError('Error! Different time systems in orbit files')

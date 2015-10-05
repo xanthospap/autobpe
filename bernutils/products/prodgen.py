@@ -1,3 +1,5 @@
+import json
+
 COD_HOST  = 'ftp.unibe.ch'
 IGS_HOST  = 'cddis.gsfc.nasa.gov'
 
@@ -26,3 +28,26 @@ SES_IDENTIFIERS_INT = {
   14: 'o', 15: 'p', 16: 'q', 17: 'r', 18: 's', 19: 't', 20: 'u', 
   21: 'v', 22: 'w', 23: 'x'
 }
+
+''' json product class
+{
+    "info"             : "Orbit Information",
+    "format"           : "sp3",
+    "satsys"           : "gps",
+    "ac"               : "cod",
+    "type"             : "final",
+    "host"             : "cddis",
+    "filename"         : "igs18753.sp3.Z"
+}
+'''
+def prod2json(**kwargs):
+  '''
+  jd = {kwargs.get('info', ''),
+      kwargs.get('format',   ''),
+      kwargs.get('satsys',   ''),
+      kwargs.get('ac',       ''),
+      kwargs.get('type',     ''),
+      kwargs.get('host',     ''),
+      kwargs.get('filename', '')})
+  '''
+  return 0

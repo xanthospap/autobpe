@@ -20,6 +20,7 @@ DEST_ORB = None
 AC       = None
 SAT_SYS  = 'GPS'
 DWNL_ION = False
+JSON_OUT = False
 
 def isUnixCompressed(fn): return len(fn) > 2 and fn[-2:] == '.Z'
 
@@ -27,8 +28,8 @@ def isUnixCompressed(fn): return len(fn) > 2 and fn[-2:] == '.Z'
 def main(argv):
 
   try:
-    opts, args = getopt.getopt(argv,'y:d:p:o:a:s:i',[
-      'year=', 'doy=', 'datapool=', 'destination=', 'analysis-center=','satellite-system=', 'download-ion'])
+    opts, args = getopt.getopt(argv,'y:d:p:o:a:s:ij',[
+      'year=', 'doy=', 'datapool=', 'destination=', 'analysis-center=','satellite-system=', 'download-ion', 'json'])
   except getopt.GetoptError:
     print>>sys.stderr,"ERROR. Getopt error ",argv
     sys.exit(1)
@@ -55,6 +56,9 @@ def main(argv):
     elif opt in ('-i', '--download-ion'):
       global DWNL_ION
       DWNL_ION = True
+    elif opt in ('-j', '--json'):
+      global JSON_OUT
+      JSON_OUT = True
     else:
       print >> sys.stderr, 'Invalid command line argument: %s'%opt
 
@@ -86,21 +90,24 @@ try:
   info_dict['sp3'] = bernutils.products.pysp3.getOrb(date=py_date, \
     ac=AC, \
     out_dir=DATAPOOL, \
-    use_glonass=ussr)
+    use_glonass=ussr, \
+    tojson=JSON_OUT)
   error_at += 1
 
   info_dict['erp'] = bernutils.products.pyerp.getErp(date=py_date, \
     ac=AC, \
-    out_dir=DATAPOOL)
+    out_dir=DATAPOOL, \
+    tojson=JSON_OUT)
   error_at += 1
 
   info_dict['dcb'] = bernutils.products.pydcb.getCodDcb(stype='c1_rnx', \
     datetm=py_date, \
-    out_dir=DATAPOOL)
+    out_dir=DATAPOOL, \
+    tojson=JSON_OUT)
   error_at += 1
 
   if DWNL_ION:
-    info_dict['ion'] = bernutils.products.pyion.getCodIon(py_date, DATAPOOL)
+    info_dict['ion'] = bernutils.products.pyion.getCodIon(py_date, DATAPOOL, tojson=JSON_OUT)
 
   ##  Alright! all products downloaded! now we need to make an easy list to
   ##+ pass to bash, to link the downloaded files from directory D to the /ORB
