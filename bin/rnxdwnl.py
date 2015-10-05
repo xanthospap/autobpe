@@ -200,6 +200,7 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
     if infolist[4] == 'NTUA': command_ += " -P2754"
   else:
     command_ = 'wget'
+    if infolist[11] == 'uranus': command_ += ' --no-passive-ftp'
     if infolist[9]  != '': command_ += (' --user=' + infolist[9])
     if infolist[10] != '': command_ += (' --password=' + infolist[10])
 
@@ -219,8 +220,8 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
 
   ## compile the path to the file
   path_ = infolist[7]
-  if path_[0]  != '/' : path_ = '/' + path_
-  if path_[-1] != '/' : path_ = path_ + '/'
+  # if path_[0]  != '/' : path_ = '/' + path_
+  # if path_[-1] != '/' : path_ = path_ + '/'
   ## special case for uranus network
   if infolist[11] == 'uranus':
     try:
@@ -230,6 +231,7 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
       path_ = path_.replace('_DOM_',dom)
     except:
       raise ValueError('ERROR. Failed to make URANUS path: [%s]'%(infolist))
+  if path_[0] == '/': path_ = path_[1:]
 
   ## set the filename (to download)
   session_identifier = '0'
@@ -240,6 +242,7 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
     else:
       session_identifier = ses_identifiers[hour];
   filename_ = infolist[2] + doy + session_identifier + '.' + year[2:] + 'd.Z'
+  if filename_[0] == '/': filename_ = filename_[1:]
 
   ## set the filename (to save)
   savef_ = filename_;
@@ -251,9 +254,9 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
 
   ## return the command as string
   if infolist[5] == "ssh": ## scp -> saved file at the end (no -O switch)
-    return (command_ + ' ' + host_ + path_ + filename_ + ' ' + savef_), savef_
+    return (command_ + ' ' + os.path.join(host_, path_, filename_) + ' ' + savef_), savef_
   else:
-    return (command_ + ' -O ' + savef_ + ' ' + host_ + path_ + filename_), savef_
+    return (command_ + ' -O ' + savef_ + ' ' + os.path.join(host_, path_, filename_)), savef_
 
 ## Resolve command line arguments
 def main (argv):
