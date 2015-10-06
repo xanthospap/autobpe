@@ -1,10 +1,10 @@
 #! /bin/bash
-CMD_THIS_HTML="<code>$(basename $0)</code> <var>${@}</var>"
+CMD_THIS_HTML="$(basename $0) ${@}"
 
 NAME=ddprocess
 VERSION="0.90"
 REVISION="-10"
-LAST_UPDATE="Sep 2015"
+LAST_UPDATE="Oct 2015"
 
 # //////////////////////////////////////////////////////////////////////////////
 # FUNCTIONS
@@ -251,9 +251,11 @@ save_n_update () {
 #          "$1" "$src_f" "$trg_f"
 #  printf "Database entry inserted at 147.102.110.69%s\n" \
 #          "${SOL_DIR}/${YEAR}/${DOY_3C}/"
-  printf "<tr><td>%s</td><td><code>%s</code></td><td><code>%s</code></td><td><code>%s</code></td><td>%s</td><td>%s</td></tr>\n" \
-          "${3}" "${src_f}" "${trg_f}.Z" "${SOL_DIR}/${YEAR}/${DOY_3C}/" \
-          "${START_OF_DAY_STR/ /_}" "${END_OF_DAY_STR/ /_}"
+#  printf "<tr><td>%s</td><td><code>%s</code></td><td><code>%s</code></td><td><code>%s</code></td><td>%s</td><td>%s</td></tr>\n" \
+#          "${3}" "${src_f}" "${trg_f}.Z" "${SOL_DIR}/${YEAR}/${DOY_3C}/" \
+#          "${START_OF_DAY_STR/ /_}" "${END_OF_DAY_STR/ /_}"
+    printf "{\"prod_type\":\"%s\",\"extension\":\"%s\",\"local_dir\":\"%s\",\"sol_type\":\"%s\",\"filename\":\"%s\",\"savedas\":\"%s\",\"host\":\"%s\",\"host_dir\":\"%s\"}" \
+      "${3}" "${1}" "${2}" "${solution_id}" "${src_f}" "${trg_f}.Z" "147.102.110.69" "${SOL_DIR}/${YEAR}/${DOY_3C}/"
   return 0
 else
   echoerr "ERROR. Failed to save/record ${1} sinex : ${trg_f}"
@@ -309,14 +311,6 @@ touch ${TIME_STAMP_FILE}
 date > ${TIME_STAMP_FILE}
 
 ## ////////////////////////////////////////////////////////////////////////////
-##  REPORT ..
-## ////////////////////////////////////////////////////////////////////////////
-#echo "[MAIN::] ${NAME} ${VERSION}-${REVISION} ${LAST_UPDATE}"
-printf "<html>\n"
-printf "<head><title>DDProcess REPORT</title></head>\n"
-printf "<h1>General Information</h1>\n"
-printf "<table><head></head><body>\n"
-## ////////////////////////////////////////////////////////////////////////////
 ## GET/EXPAND COMMAND LINE ARGUMENTS
 ## ////////////////////////////////////////////////////////////////////////////
 
@@ -346,51 +340,63 @@ fi
 eval set -- $ARGS
 
 ##  extract options and their arguments into variables.
+printf "{command:["
 while true
 do
   case "$1" in
 
     --use-ntua-products)
       MY_PRODUCT_ID="${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -r|--save-dir)
       SAVE_DIR="${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -i|--solution-id)
       SOLUTION_ID="${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -a|--analysis-center)
       AC="${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -b|--bern-loadgps)
       B_LOADGPS="${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -c|--campaign)
       CAMPAIGN="${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --debug)
       DEBUG_MODE=YES
+      printf "{\"switch\":\"%s\"}" "${1}"
       ;;
     --logfile)
       LOGFILE="${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -d|--doy) ## remove any leading zeros
       DOY=`echo "${2}" | sed 's|^0||g'`
       DOY_3C=$( printf "%03i\n" $DOY )
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -g|--tables-dir)
       TABLES_DIR="${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -h|--help)
+      printf "{\"switch\":\"%s\"}" "${1}"
       help
       exit 0
       ;;
@@ -400,6 +406,7 @@ do
         echoerr "ERROR. Invalid satellite system : ${SAT_SYS}"
         exit 1
       fi
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --stations-per-cluster)
@@ -408,6 +415,7 @@ do
         echoerr "ERROR. stations-per-cluster must be a positive integer!"
         exit 1
       fi
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --files-per-cluster)
@@ -416,6 +424,7 @@ do
         echoerr "ERROR. files-per-cluster must be a positive integer!"
         exit 1
       fi
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -e|--elevation-angle)
@@ -424,21 +433,26 @@ do
         echoerr "ERROR. Elevation angle must be a positive integer!"
         exit 1
       fi
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --append-suffix)
       APND_SUFFIX="${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -v|--version)
+      printf "{\"switch\":\"%s\"}" "${1}"
       dversion
       exit 0
       ;;
     -y|--year)
       YEAR="${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --) # end of options
+      printf "]}\n"
       shift
       break
       ;;
@@ -450,16 +464,6 @@ do
   esac
   shift
 done
-
-printf "<tr><td>Campaign</td><td><var>%s</var></td></tr>\n" \
-        "${CAMPAIGN}"
-printf "<tr><td>User Host</td><td><var>%s@%s</var></td></tr>\n" \
-        "${USER}" "${HOSTNAME}"
-printf "<tr><td>Command</td><td>%s</td></tr>\n" \
-        "$CMD_THIS_HTML"
-printf "<tr><td>ddprocess</td><td><var>%s<var></td></tr>\n" \
-        "${NAME} ${VERSION}-${REVISION} ${LAST_UPDATE}"
-printf "</body></table>\n"
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  LOGFILE, STDERR & STDOUT
@@ -593,10 +597,15 @@ fi
 ## ////////////////////////////////////////////////////////////////////////////
 ##  REPORT ..
 ## ////////////////////////////////////////////////////////////////////////////
-#printf "[DATEP::] Processing date: %s from %s to %s.\n" \
-#      "${YEAR}-${DOY_3C}" \
-#      "${START_OF_DAY_STR}" \
-#      "${END_OF_DAY_STR}"
+printf "{general_info:"
+printf "\"campaign\": \"%s\"," "${CAMPAIGN}"
+printf "\"user\": \"%s\"," "${USER}"
+printf "\"host\":\"%s\"," "${HOSTNAME}"
+printf "{\"program\": {\"name\":\"%s\",\"version\":\"%s\",\"revision\":\"%s\",\"last_upd\":\"%s\"}," \
+    "${NAME}" "${VERSION}" "${REVISION}" "${LAST_UPDATE}"
+printf "\"day_processed\": \"%s-%s\"," "${YEAR}" "${DOY_3C}"
+printf "{\"interval\": {\"from\":\"%s\", \"to\":\"%s\"}" "${START_OF_DAY_STR}" "${END_OF_DAY_STR}"
+printf "}\n"
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD RINEX FILES
@@ -615,7 +624,6 @@ fi
 ## ////////////////////////////////////////////////////////////////////////////
 if test 2 -eq 1 ; then
 
-printf "<h2>Rinex</h2>"
 >.rnxsta.dat ## temporary file
 
 ##  download the rinex files for the input network; the database knows 
@@ -710,7 +718,7 @@ fi
 ##  TODO :: mysql ...
 ##  If such a file does not exist, download CODE's ionospheric file.
 ## ////////////////////////////////////////////////////////////////////////////
-printf "<h2>Products</h2>"
+printf "{products:["
 
 ION_DOWNLOADED=0
 
@@ -826,6 +834,8 @@ fi
 cat .vmf1.json 2>/dev/null
 rm ${TMP_FL} ## remove temporary file
 fi
+
+printf "]}" ## done with products
 ## ////////////////////////////////////////////////////////////////////////////
 ##  MAKE THE CLUSTER FILE
 ##  ---------------------------------------------------------------------------
@@ -872,7 +882,7 @@ awk -v num_of_clu=${STATIONS_PER_CLUSTER} -f \
 ##+      PRELIM_SOLUTION_ID  = 'FFP'
 ##+      REDUCED_SOLUTION_ID = 'FFR1'
 ## ////////////////////////////////////////////////////////////////////////////
-printf "<h2>Solution Identifiers</h2>"
+printf "{solution_identifiers:["
 ##  Final (ambiguity-fixed) results
 FINAL_SOLUTION_ID="${SOLUTION_ID}"
 
@@ -895,15 +905,16 @@ else
 fi
 
 ##  report ..
-##printf "<p><strong>Final Solution</strong>       : <var>%s</var><br>\n" "$FINAL_SOLUTION_ID"
-##printf "<strong>Size-Reduced Solution</strong>: <var>%s</var><br>\n" "$REDUCED_SOLUTION_ID"
-##printf "<strong>Preliminery Solution</strong> : <var>%s</var></p>\n" "$PRELIM_SOLUTION_ID"
+printf "{\"description\":\"Final Solution\", \"id\":\"%s\"}" "$FINAL_SOLUTION_ID"
+printf "{\"description\":\"Size-Reduced\", \"id\":\"%s\"}" "$REDUCED_SOLUTION_ID"
+printf "{\"description\":\"Preliminary Solution\", \"id\":\"%s\"}" "$PRELIM_SOLUTION_ID"
+printf "]}"
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  SET VARIABLES IN THE PCF FILE
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-printf "<h2>Process Control File (PCF)</h2>"
+
 ##  Bernese has no 'MIXED' satellite system; this defaults to 'GPS/GLO'.
 if test "${SAT_SYS}" == "MIXED"; then
   BERN_SAT_SYS="GPS/GLO"
@@ -972,13 +983,11 @@ BERN_TASK_ID="${CAMPAIGN:0:1}DD"
 
 if test 2 -eq 1; then
 ##  run the perl script to ignite the PCF
-echo "___________________________________________________________BASH --> PERL"
 ${U}/SCRIPT/ntua_pcs.pl ${YEAR} \
           ${DOY_3C}0 \
           NTUA_DDP USER \
           ${CAMPAIGN} \
           ${BERN_TASK_ID};
-echo "___________________________________________________________PERL --> BASH"
 fi
 ##  check the status
 if ! check_run \
@@ -988,14 +997,14 @@ if ! check_run \
   echoerr "ERROR. Fatal, processing stoped."
   exit 1
 else
-  echo "Succeseful processing."
+  :
 fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  COPY PRODUCTS TO HOST; UPDATE DATABASE ENTRIES
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-printf "<h2>Saved Products</h2>"
+printf "{saved_products:["
 if test 1 -eq 1 ; then
 ##  warning: in the db mixed := GPS+GLO
 if test "${SAT_SYS^^}" = "MIXED"; then
@@ -1020,33 +1029,24 @@ fi
 ##  argv2 -> campaign dir (e.g. 'SOL')
 ##  argv3 -> product type (e.g. 'SINEX')
 
-printf "<table style=\"width:100%%\" id=\"t02\" border=\"1\">"
-printf "<thead><th>Type</th> \
-  <th>Source File</th> \
-  <th>Target File</th> \
-  <th>Path</th> \
-  <th>From</th>\
-  <th>To</th></thead>\n<tbody>"
-
 ##  final tropospheric sinex
-if ! save_n_update TRO ATM TRO_SNX ; then exit 1 ; fi
+if ! save_n_update TRO ATM TRO_SNX ; then exit 1 ; else printf "," ; fi
 
 ## final SINEX
-if ! save_n_update SNX SOL SINEX ; then exit 1 ; fi
+if ! save_n_update SNX SOL SINEX ; then exit 1 ; else printf "," ; fi
 
 ## final NQ0
-if ! save_n_update NQ0 SOL NQ ; then exit 1 ; fi
+if ! save_n_update NQ0 SOL NQ ; then exit 1 ; else printf "," ; fi
 
 ## reduced NQ0
-if ! save_n_update NQ0 SOL NQ R ; then exit 1 ; fi
+if ! save_n_update NQ0 SOL NQ R ; then exit 1 ; else printf "," ; fi
 
 ## final coordinates
 if ! save_n_update CRD STA CRD_FILE ; then exit 1 ; fi
 
-printf "</tbody>\n"
-printf "<caption>List of saved products.</caption>\n"
-printf "</table>"
 fi
+printf "]}"
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  COMPILE (NON-FATAL) ERROR/WARNINGS FILE
 ##  ---------------------------------------------------------------------------
@@ -1063,13 +1063,18 @@ find ${P}/${CAMPAIGN}/OUT/WRN${DOY_3C}0*.SUM -not -empty -ls -exec \
 find ${P}/${CAMPAIGN}/OUT/*${YEAR}${DOY_3C}0.ERR -not -empty -ls -exec \
       cat {} 1>>${WRN_FILE} 2>/dev/null \; ## match files e.g 'RNX150010.ERR'
 
-echo "Warnings file created as ${WRN_FILE}"
+## echo "Warnings file created as ${WRN_FILE}"
+##  warnings to json ..
+if ! wrn2json.py ${WRN_FILE} 2>/dev/null ; then
+  echoerr "ERROR. Failed to create json warning file!"
+  exit 1
+fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  ADDNEQ SUMMARY TO HTML
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-printf "<h2>Ambiguity Resolution</h2>"
+
 ##  the ambiguity summary file
 AMBSM=${P}/${CAMPAIGN}/OUT/AMB${YEAR:2:2}${DOY_3C}0.SUM
 python - <<END
