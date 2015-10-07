@@ -206,7 +206,9 @@ class AmbFile:
 
   def toJson(self, sat_sys=None):
  
-    print '{amb_res_summary:['
+    print '\"amb_res_summary\":['
+
+    first_record = True
 
     ## For every resolution method posible ..
     for ambmth in amb_dict:
@@ -215,15 +217,18 @@ class AmbFile:
       m_lines = self.method_lines(ambmth, sat_sys, include_summary_block=False)
 
       ## for every ambiguity line (for current method) ..
-      for aline in m_lines:
+      for idx, aline in enumerate(m_lines):
+
+        if not first_record: print ','
 
         ## cast the line to an AmbLine instance
         ambline = AmbLine(aline)
 
         ## print it in json format
-        print ambline.tojson()
+        print ambline.tojson(),
+        first_record = False
 
-    print ']}'
+    print '],'
 
   def toHtml(self, sat_sys=None):
     ''' Translate the ambiguity resolution information from this file to a

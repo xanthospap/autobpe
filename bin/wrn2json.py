@@ -19,26 +19,28 @@ def error2json(buf, first_line):
     line = buf.readline()
   print "{",
   for key, val in erdict.iteritems(): print "\"%s\":\"%s\","%(key, val),
-  print "{",
-  for key, val in erdictails.iteritems(): print "\"%s\":\"%s\","%(key, val),
+  print " \"message\":{",
+  print ', '.join(['\"{}\": \"{}\"'.format(k,v) for k,v in erdictails.iteritems()])
   print "}",
-  print "},"
+  print "}",
 
 if len(sys.argv) != 2:
   print>>sys.stderr,'ERROR. Must provide warnings file as cmd'
   sys.exit(1)
 
-print "{warnings:["
+print "\"warnings\":["
 
+warnings = 0
 with open(sys.argv[1], 'r') as w:
   line = w.readline()
-  ##[ ### SR TRPVEC: TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED]
   while line:
     if line[0:4] == ' ###':
+      if warnings > 0: print ","
       error2json(w, line)
+      warnings += 1
     else:
       print>>sys.stderr,'[WARNING] skiping line [%s]'%line
     line = w.readline()
 
-print "]}"
+print "],"
 sys.exit(0)

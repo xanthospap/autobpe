@@ -254,7 +254,7 @@ save_n_update () {
 #  printf "<tr><td>%s</td><td><code>%s</code></td><td><code>%s</code></td><td><code>%s</code></td><td>%s</td><td>%s</td></tr>\n" \
 #          "${3}" "${src_f}" "${trg_f}.Z" "${SOL_DIR}/${YEAR}/${DOY_3C}/" \
 #          "${START_OF_DAY_STR/ /_}" "${END_OF_DAY_STR/ /_}"
-    printf "{\"prod_type\":\"%s\",\"extension\":\"%s\",\"local_dir\":\"%s\",\"sol_type\":\"%s\",\"filename\":\"%s\",\"savedas\":\"%s\",\"host\":\"%s\",\"host_dir\":\"%s\"}" \
+    printf "\n{\"prod_type\":\"%s\",\"extension\":\"%s\",\"local_dir\":\"%s\",\"sol_type\":\"%s\",\"filename\":\"%s\",\"savedas\":\"%s\",\"host\":\"%s\",\"host_dir\":\"%s\"}" \
       "${3}" "${1}" "${2}" "${solution_id}" "${src_f}" "${trg_f}.Z" "147.102.110.69" "${SOL_DIR}/${YEAR}/${DOY_3C}/"
   return 0
 else
@@ -310,6 +310,8 @@ TIME_STAMP_FILE=".ddprocess-ts-${BASHPID}"
 touch ${TIME_STAMP_FILE}
 date > ${TIME_STAMP_FILE}
 
+JSON_OUT=koko.json
+
 ## ////////////////////////////////////////////////////////////////////////////
 ## GET/EXPAND COMMAND LINE ARGUMENTS
 ## ////////////////////////////////////////////////////////////////////////////
@@ -340,63 +342,63 @@ fi
 eval set -- $ARGS
 
 ##  extract options and their arguments into variables.
-printf "{command:["
+printf "{\n\"command\":[\n" > ${JSON_OUT}
 while true
 do
   case "$1" in
 
     --use-ntua-products)
       MY_PRODUCT_ID="${2}"
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     -r|--save-dir)
       SAVE_DIR="${2}"
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     -i|--solution-id)
       SOLUTION_ID="${2}"
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     -a|--analysis-center)
       AC="${2}"
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     -b|--bern-loadgps)
       B_LOADGPS="${2}"
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     -c|--campaign)
       CAMPAIGN="${2}"
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     --debug)
       DEBUG_MODE=YES
-      printf "{\"switch\":\"%s\"}" "${1}"
+      printf "{\"switch\":\"%s\"}" "${1}" >> ${JSON_OUT}
       ;;
     --logfile)
       LOGFILE="${2}"
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     -d|--doy) ## remove any leading zeros
       DOY=`echo "${2}" | sed 's|^0||g'`
       DOY_3C=$( printf "%03i\n" $DOY )
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     -g|--tables-dir)
       TABLES_DIR="${2}"
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     -h|--help)
-      printf "{\"switch\":\"%s\"}" "${1}"
+      printf "{\"switch\":\"%s\"}\n" "${1}" >> ${JSON_OUT}
       help
       exit 0
       ;;
@@ -406,7 +408,7 @@ do
         echoerr "ERROR. Invalid satellite system : ${SAT_SYS}"
         exit 1
       fi
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     --stations-per-cluster)
@@ -415,7 +417,7 @@ do
         echoerr "ERROR. stations-per-cluster must be a positive integer!"
         exit 1
       fi
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     --files-per-cluster)
@@ -424,7 +426,7 @@ do
         echoerr "ERROR. files-per-cluster must be a positive integer!"
         exit 1
       fi
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     -e|--elevation-angle)
@@ -433,26 +435,26 @@ do
         echoerr "ERROR. Elevation angle must be a positive integer!"
         exit 1
       fi
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     --append-suffix)
       APND_SUFFIX="${2}"
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     -v|--version)
-      printf "{\"switch\":\"%s\"}" "${1}"
+      printf "{\"switch\":\"%s\"}\n" "${1}" >> ${JSON_OUT}
       dversion
       exit 0
       ;;
     -y|--year)
       YEAR="${2}"
-      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}" >> ${JSON_OUT}
       shift
       ;;
     --) # end of options
-      printf "]}\n"
+      printf "],\n" >> ${JSON_OUT}
       shift
       break
       ;;
@@ -463,6 +465,7 @@ do
 
   esac
   shift
+  if test "${1}" != "--" ; then printf ",\n" >> ${JSON_OUT}; fi
 done
 
 ## ////////////////////////////////////////////////////////////////////////////
@@ -596,16 +599,17 @@ fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  REPORT ..
-## ////////////////////////////////////////////////////////////////////////////
-printf "{general_info:"
-printf "\"campaign\": \"%s\"," "${CAMPAIGN}"
-printf "\"user\": \"%s\"," "${USER}"
-printf "\"host\":\"%s\"," "${HOSTNAME}"
-printf "{\"program\": {\"name\":\"%s\",\"version\":\"%s\",\"revision\":\"%s\",\"last_upd\":\"%s\"}," \
+## ////////////////////////////////////////////////////////////////////////////a
+{
+printf "\n\"general_info\":{"
+printf "\n\"campaign\": \"%s\"," "${CAMPAIGN}"
+printf "\n\"user\": \"%s\"," "${USER}"
+printf "\n\"host\":\"%s\"," "${HOSTNAME}"
+printf "\n\"program\": {\"name\":\"%s\",\"version\":\"%s\",\"revision\":\"%s\",\"last_upd\":\"%s\"}," \
     "${NAME}" "${VERSION}" "${REVISION}" "${LAST_UPDATE}"
-printf "\"day_processed\": \"%s-%s\"," "${YEAR}" "${DOY_3C}"
-printf "{\"interval\": {\"from\":\"%s\", \"to\":\"%s\"}" "${START_OF_DAY_STR}" "${END_OF_DAY_STR}"
-printf "}\n"
+printf "\n\"day_processed\": \"%s-%s\"," "${YEAR}" "${DOY_3C}"
+printf "\n\"interval\": {\"from\":\"%s\", \"to\":\"%s\"}},\n" "${START_OF_DAY_STR}" "${END_OF_DAY_STR}"
+} >> ${JSON_OUT}
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD RINEX FILES
@@ -706,10 +710,10 @@ for sta in "${STA_ARRAY[@]}"; do echo $sta >> .station-names.dat; done
 ## ////////////////////////////////////////////////////////////////////////////
 ##  REPORT ..
 ## ////////////////////////////////////////////////////////////////////////////
-printf "<p>Number of stations available: %s/%s</p>\n" \
-        "${#STA_ARRAY[@]}" "${MAX_NET_STA}"
-printf "<p>Number of reference stations: %s</p>\n" \
-        "${#REF_STA_ARRAY[@]}"
+#printf "<p>Number of stations available: %s/%s</p>\n" \
+#        "${#STA_ARRAY[@]}" "${MAX_NET_STA}"
+#printf "<p>Number of reference stations: %s</p>\n" \
+#        "${#REF_STA_ARRAY[@]}"
 fi
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD IONOSPHERIC MODEL FILE
@@ -718,7 +722,8 @@ fi
 ##  TODO :: mysql ...
 ##  If such a file does not exist, download CODE's ionospheric file.
 ## ////////////////////////////////////////////////////////////////////////////
-printf "{products:["
+printf "\n\"products\":[\n" >> ${JSON_OUT}
+>.tmp.products.json
 
 ION_DOWNLOADED=0
 
@@ -769,7 +774,8 @@ if test ${ION_DOWNLOADED} -eq 1; then
           --datapool="${D}" \
           --destination="${P}/${CAMPAIGN}/ORB" \
           --satellite-system="${SAT_SYS}" \
-          --report=json; then
+          --report=json \
+          1>>.tmp.products.json; then
     echoerr "ERROR. Failed to download/copy/uncompress products."
     exit 1
   fi
@@ -782,7 +788,8 @@ else
           --destination="${P}/${CAMPAIGN}/ORB" \
           --satellite-system="${SAT_SYS}" \
           --download-ion \
-          --report=json; then
+          --report=json \
+          1>>.tmp.products.json; then
     echoerr "ERROR. Failed to download/copy/uncompress products."
     exit 1
   fi
@@ -831,11 +838,16 @@ fi
 ##printf "<p>Product type: <strong>vmf1</strong> :\
 ##  downloaded file(s) %s ; moved to %s</p>\n" \
 ##      "$tmp_" "$MERGED_VMF_FILE"
-cat .vmf1.json 2>/dev/null
+cat .vmf1.json >> .tmp.products.json
 rm ${TMP_FL} ## remove temporary file
 fi
 
-printf "]}" ## done with products
+if ! cat .tmp.products.json | sed 's/} }$/} },/g' 1>>${JSON_OUT}; then
+  echoerr "ERROR. Failed to compile JSON product report."
+  exit 1
+fi
+printf "\n],\n" >> ${JSON_OUT} ## done with products
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  MAKE THE CLUSTER FILE
 ##  ---------------------------------------------------------------------------
@@ -882,7 +894,6 @@ awk -v num_of_clu=${STATIONS_PER_CLUSTER} -f \
 ##+      PRELIM_SOLUTION_ID  = 'FFP'
 ##+      REDUCED_SOLUTION_ID = 'FFR1'
 ## ////////////////////////////////////////////////////////////////////////////
-printf "{solution_identifiers:["
 ##  Final (ambiguity-fixed) results
 FINAL_SOLUTION_ID="${SOLUTION_ID}"
 
@@ -905,16 +916,18 @@ else
 fi
 
 ##  report ..
-printf "{\"description\":\"Final Solution\", \"id\":\"%s\"}" "$FINAL_SOLUTION_ID"
-printf "{\"description\":\"Size-Reduced\", \"id\":\"%s\"}" "$REDUCED_SOLUTION_ID"
-printf "{\"description\":\"Preliminary Solution\", \"id\":\"%s\"}" "$PRELIM_SOLUTION_ID"
-printf "]}"
-
+{
+printf "\n\"solution_identifiers\":[\n"
+printf "{\"description\":\"Final Solution\", \"id\":\"%s\"},\n" "$FINAL_SOLUTION_ID"
+printf "{\"description\":\"Size-Reduced\", \"id\":\"%s\"},\n" "$REDUCED_SOLUTION_ID"
+printf "{\"description\":\"Preliminary Solution\", \"id\":\"%s\"}\n" "$PRELIM_SOLUTION_ID"
+printf "],\n"
+} >> ${JSON_OUT}
 ## ////////////////////////////////////////////////////////////////////////////
 ##  SET VARIABLES IN THE PCF FILE
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-
+printf "\n\"pcf_variables\":[\n" 1>>${JSON_OUT}
 ##  Bernese has no 'MIXED' satellite system; this defaults to 'GPS/GLO'.
 if test "${SAT_SYS}" == "MIXED"; then
   BERN_SAT_SYS="GPS/GLO"
@@ -938,11 +951,12 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" \
         PCV="I08" \
         PCVINF="PCV_${CAMPAIGN:0:3}" \
         ELANG="${ELEVATION_ANGLE}" \
-        CLU="${FILES_PER_CLUSTER}"; then
+        CLU="${FILES_PER_CLUSTER}" \
+        1>>${JSON_OUT} ; then
   echoerr "ERROR. Failed to set variables in PCF file."
   exit 1
 fi
-
+printf "],\n" 1>>${JSON_OUT}
 ##  TODO:    This needs to change... fix the program / make new
 ##  ---------------------------------------------------------------------------
 ##  Depending on the AC, set the INP file POLUPD.INP to fill in the right
@@ -1004,7 +1018,7 @@ fi
 ##  COPY PRODUCTS TO HOST; UPDATE DATABASE ENTRIES
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-printf "{saved_products:["
+printf "\n\"saved_products\":[" >> ${JSON_OUT}
 if test 1 -eq 1 ; then
 ##  warning: in the db mixed := GPS+GLO
 if test "${SAT_SYS^^}" = "MIXED"; then
@@ -1029,6 +1043,7 @@ fi
 ##  argv2 -> campaign dir (e.g. 'SOL')
 ##  argv3 -> product type (e.g. 'SINEX')
 
+{
 ##  final tropospheric sinex
 if ! save_n_update TRO ATM TRO_SNX ; then exit 1 ; else printf "," ; fi
 
@@ -1043,16 +1058,16 @@ if ! save_n_update NQ0 SOL NQ R ; then exit 1 ; else printf "," ; fi
 
 ## final coordinates
 if ! save_n_update CRD STA CRD_FILE ; then exit 1 ; fi
-
+} 1>>${JSON_OUT}
 fi
-printf "]}"
+printf "\n],\n" >> ${JSON_OUT}
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  COMPILE (NON-FATAL) ERROR/WARNINGS FILE
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
 WRN_FILE=${P}/${CAMPAIGN}/LOG/wrn${YEAR}${DOY_3C}0.log
-
+printf "\n" >> ${JSON_OUT}
 if ! >${WRN_FILE} ; then
   echoerr "ERROR. Failed to create warnings file ${WRN_FILE}"
 fi
@@ -1065,10 +1080,11 @@ find ${P}/${CAMPAIGN}/OUT/*${YEAR}${DOY_3C}0.ERR -not -empty -ls -exec \
 
 ## echo "Warnings file created as ${WRN_FILE}"
 ##  warnings to json ..
-if ! wrn2json.py ${WRN_FILE} 2>/dev/null ; then
+if ! wrn2json.py ${WRN_FILE} 2>/dev/null 1>>${JSON_OUT}; then
   echoerr "ERROR. Failed to create json warning file!"
   exit 1
 fi
+printf "\n" >> ${JSON_OUT}
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  ADDNEQ SUMMARY TO HTML
@@ -1077,7 +1093,7 @@ fi
 
 ##  the ambiguity summary file
 AMBSM=${P}/${CAMPAIGN}/OUT/AMB${YEAR:2:2}${DOY_3C}0.SUM
-python - <<END
+python - 1>>${JSON_OUT} <<END
 import sys, bernutils.bamb
 try:
   ambf = bernutils.bamb.AmbFile( "${AMBSM}" )
@@ -1089,21 +1105,21 @@ sys.exit(0)
 END
 if test "$?" -ne 0 ; then exit 1 ; fi
 
-printf "<h2>ADDNEQ Summary</h2>"
 ##  the final ADDNEQ summary file should be
 ADNQ=${P}/${CAMPAIGN}/OUT/${FINAL_SOLUTION_ID}${YEAR:2:2}${DOY_3C}0.OUT
 #adnq2html.py --addneq-file="${ADNQ}" \
 #          --table-entries='latcor,loncor,hgtcor,dn,de,du,adj' \
 #          --warnings-str='dn=.01,de=.01,du=.01'
-python - <<END
+python - 1>>${JSON_OUT} <<END
 import sys, bernutils.badnq
-#try:
-adnf = bernutils.badnq.AddneqFile( "${ADNQ}" )
-adnf.toJson()
-#except:
-#  print>>sys.stderr,'ERROR. Cannot translate addneq file to json!'
-sys.exit(1)
-sys.exit(0)
+status = 0
+try:
+  adnf = bernutils.badnq.AddneqFile( "${ADNQ}" )
+  adnf.toJson()
+except:
+  print>>sys.stderr,'ERROR. Cannot translate addneq file to json!'
+  status = 1
+sys.exit(status)
 END
 if test "$?" -ne 0 ; then exit 1 ; fi
 

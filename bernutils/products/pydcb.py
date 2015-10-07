@@ -165,6 +165,8 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
   else:
     raise RuntimeError('This date seems invalid (for dcb)')
 
-  if tojson: print(json.dumps(jdict))
+  if tojson:
+    ##  print(json.dumps(jdict))
+    return ret_list, jdict
 
   return ret_list

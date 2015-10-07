@@ -253,7 +253,7 @@ def __cod_sp3_all_prediction__(str_id='5D'):
 
   return [[ FILENAME, COD_HOST, COD_DIR, 'prediction (%s)'%str_id ]]
 
-def getIgsSp3Gps(datetm, out_dir=None, igs_repro2=False):
+def getIgsSp3Gps(datetm, out_dir=None, igs_repro2=False, tojson=False):
   ''' This function is responsible for downloading an optimal, valid sp3 file
       for a given date. The user-defined input variables can further narrow
       down the possible choices.
@@ -338,7 +338,7 @@ def getIgsSp3Gps(datetm, out_dir=None, igs_repro2=False):
   for triple in options:
     nr_tries += 1
     try:
-      if out_dir: 
+      if out_dir:
         saveas = os.path.join(out_dir, triple[0])
       else:
         saveas = triple[0]
@@ -353,6 +353,18 @@ def getIgsSp3Gps(datetm, out_dir=None, igs_repro2=False):
 
   if __DEBUG_MODE__ == True:
     print 'Tries: %1i/%1i Downloaded %s to %s' %(nr_tries, len(options), ret_list[1], ret_list[0])
+
+  if tojson:
+    jdict_gps = {
+      'info'    : JSON_INFO,
+      'format'  : JSON_FORMAT,
+      'satsys'  : 'gps',
+      'ac'      : 'igs',
+      'type'    : ret_list[2],
+      'host'    : IGS_HOST,
+      'filename': ret_list[1]
+    }
+    return ret_list, jdict_gps
 
   return ret_list
 
@@ -441,6 +453,18 @@ def getIgsSp3Glo(datetm, out_dir=None):
   if __DEBUG_MODE__ == True:
     print 'Tries: %1i/%1i Downloaded %s to %s' %(nr_tries, len(options), ret_list[1], ret_list[0])
 
+  if tojson:
+    jdict_glo = {
+      'info'    : JSON_INFO,
+      'format'  : JSON_FORMAT,
+      'satsys'  : 'glonass',
+      'ac'      : 'igs',
+      'type'    : ret_list[2],
+      'host'    : IGS_HOST,
+      'filename': ret_list[1]
+    }
+    return ret_list, jdict_glo
+
   return ret_list
 
 def getIgsSp3(datetm, out_dir=None, use_glonass=False, igs_repro2=False, tojson=False):
@@ -474,31 +498,14 @@ def getIgsSp3(datetm, out_dir=None, use_glonass=False, igs_repro2=False, tojson=
            the ``products.rst`` file.
 
   '''
-  answer_gps = getIgsSp3Gps(datetm, out_dir, igs_repro2)
-  jdict_gps = {
-    'info'    : JSON_INFO,
-    'format'  : JSON_FORMAT,
-    'satsys'  : 'gps',
-    'ac'      : 'igs',
-    'type'    : answer_gps[2],
-    'host'    : IGS_HOST,
-    'filename': answer_gps[1]
-  }
+  answer_gps, gps_dict = getIgsSp3Gps(datetm, out_dir, igs_repro2)
   
-  if not use_glonass:  
-    if tojson: print(json.dumps(jdict_gps))
+  if not use_glonass:
+    if tojson:
+      return answer_gps, json.dumps(gps_dict)
     return answer_gps
 
-  answer_glo = getIgsSp3Glo(datetm, out_dir)
-  jdict_glo = {
-    'info'    : JSON_INFO,
-    'format'  : JSON_FORMAT,
-    'satsys'  : 'glo',
-    'ac'      : 'igs',
-    'type'    : answer_glo[2],
-    'host'    : IGS_HOST,
-    'filename': answer_glo[1]
-  }
+  answer_glo, glo_dict = getIgsSp3Glo(datetm, out_dir)
 
   gps_sp3_Z = answer_gps[0]
   glo_sp3_Z = answer_glo[0]
@@ -522,7 +529,7 @@ def getIgsSp3(datetm, out_dir=None, use_glonass=False, igs_repro2=False, tojson=
 
   # print json
   if tojson:
-    print(json.dumps(jdict_gps, jdict_glo))
+    return igs_sp3_dotZ, [answer_gps[1], answer_glo[1]], [gps_dict, glo_dict]
 
   return [ igs_sp3_dotZ, [answer_gps[1], answer_glo[1]] ]
 
@@ -640,13 +647,14 @@ def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
     jdict = {
         'info'    : JSON_INFO,
         'format'  : JSON_FORMAT,
-        'satsys'  : 'gps+glo',
+        'satsys'  : 'gps+glonass',
         'ac'      : 'cod',
         'type'    : ret_list[2],
         'host'    : COD_HOST,
         'filename': ret_list[1]
     }
-    print(json.dumps(jdict))
+    ##  print(json.dumps(jdict))
+    return ret_list, jdict
 
   return ret_list
 

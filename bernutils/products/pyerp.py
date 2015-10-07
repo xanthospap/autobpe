@@ -389,7 +389,8 @@ def getIgsErp(datetm, out_dir=None, igs_repro2=False, tojson=False):
         'host'    : IGS_HOST,
         'filename': ret_list[1]
     }
-    print(json.dumps(jdict))
+    ##  print(json.dumps(jdict))
+    return ret_list, jdict
 
   return ret_list
 
@@ -513,7 +514,8 @@ def getCodErp(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
         'host'    : COD_HOST,
         'filename': ret_list[1]
     }
-    print(json.dumps(jdict))
+    ##  print(json.dumps(jdict))
+    return ret_list, jdict
   
   return ret_list
 

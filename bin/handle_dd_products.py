@@ -6,6 +6,8 @@
 
 import os, sys, datetime, traceback
 import getopt, shutil
+import json
+
 import bernutils.gpstime
 import bernutils.products.pysp3
 import bernutils.products.pyerp
@@ -94,6 +96,7 @@ if SAT_SYS == 'gps' or SAT_SYS == 'GPS':
   ussr = False
 
 info_dict = {}
+json_dict = {}
 
 error_at = 0
 try:
@@ -103,21 +106,35 @@ try:
     use_glonass=ussr, \
     tojson=JSON_OUT)
   error_at += 1
+  if JSON_OUT:
+    json_dict['sp3'] = info_dict['sp3'][-1]
+    info_dict['sp3'] = map(list,info_dict['sp3'][0:-1])
 
   info_dict['erp'] = bernutils.products.pyerp.getErp(date=py_date, \
     ac=AC, \
     out_dir=DATAPOOL, \
     tojson=JSON_OUT)
   error_at += 1
+  if JSON_OUT:
+    json_dict['erp'] = info_dict['erp'][-1]
+    info_dict['erp'] = map(list,info_dict['erp'][0:-1])
+    ## print 'info_dict[\"erp\"]=',info_dict['erp']
+    ## print 'json_dict[\"erp\"]=',json_dict['erp']
 
   info_dict['dcb'] = bernutils.products.pydcb.getCodDcb(stype='c1_rnx', \
     datetm=py_date, \
     out_dir=DATAPOOL, \
     tojson=JSON_OUT)
   error_at += 1
+  if JSON_OUT:
+    json_dict['dcb'] = info_dict['dcb'][-1]
+    info_dict['dcb'] = map(list,info_dict['dcb'][0:-1])
 
   if DWNL_ION:
     info_dict['ion'] = bernutils.products.pyion.getCodIon(py_date, DATAPOOL, tojson=JSON_OUT)
+    if JSON_OUT:
+      json_dict['ion'] = info_dict['ion'][-1]
+      info_dict['ion'] = map(list,info_dict['ion'][0:-1])
 
   ##  Alright! all products downloaded! now we need to make an easy list to
   ##+ pass to bash, to link the downloaded files from directory D to the /ORB
@@ -134,6 +151,7 @@ try:
   if isUnixCompressed(info_dict['sp3'][0]):
     sp3file += '.Z'
   info_dict['sp3'].append(sp3file)
+  ##  print info_dict['sp3']
 
   if AC.lower() == 'cod':
     erpfile = os.path.join(DEST_ORB,\
@@ -144,12 +162,14 @@ try:
   if isUnixCompressed(info_dict['erp'][0]):
     erpfile += '.Z'
   info_dict['erp'].append(erpfile)
+  ##  print info_dict['erp']
 
   dcbfile = os.path.join(DEST_ORB,\
     "P1C1%s%s.DCB"%(yr2, mnth))
   if isUnixCompressed(info_dict['dcb'][0]):
     dcbfile += '.Z'
   info_dict['dcb'].append(dcbfile)
+  ##  print info_dict['dcb']
 
   if DWNL_ION:
     ionfile = os.path.join(DEST_ORB.replace('/ORB', '/ATM'),\
@@ -157,18 +177,27 @@ try:
     if isUnixCompressed(info_dict['ion'][0]):
       ionfile += '.Z'
     info_dict['ion'].append(ionfile)
+    ##  print info_dict['ion']
 
   for i, j in info_dict.iteritems():
-    shutil.copy(j[0], j[2])
+    ## print 'Moving %s to %s'%(j[0][0], j[1])
+    shutil.copy(j[0][0], j[1])
     dfiles_str = ( ', '.join(str(p) for p in [j[1]]) ).replace('[','').replace(']','')
     if REPORT == 'ascii':
       print '[PRODUCTS::%s] Downloaded file %s ; moved to %s'%(i, dfiles_str, j[2])
     elif REPORT == 'html':
       print '<p>Product type: <strong>%s</strong> : \
           downloaded file(s) <code>%s</code> ; \
-          moved to <code>%s</code></p>'%(i, dfiles_str, j[2])
-    if isUnixCompressed(j[2]):
-      bernutils.webutils.UnixUncompress(j[2])
+          moved to <code>%s</code></p>'%(i, dfiles_str, j[1])
+    if isUnixCompressed(j[1]):
+      bernutils.webutils.UnixUncompress(j[1])
+
+  for idx, val in enumerate(json_dict):
+    if idx == len(json_dict) - 1:
+      end = "}"
+    else:
+      end = "},"
+    print "{\"%s\":"%val, str(json_dict[val]).replace('\'', '\"'), end
 
 except Exception, e:
   ## where was the exception thrown ?

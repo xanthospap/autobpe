@@ -128,11 +128,14 @@ class PcfFile:
     else:
       var_list = self.__varlist
 
-    print '{pcf_variables:['
-    for i in var_list:
+    ##  print '\"pcf_variables\":['
+    for idx, i in enumerate(var_list):
       var_str = '{\"var_name\":\"%s\", \"description\": \"%s\", \"value\": \"%s\" }'%(i.var(), i.description(), i.value())
-      print var_str
-    print ']}'
+      if idx == len(var_list)-1:
+        print var_str
+      else:
+        print var_str+','
+    ##  print ']'
 
 
   def dump_to_html(self):

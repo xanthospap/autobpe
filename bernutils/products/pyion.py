@@ -222,6 +222,7 @@ def getCodIon(datetm, out_dir=None, tojson=False):
         'host'    : JSON_HOST,
         'filename': ret_list[1]
     }
-    print(json.dumps(jdict))
+    ##  print(json.dumps(jdict))
+    return ret_list, jdict
 
   return ret_list
