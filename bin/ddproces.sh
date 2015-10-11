@@ -722,7 +722,7 @@ fi
 ##  TODO :: mysql ...
 ##  If such a file does not exist, download CODE's ionospheric file.
 ## ////////////////////////////////////////////////////////////////////////////
-printf "\n\"products\":[\n" >> ${JSON_OUT}
+printf "\n\"products\":{\n" >> ${JSON_OUT}
 >.tmp.products.json
 
 ION_DOWNLOADED=0
@@ -842,11 +842,11 @@ cat .vmf1.json >> .tmp.products.json
 rm ${TMP_FL} ## remove temporary file
 fi
 
-if ! cat .tmp.products.json | sed 's/} }$/} },/g' 1>>${JSON_OUT}; then
+if ! cat .tmp.products.json | sed 's/}\s$/},/g' 1>>${JSON_OUT}; then
   echoerr "ERROR. Failed to compile JSON product report."
   exit 1
 fi
-printf "\n],\n" >> ${JSON_OUT} ## done with products
+printf "\n},\n" >> ${JSON_OUT} ## done with products
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  MAKE THE CLUSTER FILE

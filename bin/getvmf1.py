@@ -149,7 +149,7 @@ if iyear <= 2008:
 # print results
 if JSON_OUT:
     with open(JSON_OUT, 'w') as jout:
-      print>>jout,"{\"%s\":["%("vmf1")
+      print>>jout,"\"%s\":["%("vmf1")
       for idx, i in enumerate(retlist):
           jdict = {
               'info'    : 'Vienna Mapping Function 1 Grid',
@@ -160,7 +160,7 @@ if JSON_OUT:
               'host'    : HOST,
               'filename': i[0]
             }
-          if idx == len(retlist) - 1: end = ']}'
+          if idx == len(retlist) - 1: end = ']'
           else: end = ','
           print>>jout,"%s %s"%(json.dumps(jdict), end),
 

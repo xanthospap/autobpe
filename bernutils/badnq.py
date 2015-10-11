@@ -718,7 +718,7 @@ class AddneqFile:
     for key, val in dict1.iteritems():
       full_info = val + lst1[key]
       dict1[key] = FullStationRecord(key, full_info)
-    print "\"addneq_summary\":['
+    print "\"addneq_summary\":["
     it = 0
     for sta, val in dict1.iteritems():
       print val.tojson(),

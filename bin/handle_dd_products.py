@@ -194,10 +194,10 @@ try:
 
   for idx, val in enumerate(json_dict):
     if idx == len(json_dict) - 1:
-      end = "}"
+      end = ""
     else:
-      end = "},"
-    print "{\"%s\":"%val, str(json_dict[val]).replace('\'', '\"'), end
+      end = ","
+    print "\"%s\":"%val, str(json_dict[val]).replace('\'', '\"'), end
 
 except Exception, e:
   ## where was the exception thrown ?

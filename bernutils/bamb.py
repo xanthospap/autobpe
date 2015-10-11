@@ -108,7 +108,7 @@ class AmbLine:
     return sys, satsys_dict[sys]
 
   def tojson(self):
-    jstr = "{\"baseline\":\"%s\", \"station1\":\"%s\", \"station1\":\"%s\", \"length\": %6.1f, \"method\": \"%s\", \"num_of_ambs\": %5i, \"precent\": %4.1f, \"satsys\": \"%s\" }"%(self.baseline(),self.station1(), self.station2(), self.length(), self.method(), self.ambsbefore()[0], self.percent(),self.satsys()[1])
+    jstr = "{\"baseline\":\"%s\", \"station1\":\"%s\", \"station2\":\"%s\", \"length\": %6.1f, \"method\": \"%s\", \"num_of_ambs\": %5i, \"percent\": %4.1f, \"satsys\": \"%s\" }"%(self.baseline(),self.station1(), self.station2(), self.length(), self.method(), self.ambsbefore()[0], self.percent(),self.satsys()[1])
     return jstr
 
 class AmbFile:
@@ -233,7 +233,7 @@ class AmbFile:
   def toHtml(self, sat_sys=None):
     ''' Translate the ambiguity resolution information from this file to a
         html table.
-        
+
         :param sat_sys:    **(Optional)** if set, only the lines corresponding
                            to the selected satellite system will be returned.
                            Can be any of the keys of the ``bernutils.bamb.sasys_dict``
