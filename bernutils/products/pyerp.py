@@ -10,10 +10,10 @@ import bernutils.products.prodgen
 __DEBUG_MODE__ = False
 
 erp_type = {'d': 'CODwwww7.ERP.Z',
-  'f': 'cofwwww7.erp.Z',
-  'r': 'CODwwwwn.ERP_R',
-  'u': 'COD.ERP_U',
-  'p': 'CODwwwwn.ERP_Pi',
+  'f' : 'cofwwww7.erp.Z',
+  'r' : 'CODwwwwn.ERP_R',
+  'u' : 'COD.ERP_U',
+  'p' : 'CODwwwwn.ERP_Pi',
   '2d': 'CO2wwww7.ERP.Z',
   '2f': 'cf2wwww7.erp.Z'
 }
@@ -27,7 +27,6 @@ COD_DIR       = bernutils.products.prodgen.COD_DIR
 COD_DIR_2013  = bernutils.products.prodgen.COD_DIR_2013
 IGS_DIR       = bernutils.products.prodgen.IGS_DIR
 IGS_DIR_REP2  = bernutils.products.prodgen.IGS_DIR_REP2
-
 JSON_INFO     = 'Earth Rotation Parameters'
 JSON_FORMAT   = 'erp'
 
@@ -79,8 +78,8 @@ def erpTimeSpan(filen, as_mjd=True):
 def __igs_erp_all_final__(igs_repro2=False):
   ''' Utility function; do not use as standalone. This function will return the
       filename, host, and hostdir of a valid final igs-generated erp file, based
-      on the input parameters. These information can be later used to download the
-      file.
+      on the input parameters. These information can be later used to download 
+      the file.
 
       :param igs_repro2: Use IGS repro2 (2nd reprocessing campaign) erp products.
 

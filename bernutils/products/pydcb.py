@@ -12,7 +12,7 @@ COD_DIR       = bernutils.products.prodgen.COD_DIR
 COD_DIR_2013  = bernutils.products.prodgen.COD_DIR_2013
 
 dcb_type = {'p2': 'P1P2yymm.DCB',
-  'c1': 'P1C1yymm.DCB',
+  'c1'    : 'P1C1yymm.DCB',
   'c1_rnx': 'P1C1yymm_RINEX.DCB',
   'c2_rnx': 'P2C2yymm_RINEX.DCB'
 }
@@ -72,14 +72,19 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
       :param out_dir: Path to directory where the downloaded file shall
                       be stored.
 
-      :returns:       A list/tuple with two strings; the first one is the 
-                      filename of the downloaded file. The second element is the
-                      (original) name of the remote file.
+      :returns:       If the input parameter ``tojson`` is ``True``, a tuple 
+                      formated as:
+                      ( [localfile, remotefile] , json_dictionary )
+                      If the input parameter ``tojson`` is ``False``, then the
+                      function returns:
+                      [localfile, remotefile]
 
       .. note:: This functions uses :func:`bernutils.products.pydcb._getFinalDcb_`
         and :func:`bernutils.products.pydcb._getRunningDcb_`
 
   '''
+
+  ##  a dictionary to hold (json-type) information on the downloaded dcb file.
   jdict = {
     'info'    : 'Differential Code Bias',
     'format'  : 'DCB',
@@ -95,8 +100,7 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
     raise RuntimeError('Invalid directory: %s -> getCodDcb.' %out_dir)
 
   ## Only interested in the date part of datetm
-  if type(datetm) == datetime.datetime:
-    datetm = datetm.date()
+  if type(datetm) == datetime.datetime: datetm = datetm.date()
 
   try:
     generic_file = dcb_type[stype]
@@ -158,15 +162,13 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
         raise RuntimeError('ERROR. got more files than expected!')
       localfile  = ret_list[0][0]
       remotefile = ret_list[0][1]
-      ret_list = [localfile, remotefile]
+      ret_list   = [localfile, remotefile]
       jdict['type'] = 'final (%s)'%stype
     except:
       raise
   else:
     raise RuntimeError('This date seems invalid (for dcb)')
 
-  if tojson:
-    ##  print(json.dumps(jdict))
-    return ret_list, jdict
+  if tojson: return ret_list, jdict
 
   return ret_list

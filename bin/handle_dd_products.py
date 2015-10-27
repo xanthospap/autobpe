@@ -25,6 +25,8 @@ DWNL_ION = False
 REPORT   = None
 JSON_OUT = False
 
+##  given an (input) filename, check to see if this file is UNIX-compressed,
+##+ i.e. if it ends with '.Z'
 def isUnixCompressed(fn): return len(fn) > 2 and fn[-2:] == '.Z'
 
 ## Resolve command line arguments
@@ -92,8 +94,7 @@ except:
   sys.exit(1)
 
 ussr = True
-if SAT_SYS == 'gps' or SAT_SYS == 'GPS':
-  ussr = False
+if SAT_SYS == 'gps' or SAT_SYS == 'GPS': ussr = False
 
 info_dict = {}
 json_dict = {}
