@@ -13,14 +13,14 @@ yesterday = datetime.date.today() - datetime.timedelta(1)
 today = datetime.datetime.today()
 
 # path to download files
-mydir = '/home/bpe2/test'
+mydir = '/home/xanthos/Downloads'
 
 ##  How to download .ion files
 #print bernutils.products.pyion.getCodIon(dtm, mydir, True)
 
 ## How to download .erp files
 print bernutils.products.pyerp.getErp(date=dtm, out_dir=mydir, ac='igs', tojson=True)
-print bernutils.products.pyerp.getErp(date=yesterday, out_dir=mydir, ac='cod', tojson=True)
+print bernutils.products.pyerp.getErp(date=yesterday, out_dir=mydir, ac='cod', tojson=False)
 
 ## How to download .sp3 files
 # print bernutils.products.pysp3.getOrb(date=dtm, out_dir=mydir, ac='igs', tojson=True)

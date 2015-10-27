@@ -2,7 +2,6 @@ import sys
 import os
 import datetime
 import ftplib
-import json
 
 import bernutils.gpstime
 import bernutils.webutils
@@ -42,7 +41,7 @@ def __igs_sp3_all_final__(igs_repro2=False):
     DIR      = IGS_DIR + '/wwww/'
     descr    = 'final'
 
-  return [[ FILENAME, HOST, DIR, descr ]]
+  return [ [ FILENAME, HOST, DIR, descr ] ]
 
 def __igs_sp3_all_final_glo__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -52,7 +51,7 @@ def __igs_sp3_all_final_glo__():
       .. warning:: handles glonass-only sp3 files.
 
   '''
-  return [[ 'iglwwwwd.sp3.Z', IGS_HOST, IGS_DIR_GLO+ '/wwww/', 'final' ]]
+  return [ [ 'iglwwwwd.sp3.Z', IGS_HOST, IGS_DIR_GLO+ '/wwww/', 'final' ] ]
 
 def __igs_sp3_all_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -62,7 +61,7 @@ def __igs_sp3_all_rapid__():
       .. warning:: handles gps-only sp3 files.
 
   '''
-  return [[ 'igrwwwwd.sp3.Z', IGS_HOST, IGS_DIR + '/wwww/', 'rapid' ]]
+  return [ [ 'igrwwwwd.sp3.Z', IGS_HOST, IGS_DIR + '/wwww/', 'rapid' ] ]
 
 def __igs_sp3_all_ultra_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -126,35 +125,35 @@ def __cod_sp3_all_final__(use_repro_13=False, use_one_day_sol=False, igs_repro2=
           in the  ``products.rst`` file.
 
   '''
-  # Manage repro2 igs campaign erp files.
+  ##  Manage repro2 igs campaign erp files.
   if igs_repro2 == True:
     HOST = IGS_HOST
     DIR  = IGS_DIR_REP2 + '/wwww/'
-    ## One-day solution: (CDDIS)/repro2/wwww/cf2wwwwd.eph.Z
+    ##  One-day solution: (CDDIS)/repro2/wwww/cf2wwwwd.eph.Z
     if use_one_day_sol == True:
       FILENAME = 'cf2wwwwd.eph.Z'
       descr    = 'final (repro2, one-day sol)'
-    ## Normal erp (3-day) (CDDIS)/repro2/wwww/co2wwwwd.eph.Z
+    ##  Normal erp (3-day) (CDDIS)/repro2/wwww/co2wwwwd.eph.Z
     else:
       FILENAME = 'co2wwwwd.eph.Z'
       descr    = 'final (repro2)'
 
   else:
-    ## One-day solution (CDDIS)/wwww/cofwwwwd.eph.Z
+    ##  One-day solution (CDDIS)/wwww/cofwwwwd.eph.Z
     if use_one_day_sol == True:
       FILENAME = 'cofwwwwd.eph.Z'
       HOST     = IGS_HOST
       DIR      = IGS_DIR + '/wwww/'
       descr    = 'final (one-day sol)'
 
-    ## CODE's 2013 re-processing (CODE)/REPRO_2013/CODE/yyyy/CODwwwwd.EPH.Z
+    ##  CODE's 2013 re-processing (CODE)/REPRO_2013/CODE/yyyy/CODwwwwd.EPH.Z
     elif use_repro_13 == True:
       FILENAME = 'CODwwwwd.EPH.Z'
       HOST     = COD_HOST
       DIR      = COD_DIR_2013 + '/yyyy/'
       descr    = 'final (repro 2013)'
 
-    ## Normal, 3-day file (CODE)/CODE/yyyy/CODwwwwd.EPH.Z
+    ##  Normal, 3-day file (CODE)/CODE/yyyy/CODwwwwd.EPH.Z
     else:
       FILENAME = 'CODwwwwd.EPH.Z'
       HOST     = COD_HOST
@@ -181,12 +180,12 @@ def __cod_sp3_all_final_rapid__():
 
   '''
 
-  ## final rapid (in yyy_M folder)
+  ##  final rapid (in yyy_M folder)
   FILENAME_FR1 = 'CODwwwwd.EPH_M.Z'
   HOST_FR1     = COD_HOST
   DIR_FR1      = COD_DIR + '/yyyy_M/'
 
-  ## final rapid (in root folder)
+  ##  final rapid (in root folder)
   FILENAME_FR2 = 'CODwwwwd.EPH_M'
   HOST_FR2     = COD_HOST
   DIR_FR2      = COD_DIR
@@ -206,7 +205,7 @@ def __cod_sp3_all_early_rapid__():
         the ``products.rst`` file.
 
   '''
-  return [[ 'CODwwwwd.EPH_R', COD_HOST, COD_DIR, 'rapid (early)' ]]
+  return [ [ 'CODwwwwd.EPH_R', COD_HOST, COD_DIR, 'rapid (early)' ] ]
 
 def __cod_sp3_all_ultra_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -220,7 +219,7 @@ def __cod_sp3_all_ultra_rapid__():
         the ``products.rst`` file.
 
   '''
-  return [[ 'COD.EPH_U', COD_HOST, COD_DIR, 'ultra-rapid' ]]
+  return [ [ 'COD.EPH_U', COD_HOST, COD_DIR, 'ultra-rapid' ] ]
 
 def __cod_sp3_all_prediction__(str_id='5D'):
   ''' Utility function; do not use as standalone. This function will return the
@@ -251,7 +250,7 @@ def __cod_sp3_all_prediction__(str_id='5D'):
   else:
     raise RuntimeError('Invalid SP3 prediction flag %s.', str_id)
 
-  return [[ FILENAME, COD_HOST, COD_DIR, 'prediction (%s)'%str_id ]]
+  return [ [ FILENAME, COD_HOST, COD_DIR, 'prediction (%s)'%str_id ] ]
 
 def getIgsSp3Gps(datetm, out_dir=None, igs_repro2=False, tojson=False):
   ''' This function is responsible for downloading an optimal, valid sp3 file
@@ -283,21 +282,23 @@ def getIgsSp3Gps(datetm, out_dir=None, igs_repro2=False, tojson=False):
            :func:`bernutils.products.pysp3.__igs_sp3_all_prediction__`.
 
   '''
-  ## output dir must exist
+  ##  output dir must exist
   if out_dir and not os.path.isdir(out_dir):
     raise RuntimeError('Invalid directory: %s -> getIgsSp3.' %out_dir)
 
-  ## transform date to datetime (if needed)
+  ##  transform date to datetime (if needed)
   if type(datetm) == datetime.date:
     datetm = datetime.datetime.combine(datetm, datetime.datetime.min.time())
 
-  ## compute delta time (in days) from today
+  ##  compute delta time (in days) from today
   dt = datetime.datetime.today() - datetm
   dt = dt.days + (dt.seconds // 3600) /24.0
 
+  ##  depending on deltatime, get a list of lists, where each sublist contains
+  ##+ information on possible sp3 files (in ascending order, i.e. the best
+  ##+ possible files are at the begining of options). Each sublist in options
+  ##+ contains the info: [ FILENAME, REMOTE_HOST, REMOTE_DIR, description_string ]
   options = []
-
-  ## depending on deltatime, get a list of optional erp files
   if dt >= 17:
     options =  __igs_sp3_all_final__(igs_repro2)
   elif dt >= 4:
@@ -314,22 +315,28 @@ def getIgsSp3Gps(datetm, out_dir=None, igs_repro2=False, tojson=False):
   else:
     raise RuntimeError('DeltaTime two far in the future %+03.1f' %dt)
 
-  ## compute the needed date formats
+  ##  compute the needed date formats
   week, sow = bernutils.gpstime.pydt2gps(datetm)
   dow       = int(datetm.strftime('%w'))
   iyear     = int(datetm.strftime('%Y'))
   yy        = int(datetm.strftime('%y'))
 
-  ## need to replace the dates
-  options = [ i.replace('yyyy', ('%04i' %iyear)).replace('wwwwd', ('%04i%01i' %(week, dow))).replace('wwww', ('%04i' %week)).replace('yy', ('%02i' %yy)) for slst in options for i in slst ]
+  ##  need to replace the dates in each sub-list of options; note that the
+  ##+ following will transform a list-of-lists to a plain list ...
+  options = [ i.replace('yyyy', ('%04i' %iyear))
+          .replace('wwwwd', ('%04i%01i' %(week, dow)))
+          .replace('wwww', ('%04i' %week))
+          .replace('yy', ('%02i' %yy)) \
+                  for slst in options for i in slst ]
+  ##  ...so now, make that a list of lists again!
   options = [ options[x:x+4] for x in xrange(0, len(options), 4) ]
 
   if __DEBUG_MODE__ == True:
     print 'Delta days is : %+04.1f' %dt
-    for i in options:
-      print 'will try: ', i
+    for i in options: print 'will try: ', i
 
-  ## the successeful triple is ..
+  ##  the successeful triple (actualy a 4-ple but i'am bored to change the 
+  ##+ name) is ..
   ret_list = []
   nr_tries = 0
 
@@ -342,7 +349,7 @@ def getIgsSp3Gps(datetm, out_dir=None, igs_repro2=False, tojson=False):
         saveas = os.path.join(out_dir, triple[0])
       else:
         saveas = triple[0]
-      info = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
+      info     = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
       ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0]), triple[3]]
       break
     except:
@@ -354,6 +361,7 @@ def getIgsSp3Gps(datetm, out_dir=None, igs_repro2=False, tojson=False):
   if __DEBUG_MODE__ == True:
     print 'Tries: %1i/%1i Downloaded %s to %s' %(nr_tries, len(options), ret_list[1], ret_list[0])
 
+  ##  Should we also want json output, just compile a dictionary with information
   if tojson:
     jdict_gps = {
       'info'    : JSON_INFO,
@@ -391,21 +399,20 @@ def getIgsSp3Glo(datetm, out_dir=None):
            :func:`bernutils.products.pysp3.__igs_sp3_all_ultra_rapid_glo__`.
 
   '''
-  ## output dir must exist
+  ##  output dir must exist
   if out_dir and not os.path.isdir(out_dir):
     raise RuntimeError('Invalid directory: %s -> getIgsSp3.' %out_dir)
 
-  ## transform date to datetime (if needed)
+  ##  transform date to datetime (if needed)
   if type(datetm) == datetime.date:
     datetm = datetime.datetime.combine(datetm, datetime.datetime.min.time())
 
-  ## compute delta time (in days) from today
+  ##  compute delta time (in days) from today
   dt = datetime.datetime.today() - datetm
   dt = dt.days + (dt.seconds // 3600) /24.0
 
+  ##  depending on deltatime, get a list of optional erp files
   options = []
-
-  ## depending on deltatime, get a list of optional erp files
   if dt >= 15:
     options =  __igs_sp3_all_final_glo__()
   elif dt > -1:
@@ -413,22 +420,25 @@ def getIgsSp3Glo(datetm, out_dir=None):
   else:
     raise RuntimeError('DeltaTime two far in the future %+03.1f' %dt)
 
-  ## compute the needed date formats
+  ##  compute the needed date formats
   week, sow = bernutils.gpstime.pydt2gps(datetm)
   dow       = int(datetm.strftime('%w'))
   iyear     = int(datetm.strftime('%Y'))
   yy        = int(datetm.strftime('%y'))
 
-  ## need to replace the dates
-  options = [ i.replace('yyyy', ('%04i' %iyear)).replace('wwwwd', ('%04i%01i' %(week, dow))).replace('wwww', ('%04i' %week)).replace('yy', ('%02i' %yy)) for slst in options for i in slst ]
+  ##  need to replace the dates
+  options = [ i.replace('yyyy', ('%04i' %iyear))
+          .replace('wwwwd', ('%04i%01i' %(week, dow)))
+          .replace('wwww', ('%04i' %week))
+          .replace('yy', ('%02i' %yy)) \
+                  for slst in options for i in slst ]
   options = [ options[x:x+4] for x in xrange(0, len(options), 4) ]
 
   if __DEBUG_MODE__ == True:
     print 'Delta days is : %+04.1f' %dt
-    for i in options:
-      print 'will try: ', i
+    for i in options: print 'will try: ', i
 
-  ## the successeful triple is ..
+  ##  the successeful triple is ..
   ret_list = []
   nr_tries = 0
 
@@ -441,7 +451,7 @@ def getIgsSp3Glo(datetm, out_dir=None):
         saveas = os.path.join(out_dir, triple[0])
       else:
         saveas = triple[0]
-      info = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
+      info     = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
       ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0]), triple[3]]
       break
     except:
@@ -453,6 +463,7 @@ def getIgsSp3Glo(datetm, out_dir=None):
   if __DEBUG_MODE__ == True:
     print 'Tries: %1i/%1i Downloaded %s to %s' %(nr_tries, len(options), ret_list[1], ret_list[0])
 
+  ##  compile a json-like dictionary
   if tojson:
     jdict_glo = {
       'info'    : JSON_INFO,
@@ -498,36 +509,41 @@ def getIgsSp3(datetm, out_dir=None, use_glonass=False, igs_repro2=False, tojson=
            the ``products.rst`` file.
 
   '''
+  ##  let's first download the gps-only file
   answer_gps, gps_dict = getIgsSp3Gps(datetm, out_dir, igs_repro2)
   
+  ##  if we want no glonass info, just return the gps, with/without an 
+  ##+ accompanying json-type dictionary
   if not use_glonass:
     if tojson:
-      return answer_gps, json.dumps(gps_dict)
+      return answer_gps, gps_dict
     return answer_gps
 
+  ##  ..ok, so we also want glonass info .. download then !
   answer_glo, glo_dict = getIgsSp3Glo(datetm, out_dir)
 
+  ##  the downloaded/saved files are:
   gps_sp3_Z = answer_gps[0]
   glo_sp3_Z = answer_glo[0]
 
-  # uncompress the files
+  ##  uncompress the files ...
   gps_sp3 = bernutils.webutils.UnixUncompress(gps_sp3_Z)
   glo_sp3 = bernutils.webutils.UnixUncompress(glo_sp3_Z)
 
-  # merge them
+  ## merge them ...
   _basename = os.path.basename(gps_sp3)
   _dir      = os.path.dirname(gps_sp3)
   igs_sp3   = os.path.join(_dir, _basename.replace(_basename[0:3], 'igc'))
   merge_sp3_GR(gps_sp3, glo_sp3, igs_sp3)
 
-  # remove individual files
+  ##  remove the individual (satellite system - specific) files
   os.remove(gps_sp3)
   os.remove(glo_sp3)
 
-  # compress the merged file
+  ##  compress the merged file
   igs_sp3_dotZ = bernutils.webutils.UnixCompress(igs_sp3)
 
-  # print json
+  ##  print json
   if tojson:
     return igs_sp3_dotZ, [answer_gps[1], answer_glo[1]], [gps_dict, glo_dict]
 
@@ -569,25 +585,25 @@ def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
            :func:`bernutils.products.pysp3.__cod_sp3_all_prediction__`.
 
   '''
-  ## output dir must exist
+  ##  output dir must exist
   if out_dir and not os.path.isdir(out_dir):
     raise RuntimeError('Invalid directory: %s -> getCodErp.' %out_dir)
 
-  ## transform date to datetime (if needed)
+  ##  transform date to datetime (if needed)
   if type(datetm) == datetime.date:
     datetm = datetime.datetime.combine(datetm, datetime.datetime.min.time())
 
-  ## check input parameters
+  ##  check input parameters
   if use_repro_13 == True and (use_one_day_sol == True or igs_repro2 == True):
     raise RuntimeError('Invalid sp3 options! Cannot have both cod and erp hosts')
 
-  ## compute delta time (in days) from today
+  ##  compute delta time (in days) from today
   dt = datetime.datetime.today() - datetm
   dt = dt.days + (dt.seconds // 3600) /24.0
 
+  ##  depending on deltatime, get a list of optional erp files (see one of the
+  ##+ above functions for what we're doing here)
   options = []
-
-  ## depending on deltatime, get a list of optional erp files
   if dt >= 15:
     options =   __cod_sp3_all_final__(use_repro_13, use_one_day_sol, igs_repro2)
   elif dt >= 4:
@@ -604,21 +620,23 @@ def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
   else:
     raise RuntimeError('DeltaTime two far in the future %+03.1f' %dt)
 
-  ## compute the needed date formats
+  ##  compute the needed date formats
   week, sow = bernutils.gpstime.pydt2gps(datetm)
   dow       = int(datetm.strftime('%w'))
   iyear     = int(datetm.strftime('%Y'))
 
-  ## need to replace the dates
-  options = [ i.replace('yyyy', ('%04i' %iyear)).replace('wwwwd', ('%04i%01i' %(week, dow))).replace('wwww', ('%04i' %week)) for slst in options for i in slst ]
+  ##  need to replace the dates
+  options = [ i.replace('yyyy', ('%04i' %iyear))
+          .replace('wwwwd', ('%04i%01i' %(week, dow)))
+          .replace('wwww', ('%04i' %week)) \
+                  for slst in options for i in slst ]
   options = [ options[x:x+4] for x in xrange(0, len(options), 4) ]
 
   if __DEBUG_MODE__ == True:
     print 'Delta days is : %+04.1f' %dt
-    for i in options:
-      print 'will try: ', i
+    for i in options: print 'will try: ', i
 
-  ## the successeful triple is ..
+  ##  the successeful triple is ..
   ret_list = []
   nr_tries = 0
 
@@ -631,7 +649,7 @@ def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
         saveas = os.path.join(out_dir, triple[0])
       else:
         saveas = triple[0]
-      info = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
+      info     = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
       ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0]), triple[3]]
       break
     except:
@@ -761,7 +779,17 @@ def getOrb(**kwargs):
            the CDDIS ftp host.
 
   '''
-  _args = { 'ac': 'cod', 'out_dir': None, 'use_glonass': False, 'use_repro_13': False, 'use_one_day_sol': False, 'igs_repro2': False, 'tojson': False }
+
+  ##  default function (input) parameters
+  _args = { 'ac'             : 'cod', 
+            'out_dir'        : None, 
+            'use_glonass'    : False, 
+            'use_repro_13'   : False, 
+            'use_one_day_sol': False, 
+            'igs_repro2'     : False, 
+            'tojson'         : False }
+
+  ##  update the dictionary
   _args.update(**kwargs)
 
   if 'date' in kwargs:
@@ -770,13 +798,23 @@ def getOrb(**kwargs):
     if 'year' not in kwargs or 'doy' not in kwargs:
       raise RuntimeError('Should provide YEAR and DoY.')
     else:
-      datetm = datetime.datetime.strptime('%s-%s'%(kwargs['year'], kwargs['doy']), '%Y-%j').date()
+      datetm = datetime.datetime.strptime('%s-%s'%(kwargs['year'], kwargs['doy']),\
+              '%Y-%j').date()
 
   ## Do nothing :) just pass arguments to the ac-specific function
   if _args['ac'].lower() == 'cod':
-    return getCodSp3(datetm, _args['out_dir'], _args['use_repro_13'], _args['use_one_day_sol'], _args['igs_repro2'], _args['tojson'])
+    return getCodSp3(datetm, 
+            _args['out_dir'], 
+            _args['use_repro_13'], 
+            _args['use_one_day_sol'], 
+            _args['igs_repro2'], 
+            _args['tojson'])
   elif _args['ac'].lower() == 'igs':
-    return getIgsSp3(datetm, _args['out_dir'], _args['use_glonass'], _args['igs_repro2'], _args['tojson'])
+    return getIgsSp3(datetm, 
+            _args['out_dir'], 
+            _args['use_glonass'], 
+            _args['igs_repro2'], 
+            _args['tojson'])
   else:
     raise RuntimeError('Invalid Analysis Center: %s.' %_args['ac'])
 
@@ -884,7 +922,7 @@ def merge_sp3_GR(gps_sp3, glo_sp3, out_sp3=None):
     sys.stdout = open(out_sp3, 'w')
 
   try:
-    bernutils.products.pysp3_mrg. __merge_igl_igs__(gps_sp3, glo_sp3)
+    bernutils.products.pysp3_mrg.__merge_igl_igs__(gps_sp3, glo_sp3)
   except:
     raise
 

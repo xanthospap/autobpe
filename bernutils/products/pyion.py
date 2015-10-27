@@ -1,7 +1,6 @@
 import os
 import datetime
 import ftplib
-import json
 
 import bernutils.gpstime
 import bernutils.webutils
@@ -16,22 +15,11 @@ COD_DIR_2013  = bernutils.products.prodgen.COD_DIR_2013
 IGS_DIR       = bernutils.products.prodgen.IGS_DIR
 IGS_DIR_REP2  = bernutils.products.prodgen.IGS_DIR_REP2
 
-''' json product class
-{
-    "info"             : "Orbit Information",
-    "format"           : "sp3",
-    "satsys"           : "gps",
-    "ac"               : "cod",
-    "type"             : "final",
-    "host"             : "cddis",
-    "filename"         : "igs18753.sp3.Z"
-}
-'''
-JSON_INFO = "Ionospheric correction file."
+JSON_INFO   = "Ionospheric correction file."
 JSON_FORMAT = "ION"
 JSON_SATSYS = ""
-JSON_AC = "COD"
-JSON_HOST = COD_HOST
+JSON_AC     = "COD"
+JSON_HOST   = COD_HOST
 
 def __cod_ion_all_final__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -53,7 +41,7 @@ def __cod_ion_all_final__():
   HOST     = COD_HOST
   DIR      = COD_DIR + '/yyyy/'
 
-  return [[ FILENAME, HOST, DIR, 'final' ]]
+  return [ [ FILENAME, HOST, DIR, 'final' ] ]
 
 def __cod_ion_all_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -73,7 +61,7 @@ def __cod_ion_all_rapid__():
   HOST     = COD_HOST
   DIR      = COD_DIR
 
-  return  [[FILENAME, HOST, DIR, 'rapid']]
+  return  [ [FILENAME, HOST, DIR, 'rapid'] ]
 
 def __cod_ion_all_ultra_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -87,7 +75,7 @@ def __cod_ion_all_ultra_rapid__():
         the ``products.rst`` file.
 
   '''
-  return [[ 'COD.ION_U', COD_HOST, COD_DIR, 'ultra-rapid' ]]
+  return [ [ 'COD.ION_U', COD_HOST, COD_DIR, 'ultra-rapid' ] ]
 
 def __cod_ion_all_prediction__(str_id='P5'):
   ''' Utility function; do not use as standalone. This function will return the
@@ -118,7 +106,7 @@ def __cod_ion_all_prediction__(str_id='P5'):
   else:
     raise RuntimeError('Invalid ION prediction flag %s.', str_id)
 
-  return [[ FILENAME, COD_HOST, COD_DIR, 'prediction (%s)'%str_id ]]
+  return [ [ FILENAME, COD_HOST, COD_DIR, 'prediction (%s)'%str_id ] ]
 
 def getCodIon(datetm, out_dir=None, tojson=False):
   ''' This function is responsible for downloading an optimal, valid ion file
@@ -142,21 +130,20 @@ def getCodIon(datetm, out_dir=None, tojson=False):
            :func:`bernutils.products.pyion.__cod_ion_all_prediction__`.
 
   '''
-  ## output dir must exist
+  ##  output dir must exist
   if out_dir and not os.path.isdir(out_dir):
     raise RuntimeError('Invalid directory: %s -> getCodIon.' %out_dir)
 
-  ## transform date to datetime (if needed)
+  ##  transform date to datetime (if needed)
   if type(datetm) == datetime.date:
     datetm = datetime.datetime.combine(datetm, datetime.datetime.min.time())
 
-  ## compute delta time (in days) from today
+  ##  compute delta time (in days) from today
   dt = datetime.datetime.today() - datetm
   dt = dt.days + (dt.seconds // 3600) /24.0
 
-  options = []
-
-  ## depending on deltatime, get a list of optional erp files
+  ##  depending on deltatime, get a list of optional erp files
+  options = [] ##  in the future, a list of lists each of length 4, with possible ions
   if dt >= 15:
     options =   __cod_ion_all_final__()
   elif dt >= 4:
@@ -173,21 +160,23 @@ def getCodIon(datetm, out_dir=None, tojson=False):
   else:
     raise RuntimeError('DeltaTime two far in the future %+03.1f' %dt)
 
-  ## compute the needed date formats
+  ##  compute the needed date formats
   week, sow = bernutils.gpstime.pydt2gps(datetm)
   dow       = int(datetm.strftime('%w'))
   iyear     = int(datetm.strftime('%Y'))
 
-  ## need to replace the dates
-  options = [ i.replace('yyyy', ('%04i' %iyear)).replace('wwwwd', ('%04i%01i' %(week, dow))) for slst in options for i in slst ]
+  ##  need to replace the dates (that will also transform options to a list)
+  options = [ i.replace('yyyy', ('%04i' %iyear))
+          .replace('wwwwd', ('%04i%01i' %(week, dow))) \
+                  for slst in options for i in slst ]
+  ##  let's make options a list of lists again
   options = [ options[x:x+4] for x in xrange(0, len(options), 4) ]
 
   if __DEBUG_MODE__ == True:
     print 'Delta days is : %+04.1f' %dt
-    for i in options:
-      print 'will try: ', i
+    for i in options: print 'will try: ', i
 
-  ## the successeful triple is ..
+  ##  the successeful triple is ..
   ret_list = []
   nr_tries = 0
 
@@ -200,7 +189,7 @@ def getCodIon(datetm, out_dir=None, tojson=False):
         saveas = os.path.join(out_dir, triple[0])
       else:
         saveas = triple[0]
-      info = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
+      info     = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
       ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0]), triple[3]]
       break
     except:
@@ -212,6 +201,7 @@ def getCodIon(datetm, out_dir=None, tojson=False):
   if __DEBUG_MODE__ == True:
     print 'Tries: %1i/%1i Downloaded %s to %s' %(nr_tries, len(options), ret_list[1], ret_list[0])
 
+  ##  if we also want json out ...
   if tojson:
     jdict = {
         'info'    : JSON_INFO,
@@ -222,7 +212,6 @@ def getCodIon(datetm, out_dir=None, tojson=False):
         'host'    : JSON_HOST,
         'filename': ret_list[1]
     }
-    ##  print(json.dumps(jdict))
     return ret_list, jdict
 
   return ret_list

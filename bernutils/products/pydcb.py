@@ -1,7 +1,6 @@
 import os
 import datetime
 import ftplib
-import json
 
 import bernutils.gpstime
 import bernutils.webutils
@@ -11,10 +10,10 @@ COD_HOST      = bernutils.products.prodgen.COD_HOST
 COD_DIR       = bernutils.products.prodgen.COD_DIR
 COD_DIR_2013  = bernutils.products.prodgen.COD_DIR_2013
 
-dcb_type = {'p2': 'P1P2yymm.DCB',
-  'c1'    : 'P1C1yymm.DCB',
-  'c1_rnx': 'P1C1yymm_RINEX.DCB',
-  'c2_rnx': 'P2C2yymm_RINEX.DCB'
+dcb_type = {'p2'    : 'P1P2yymm.DCB',
+            'c1'    : 'P1C1yymm.DCB',
+            'c1_rnx': 'P1C1yymm_RINEX.DCB',
+            'c2_rnx': 'P2C2yymm_RINEX.DCB'
 }
 ''' A dictionary to hold pairs of dcb file types and corresponding
     dcb file names.
@@ -95,11 +94,11 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
     'filename': ''
   }
 
-  ## output dir must exist
+  ##  output dir must exist
   if out_dir and not os.path.isdir(out_dir):
     raise RuntimeError('Invalid directory: %s -> getCodDcb.' %out_dir)
 
-  ## Only interested in the date part of datetm
+  ##  only interested in the date part of datetm
   if type(datetm) == datetime.datetime: datetm = datetm.date()
 
   try:
@@ -107,36 +106,37 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
   except:
     raise RuntimeError('Invalid dcb type: [%s]' %stype)
 
-  # if the current month is the same as the month requested, then
-  # download the running average.
+  ##  if the current month is the same as the month requested, then
+  ##+ download the running average.
   today = datetime.datetime.now()
   dt    = today.date() - datetm ##.date()
   iyear = int(datetm.strftime('%Y'))
   iyr2  = int(datetm.strftime('%y'))
   imonth= int(datetm.strftime('%m'))
 
-  ## get running dcb
+  ##  get running dcb
   if today.year == datetm.year and today.month == datetm.month:
     filename = generic_file.replace('yymm','')
     saveas   = filename
     if out_dir: saveas = os.path.join(out_dir, filename)
     try:
       localfile, webfile = _getRunningDcb_(filename, saveas)
-      ret_list = [localfile, webfile]
-      jdict['type'] = 'running (%s)'%stype
+      ret_list           = [localfile, webfile]
+      jdict['type']      = 'running (%s)'%stype
     except:
       raise
 
-  ## try for final; if fail, try for running
+  ##  try for final; if fail, try for running
   elif dt.days < 30:
     filename = generic_file.replace('yymm', ('%02i%02i' %(iyr2, imonth)))
     filename+= '.Z'
     saveas   = filename
-    if out_dir:  saveas = os.path.join(out_dir, filename)
+    if out_dir:
+      saveas = os.path.join(out_dir, filename)
     try:
       localfile, webfile = _getFinalDcb_(iyear,filename,saveas)
-      ret_list = [localfile, webfile]
-      jdict['type'] = 'final (%s)'%stype
+      ret_list           = [localfile, webfile]
+      jdict['type']      = 'final (%s)'%stype
     except:
       filename = generic_file.replace('yymm', '')
       saveas   = filename
@@ -144,19 +144,19 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
         saveas = os.path.join(out_dir, filename)
       try:
         localfile, webfile = _getRunningDcb_(filename,saveas)
-        ret_list = [localfile, webfile]
-        jdict['type'] = 'running (%s)'%stype
+        ret_list           = [localfile, webfile]
+        jdict['type']      = 'running (%s)'%stype
       except:
         raise
 
-  ## get final dcb
+  ##  get final dcb
   elif dt.days >= 30:
     filename = generic_file.replace('yymm', ('%02i%02i' %(iyr2, imonth)))
     filename+= '.Z'
     saveas   = filename
     if out_dir: saveas = os.path.join(out_dir, filename)
     try:
-      ## we should get answer of type: [ [localfile, webfile] ]
+      ##  we should get answer of type: [ [localfile, webfile] ]
       ret_list = _getFinalDcb_(iyear,filename,saveas)
       if len(ret_list) != 1:
         raise RuntimeError('ERROR. got more files than expected!')
@@ -166,9 +166,11 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
       jdict['type'] = 'final (%s)'%stype
     except:
       raise
+
   else:
     raise RuntimeError('This date seems invalid (for dcb)')
 
+  ##  if we also want a json-type dictionary, let's return it.
   if tojson: return ret_list, jdict
 
   return ret_list
