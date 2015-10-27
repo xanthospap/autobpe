@@ -13,19 +13,19 @@ yesterday = datetime.date.today() - datetime.timedelta(1)
 today = datetime.datetime.today()
 
 # path to download files
-mydir = '/home/xanthos/Desktop'
+mydir = '/home/bpe2/test'
 
 ##  How to download .ion files
 #print bernutils.products.pyion.getCodIon(dtm, mydir, True)
 
 ## How to download .erp files
-#print bernutils.products.pyerp.getErp(date=dtm, out_dir=mydir, ac='igs', tojson=True)
-#print bernutils.products.pyerp.getErp(date=yesterday, out_dir=mydir, ac='cod', tojson=True)
+print bernutils.products.pyerp.getErp(date=dtm, out_dir=mydir, ac='igs', tojson=True)
+print bernutils.products.pyerp.getErp(date=yesterday, out_dir=mydir, ac='cod', tojson=True)
 
 ## How to download .sp3 files
-#print bernutils.products.pysp3.getOrb(date=dtm, out_dir=mydir, ac='igs', tojson=True)
-#print bernutils.products.pysp3.getOrb(date=yesterday, out_dir=mydir, ac='cod', tojson=True)
-print bernutils.products.pysp3.getOrb(date=yesterday, out_dir=mydir, ac='igs', tojson=True, use_glonass=True)
+# print bernutils.products.pysp3.getOrb(date=dtm, out_dir=mydir, ac='igs', tojson=True)
+# print bernutils.products.pysp3.getOrb(date=yesterday, out_dir=mydir, ac='cod', tojson=True)
+# print bernutils.products.pysp3.getOrb(date=yesterday, out_dir=mydir, ac='igs', tojson=True, use_glonass=True)
 
 #bernutils.products.pysp3.merge_sp3_GR('igs17545.sp3', 'igl17545.sp3', 'merged.sp3')
 #print bernutils.products.pysp3.getNav(dtm, 'G', dir)

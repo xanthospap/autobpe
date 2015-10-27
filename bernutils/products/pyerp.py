@@ -94,21 +94,19 @@ def __igs_erp_all_final__(igs_repro2=False):
     DIR      = IGS_DIR + '/wwww/'
     descr    = 'final'
 
-  return [[ FILENAME, HOST, DIR, descr ]]
+  return [ FILENAME, HOST, DIR, descr ]
 
 def __igs_erp_all_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
       filename, host, and hostdir of a valid rapid igs-generated erp file.These 
       information can be later used to download the file.
-
   '''
-  return [[ 'igrwwwwd.erp.Z', IGS_HOST, IGS_DIR + '/wwww/', 'rapid' ]]
+  return [ 'igrwwwwd.erp.Z', IGS_HOST, IGS_DIR + '/wwww/', 'rapid' ]
 
 def __igs_erp_all_ultra_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
       filename, host, and hostdir of a valid ultra-rapid igs-generated erp file.
       These information can be later used to download the file.
-
   '''
   ret_list = []
   for i in xrange(0, 24, 6):
@@ -121,7 +119,7 @@ def __igs_erp_all_prediction__():
       These information can be later used to download the file.
 
   '''
-  return [[ 'igu00p01.erp.Z', IGS_HOST, IGS_DIR, 'prediction' ]]
+  return [ 'igu00p01.erp.Z', IGS_HOST, IGS_DIR, 'prediction' ]
 
 def __cod_erp_all_final__(use_repro_13=False, use_one_day_sol=False, igs_repro2=False):
   ''' Utility function; do not use as standalone. This function will return the
@@ -186,7 +184,7 @@ def __cod_erp_all_final__(use_repro_13=False, use_one_day_sol=False, igs_repro2=
       DIR      = COD_DIR + '/yyyy/'
       descr    = 'final'
 
-  return [[ FILENAME, HOST, DIR, descr ]]
+  return [ FILENAME, HOST, DIR, descr ]
 
 def __cod_erp_all_final_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -203,7 +201,6 @@ def __cod_erp_all_final_rapid__():
       .. note:: There are two possible fina-rapid erp files, stored in different
         product areas and in different formats (.Z or uncompressed). The function
         will thus return information for both.
-
   '''
 
   ## final rapid (in yyy_M folder)
@@ -216,8 +213,8 @@ def __cod_erp_all_final_rapid__():
   HOST_FR2     = COD_HOST
   DIR_FR2      = COD_DIR
 
-  return  [[FILENAME_FR1, HOST_FR1, DIR_FR1, 'rapid (final)'], 
-           [FILENAME_FR2, HOST_FR2, DIR_FR2, 'rapid (final)']]
+  return [FILENAME_FR1, HOST_FR1, DIR_FR1, 'rapid (final)'], \
+      [FILENAME_FR2, HOST_FR2, DIR_FR2, 'rapid (final)']
 
 def __cod_erp_all_early_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -229,9 +226,8 @@ def __cod_erp_all_early_rapid__():
 
       .. note:: The options here should **exactly match** the ones described in
         the ``products.rst`` file.
-
   '''
-  return [[ 'CODwwwwd.ERP_R', COD_HOST, COD_DIR, 'rapid (early)' ]]
+  return [ 'CODwwwwd.ERP_R', COD_HOST, COD_DIR, 'rapid (early)' ]
 
 def __cod_erp_all_ultra_rapid__():
   ''' Utility function; do not use as standalone. This function will return the
@@ -244,9 +240,8 @@ def __cod_erp_all_ultra_rapid__():
       .. note::
         The options here should **exactly match** the ones described in the ``products.rst``
         file.
-
   '''
-  return [[ 'COD.ERP_U', COD_HOST, COD_DIR, 'ultra-rapid' ]]
+  return [ 'COD.ERP_U', COD_HOST, COD_DIR, 'ultra-rapid' ]
 
 def __cod_erp_all_prediction__(str_id='5D'):
   ''' Utility function; do not use as standalone. This function will return the
@@ -266,7 +261,6 @@ def __cod_erp_all_prediction__(str_id='5D'):
 
       .. note:: The options here should **exactly match** the ones described in 
         the ``products.rst`` file.
-
   '''
   if str_id == '5D':
     FILENAME = 'CODwwwwd.ERP_5D'
@@ -277,7 +271,7 @@ def __cod_erp_all_prediction__(str_id='5D'):
   else:
     raise RuntimeError('Invalid ERP prediction flag %s.', str_id)
 
-  return [[ FILENAME, COD_HOST, COD_DIR, 'prediction (%s)'%str_id ]]
+  return [ FILENAME, COD_HOST, COD_DIR, 'prediction (%s)'%str_id ]
 
 def getIgsErp(datetm, out_dir=None, igs_repro2=False, tojson=False):
   ''' This function is responsible for downloading an optimal, valid erp file
@@ -366,6 +360,7 @@ def getIgsErp(datetm, out_dir=None, igs_repro2=False, tojson=False):
         saveas = os.path.join(out_dir, triple[0])
       else:
         saveas = triple[0]
+      print 'Calling bernutils.webutils.grabFtpFile(%s, %s, %s, %s)'%(triple[1], triple[2], triple[0], saveas)
       info = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
       ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0]), triple[3]]
       break
@@ -388,7 +383,6 @@ def getIgsErp(datetm, out_dir=None, igs_repro2=False, tojson=False):
         'host'    : IGS_HOST,
         'filename': ret_list[1]
     }
-    ##  print(json.dumps(jdict))
     return ret_list, jdict
 
   return ret_list
@@ -487,10 +481,11 @@ def getCodErp(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
   for triple in options:
     nr_tries += 1
     try:
-      if out_dir: 
+      if out_dir:
         saveas = os.path.join(out_dir, triple[0])
       else:
         saveas = triple[0]
+      print 'Calling bernutils.webutils.grabFtpFile(%s, %s, %s, %s)'%(triple[1], triple[2], triple[0], saveas)
       info = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
       ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0]), triple[3]]
       break
@@ -513,9 +508,8 @@ def getCodErp(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
         'host'    : COD_HOST,
         'filename': ret_list[1]
     }
-    ##  print(json.dumps(jdict))
     return ret_list, jdict
-  
+
   return ret_list
 
 def getErp(**kwargs):
