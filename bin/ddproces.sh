@@ -142,14 +142,44 @@ check_tables () {
            ${1}/blq/${2}.BLQ \
            ${1}/atl/${2}.ATL \
            ${1}/crd/${2}.CRD \
-           ${1}/atl/${2}52.STA; do
+           ${1}/atl/${2}.STA; do
     if ! test -f $f ; then
       echoerr "Missing file: $f"
       ## return 1
+    #else
+    #  bfn=$(basename $f)
+    #  ln -sf ${f} ${P}/STA/${bfn}
     fi
   done
 
   return 0
+}
+
+link_sta () {
+  if ! test -f ${TABLES_DIR}/sta/${CAMPAIGN}.STA; then
+    echoerr "ERROR. Cannot find sta file ${TABLES_DIR}/sta/${CAMPAIGN}.STA"
+    exit 1
+  fi
+  if ln -sf ${TABLES_DIR}/sta/${CAMPAIGN}.STA \
+    ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.STA 2>/dev/null; then
+    return 0
+  else
+    echoerr "ERROR. Failed to link sta file (from ${TABLES_DIR}/sta/${CAMPAIGN}.STA to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.STA"
+    return 1
+  fi
+}
+link_blq () {
+  if ! test -f ${TABLES_DIR}/blq/${CAMPAIGN}.BLQ; then
+    echoerr "ERROR. Cannot find blq file ${TABLES_DIR}/blq/${CAMPAIGN}.BLQ"
+    exit 1
+  fi
+  if ln -sf ${TABLES_DIR}/blq/${CAMPAIGN}.BLQ \
+    ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ 2>/dev/null; then
+    return 0
+  else
+    echoerr "ERROR. Failed to link blq file (from ${TABLES_DIR}/blq/${CAMPAIGN}.BLQ to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ"
+    return 1
+  fi
 }
 
 ##  year - doy to datetime in format '%Y-%m-%d %H-%M-%S'
@@ -1052,6 +1082,19 @@ if ! awk -v FLAG=R -v REPLACE_ALL=NO -f \
   exit 1
 fi
 
+## ////////////////////////////////////////////////////////////////////////////
+##  LINK REQUIRED FILES FROM TABLES DIR
+##  ---------------------------------------------------------------------------
+## ////////////////////////////////////////////////////////////////////////////
+if ! link_sta ; then
+  echoerr "ERROR. Failed to link the sta file!"
+  exit 1
+fi
+
+if ! link_blq ; then
+  echoerr "ERROR. Failed to link the blq file!"
+  exit 1
+fi
 ## ////////////////////////////////////////////////////////////////////////////
 ##  PROCESS THE DATA
 ##  ---------------------------------------------------------------------------

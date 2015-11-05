@@ -510,7 +510,7 @@ def getIgsSp3(datetm, out_dir=None, use_glonass=False, igs_repro2=False, tojson=
 
   '''
   ##  let's first download the gps-only file
-  answer_gps, gps_dict = getIgsSp3Gps(datetm, out_dir, igs_repro2)
+  answer_gps, gps_dict = getIgsSp3Gps(datetm, out_dir, igs_repro2, tojson)
   
   ##  if we want no glonass info, just return the gps, with/without an 
   ##+ accompanying json-type dictionary

@@ -120,6 +120,11 @@ try:
   if JSON_OUT:
     json_dict['sp3'] = info_dict['sp3'][-1]
     info_dict['sp3'] = map(list,info_dict['sp3'][0:-1])
+  ##  print 'Sp3 info list:', info_dict['sp3']
+  ##  would print something like:
+  ##  [['/home/bpe2/data/GPSDATA/DATAPOOL/COD16770.EPH.Z', \
+  ##    'ftp.unibe.ch/aiub/CODE/2012/COD16770.EPH.Z', \
+  ##    'final']]
 
   info_dict['erp'] = bernutils.products.pyerp.getErp(date=py_date, \
     ac=AC, \
@@ -131,8 +136,6 @@ try:
   if JSON_OUT:
     json_dict['erp'] = info_dict['erp'][-1]
     info_dict['erp'] = map(list,info_dict['erp'][0:-1])
-    ## print 'info_dict[\"erp\"]=',info_dict['erp']
-    ## print 'json_dict[\"erp\"]=',json_dict['erp']
 
   info_dict['dcb'] = bernutils.products.pydcb.getCodDcb(stype='c1_rnx', \
     datetm=py_date, \
@@ -149,22 +152,14 @@ try:
       json_dict['ion'] = info_dict['ion'][-1]
       info_dict['ion'] = map(list,info_dict['ion'][0:-1])
 
-  ##  Alright! all products downloaded! now we need to make an easy list to
-  ##+ pass to bash, to link the downloaded files from directory D to the /ORB
-  ##+ directory.
-  ##  Whatever the names of the downloaded files, the linked destination should
-  ##+ use the standard name, e.g. if we downloaded the file igu18701_06.sp3.Z
-  ##+ we should link to D/igs18701.sp3.Z
-
   dow, mnth, yr2 = py_date.strftime("%w-%m-%y").split('-')
   gpsw, sow = bernutils.gpstime.pydt2gps(py_date)
 
   sp3file = os.path.join(DEST_ORB,\
     ("%s%4i%1i.PRE"%(AC, gpsw, int(dow))))
-  if isUnixCompressed(info_dict['sp3'][0]):
+  if isUnixCompressed(info_dict['sp3'][0][0]):
     sp3file += '.Z'
   info_dict['sp3'].append(sp3file)
-  ##  print info_dict['sp3']
 
   if AC.lower() == 'cod':
     erpfile = os.path.join(DEST_ORB,\
@@ -172,29 +167,30 @@ try:
   else:
     erpfile = os.path.join(DEST_ORB,\
       "%s%4i%1i.IEP"%(AC, gpsw, int(dow)))
-  if isUnixCompressed(info_dict['erp'][0]):
+  if isUnixCompressed(info_dict['erp'][0][0]):
     erpfile += '.Z'
   info_dict['erp'].append(erpfile)
-  ##  print info_dict['erp']
 
   dcbfile = os.path.join(DEST_ORB,\
     "P1C1%s%s.DCB"%(yr2, mnth))
-  if isUnixCompressed(info_dict['dcb'][0]):
+  if isUnixCompressed(info_dict['dcb'][0][0]):
     dcbfile += '.Z'
   info_dict['dcb'].append(dcbfile)
-  ##  print info_dict['dcb']
 
   if DWNL_ION:
     ionfile = os.path.join(DEST_ORB.replace('/ORB', '/ATM'),\
         "COD%4i%1i.ION"%(gpsw, int(dow)))
-    if isUnixCompressed(info_dict['ion'][0]):
+    if isUnixCompressed(info_dict['ion'][0][0]):
       ionfile += '.Z'
     info_dict['ion'].append(ionfile)
-    ##  print info_dict['ion']
 
   for i, j in info_dict.iteritems():
-    ## print 'Moving %s to %s'%(j[0][0], j[1])
+    ##  print 'Moving %s to %s'%(j[0][0], j[1])
     shutil.copy(j[0][0], j[1])
+    print "Checking if file is compressed:",j[1]
+    if isUnixCompressed( j[1] ):
+      j[1] = bernutils.webutils.UnixUncompress( j[1] )
+      print 'file uncompressed; set to',j[1]
     dfiles_str = ( ', '.join(str(p) for p in [j[1]]) ).replace('[','').replace(']','')
     if REPORT == 'ascii':
       print '[PRODUCTS::%s] Downloaded file %s ; moved to %s'%(i, dfiles_str, j[2])
@@ -202,8 +198,11 @@ try:
       print '<p>Product type: <strong>%s</strong> : \
           downloaded file(s) <code>%s</code> ; \
           moved to <code>%s</code></p>'%(i, dfiles_str, j[1])
-    if isUnixCompressed(j[1]):
-      bernutils.webutils.UnixUncompress(j[1])
+    #if isUnixCompressed(j[1]):
+    #  print "[handle_products] Uncompressing %s"%j[1]
+    #  bernutils.webutils.UnixUncompress(j[1])
+    #else:
+    #  print "file %s is not compressed"%j[1]
 
   for idx, val in enumerate(json_dict):
     if idx == len(json_dict) - 1:
