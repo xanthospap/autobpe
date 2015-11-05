@@ -128,6 +128,8 @@ Switches: -a --analysis-center= specify the analysis center; this can be e.g.
 
           --cod-repro13 Use CODE's REPRO2013 results.
 
+          --no-atl Do not use an .ATL correction file.
+
           -h --help display (this) help message and exit
 
           -v --version display version and exit
@@ -178,6 +180,24 @@ link_blq () {
     return 0
   else
     echoerr "ERROR. Failed to link blq file (from ${TABLES_DIR}/blq/${CAMPAIGN}.BLQ to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ"
+    return 1
+  fi
+}
+
+link_pcv () {
+  PCV_EXT="I08"
+  if test -z "$PCV_FILE" ; then
+    PCV_FILE=PCV_${CAMPAIGN:0:3}
+  fi
+  if ! test -f ${TABLES_DIR}/pcv/${PCV_FILE}.${PCV_EXT}; then
+    echoerr "ERROR. CAnnot find pcv file ${TABLES_DIR}/pcv/${PCV_FILE}.${PCV_EXT}"
+    exit 1
+  fi
+  if ln -sf ${TABLES_DIR}/pcv/${PCV_FILE}.${PCV_EXT} \
+    ${X}/GEN/${PCV_FILE}.${PCV_EXT} ; then
+    return 0
+  else
+    echoerr "ERROR. Failed to link pcv file (from ${TABLES_DIR}/pcv/${PCV_FILE}.${PCV_EXT} to ${X}/GEN/${PCV_FILE}.${PCV_EXT}"
     return 1
   fi
 }
@@ -344,6 +364,7 @@ ELEVATION_ANGLE=3
 PCF_FILE=NTUA_DDP.PCF
 USE_REPRO2=NO
 COD_REPRO13=NO
+USE_ATL=YES
 
 ##  Ntua's product area
 MY_PRODUCT_AREA=/media/Seagate/solutions52 ## add yyyy/ddd later on
@@ -385,7 +406,7 @@ getopt -T > /dev/null ## check getopt version
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
   ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e:a: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13 \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,no-atl \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -514,6 +535,10 @@ do
     --cod-repro13)
       printf 1>>${JSON_OUT} "{\"switch\":\"%s\"}" "${1}"
       COD_REPRO13=YES
+      ;;
+    --no-atl)
+      printf 1>>${JSON_OUT} "{\"switch\":\"%s\"}" "${1}"
+      USE_ATL=NO
       ;;
     -y|--year)
       YEAR="${2}"
@@ -733,14 +758,14 @@ fi
 
 ##  make a table with available rinex/station names, reference stations, etc ..
 ##  dump output to the .rnxsta.dat file (filter it later on)
+
+##  do not include --no-marker-numbers
 if ! validate_ntwrnx.py \
             --year=${YEAR} \
             --doy=${DOY} \
             --fix-file=/home/bpe2/tables/fix/IGB08.FIX \
-            --no-marker-numbers \
             --network=${CAMPAIGN} \
             --rinex-path=${D} \
-            --no-marker-numbers \
             1> .rnxsta.dat; then
   echoerr "ERROR. Failed to compile rinex/station summary -> [validate_ntwrnx.py]"
   exit 1
@@ -765,13 +790,13 @@ if [[ $MAX_NET_STA -lt 0 \
   exit 1
 fi
 
-rm .rnxsta.dat ## remove temporary; no longer needed
+#rm .rnxsta.dat ## remove temporary; no longer needed
 
 ## make sure number reference stations > 4
 if test ${#REF_STA_ARRAY[@]} -lt 5; then
-  echoerr "ERROR. Two few reference stations (${#REF_STA_ARRAY[@]}); \
+  echoerr "WARNING: Two few reference stations (${#REF_STA_ARRAY[@]}); \
     processing stoped."
-  exit 1
+  ## exit 1
 fi
 
 ## transfer all available rinex to RAW/ and uncompress them
@@ -1029,6 +1054,12 @@ else
   BERN_SAT_SYS="${SAT_SYS}"
 fi
 
+if test "$USE_ATL" == "NO" ; then
+  ATLFILE=""
+else
+  ATLFILE="${CAMPAIGN}"
+fi
+
 if ! test -f ${U}/PCF/${PCF_FILE}; then
   echoerr "ERROR. Invalid pcf file ${U}/PCF/${PCF_FILE}"
   exit 1
@@ -1040,8 +1071,9 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" 1>>${JSON_OUT} \
         E="${FINAL_SOLUTION_ID}" \
         F="${REDUCED_SOLUTION_ID}" \
         BLQINF="${CAMPAIGN}" \
-        ATLINF="${CAMPAIGN}" \
+        ATLINF="${ATLFILE}" \
         STAINF="${CAMPAIGN}" \
+        CRDINF="${CAMPAIGN}" \
         SATSYS="${BERN_SAT_SYS}" \
         PCV="I08" \
         PCVINF="PCV_${CAMPAIGN:0:3}" \
@@ -1093,6 +1125,11 @@ fi
 
 if ! link_blq ; then
   echoerr "ERROR. Failed to link the blq file!"
+  exit 1
+fi
+
+if ! link_pcv ; then
+  echoerr "ERROR. Failed to link the pcv file!"
   exit 1
 fi
 ## ////////////////////////////////////////////////////////////////////////////
