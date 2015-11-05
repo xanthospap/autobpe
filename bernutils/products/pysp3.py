@@ -649,6 +649,7 @@ def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
         saveas = os.path.join(out_dir, triple[0])
       else:
         saveas = triple[0]
+      print "bernutils.webutils.grabFtpFile(",triple[1], triple[2], triple[0], saveas,")"
       info     = bernutils.webutils.grabFtpFile(triple[1], triple[2], triple[0], saveas)
       ret_list = [saveas, '%s%s%s' %(triple[1], triple[2], triple[0]), triple[3]]
       break

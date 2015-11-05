@@ -124,6 +124,10 @@ Switches: -a --analysis-center= specify the analysis center; this can be e.g.
 
           --json-out= Output file in json format.
 
+          --repro2-prods Use IGS repro2 campaign products.
+
+          --cod-repro13 Use CODE's REPRO2013 results.
+
           -h --help display (this) help message and exit
 
           -v --version display version and exit
@@ -308,6 +312,8 @@ STATIONS_PER_CLUSTER=3
 FILES_PER_CLUSTER=7
 ELEVATION_ANGLE=3
 PCF_FILE=NTUA_DDP.PCF
+USE_REPRO2=NO
+COD_REPRO13=NO
 
 ##  Ntua's product area
 MY_PRODUCT_AREA=/media/Seagate/solutions52 ## add yyyy/ddd later on
@@ -349,7 +355,7 @@ getopt -T > /dev/null ## check getopt version
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
   ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e:a: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out: \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13 \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -470,6 +476,14 @@ do
       printf 1>>${JSON_OUT} "{\"switch\":\"%s\"}" "${1}"
       dversion
       exit 0
+      ;;
+    --repro2-prods)
+      printf 1>>${JSON_OUT} "{\"switch\":\"%s\"}" "${1}"
+      USE_REPRO2=YES
+      ;;
+    --cod-repro13)
+      printf 1>>${JSON_OUT} "{\"switch\":\"%s\"}" "${1}"
+      COD_REPRO13=YES
       ;;
     -y|--year)
       YEAR="${2}"
@@ -614,6 +628,19 @@ else
   fi
 fi
 
+##  check validity of products/ac
+##  cannot have both repro2 and repro13
+if test "${COD_REPRO13}" == "YES" ; then
+  if test "${USE_REPRO2}" == "YES" ; then
+    echoerr "ERROR. CAnnot have both repro2 and code's repro13."
+    exit 1
+  fi
+  if test "${AC^^}" != "COD"; then
+    echoerr "ERROR. repro13 products only available from CODE"
+    exit 1
+  fi
+fi
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DATETIME VARIABLES
 ##  ---------------------------------------------------------------------------
@@ -658,7 +685,7 @@ printf "}\n"
 ##  Lastly, copy and uncompress (.Z && crx2rnx) the files in the campaign
 ##+ directory /RAW.
 ## ////////////////////////////////////////////////////////////////////////////
-if test 2 -eq 1 ; then
+if test 1 -eq 1 ; then
 
 >.rnxsta.dat ## temporary file
 
@@ -798,9 +825,17 @@ fi
 ##+ the bernutils module documentation.
 ## ////////////////////////////////////////////////////////////////////////////
 if test 1 -eq 1 ;  then
+
+if test "$USE_REPRO2" == "YES" ; then
+  add_option="--use-repro2"
+fi
+if test "$COD_REPRO13" == "YES" ; then
+  add_option="--use-repro13"
+fi
+
 ##  will we need an ion file ?
 if test ${ION_DOWNLOADED} -eq 1; then
-  if ! handle_dd_products.py \
+  if ! handle_dd_products.py 1>>${JSON_OUT} ${add_option}\
           --year="${YEAR}" \
           --doy="${DOY}" \
           --analysis-center="${AC}" \
@@ -812,7 +847,7 @@ if test ${ION_DOWNLOADED} -eq 1; then
     exit 1
   fi
 else
-  if ! handle_dd_products.py \
+  if ! handle_dd_products.py 1>>${JSON_OUT} ${add_option} \
           --year="${YEAR}" \
           --doy="${DOY}" \
           --analysis-center="${AC}" \
@@ -839,7 +874,7 @@ if test 1 -eq 1 ; then
 ## temporary file to hold getvmf1.py output
 TMP_FL=.vmf1-${YEAR}${DOY}.dat
 
-if ! getvmf1.py --year=${YEAR} --doy=${DOY} --outdir=${D} --json=".vmf1.json" 1> ${TMP_FL}; then
+if ! getvmf1.py --year=${YEAR} --doy=${DOY} --outdir=${D} --json=".vmf1.json" 1>${TMP_FL}; then
   echoerr "ERROR. Failed to get VMF1 grid file(s)"
   exit 1
 fi
@@ -869,7 +904,7 @@ fi
 ##printf "<p>Product type: <strong>vmf1</strong> :\
 ##  downloaded file(s) %s ; moved to %s</p>\n" \
 ##      "$tmp_" "$MERGED_VMF_FILE"
-cat .vmf1.json 2>/dev/null
+cat .vmf1.json 1>>${JSON_OUT} 2>/dev/null
 rm ${TMP_FL} ## remove temporary file
 fi
 
@@ -976,6 +1011,7 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" 1>>${JSON_OUT} \
         F="${REDUCED_SOLUTION_ID}" \
         BLQINF="${CAMPAIGN}" \
         ATLINF="${CAMPAIGN}" \
+        STAINF="${CAMPAIGN}" \
         SATSYS="${BERN_SAT_SYS}" \
         PCV="I08" \
         PCVINF="PCV_${CAMPAIGN:0:3}" \
@@ -1023,7 +1059,7 @@ fi
 ## ////////////////////////////////////////////////////////////////////////////
 BERN_TASK_ID="${CAMPAIGN:0:1}DD"
 
-if test 2 -eq 1; then
+if test 1 -eq 1; then
 ##  run the perl script to ignite the PCF
 ${U}/SCRIPT/ntua_pcs.pl ${YEAR} \
           ${DOY_3C}0 \
@@ -1072,6 +1108,7 @@ fi
 ##  argv2 -> campaign dir (e.g. 'SOL')
 ##  argv3 -> product type (e.g. 'SINEX')
 
+{
 ##  final tropospheric sinex
 if ! save_n_update TRO ATM TRO_SNX ; then exit 1 ; else printf "," ; fi
 
@@ -1086,7 +1123,7 @@ if ! save_n_update NQ0 SOL NQ R ; then exit 1 ; else printf "," ; fi
 
 ## final coordinates
 if ! save_n_update CRD STA CRD_FILE ; then exit 1 ; fi
-
+} 1>>${JSON_OUT}
 fi
 printf 1>>${JSON_OUT} "]}"
 

@@ -24,6 +24,8 @@ SAT_SYS  = 'GPS'
 DWNL_ION = False
 REPORT   = None
 JSON_OUT = False
+REPRO2   = False
+REPRO13  = False
 
 ##  given an (input) filename, check to see if this file is UNIX-compressed,
 ##+ i.e. if it ends with '.Z'
@@ -34,7 +36,7 @@ def main(argv):
 
   try:
     opts, args = getopt.getopt(argv,'y:d:p:o:a:s:ir:',[
-      'year=', 'doy=', 'datapool=', 'destination=', 'analysis-center=','satellite-system=', 'download-ion','report='])
+      'year=', 'doy=', 'datapool=', 'destination=', 'analysis-center=','satellite-system=', 'download-ion','report=', 'use-repro2', 'use-repro13'])
   except getopt.GetoptError:
     print>>sys.stderr,"ERROR. Getopt error ",argv
     sys.exit(1)
@@ -61,6 +63,12 @@ def main(argv):
     elif opt in ('-i', '--download-ion'):
       global DWNL_ION
       DWNL_ION = True
+    elif opt in ('--use-repro2'):
+      global REPRO2
+      REPRO2 = True
+    elif opt in ('--use-repro13'):
+      global REPRO13
+      REPRO13 = True
     elif opt in ('-r', '--report'):
       global REPORT
       if arg == 'ascii':
@@ -105,6 +113,8 @@ try:
     ac=AC, \
     out_dir=DATAPOOL, \
     use_glonass=ussr, \
+    igs_repro2=REPRO2, \
+    use_repro_13=REPRO13, \
     tojson=JSON_OUT)
   error_at += 1
   if JSON_OUT:
@@ -114,6 +124,8 @@ try:
   info_dict['erp'] = bernutils.products.pyerp.getErp(date=py_date, \
     ac=AC, \
     out_dir=DATAPOOL, \
+    igs_repro2=REPRO2, \
+    use_repro_13=REPRO13, \
     tojson=JSON_OUT)
   error_at += 1
   if JSON_OUT:
