@@ -372,11 +372,11 @@ MY_PRODUCT_AREA=/media/Seagate/solutions52 ## add yyyy/ddd later on
 
 ##  database for local/user products
 DB_HOST="147.102.110.73"
-DB_USER="bpe2"
-DB_PASSWORD="webadmin"
+DB_USER="hypatia"
+DB_PASSWORD="ypat;ia"
 DB_DBNAME="procsta"
 
-PATH=${PATH}:/home/bpe2/src/autobpe/bin
+PATH=${PATH}:/home/bpe/autobpe/bin
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  CREATE STAMP FILE & SET JSON OUTPUT (IF ANY)
@@ -761,9 +761,12 @@ fi
 
 ##  do not include --no-marker-numbers
 if ! validate_ntwrnx.py \
+            --db-host=${DB_HOST} \
+            --db-user=${DB_USER} \
+            --db-pass=${DB_PASSWORD} \
             --year=${YEAR} \
             --doy=${DOY} \
-            --fix-file=/home/bpe2/tables/fix/IGB08.FIX \
+            --fix-file=/home/bpe/tables/fix/IGB08.FIX \
             --network=${CAMPAIGN} \
             --rinex-path=${D} \
             1> .rnxsta.dat; then
@@ -804,7 +807,7 @@ for i in "${RNX_ARRAY[@]}"; do
   if RNX=${i} \
         && cp ${D}/${RNX} ${P}/${CAMPAIGN}/RAW/ \
         && uncompress -f ${P}/${CAMPAIGN}/RAW/${RNX} \
-        && crx2rnx -f ${P}/${CAMPAIGN}/RAW/${RNX%.Z} \
+        && CRX2RNX -f ${P}/${CAMPAIGN}/RAW/${RNX%.Z} \
         && j=${RNX/%d.Z/o} \
         && j=${j^^} \
         && mv ${P}/${CAMPAIGN}/RAW/${RNX/%d.Z/o} ${P}/${CAMPAIGN}/RAW/${j}

@@ -69,17 +69,27 @@ def main (argv):
 
   try:
     opts, args = getopt.getopt(argv,'hn:y:d:f:p:s:',[
-      'help', 'network=', 'year=','doy=','fix-file=', 'rinex-path=', 'session=', 'no-marker-numbers'])
+      'help', 'network=', 'year=','doy=','fix-file=', 'rinex-path=', 'session=', 'no-marker-numbers', 'db-host=', 'db-user=', 'db-pass='])
 
-  except getopt.GetoptError:
+  except getopt.GetoptError as err:
     help()
     print >>sys.stderr, 'ERROR. Getopt failed; check argv/argc!'
+    print >>sys.stderr, 'Error : %s'%str(err)
     sys.exit(1)
 
   for opt, arg in opts:
     if opt in ('-h', '--help'):
       help()
       sys.exit(0)
+    elif opt in ('--db-host'):
+      global HOST_NAME
+      HOST_NAME = arg
+    elif opt in ('--db-user'):
+      global USER_NAME
+      USER_NAME = arg
+    elif opt in ('--db-pass'):
+      global PASSWORD
+      PASSWORD = arg
     elif opt in ('-n', '--network'):
       global NETWORK
       NETWORK = arg

@@ -53,8 +53,8 @@ def help (i):
 
 ## Global variables / default values
 HOST_NAME   = '147.102.110.73'
-USER_NAME   = 'bpe2'
-PASSWORD    = 'webadmin'
+USER_NAME   = 'hypatia'
+PASSWORD    = 'ypat;ia'
 DB_NAME     = 'procsta'
 stations    = []
 networks    = []
