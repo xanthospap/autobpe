@@ -130,6 +130,8 @@ Switches: -a --analysis-center= specify the analysis center; this can be e.g.
 
           --no-atl Do not use an .ATL correction file.
 
+          --antex= Specify an antex file to transform to a PCV
+
           -h --help display (this) help message and exit
 
           -v --version display version and exit
@@ -365,6 +367,7 @@ PCF_FILE=NTUA_DDP.PCF
 USE_REPRO2=NO
 COD_REPRO13=NO
 USE_ATL=YES
+MAKE_PCV=NO
 
 ##  Ntua's product area
 MY_PRODUCT_AREA=/media/Seagate/solutions52 ## add yyyy/ddd later on
@@ -406,7 +409,7 @@ getopt -T > /dev/null ## check getopt version
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
   ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e:a: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,no-atl \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,no-atl,antex: \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -542,6 +545,11 @@ do
       ;;
     -y|--year)
       YEAR="${2}"
+      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      shift
+      ;;
+    --antex)
+      MAKE_PCV="${2}"
       printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
@@ -692,6 +700,18 @@ if test "${COD_REPRO13}" == "YES" ; then
   fi
   if test "${AC^^}" != "COD"; then
     echoerr "ERROR. repro13 products only available from CODE"
+    exit 1
+  fi
+fi
+
+##  make the antex file is neccessary
+if test "$MAKE_PCV" != "NO" ; then
+  if ! atx2pcv.sh --antex="${MAKE_PCV}" \
+                --sta="${P}/${CAMPAIGN}/STA/${CAMPAIGN}" \
+                --campaign="${CAMPAIGN}" \
+                --phg-out="PCV_${CAMPAIGN:0:3}" \
+                --loadgps="${B_LOADGPS}" ; then
+    echoerr "ERROR. Failed to make the PCV file!"
     exit 1
   fi
 fi

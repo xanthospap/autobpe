@@ -6,7 +6,7 @@
 ##+ script; type atx2pcv.sh -h for help/usage
 ##  
 
-rm run_atx2pcv.sh
+rm run_atx2pcv.sh 2>/dev/null
 
 ##  call prepare_atx2pcv.py to create the script
 ##+ that call the perl module, plus makes all
