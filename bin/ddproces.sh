@@ -132,6 +132,8 @@ Switches: -a --analysis-center= specify the analysis center; this can be e.g.
 
           --antex= Specify an antex file to transform to a PCV
 
+          --stainf= Specify the station information file (no extension; should be in tables dir)
+
           -h --help display (this) help message and exit
 
           -v --version display version and exit
@@ -367,7 +369,16 @@ PCF_FILE=NTUA_DDP.PCF
 USE_REPRO2=NO
 COD_REPRO13=NO
 USE_ATL=YES
+
+## pcv and antex related variables ##
 MAKE_PCV=NO
+PCV_EXT=I08
+PCVINF=       ##  will be set (later) to the filename of the PCV to be used
+
+## station information file ##
+STAINF=                     ##  the filename (no path, no extension)
+STAINF_FILE=                ##  the file
+STAINF_EXT=".STA"           ##  the extension
 
 ##  Ntua's product area
 MY_PRODUCT_AREA=/media/Seagate/solutions52 ## add yyyy/ddd later on
@@ -408,8 +419,8 @@ getopt -T > /dev/null ## check getopt version
 
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
-  ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e:a: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,no-atl,antex: \
+  ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e:a:p: \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,no-atl,antex:,pcv-file:,stainf: \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -550,6 +561,16 @@ do
       ;;
     --antex)
       MAKE_PCV="${2}"
+      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      shift
+      ;;
+    --stainf)
+      STAINF="${2}"
+      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      shift
+      ;;
+    -p|--pcv-file)
+      PCV_FILE="${2}"
       printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
@@ -704,16 +725,97 @@ if test "${COD_REPRO13}" == "YES" ; then
   fi
 fi
 
-##  make the antex file is neccessary
-if test "$MAKE_PCV" != "NO" ; then
+## ------------------------------------------------------------------------- ##
+##                                                                           ##
+##  Validate the station information file: see that it exists, and link it   ##
+##                                                                           ##
+## ------------------------------------------------------------------------- ##
+if [ -z ${STAINF+x} ]; then
+  echo "[DEBUG] Station information file not specified; seting it to \"\$CAMPAIGN\""
+  STAINF="${CAMPAIGN}"
+fi
+
+if ! test -f ${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT} ; then
+  echoerr "ERROR. Cannot find the station information file \"${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT}\""
+  exit 1
+else
+  if ! ln -sf ${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT} \
+              ${P}/STA/${STAINF}.${STAINF_EXT} ; then
+    echoerr "ERROR. Failed to link the station information file \"${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT}\""
+    exit 1
+  else
+    echo "[DEBUG] Using the the station information file \"${P}/STA/${STAINF}.${STAINF_EXT}\""
+    STAINF_FILE="${P}/STA/${STAINF}.${STAINF_EXT}"
+  fi
+fi
+
+
+## ------------------------------------------------------------------------- ##
+##                                                                           ##
+##  Make the pcv file if neccessary and/or link, so that after this block,   ##
+##+ we have a valid PCVINF file at ${X}/GEN, i.e. there should be a file     ##
+##+ (or link) at ${X}/GEN/${PCVINF}.${PCV_EXT} holding pcv info for all      ##
+##+ antennas. The variable PCVINF and PCV_EXT are later to be fed to the     ##
+##+ PCF file as variables.                                                   ##
+##                                                                           ##
+##  At this point, all variables in the LOADGPS.setvar file should           ##
+##+ have been exported.                                                      ##
+##                                                                           ##
+##  Also, we need the .STA file to be properly placed at the                 ##
+##+ campaign-specific STA/ folder.                                           ##
+##                                                                           ##
+## ------------------------------------------------------------------------- ##
+##
+##  Case a: We have both a PCV file and an antex file specified
+if [ "$MAKE_PCV" != "NO" ] && [ ! -z ${PCV_FILE+x} ] ; then
+  echo "[DEBUG] Both an antex file ($MAKE_PCV) and a pcv file ($PCV_FILE) given"
+  echo "[DEBUG] Updating pcv file using the atx2pcv.sh program"
   if ! atx2pcv.sh --antex="${MAKE_PCV}" \
-                --sta="${P}/${CAMPAIGN}/STA/${CAMPAIGN}" \
-                --campaign="${CAMPAIGN}" \
-                --phg-out="PCV_${CAMPAIGN:0:3}" \
-                --loadgps="${B_LOADGPS}" ; then
+                  --sta="${P}/${CAMPAIGN}/STA/${CAMPAIGN}" \
+                  --campaign="${CAMPAIGN}" \
+                  --pcv="${TABLES_DIR}/pcv/${PCV_FILE}.${PCV_EXT}"
+                  --phg-out="PCV_${CAMPAIGN:0:3}" \
+                  --loadgps="${B_LOADGPS}" ; then
     echoerr "ERROR. Failed to make the PCV file!"
     exit 1
+  else
+    PCVINF=PCV_${CAMPAIGN:0:3}
   fi
+else
+##
+##  Case b: We have a PCV file and no antex file
+  if [ "$MAKE_PCV" = "NO" ] && [ ! -z ${PCV_FILE+x} ] ; then
+    echo "[DEBUG] Only specified a PCV file ($PCV_FILE); using this"
+    PCVINF=$(basename "${PCV_FILE}")
+    if ! test -f ${TABLES_DIR}/pcv/${PCVINF}.${PCV_EXT} ; then
+      echoerr "ERROR. Failed to find file ${TABLES_DIR}/pcv/${PCVINF}.${PCV_EXT}"
+      exit 1
+    fi
+    ln -sf ${TABLES_DIR}/pcv/${PCVINF}.${PCV_EXT} ${X}/GEN/${PCVINF}.${PCV_EXT}
+##
+##  Case c We have an antex file but no pcv file
+  elif [ "$MAKE_PCV" != "NO" ] && [ -z ${PCV_FILE+x} ] ; then
+    echo "[DEBUG] Only specified an antex file ($MAKE_PCV); using this to create a pcv file"
+    if ! atx2pcv.sh --antex="${MAKE_PCV}" \
+                    --sta="${P}/${CAMPAIGN}/STA/${CAMPAIGN}" \
+                    --campaign="${CAMPAIGN}" \
+                    --phg-out="PCV_${CAMPAIGN:0:3}" \
+                    --loadgps="${B_LOADGPS}" ; then
+      echoerr "ERROR. Failed to make the PCV file!"
+      exit 1
+    else
+      PCVINF=PCV_${CAMPAIGN:0:3}
+    fi
+  else
+    echoerr "ERROR. WTF?? What PCV file do you want?"
+    exit 1
+  fi
+fi
+##
+##  final check
+if ! test -f "${X}/GEN/${PCVINF}.${PCV_EXT}" ; then
+  echoerr "ERROR. Failed to make the PCV file (F)! cannot find ${X}/GEN/${PCVINF}.${PCV_EXT}"
+  exit 1
 fi
 
 ## ////////////////////////////////////////////////////////////////////////////
@@ -1095,11 +1197,11 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" 1>>${JSON_OUT} \
         F="${REDUCED_SOLUTION_ID}" \
         BLQINF="${CAMPAIGN}" \
         ATLINF="${ATLFILE}" \
-        STAINF="${CAMPAIGN}" \
+        STAINF="${STAINF}" \
         CRDINF="${CAMPAIGN}" \
         SATSYS="${BERN_SAT_SYS}" \
-        PCV="I08" \
-        PCVINF="PCV_${CAMPAIGN:0:3}" \
+        PCV="${PCV_EXT}" \
+        PCVINF="${PCVINF}" \
         ELANG="${ELEVATION_ANGLE}" \
         CLU="${FILES_PER_CLUSTER}"; then
   echoerr "ERROR. Failed to set variables in PCF file."
