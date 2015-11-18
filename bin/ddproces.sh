@@ -139,6 +139,7 @@ Switches: -a --analysis-center= specify the analysis center; this can be e.g.
           --antex= Specify an antex file to transform to a PCV
 
           --stainf= Specify the station information file (no extension; should be in tables dir)
+          --fix-file= Specify the name of the .FIX file
 
           -h --help display (this) help message and exit
 
@@ -389,7 +390,11 @@ PCVINF=       ##  will be set (later) to the filename of the PCV to be used
 ## station information file ##
 ## STAINF=                  ##  the filename (no path, no extension); unset
 ## STAINF_FILE=             ##  the file; unset
-STAINF_EXT="STA"           ##  the extension
+STAINF_EXT="STA"            ##  the extension
+
+## fix file
+FIXAPR=${HOME}/tables/fix/IGB08.FIX
+## FIXINF=
 
 ##  Ntua's product area
 MY_PRODUCT_AREA=/media/Seagate/solutions52 ## add yyyy/ddd later on
@@ -585,6 +590,11 @@ do
       printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
+    --fix-file)
+      FIXAPR="${2}"
+      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      shift
+      ;;
     --json-out)
       ## This should have already been set !
       if [ "$JSON_OUT" != "$2" ]; then
@@ -739,7 +749,7 @@ fi
 ## ------------------------------------------------------------------------- ##
 ##                                                                           ##
 ##  Validate the station information file: see that it exists, and link it   ##
-##+ from tables directory the the campaign's sta dir.
+##+ from tables directory the the campaign's sta dir.                        ##
 ##                                                                           ##
 ## ------------------------------------------------------------------------- ##
 if [ -z ${STAINF+x} ]; then
@@ -764,6 +774,22 @@ else
     STAINF_FILE="${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT}"
   fi
 fi
+
+## ------------------------------------------------------------------------- ##
+##                                                                           ##
+##  Validate the fix file: see that it exists, and copy it                   ##
+##+ from tables directory (or wherever it is) to the the campaign's sta      ##
+##+ dir as REF$YSS+0                                                         ##
+##                                                                           ##
+## ------------------------------------------------------------------------- ##
+if ! test -f "${FIXAPR}" ; then
+  echoerr "ERROR. Cannot find the .FIX file \"${FIXAPR}\""
+  exit 1
+fi
+FIXINF="${P}/${CAMPAIGN}/STA/REF${YEAR:2:2}${DOY_3C}0.FIX"
+cp -f ${FIXAPR} ${FIXINF}
+echodbg "[DEBUG] Using .FIX file \"${FIXAPR}\""
+echodbg "[DEBUG] \"${FIXAPR}\" copied to \"${FIXINF}\""
 
 ## ------------------------------------------------------------------------- ##
 ##                                                                           ##
@@ -907,14 +933,13 @@ fi
 
 ##  do not include --no-marker-numbers
 if ! validate_ntwrnx.py \
-            --db-host=${DB_HOST} \
-            --db-user=${DB_USER} \
-            --db-pass=${DB_PASSWORD} \
-            --year=${YEAR} \
-            --doy=${DOY} \
-            --fix-file=/home/bpe/tables/fix/IGB08.FIX \
-            --network=${CAMPAIGN} \
-            --rinex-path=${D} \
+            --db-host="${DB_HOST}" \
+            --db-user="${DB_USER}" \
+            --year="${YEAR}" \
+            --doy="${DOY}" \
+            --fix-file="${FIXINF}" \
+            --network="${CAMPAIGN}" \
+            --rinex-path="${D}" \
             1> .rnxsta.dat; then
   echoerr "ERROR. Failed to compile rinex/station summary -> [validate_ntwrnx.py]"
   exit 1

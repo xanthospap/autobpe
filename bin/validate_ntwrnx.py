@@ -32,131 +32,139 @@ report any bugs to    :
 '''
 
 ## Import libraries
-import sys
-import os
-import getopt
+import sys, os, re
 import datetime
 import MySQLdb
 import traceback
-import re
+import argparse
 
 ## Global variables / default values
-HOST_NAME     = '147.102.110.73'
-USER_NAME     = 'bpe2'
-PASSWORD      = 'webadmin'
-DB_NAME       = 'procsta'
-NETWORK       = None
-YEAR          = None
-DOY           = None
-FIX_FILE      = '/home/bpe2/tables/fix/IGb08.FIX'
-PTH2RNX       = '/home/bpe2/data/DATAPOOL'
-SESSION       = '0'
 USE_MARKER_NR = True
+SUCCESS=0
+FAILURE=1
+EXIT_STATUS=SUCCESS
 
-def help():
-  print "THIS SHOULD BE validate_rnx's help message"
-  return
+parser = argparse.ArgumentParser(description='Validate rinex/stations.')
 
-## Resolve command line arguments
-def main (argv):
+##  database host name
+parser.add_argument('--db-host',
+                    action='store',
+                    required=False,
+                    default='147.102.110.73',
+                    help='The hostname/ip of the MySQL server hosting the database.',
+                    metavar='DB_HOST',
+                    dest='DB_HOST')
+##  database user name
+parser.add_argument('--db-user',
+                    action='store',
+                    required=False,
+                    default='hypatia',
+                    help='The user asking permission to query the database.',
+                    metavar='DB_USER',
+                    dest='DB_USER')
+##  database password
+parser.add_argument('--db-pass',
+                    action='store',
+                    required=False,
+                    default='ypat;ia',
+                    help='The password to connect to the database.',
+                    metavar='DB_PASS',
+                    dest='DB_PASS')
+##  database name 
+parser.add_argument('--db-name',
+                    action='store',
+                    required=False,
+                    default='procsta',
+                    help='The name of the database to query.',
+                    metavar='DB_NAME',
+                    dest='DB_NAME')
+##  The year (4-digit)
+parser.add_argument('-y', '--year',
+                    action='store',
+                    required=True,
+                    help='The year as a four-digit integer.',
+                    metavar='YEAR',
+                    dest='year')
+##  The day of year (doy) 
+parser.add_argument('-d', '--doy',
+                    action='store',
+                    required=True,
+                    help='The day of year (doy) as integer.',
+                    metavar='DOY',
+                    dest='doy')
+##  The .FIX file, i.e. the list of reference files 
+parser.add_argument('-f', '--fix-file',
+                    action='store',
+                    required=True,
+                    help='The .FIX file, i.e. the file holding the names of the'
+                    'reference stations.',
+                    metavar='FIX_FILE',
+                    dest='fix_file')
+##  The name of the network 
+parser.add_argument('-n', '--network',
+                    action='store',
+                    required=True,
+                    help='The name of the network.',
+                    metavar='NETWORK',
+                    dest='network')
+##  The path to RINEX files 
+parser.add_argument('-p', '--rinex-path',
+                    action='store',
+                    required=True,
+                    help='The path to the rinex file to validate.',
+                    metavar='PTH2RNX',
+                    dest='pth2rnx') 
+##  The session
+parser.add_argument('-s', '--session',
+                    action='store',
+                    required=False,
+                    default='0',
+                    help='The session.',
+                    metavar='SESSION',
+                    dest='session') 
 
-  ## print 'all my arguments are: ', argv[:]
+##  Parse command line arguments
+args = parser.parse_args()
 
-  if len(argv) < 1:
-    print >>sys.stderr, 'ERROR. Cannot run with zero arguments!'
-    help()
+## validate cmd arguments
+if not os.path.isfile( args.fix_file ):
+    print >>sys.stderr, 'Invalid Reference fix file: %s'%( args.fix_file )
+    sys.exit(1)
+if not os.path.isdir( args.pth2rnx ):
+    print >>sys.stderr, 'Invalid path to RINEX: %s'%( args.pth2rnx )
+    sys.exit(1)
+if len( args.session ) != 1:
+    print >>sys.stderr, 'Invalid session identifier: %s'%( args.session )
     sys.exit(1)
 
-  try:
-    opts, args = getopt.getopt(argv,'hn:y:d:f:p:s:',[
-      'help', 'network=', 'year=','doy=','fix-file=', 'rinex-path=', 'session=', 'no-marker-numbers', 'db-host=', 'db-user=', 'db-pass='])
+## read all lines from the .FIX file
+with open( args.fix_file, 'r' ) as f: lines = f.readlines()
 
-  except getopt.GetoptError as err:
-    help()
-    print >>sys.stderr, 'ERROR. Getopt failed; check argv/argc!'
-    print >>sys.stderr, 'Error : %s'%str(err)
+## Resolve the input date
+try:
+    dt = datetime.datetime.strptime('%s-%s'%(int(args.year),int(args.doy)),
+                                    '%Y-%j')
+except:
+    print >>sys.stderr, 'Invalid date: year = %s doy = %s'%(args.year, args.doy)
     sys.exit(1)
 
-  for opt, arg in opts:
-    if opt in ('-h', '--help'):
-      help()
-      sys.exit(0)
-    elif opt in ('--db-host'):
-      global HOST_NAME
-      HOST_NAME = arg
-    elif opt in ('--db-user'):
-      global USER_NAME
-      USER_NAME = arg
-    elif opt in ('--db-pass'):
-      global PASSWORD
-      PASSWORD = arg
-    elif opt in ('-n', '--network'):
-      global NETWORK
-      NETWORK = arg
-    elif opt in ('-y', '--year'):
-      global YEAR
-      YEAR = arg
-    elif opt in ('-d', '--doy'):
-      global DOY
-      DOY = arg
-    elif opt in ('-f', '--fix-file'):
-      global FIX_FILE
-      FIX_FILE = arg
-    elif opt in ('-p', '--rinex-path'):
-      global PTH2RNX
-      PTH2RNX = arg
-    elif opt in ('-s', '--session'):
-      global SESSION
-      SESSION = arg
-    elif opt in ('--no-marker-numbers'):
-      global USE_MARKER_NR
-      USE_MARKER_NR = False
-    else:
-      print >>sys.stderr, 'ERROR. Invalid command line argument: %s'%opt
+## Month as 3-char, e.g. Jan (sMon)
+## Month as 2-char, e.g. 01 (iMon)
+## Day of month as 2-char, e.g. 05 (DoM)
+## Day of year a 3-char, e.g. 157 (DoY)
+Year, Cent, sMon, iMon, DoM, DoY = dt.strftime('%Y-%y-%b-%m-%d-%j').split('-')
 
-## Start main
-if __name__ == "__main__":
-  main( sys.argv[1:] )
-
-  ## validate cmd arguments
-  if not os.path.isfile(FIX_FILE):
-    print >>sys.stderr, 'Invalid Reference fix file: %s'%(FIX_FILE)
-    sys.exit(1)
-  if not os.path.isdir(PTH2RNX):
-    print >>sys.stderr, 'Invalid path to RINEX: %s'%(PTH2RNX)
-    sys.exit(1)
-  if len(SESSION) != 1:
-    print >>sys.stderr, 'Invalid session identifier: %s'%(SESSION)
-    sys.exit(1)
-  if not NETWORK:
-     print >>sys.stderr, 'ERROR. Need to specify network name'
-     sys.exit(1)
-
-  ## read all lines from the .FIX file
-  with open(FIX_FILE, 'r') as f:
-    lines = f.readlines()
-
-  ## Resolve the input date
-  try:
-    dt = datetime.datetime.strptime('%s-%s'%(int(YEAR),int(DOY)),'%Y-%j')
-  except:
-    print >>sys.stderr, 'Invalid date: year = %s doy = %s'%(YEAR, DOY)
-    sys.exit(1)
-
-  ## Month as 3-char, e.g. Jan (sMon)
-  ## Month as 2-char, e.g. 01 (iMon)
-  ## Day of month as 2-char, e.g. 05 (DoM)
-  ## Day of year a 3-char, e.g. 157 (DoY)
-  Year, Cent, sMon, iMon, DoM, DoY = dt.strftime('%Y-%y-%b-%m-%d-%j').split('-')
-
-  ## try connecting to the database server
-  try:
-    db  = MySQLdb.connect(host=HOST_NAME, user=USER_NAME, passwd=PASSWORD, db=DB_NAME)
+## try connecting to the database server
+try:
+    db  = MySQLdb.connect(host   = args.DB_HOST, 
+                          user   = args.DB_USER, 
+                          passwd = args.DB_PASS, 
+                          db     = args.DB_NAME)
     cur = db.cursor()
 
-    QUERY='SELECT stacode.mark_name_DSO, stacode.mark_name_OFF, stacode.mark_numb_OFF, stacode.station_name FROM stacode JOIN station ON stacode.stacode_id=station.stacode_id JOIN  sta2nets ON sta2nets.station_id=station.station_id JOIN network ON network.network_id=sta2nets.network_id WHERE network.network_name="%s";'%(NETWORK)
+    QUERY='SELECT stacode.mark_name_DSO, stacode.mark_name_OFF, stacode.mark_numb_OFF, stacode.station_name FROM stacode JOIN station ON stacode.stacode_id=station.stacode_id JOIN  sta2nets ON sta2nets.station_id=station.station_id JOIN network ON network.network_id=sta2nets.network_id WHERE network.network_name="%s";'%( args.network )
 
-    cur.execute(QUERY)
+    cur.execute( QUERY )
     SENTENCE = cur.fetchall()
     '''
     the answer should be a list of tuples, where each station of the network
@@ -165,28 +173,33 @@ if __name__ == "__main__":
     '''
     print '%-15s %-16s %-9s %-9s'%("RINEX", "MARKER NAME", "AVAILABLE", "REFERENCE")
     for tpl in SENTENCE:
-      rnx_file      = os.path.join(PTH2RNX, tpl[0] + ('%s%s.%sd.Z'%(DoY, SESSION, Cent)) )
-      marker_name   = tpl[1]
-      marker_number = tpl[2]
-      rnx_exists    = 'No'
-      rnx_is_ref    = 'No'
+        rnx_file      = os.path.join(args.pth2rnx, 
+                      tpl[0] + ('%s%s.%sd.Z'%(DoY, args.session, Cent)) )
+        marker_name   = tpl[1]
+        marker_number = tpl[2]
+        rnx_exists    = 'No' ##  initial guess ...
+        rnx_is_ref    = 'No' ##  initial guess ...
 
-      if USE_MARKER_NR:
-        used_name = '%s %s' %(marker_name, marker_number)
-      else:
-        used_name = '%s' %(marker_name)
-      if len(marker_name) != 4:
-        print >> sys.stderr, 'ERROR ! Invalid marker number %s for station %s'%(marker_name, tpl[0])
-        raise RuntimeError('')
-      if os.path.isfile(rnx_file): rnx_exists = 'Yes'
-      if filter(lambda x: re.search(r'^%s\s+'%(used_name.upper()), x), lines):
-        rnx_is_ref = 'Yes'
-      print '%-15s %-16s %-9s %-9s'%(os.path.basename(rnx_file), used_name.upper(), rnx_exists, rnx_is_ref)
+        if USE_MARKER_NR:
+            used_name = '%s %s'%(marker_name, marker_number)
+        else:
+            used_name = '%s' %(marker_name)
 
-  except:
+        if len(marker_name) != 4:
+            print >> sys.stderr, 'ERROR ! Invalid marker number %s for station %s'%(marker_name, tpl[0])
+            raise RuntimeError('')
+
+        if os.path.isfile( rnx_file ): rnx_exists = 'Yes'
+        
+        if filter( lambda x: re.search(r'^%s\s+'%(used_name.upper()), x), lines):
+            rnx_is_ref = 'Yes'
+      
+        print '%-15s %-16s %-9s %-9s'%(os.path.basename(rnx_file), used_name.upper(), rnx_exists, rnx_is_ref)
+
+except:
     try: db.close()
     except: pass
     print >> sys.stderr, '***ERROR ! Cannot connect/query database server.'
-    sys.exit(1)
+    EXIT_STATUS = FAILURE
 
-  sys.exit(0)
+sys.exit( EXIT_STATUS )

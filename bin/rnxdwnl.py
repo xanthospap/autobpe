@@ -200,7 +200,7 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
     if infolist[4] == 'NTUA': command_ += " -P2754"
   else:
     command_ = 'wget'
-    if infolist[11] == 'uranus': command_ += ' --no-passive-ftp'
+    if infolist[4]  == 'TREECOMP': command_ += ' --no-passive-ftp'
     if infolist[9]  != '': command_ += (' --user=' + infolist[9])
     if infolist[10] != '': command_ += (' --password=' + infolist[10])
 
@@ -220,10 +220,9 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
 
   ## compile the path to the file
   path_ = infolist[7]
-  # if path_[0]  != '/' : path_ = '/' + path_
-  # if path_[-1] != '/' : path_ = path_ + '/'
+  
   ## special case for uranus network
-  if infolist[11] == 'uranus':
+  if infolist[4] == 'TREECOMP':
     try:
       ## path_ += infolist[3] + '/' + year[2:2] + '/' + dom + '/'
       path_ = path_.replace('_FULL_STA_NAME_',infolist[3])
@@ -342,7 +341,19 @@ if __name__ == "__main__":
         SENTENCE = cur.fetchall()
         # answer must only have one raw
         if len(SENTENCE) > 1:
-          print >> sys.stderr, 'ERROR. More than one records matching for station %s'%s
+          ## print >> sys.stderr, 'ERROR. More than one records matching for station %s'%s
+          ## station belongs to more than one networks; see bug 13
+          print >> sys.stderr, 'WARNING! station %s belongs in more than one networks'%s
+          add_sta = True
+          ref_line = SENTENCE[0]
+          for line in SENTENCE[1:]:
+            for idx, field in enumerate( ref_line[0:10] ):
+              if field != line[idx]:
+                add_sta = False
+                print >> sys.stderr, 'ERROR. Station %s belongs to more than one networks but independent fields don\'t match!'%s
+          if add_sta :
+            print >> sys.stderr, 'WARNING! station %s added to download list'%s
+            station_info.append( SENTENCE[0] )
         elif len(SENTENCE) < 1:
           print >> sys.stderr, 'ERROR. Cannot match station %s in the database.'%s
         else:
@@ -402,7 +413,7 @@ if __name__ == "__main__":
       else:
          print '## File %s already exists. Skipping download.'%sf
     else:
-      ## print 'Command = [%s], station=%s'%(cmd, sf)
+      ##print 'Command = [%s], station=%s'%(cmd, sf)
       try:
         executeShellCmd(cmd)
       except ValueError as e:
