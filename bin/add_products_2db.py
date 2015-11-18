@@ -61,8 +61,8 @@ software    = 'BERN52'
 
 ## database
 DB_HOST='147.102.110.73'
-DB_USER='bpe2'
-DB_PASSWORD='webadmin'
+DB_USER="hypatia"
+DB_PASSWORD="ypat;ia"
 DB_NAME='procsta'
 
 satsys_dict = {

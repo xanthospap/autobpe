@@ -13,6 +13,12 @@ LAST_UPDATE="Oct 2015"
 ##  echo to stderr
 echoerr () { echo "$@" 1>&2; }
 
+##  echo to stdout only if debuging flag is set, i.e. if the variable 
+##+ "DEBUG_MODE" > 0.
+echodbg() { 
+  test "${DEBUG_MODE}" -gt 0 && echo "$@" 
+}
+
 ##  control perl script output
 ##  argv1 -> path to BPE
 ##  argv2 -> status filename (no path)
@@ -345,7 +351,12 @@ set_json_out () {
 # //////////////////////////////////////////////////////////////////////////////
 # GLOBAL VARIABLES
 # //////////////////////////////////////////////////////////////////////////////
-DEBUG_MODE=NO
+
+##  set debug mode:
+##+ 0 : no debug
+##+ 1 : print debuging messages
+##+ 2 : extended debuging mode (sets '-v')
+DEBUG_MODE=0
 
 ##  following variables should be set via cmd arguments (else error!)
 # YEAR=
@@ -376,9 +387,9 @@ PCV_EXT=I08
 PCVINF=       ##  will be set (later) to the filename of the PCV to be used
 
 ## station information file ##
-STAINF=                     ##  the filename (no path, no extension)
-STAINF_FILE=                ##  the file
-STAINF_EXT=".STA"           ##  the extension
+## STAINF=                  ##  the filename (no path, no extension); unset
+## STAINF_FILE=             ##  the file; unset
+STAINF_EXT="STA"           ##  the extension
 
 ##  Ntua's product area
 MY_PRODUCT_AREA=/media/Seagate/solutions52 ## add yyyy/ddd later on
@@ -472,7 +483,7 @@ do
       shift
       ;;
     --debug)
-      DEBUG_MODE=YES
+      DEBUG_MODE=1
       printf 1>>${JSON_OUT} "{\"switch\":\"%s\"}" "${1}"
       ;;
     --logfile)
@@ -728,27 +739,31 @@ fi
 ## ------------------------------------------------------------------------- ##
 ##                                                                           ##
 ##  Validate the station information file: see that it exists, and link it   ##
+##+ from tables directory the the campaign's sta dir.
 ##                                                                           ##
 ## ------------------------------------------------------------------------- ##
 if [ -z ${STAINF+x} ]; then
-  echo "[DEBUG] Station information file not specified; seting it to \"\$CAMPAIGN\""
+  echodbg "[DEBUG] Station information file not specified; 
+          seting it to \"$CAMPAIGN\""
   STAINF="${CAMPAIGN}"
 fi
 
 if ! test -f ${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT} ; then
-  echoerr "ERROR. Cannot find the station information file \"${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT}\""
+  echoerr "ERROR. Cannot find the station information file 
+          \"${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT}\""
   exit 1
 else
   if ! ln -sf ${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT} \
-              ${P}/STA/${STAINF}.${STAINF_EXT} ; then
-    echoerr "ERROR. Failed to link the station information file \"${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT}\""
+              ${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT} ; then
+    echoerr "ERROR. Failed to link the station information file 
+            \"${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT}\""
     exit 1
   else
-    echo "[DEBUG] Using the the station information file \"${P}/STA/${STAINF}.${STAINF_EXT}\""
-    STAINF_FILE="${P}/STA/${STAINF}.${STAINF_EXT}"
+    echodbg "[DEBUG] Using the the station information file 
+            \"${P}/STA/${STAINF}.${STAINF_EXT}\""
+    STAINF_FILE="${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT}"
   fi
 fi
-
 
 ## ------------------------------------------------------------------------- ##
 ##                                                                           ##
@@ -765,12 +780,18 @@ fi
 ##+ campaign-specific STA/ folder.                                           ##
 ##                                                                           ##
 ## ------------------------------------------------------------------------- ##
-##
+
+##  Set the verbocity level for the atx2pcv.sh script
+A2P_VRB=0
+if test "$DEBUG_MODE" -ne 0 ; then A2P_VRB=1 ; fi
+
 ##  Case a: We have both a PCV file and an antex file specified
 if [ "$MAKE_PCV" != "NO" ] && [ ! -z ${PCV_FILE+x} ] ; then
-  echo "[DEBUG] Both an antex file ($MAKE_PCV) and a pcv file ($PCV_FILE) given"
-  echo "[DEBUG] Updating pcv file using the atx2pcv.sh program"
+  echodbg "[DEBUG] Both an antex file ($MAKE_PCV) 
+          and a pcv file ($PCV_FILE) given"
+  echodbg "[DEBUG] Updating pcv file using the atx2pcv.sh program"
   if ! atx2pcv.sh --antex="${MAKE_PCV}" \
+                  --verbose="${A2P_VRB}" \
                   --sta="${P}/${CAMPAIGN}/STA/${CAMPAIGN}" \
                   --campaign="${CAMPAIGN}" \
                   --pcv="${TABLES_DIR}/pcv/${PCV_FILE}.${PCV_EXT}"
@@ -785,7 +806,7 @@ else
 ##
 ##  Case b: We have a PCV file and no antex file
   if [ "$MAKE_PCV" = "NO" ] && [ ! -z ${PCV_FILE+x} ] ; then
-    echo "[DEBUG] Only specified a PCV file ($PCV_FILE); using this"
+    echodbg "[DEBUG] Only specified a PCV file ($PCV_FILE); using this"
     PCVINF=$(basename "${PCV_FILE}")
     if ! test -f ${TABLES_DIR}/pcv/${PCVINF}.${PCV_EXT} ; then
       echoerr "ERROR. Failed to find file ${TABLES_DIR}/pcv/${PCVINF}.${PCV_EXT}"
@@ -795,8 +816,10 @@ else
 ##
 ##  Case c We have an antex file but no pcv file
   elif [ "$MAKE_PCV" != "NO" ] && [ -z ${PCV_FILE+x} ] ; then
-    echo "[DEBUG] Only specified an antex file ($MAKE_PCV); using this to create a pcv file"
+    echodbg "[DEBUG] Only specified an antex file 
+            ($MAKE_PCV); using this to create a pcv file"
     if ! atx2pcv.sh --antex="${MAKE_PCV}" \
+                    --verbose="${A2P_VRB}" \
                     --sta="${P}/${CAMPAIGN}/STA/${CAMPAIGN}" \
                     --campaign="${CAMPAIGN}" \
                     --phg-out="PCV_${CAMPAIGN:0:3}" \
@@ -814,7 +837,8 @@ fi
 ##
 ##  final check
 if ! test -f "${X}/GEN/${PCVINF}.${PCV_EXT}" ; then
-  echoerr "ERROR. Failed to make the PCV file (F)! cannot find ${X}/GEN/${PCVINF}.${PCV_EXT}"
+  echoerr "ERROR. Failed to make the PCV file (F)! 
+          cannot find ${X}/GEN/${PCVINF}.${PCV_EXT}"
   exit 1
 fi
 
@@ -1243,20 +1267,21 @@ fi
 ##  LINK REQUIRED FILES FROM TABLES DIR
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-if ! link_sta ; then
-  echoerr "ERROR. Failed to link the sta file!"
-  exit 1
-fi
+#if ! link_sta ; then
+#  echoerr "ERROR. Failed to link the sta file!"
+#  exit 1
+#fi
 
 if ! link_blq ; then
   echoerr "ERROR. Failed to link the blq file!"
   exit 1
 fi
 
-if ! link_pcv ; then
-  echoerr "ERROR. Failed to link the pcv file!"
-  exit 1
-fi
+#if ! link_pcv ; then
+#  echoerr "ERROR. Failed to link the pcv file!"
+#  exit 1
+#fi
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  PROCESS THE DATA
 ##  ---------------------------------------------------------------------------
@@ -1272,6 +1297,7 @@ ${U}/SCRIPT/ntua_pcs.pl ${YEAR} \
           ${CAMPAIGN} \
           ${BERN_TASK_ID};
 fi
+
 ##  check the status
 if ! check_run \
       ${P}/${CAMPAIGN}/BPE \

@@ -158,6 +158,19 @@ parser.add_argument('--shell-script',
     dest='shell_script'
     )
 
+##  Verbosity level
+parser.add_argument('-v', '--verbose',
+    action='store',
+    type=int,
+    default=0,
+    required=False,
+    help='Specify the verbosity level: \n\t0 output only vutal messages'
+    '\n\t1 Output minimum info \n\t2 Output all info.',
+    metavar='VERBOSITY',
+    choices=[0, 1, 2],
+    dest='verbosity_level'
+    )
+
 files_to_delete = []
 
 ##  Parse command line arguments
@@ -272,6 +285,8 @@ doy           = 1
 session       = 0
 sys_command_2 = '%s %04i %03i%01i %s'%(perl_script, year, doy, session, args.campaign)
 
+if args.verbosity_level < 2: sys_command_2 += ' 1>/dev/null'
+
 if args.shell_script is not None:
     if year >= 2000 : yr2 = year - 2000
     else            : yr2 = year - 1900
@@ -301,8 +316,9 @@ if args.shell_script is not None:
         print >> fout, '\texit 1'
         print >> fout, 'else'
         print >> fout, '\tln -sf %s %s'%(phg_out, phg_gen)
-        print >> fout, '\techo \'PCV file %s created as %s.\''%(args.out_pcv_file, phg_out)
-        print >> fout, '\techo \'PCV file linked to %s\''%(phg_gen)
+        if args.verbosity_level > 0:
+            print >> fout, '\techo \'[DEBUG] PCV file %s created as %s.\''%(args.out_pcv_file, phg_out)
+            print >> fout, '\techo \'[DEBUG] PCV file linked to %s\''%(phg_gen)
         print >> fout, 'fi'
         for rmf in files_to_delete: print >> fout, 'rm %s'%(rmf)
         print >> fout, 'exit 0'
