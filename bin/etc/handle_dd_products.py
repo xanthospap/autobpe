@@ -185,12 +185,12 @@ try:
     info_dict['ion'].append(ionfile)
 
   for i, j in info_dict.iteritems():
-    print>>sys.stderr, 'Moving %s to %s'%(j[0][0], j[1])
+    ## print>>sys.stderr, 'Moving %s to %s'%(j[0][0], j[1])
     shutil.copy(j[0][0], j[1])
-    print "Checking if file is compressed:",j[1]
+    ## print "Checking if file is compressed:",j[1]
     if isUnixCompressed( j[1] ):
       j[1] = bernutils.webutils.UnixUncompress( j[1] )
-      print 'file uncompressed; set to',j[1]
+      ## print 'file uncompressed; set to',j[1]
     dfiles_str = ( ', '.join(str(p) for p in [j[1]]) ).replace('[','').replace(']','')
     if REPORT == 'ascii':
       print '[PRODUCTS::%s] Downloaded file %s ; moved to %s'%(i, dfiles_str, j[2])
@@ -205,10 +205,11 @@ try:
     #  print "file %s is not compressed"%j[1]
 
   for idx, val in enumerate(json_dict):
-    if idx == len(json_dict) - 1:
-      end = ""
-    else:
-      end = ","
+    #if idx == len(json_dict) - 1:
+    #  end = ""
+    #else:
+    end = ","
+    ## last line needs a comma! vmf1 will follow
     print "\"%s\":"%val, str(json_dict[val]).replace('\'', '\"'), end
 
 except Exception, e:

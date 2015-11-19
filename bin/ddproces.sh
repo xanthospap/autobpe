@@ -396,6 +396,10 @@ STAINF_EXT="STA"            ##  the extension
 FIXAPR=${HOME}/tables/fix/IGB08.FIX
 ## FIXINF=
 
+##  exclude file/stations
+# STA_EXCLUDE_FILE=
+USE_EUREF_EXCLUDE_LIST=NO
+
 ##  Ntua's product area
 MY_PRODUCT_AREA=/media/Seagate/solutions52 ## add yyyy/ddd later on
 # MY_PRODUCT_ID optionaly set via cmd, if we are going to search our products
@@ -405,7 +409,6 @@ DB_HOST="147.102.110.73"
 DB_USER="hypatia"
 DB_PASSWORD="ypat;ia"
 DB_DBNAME="procsta"
-
 
 ##  FIXME: This needs to be the path to the autobpe/bin directory
 PATH=${PATH}:${HOME}/autobpe/bin
@@ -440,7 +443,7 @@ getopt -T > /dev/null ## check getopt version
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
   ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e:a:p: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,no-atl,antex:,pcv-file:,stainf: \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,no-atl,antex:,pcv-file:,stainf:,use-epn-exclude,exclude-list: \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -456,54 +459,54 @@ fi
 eval set -- $ARGS
 
 ##  extract options and their arguments into variables.
-printf 1>>${JSON_OUT} "{command:["
+printf 1>${JSON_OUT} "{\"command\":[\n"
 while true
 do
   case "$1" in
 
     --use-ntua-products)
       MY_PRODUCT_ID="${2}"
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -r|--save-dir)
       SAVE_DIR="${2}"
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -i|--solution-id)
       SOLUTION_ID="${2}"
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -a|--analysis-center)
       AC="${2}"
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -b|--bern-loadgps)
       B_LOADGPS="${2}"
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -c|--campaign)
       CAMPAIGN="${2}"
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --debug)
       DEBUG_MODE=1
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\"}" "${1}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       ;;
     --logfile)
       LOGFILE="${2}"
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -d|--doy) ## remove any leading zeros
       DOY=`echo "${2}" | sed 's|^0*||g'`
       DOY_3C=$( printf "%03i\n" $DOY )
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -g|--tables-dir)
@@ -512,7 +515,7 @@ do
       shift
       ;;
     -h|--help)
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\"}" "${1}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       help
       exit 0
       ;;
@@ -522,7 +525,7 @@ do
         echoerr "ERROR. Invalid satellite system : ${SAT_SYS}"
         exit 1
       fi
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --stations-per-cluster)
@@ -531,7 +534,7 @@ do
         echoerr "ERROR. stations-per-cluster must be a positive integer!"
         exit 1
       fi
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --files-per-cluster)
@@ -540,7 +543,7 @@ do
         echoerr "ERROR. files-per-cluster must be a positive integer!"
         exit 1
       fi
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -e|--elevation-angle)
@@ -549,67 +552,76 @@ do
         echoerr "ERROR. Elevation angle must be a positive integer!"
         exit 1
       fi
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --append-suffix)
       APND_SUFFIX="${2}"
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -v|--version)
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\"}" "${1}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       dversion
       exit 0
       ;;
     --repro2-prods)
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\"}" "${1}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       USE_REPRO2=YES
       ;;
     --cod-repro13)
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\"}" "${1}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       COD_REPRO13=YES
       ;;
     --no-atl)
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\"}" "${1}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       USE_ATL=NO
       ;;
     -y|--year)
       YEAR="${2}"
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --antex)
       MAKE_PCV="${2}"
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --stainf)
       STAINF="${2}"
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -p|--pcv-file)
       PCV_FILE="${2}"
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --fix-file)
       FIXAPR="${2}"
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --json-out)
       ## This should have already been set !
       if [ "$JSON_OUT" != "$2" ]; then
-        echoerr "ERROR. json-out not parsewd correctly! ($JSON_OUT \!= $2)"
+        echoerr "ERROR. json-out not parsed correctly! ($JSON_OUT \!= $2)"
         exit 1
       fi
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      shift
+      ;;
+    --use-epn-exclude)
+      USE_EUREF_EXCLUDE_LIST=YES
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      ;;
+    --exclude-list)
+      STA_EXCLUDE_FILE="${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --) # end of options
-      printf 1>>${JSON_OUT} "]}\n"
+      printf 1>>${JSON_OUT} "\n],\n"
       shift
       break
       ;;
@@ -620,7 +632,9 @@ do
 
   esac
   shift
+  if test "${#}" -gt 1 ; then printf 1>>${JSON_OUT} "," ; fi
 done
+
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  LOGFILE, STDERR & STDOUT
@@ -890,15 +904,15 @@ fi
 ##  REPORT ..
 ## ////////////////////////////////////////////////////////////////////////////
 {
-printf "{general_info:"
-printf "\"campaign\": \"%s\"," "${CAMPAIGN}"
-printf "\"user\": \"%s\"," "${USER}"
-printf "\"host\":\"%s\"," "${HOSTNAME}"
-printf "{\"program\": {\"name\":\"%s\",\"version\":\"%s\",\"revision\":\"%s\",\"last_upd\":\"%s\"}," \
+printf "\n\"general_info\":{"
+printf "\n\"campaign\": \"%s\"," "${CAMPAIGN}"
+printf "\n\"user\": \"%s\"," "${USER}"
+printf "\n\"host\":\"%s\"," "${HOSTNAME}"
+printf "\n\"program\": {\"name\":\"%s\",\"version\":\"%s\",\"revision\":\"%s\",\"last_upd\":\"%s\"}," \
     "${NAME}" "${VERSION}" "${REVISION}" "${LAST_UPDATE}"
-printf "\"day_processed\": \"%s-%s\"," "${YEAR}" "${DOY_3C}"
-printf "{\"interval\": {\"from\":\"%s\", \"to\":\"%s\"}" "${START_OF_DAY_STR}" "${END_OF_DAY_STR}"
-printf "}\n"
+printf "\n\"day_processed\": \"%s-%s\"," "${YEAR}" "${DOY_3C}"
+printf "\n\"interval\": {\"from\":\"%s\", \"to\":\"%s\"}" "${START_OF_DAY_STR}" "${END_OF_DAY_STR}"
+printf "\n},\n"
 } 1>>${JSON_OUT}
 
 ## ////////////////////////////////////////////////////////////////////////////
@@ -916,7 +930,6 @@ printf "}\n"
 ##  Lastly, copy and uncompress (.Z && crx2rnx) the files in the campaign
 ##+ directory /RAW.
 ## ////////////////////////////////////////////////////////////////////////////
-if test 1 -eq 1 ; then
 
 >.rnxsta.dat ## temporary file
 
@@ -932,6 +945,23 @@ if ! rnxdwnl.py \
   exit 1
 fi
 
+##  make a file with all excluded stations (if any)
+X_STA_FL=.sta2exclude
+>${X_STA_FL}
+if test "${USE_EUREF_EXCLUDE_LIST}" = "YES" ; then
+  if ! ${P2ETC}/get_euref_excl_list.sh ${YEAR} ${DOY} 1>${X_STA_FL} ; then
+    echoerr "[WARNING] Failed to download Euref exclusion list!"
+  fi
+fi
+if ! test -z ${STA_EXCLUDE_FILE+x} ; then
+  if ! test -f ${STA_EXCLUDE_FILE} ; then
+    echoerr "[WARNING] Station exclusion file \"${STA_EXCLUDE_FILE}\" does not exist."
+  else
+    echodb "[DEBUG] Using ${STA_EXCLUDE_FILE} exclusion file."
+    cat ${STA_EXCLUDE_FILE} >> ${X_STA_FL}
+  fi
+fi
+
 ##  make a table with available rinex/station names, reference stations, etc ..
 ##  dump output to the .rnxsta.dat file (filter it later on)
 
@@ -944,6 +974,7 @@ if ! validate_ntwrnx.py \
             --fix-file="${FIXINF}" \
             --network="${CAMPAIGN}" \
             --rinex-path="${D}" \
+            --exclude-file="${X_STA_FL}" \
             1> .rnxsta.dat; then
   echoerr "ERROR. Failed to compile rinex/station summary -> [validate_ntwrnx.py]"
   exit 1
@@ -955,9 +986,9 @@ declare -a STA_ARRAY     ##  array to hold available station names
 declare -a REF_STA_ARRAY ##  array to hold available reference stations
 MAX_NET_STA=             ##  nr of stations in the network
 
-mapfile -t STA_ARRAY < <(filter_available_stations.awk .rnxsta.dat)
-mapfile -t RNX_ARRAY < <(filter_available_rinex.awk .rnxsta.dat)
-mapfile -t REF_STA_ARRAY < <(filter_available_reference.awk .rnxsta.dat)
+mapfile -t STA_ARRAY < <(${P2ETC}/filter_available_stations.awk .rnxsta.dat)
+mapfile -t RNX_ARRAY < <(${P2ETC}/filter_available_rinex.awk .rnxsta.dat)
+mapfile -t REF_STA_ARRAY < <(${P2ETC}/filter_available_reference.awk .rnxsta.dat)
 MAX_NET_STA=$(cat .rnxsta.dat | tail -n+2 | wc -l)
 
 ## basic validation; make sure nothing went terribly wrong!
@@ -972,9 +1003,7 @@ fi
 
 ## make sure number reference stations > 4
 if test ${#REF_STA_ARRAY[@]} -lt 5; then
-  echoerr "WARNING: Two few reference stations (${#REF_STA_ARRAY[@]}); \
-    processing stoped."
-  ## exit 1
+  echoerr "[WARNING] Two few reference stations (${#REF_STA_ARRAY[@]})"
 fi
 
 ## transfer all available rinex to RAW/ and uncompress them
@@ -1002,13 +1031,13 @@ for sta in "${STA_ARRAY[@]}"; do echo $sta >> .station-names.dat; done
 ## ////////////////////////////////////////////////////////////////////////////
 ##  REPORT ..
 ## ////////////////////////////////////////////////////////////////////////////
-{
-printf "<p>Number of stations available: %s/%s</p>\n" \
-        "${#STA_ARRAY[@]}" "${MAX_NET_STA}"
-printf "<p>Number of reference stations: %s</p>\n" \
-        "${#REF_STA_ARRAY[@]}"
-} 1>>${JSON_OUT}
-fi
+#{
+#printf "<p>Number of stations available: %s/%s</p>\n" \
+#        "${#STA_ARRAY[@]}" "${MAX_NET_STA}"
+#printf "<p>Number of reference stations: %s</p>\n" \
+#        "${#REF_STA_ARRAY[@]}"
+#} 1>>${JSON_OUT}
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD IONOSPHERIC MODEL FILE
 ##  ---------------------------------------------------------------------------
@@ -1016,7 +1045,7 @@ fi
 ##  TODO :: mysql ...
 ##  If such a file does not exist, download CODE's ionospheric file.
 ## ////////////////////////////////////////////////////////////////////////////
-printf 1>>${JSON_OUT} "{products:["
+printf 1>>${JSON_OUT} "\n\"products\":{"
 
 ION_DOWNLOADED=0
 
@@ -1141,7 +1170,7 @@ cat .vmf1.json 1>>${JSON_OUT} 2>/dev/null
 rm ${TMP_FL} ## remove temporary file
 fi
 
-printf 1>>${JSON_OUT} "]}" ## done with products
+printf 1>>${JSON_OUT} "\n}," ## done with products
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  MAKE THE CLUSTER FILE
@@ -1189,7 +1218,7 @@ awk -v num_of_clu=${STATIONS_PER_CLUSTER} -f \
 ##+      PRELIM_SOLUTION_ID  = 'FFP'
 ##+      REDUCED_SOLUTION_ID = 'FFR1'
 ## ////////////////////////////////////////////////////////////////////////////
-printf 1>>${JSON_OUT} "{solution_identifiers:["
+printf 1>>${JSON_OUT} "\n\"solution_identifiers\":["
 
 ##  Final (ambiguity-fixed) results
 FINAL_SOLUTION_ID="${SOLUTION_ID}"
@@ -1214,10 +1243,10 @@ fi
 
 ##  report ..
 {
-printf "{\"description\":\"Final Solution\", \"id\":\"%s\"}" "$FINAL_SOLUTION_ID"
-printf "{\"description\":\"Size-Reduced\", \"id\":\"%s\"}" "$REDUCED_SOLUTION_ID"
-printf "{\"description\":\"Preliminary Solution\", \"id\":\"%s\"}" "$PRELIM_SOLUTION_ID"
-printf "]}"
+printf "\n{\"description\":\"Final Solution\", \"id\":\"%s\"}," "$FINAL_SOLUTION_ID"
+printf "\n{\"description\":\"Size-Reduced\", \"id\":\"%s\"}," "$REDUCED_SOLUTION_ID"
+printf "\n{\"description\":\"Preliminary Solution\", \"id\":\"%s\"}" "$PRELIM_SOLUTION_ID"
+printf "\n],\n"
 } 1>>${JSON_OUT}
 
 ## ////////////////////////////////////////////////////////////////////////////
@@ -1342,7 +1371,7 @@ fi
 ##  COPY PRODUCTS TO HOST; UPDATE DATABASE ENTRIES
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-printf 1>>${JSON_OUT} "{saved_products:["
+printf 1>>${JSON_OUT} "\n\"saved_products\":["
 
 if test 1 -eq 1 ; then
 ##  warning: in the db mixed := GPS+GLO
@@ -1385,7 +1414,7 @@ if ! save_n_update NQ0 SOL NQ R ; then exit 1 ; else printf "," ; fi
 if ! save_n_update CRD STA CRD_FILE ; then exit 1 ; fi
 } 1>>${JSON_OUT}
 fi
-printf 1>>${JSON_OUT} "]}"
+printf 1>>${JSON_OUT} "],\n"
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  COMPILE (NON-FATAL) ERROR/WARNINGS FILE
@@ -1445,28 +1474,32 @@ ADNQ=${P}/${CAMPAIGN}/OUT/${FINAL_SOLUTION_ID}${YEAR:2:2}${DOY_3C}0.OUT
 #          --warnings-str='dn=.01,de=.01,du=.01'
 python - <<END 1>>${JSON_OUT}
 import sys, bernutils.badnq
-#try:
-adnf = bernutils.badnq.AddneqFile( "${ADNQ}" )
-adnf.toJson()
-#except:
-#  print>>sys.stderr,'ERROR. Cannot translate addneq file to json!'
-sys.exit(1)
+try:
+  adnf = bernutils.badnq.AddneqFile( "${ADNQ}" )
+  adnf.toJson()
+except:
+  print>>sys.stderr,'ERROR. Cannot translate addneq file to json!'
+  sys.exit(1)
 sys.exit(0)
 END
-if test "$?" -ne 0 ; then exit 1 ; fi
+if test "$?" -ne 0 ; then
+  echoerr "ERROR. Cannot translate addneq file to json!"
+  exit 1
+fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  REMOVE CAMPAIGN FILES
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-if test 1 -eq 2 ; then
+
 ##  we are going to remove any file in the campaign-specific folders, newer
 ##+ than .ddprocess-time-stamp (i.e. the stamp file), except from symlinks.
-find -P ${P}/${CAMPAIGN}/ \
+find  ${P}/${CAMPAIGN}/* \
       -maxdepth 1 \
       -type f \
       -newer ${TIME_STAMP_FILE} \
-      ! name ${WRN_FILE}
-fi
+      ! name ${WRN_FILE} \
+      -exec rm -rf {} \;
 
+printf 1>>${JSON_OUT} "\n}"
 exit 0

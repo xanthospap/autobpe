@@ -122,9 +122,22 @@ parser.add_argument('-s', '--session',
                     help='The session.',
                     metavar='SESSION',
                     dest='session') 
+##  File with stations to exclude
+parser.add_argument('-e', '--exclude-file',
+                    action='store',
+                    required=False,
+                    help='A file with stations to be ecluded.',
+                    metavar='EXCLUDE_FILE',
+                    dest='exclude_file') 
 
 ##  Parse command line arguments
 args = parser.parse_args()
+
+##  list of stations to be excluded
+if args.exclude_file is not None:
+    with open( args.exclude_file, 'r' ) as f: exclude_lines = f.readlines()
+else:
+    exclude_lines = []
 
 ## validate cmd arguments
 if not os.path.isfile( args.fix_file ):
@@ -171,7 +184,8 @@ try:
     reports its name(DSO), name(official), number(official) full_name(?), e.g.
     ('pdel', 'pdel', '31906M004', '')
     '''
-    print '%-15s %-16s %-9s %-9s'%("RINEX", "MARKER NAME", "AVAILABLE", "REFERENCE")
+    print '%-15s %-16s %-9s %-9s %-8s'\
+        %("RINEX", "MARKER NAME", "AVAILABLE", "REFERENCE", "EXCLUDED")
     for tpl in SENTENCE:
         rnx_file      = os.path.join(args.pth2rnx, 
                       tpl[0] + ('%s%s.%sd.Z'%(DoY, args.session, Cent)) )
@@ -179,6 +193,7 @@ try:
         marker_number = tpl[2]
         rnx_exists    = 'No' ##  initial guess ...
         rnx_is_ref    = 'No' ##  initial guess ...
+        rnx_is_excl   = 'No' ##  initial guess ...
 
         if USE_MARKER_NR:
             used_name = '%s %s'%(marker_name, marker_number)
@@ -193,8 +208,11 @@ try:
         
         if filter( lambda x: re.search(r'^%s\s+'%(used_name.upper()), x), lines):
             rnx_is_ref = 'Yes'
+
+        if filter( lambda x: re.search(r'^%s\s*'%(used_name.upper().strip()), x), exclude_lines):
+            rnx_is_excl = 'Yes'
       
-        print '%-15s %-16s %-9s %-9s'%(os.path.basename(rnx_file), used_name.upper(), rnx_exists, rnx_is_ref)
+        print '%-15s %-16s %-9s %-9s %-8s'%(os.path.basename(rnx_file), used_name.upper(), rnx_exists, rnx_is_ref, rnx_is_excl)
 
 except:
     try: db.close()
