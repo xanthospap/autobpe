@@ -406,7 +406,11 @@ DB_USER="hypatia"
 DB_PASSWORD="ypat;ia"
 DB_DBNAME="procsta"
 
-PATH=${PATH}:/home/bpe/autobpe/bin
+
+##  FIXME: This needs to be the path to the autobpe/bin directory
+PATH=${PATH}:${HOME}/autobpe/bin
+PATH=${PATH}:${HOME}/autobpe/bin/etc
+P2ETC=${HOME}/autobpe/bin/etc
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  CREATE STAMP FILE & SET JSON OUTPUT (IF ANY)
@@ -1156,7 +1160,7 @@ printf 1>>${JSON_OUT} "]}" ## done with products
 CLUSTER_FILE=${P}/${CAMPAIGN}/STA/${CAMPAIGN}.CLU
 
 awk -v num_of_clu=${STATIONS_PER_CLUSTER} -f \
-  make_cluster_file.awk .station-names.dat \
+  ${P2ETC}/make_cluster_file.awk .station-names.dat \
   1>${CLUSTER_FILE}
 
 ## ////////////////////////////////////////////////////////////////////////////
@@ -1282,7 +1286,7 @@ fi
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
 if ! awk -v FLAG=R -v REPLACE_ALL=NO -f \
-        change_crd_flags.awk ${TABLES_DIR}/crd/${CAMPAIGN}.CRD \
+        ${P2ETC}/change_crd_flags.awk ${TABLES_DIR}/crd/${CAMPAIGN}.CRD \
         1>${P}/${CAMPAIGN}/STA/REG${YEAR:2:2}${DOY_3C}0.CRD; then
   echoerr "ERROR. Could not create a-priori coordinate file."
   exit 1
@@ -1387,11 +1391,16 @@ printf 1>>${JSON_OUT} "]}"
 ##  COMPILE (NON-FATAL) ERROR/WARNINGS FILE
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-WRN_FILE=${P}/${CAMPAIGN}/LOG/wrn${YEAR}${DOY_3C}0.log
 
-if ! >${WRN_FILE} ; then
-  echoerr "ERROR. Failed to create warnings file ${WRN_FILE}"
+##  check that the campaign has a /LOG directory
+if test -d ${P}/${CAMPAIGN}/LOG ; then
+  LOG_DIR=LOG
+else
+  LOG_DIR=BPE
 fi
+
+WRN_FILE=${P}/${CAMPAIGN}/${LOG_DIR}/wrn${YEAR}${DOY_3C}0.log
+>${WRN_FILE}
 
 find ${P}/${CAMPAIGN}/OUT/WRN${DOY_3C}0*.SUM -not -empty -ls -exec \
       cat {} 1>>${WRN_FILE} 2>/dev/null \; ## match files e.g 'WRN0010003.SUM'
@@ -1401,9 +1410,13 @@ find ${P}/${CAMPAIGN}/OUT/*${YEAR}${DOY_3C}0.ERR -not -empty -ls -exec \
 
 ## echo "Warnings file created as ${WRN_FILE}"
 ##  warnings to json ..
-if ! wrn2json.py ${WRN_FILE} 1>>${JSON_OUT} 2>/dev/null ; then
-  echoerr "ERROR. Failed to create json warning file!"
-  exit 1
+if test -s ${WRN_FILE} ; then
+  if ! wrn2json.py ${WRN_FILE} 1>>${JSON_OUT} 2>/dev/null ; then
+    echoerr "ERROR. Failed to create json warning file!"
+    exit 1
+  fi
+else
+  echodbg "[DEBUG] Warnings file is empty."
 fi
 
 ## ////////////////////////////////////////////////////////////////////////////

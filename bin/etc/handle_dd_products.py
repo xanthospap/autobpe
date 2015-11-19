@@ -185,7 +185,7 @@ try:
     info_dict['ion'].append(ionfile)
 
   for i, j in info_dict.iteritems():
-    ##  print 'Moving %s to %s'%(j[0][0], j[1])
+    print>>sys.stderr, 'Moving %s to %s'%(j[0][0], j[1])
     shutil.copy(j[0][0], j[1])
     print "Checking if file is compressed:",j[1]
     if isUnixCompressed( j[1] ):

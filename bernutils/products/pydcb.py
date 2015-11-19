@@ -1,6 +1,7 @@
-import os
+import os, sys
 import datetime
 import ftplib
+import itertools
 
 import bernutils.gpstime
 import bernutils.webutils
@@ -120,8 +121,9 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
     saveas   = filename
     if out_dir: saveas = os.path.join(out_dir, filename)
     try:
-      localfile, webfile = _getRunningDcb_(filename, saveas)
+      localfile, webfile = list(itertools.chain(*_getRunningDcb_(filename, saveas)))
       ret_list           = [localfile, webfile]
+      #ret_list = _getRunningDcb_(filename, saveas)
       jdict['type']      = 'running (%s)'%stype
     except:
       raise
@@ -134,8 +136,9 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
     if out_dir:
       saveas = os.path.join(out_dir, filename)
     try:
-      localfile, webfile = _getFinalDcb_(iyear,filename,saveas)
-      ret_list           = [localfile, webfile]
+      #localfile, webfile = _getFinalDcb_(iyear,filename,saveas)
+      #ret_list           = [localfile, webfile]
+      ret_list = _getFinalDcb_(iyear,filename,saveas)
       jdict['type']      = 'final (%s)'%stype
     except:
       filename = generic_file.replace('yymm', '')
@@ -143,8 +146,9 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
       if out_dir:
         saveas = os.path.join(out_dir, filename)
       try:
-        localfile, webfile = _getRunningDcb_(filename,saveas)
-        ret_list           = [localfile, webfile]
+        #localfile, webfile = _getRunningDcb_(filename,saveas)
+        #ret_list           = [localfile, webfile]
+        ret_list = _getRunningDcb_(filename,saveas)
         jdict['type']      = 'running (%s)'%stype
       except:
         raise

@@ -19,25 +19,25 @@ doy=
 
 if test "$#" -eq 1 ; then
   if ! [[ "$1" =~ ^[0-9]+$ ]] ; then
-    echo "Invalid gps week!" 1>&2
+    echo "ERROR. Invalid gps week!" 1>&2
     exit 1
   else
     gps_week="${1}"
   fi
 elif test "$#" -eq 2 ; then
   if ! [[ "$1" =~ ^[0-9]+$ ]] ; then
-    echo "Invalid year !" 1>&2
+    echo "ERROR. Invalid year !" 1>&2
     exit 1
   else
     year="${1}"
-    echo "year set"
+    ## echo "year set"
   fi
   if ! [[ "$2" =~ ^[0-9]+$ ]] ; then
-    echo "Invalid day of year (doy) !" 1>&2
+    echo "ERROR. Invalid day of year (doy) !" 1>&2
     exit 1
   else
     doy=$( echo ${2} | sed 's|^0*||g' )
-    echo "doy set to $doy"
+    ## echo "doy set to $doy"
   fi
 else
   echo "ERROR. Invalid Usage" 1>&2
