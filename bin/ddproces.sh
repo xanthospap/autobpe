@@ -141,6 +141,8 @@ Switches: -a --analysis-center= specify the analysis center; this can be e.g.
           --stainf= Specify the station information file (no extension; should be in tables dir)
           --fix-file= Specify the name of the .FIX file
 
+          --skip-remove Do not remove campaign-specifi files
+
           -h --help display (this) help message and exit
 
           -v --version display version and exit
@@ -400,6 +402,9 @@ FIXAPR=${HOME}/tables/fix/IGB08.FIX
 # STA_EXCLUDE_FILE=
 USE_EUREF_EXCLUDE_LIST=NO
 
+##  will we delete campaign files ?
+# SKIP_REMOVE=
+
 ##  Ntua's product area
 MY_PRODUCT_AREA=/media/Seagate/solutions52 ## add yyyy/ddd later on
 # MY_PRODUCT_ID optionaly set via cmd, if we are going to search our products
@@ -443,7 +448,7 @@ getopt -T > /dev/null ## check getopt version
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
   ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e:a:p: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,no-atl,antex:,pcv-file:,stainf:,use-epn-exclude,exclude-list: \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,no-atl,antex:,pcv-file:,stainf:,use-epn-exclude,exclude-list:,skip-remove \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -613,6 +618,10 @@ do
       ;;
     --use-epn-exclude)
       USE_EUREF_EXCLUDE_LIST=YES
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      ;;
+    --skip-remove)
+      SKIP_REMOVE=YES
       printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       ;;
     --exclude-list)
@@ -1492,14 +1501,26 @@ fi
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
 
+if test "${SKIP_REMOVE}" != "YES" ; then
+
 ##  we are going to remove any file in the campaign-specific folders, newer
 ##+ than .ddprocess-time-stamp (i.e. the stamp file), except from symlinks.
-find  ${P}/${CAMPAIGN}/* \
-      -maxdepth 1 \
-      -type f \
-      -newer ${TIME_STAMP_FILE} \
-      ! name ${WRN_FILE} \
-      -exec rm -rf {} \;
+  if ! test -f ${TIME_STAMP_FILE} ; then
+    echoerr "[WARNING] Removing nothing cause file ${TIME_STAMP_FILE} is missing"
+  else
+    b_wrnfile=$(basename ${WRN_FILE})
+    find -P ${P}/${CAMPAIGN}/* \
+          -maxdepth 1 \
+          -type f \
+          -newer ${TIME_STAMP_FILE} \
+          -not -name ${b_wrnfile} \
+          -not -name "*.STA" \
+          -not -name "*.ABB" \
+          -exec rm -rf {} \;
+  fi
+else
+  echodbg "[DEBUG] Removing of file skiped!"
+fi
 
 printf 1>>${JSON_OUT} "\n}"
 exit 0

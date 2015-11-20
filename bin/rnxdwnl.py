@@ -200,7 +200,8 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
     if infolist[4] == 'NTUA': command_ += " -P2754"
   else:
     command_ = 'wget'
-    if infolist[4]  == 'TREECOMP': command_ += ' --no-passive-ftp'
+    if infolist[4]  == 'TREECOMP' or infolist[4] == 'TREECOMP2': 
+        command_ += ' --no-passive-ftp'
     if infolist[9]  != '': command_ += (' --user=' + infolist[9])
     if infolist[10] != '': command_ += (' --password=' + infolist[10])
 
@@ -222,7 +223,7 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
   path_ = infolist[7]
   
   ## special case for uranus network
-  if infolist[4] == 'TREECOMP':
+  if infolist[4] == 'TREECOMP' or infolist[4] == 'TREECOMP2' :
     try:
       ## path_ += infolist[3] + '/' + year[2:2] + '/' + dom + '/'
       path_ = path_.replace('_FULL_STA_NAME_',infolist[3])
@@ -413,7 +414,7 @@ if __name__ == "__main__":
       else:
          print '## File %s already exists. Skipping download.'%sf
     else:
-      ##print 'Command = [%s], station=%s'%(cmd, sf)
+      print 'Command = [%s], station=%s'%(cmd, sf)
       try:
         executeShellCmd(cmd)
       except ValueError as e:
