@@ -199,8 +199,8 @@ if not os.path.isfile( args.antex_file ):
     print >> sys.stderr, 'ERROR. Invalid antex file (%s)'%args.antex_file
     sys.exit(1)
 antex_filename = os.path.basename( args.antex_file )
-antex_src_dir  = os.path.dirname( args.antex_file )
-symlink_source = args.antex_file
+antex_src_dir  = os.path.dirname( os.path.abspath( args.antex_file ) )
+symlink_source = os.path.join(antex_src_dir, antex_filename)
 symlink_target = os.path.join(campaign_dir, 'OUT', antex_filename)
 if symlink_source != symlink_target:
     ## if such file already exists, first move it
@@ -217,8 +217,8 @@ if not os.path.isfile( args.sta_file + '.STA' ):
     print >> sys.stderr, 'ERROR. Invalid sta file (%s)'%( args.sta_file + '.STA' )
     sys.exit(1)
 sta_filename   = os.path.basename( args.sta_file ) + '.STA'
-sta_src_dir    = os.path.dirname( args.sta_file )
-symlink_source = args.sta_file + '.STA'
+sta_src_dir    = os.path.dirname( os.path.abspath( args.sta_file ) )
+symlink_source = os.path.join(sta_src_dir, sta_filename )
 symlink_target = os.path.join(campaign_dir, 'STA', sta_filename )
 if symlink_source != symlink_target:
     ## if such file already exists, first move it
@@ -235,9 +235,9 @@ if args.in_pcv_file != None:
         print >> sys.stderr, 'ERROR. Invalid input pcv file (%s)'%( args.in_pcv_file )
         sys.exit(1)
     in_pcv_filename = os.path.basename( args.in_pcv_file )
-    in_pcv_dir      = os.path.dirname( args.in_pcv_file )
-    if in_pcv_dir != os.path.join(bv['X'], 'GEN'):
-        symlink_source = args.in_pcv_file
+    in_pcv_dir      = os.path.dirname( os.path.abspath( args.in_pcv_file ) )
+    if in_pcv_dir  != os.path.join(bv['X'], 'GEN'):
+        symlink_source = os.path.join( in_pcv_dir, in_pcv_filename )
         symlink_target = os.path.join(bv['X'], 'GEN', in_pcv_filename)
         os.symlink( symlink_source, symlink_target )
         files_to_delete.append( symlink_target )

@@ -1,9 +1,8 @@
 #! /bin/bash
-CMD_THIS_HTML="$(basename $0) ${@}"
 
 NAME=ddprocess
 VERSION="0.90"
-REVISION="-10"
+REVISION="20"
 LAST_UPDATE="Oct 2015"
 
 # //////////////////////////////////////////////////////////////////////////////
@@ -23,27 +22,25 @@ echodbg() {
 ##  argv1 -> path to BPE
 ##  argv2 -> status filename (no path)
 ##  argv3 -> output filename (no path)
-check_run () {
+check_bpe_run () {
 
   bpe_path="$1"
   status_f="${bpe_path}/${2}"
   outout_f="${bpe_path}/${3}"
 
   if ! test -f ${status_f}; then
-    echoerr "ERROR. Cannot find status file $status_f"
+    echoerr "[ERROR] Cannot find the bpe status file \"$status_f\""
     return 1
   fi
-  ## grep for error
+
+  ##  Grep the status file for /error/. If found, cat all log files
+  ##+ to stderr.
   if grep "error" ${status_f} &>/dev/null ; then
-    if ! test -d ${bpe_path}; then
-      echoerr "ERROR. Invalid /BPE folder: $bpe_path"
-      return 1
-    fi
     for i in `ls ${bpe_path}/*.LOG`; do
       cat ${i} >&2
     done
     cat ${outout_f} >&2
-    exit 1
+    return 1
   else ## no error hurray !!!!
     return 0
   fi
@@ -1371,11 +1368,11 @@ ${U}/SCRIPT/ntua_pcs.pl ${YEAR} \
           ${BERN_TASK_ID}
 
 ##  check the status
-if ! check_run \
+if ! check_bpe_run \
       ${P}/${CAMPAIGN}/BPE \
       "${CAMPAIGN:0:3}_${BERN_TASK_ID}.RUN" \
       "${CAMPAIGN:0:3}_${BERN_TASK_ID}.OUT" ; then
-  echoerr "ERROR. Fatal, processing stoped."
+  echoerr "[ERRO]. Fatal, processing stoped."
   exit 1
 else
   :
