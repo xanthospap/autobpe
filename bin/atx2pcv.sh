@@ -26,4 +26,6 @@ done
 chmod +x run_atx2pcv.sh
 ./run_atx2pcv.sh
 
+rm run_atx2pcv.sh
+
 exit $?

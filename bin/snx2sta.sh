@@ -26,4 +26,6 @@ done
 chmod +x run_snx2sta.sh
 ./run_snx2sta.sh
 
+rm run_snx2sta.sh
+
 exit $?

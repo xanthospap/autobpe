@@ -2,14 +2,14 @@
 
 ##
 ##  This script will prepare thee run of the perl/Bernese PCF
-##+ file SNX2STA.PCF. Given the right command line arguments,
+##+ file STAMRG.PCF. Given the right command line arguments,
 ##+ it will:
 ##+ a. perform validation test (i.e. existance of files)
 ##+ b. prepare the PCF file, i.e. set the right variables
 ##+ c. prepare a bash-shell script to run the perl module (i.e.
-##+    ntua_s2s.pl found in the ${U}/SCRIPT dir and check the
+##+    ntua_a2p.pl found in the ${U}/SCRIPT dir and check the
 ##+    output.
-##  prepare_snx2sta.py -h will provide further info and usage details.
+##  prepare_stamrg.py -h will provide further info and usage details.
 ##
 ##  all the best,
 ##+ xanthos
@@ -55,54 +55,34 @@ def resolve_bern_var_dict( bern_dict ):
 
 ##  globals                                     ##
 ## -------------------------------------------- ##
-PCF_FILENAME = 'SNX2STA.PCF'
-PL_FILENAME  = 'ntua_s2s.pl'
+PCF_FILENAME = 'STAMRG.PCF'
+PL_FILENAME  = 'ntua_stamrg.pl'
 
 ##  Set the cmd parser.
 parser = argparse.ArgumentParser(
-    description="Convert a sinex file to a Bernese-format .STA file.",
-    epilog="For this script to work, the user must have access to a"
-    "working Bernese v5.2 installation. Additionaly, it is expected that:"
-    "\n\t1. a PCF file named \'SNX2STA.PCF\' exists in the ${U}/PCF dir,"
-    "\n\t2. a perl program named \'ntua_s2s.pl\' exists in the ${U}/SCRIPT dir."
+    description='Merge two .STA files.',
+    epilog='For this script to work, the user must have access to a'
+    'working Bernese v5.2 installation. Additionaly, it is expected that:'
+    '\n\t1. a PCF file named \'STAMRG.PCF\' exists in the ${U}/PCF dir,'
+    '\n\t2. a perl program named \'ntua_stamrg.pl\' exists in the ${U}/SCRIPT dir.'
     )
 
-## year 
-parser.add_argument('-y', '--year',
-    action='store',
-    required=False,
-    type=int,
-    help='The year as a four digit integer.',
-    metavar='YEAR',
-    dest='year',
-    default=2015
-    )
-## day of year 
-parser.add_argument('-d', '--doy',
-    action='store',
-    required=False,
-    type=int,
-    help='The day of year as integer.',
-    metavar='DOY',
-    dest='doy',
-    default=1
-    )
-## the session
-parser.add_argument('--session',
-    action='store',
-    required=False,
-    help='The session as char.',
-    metavar='SESSION',
-    dest='session',
-    default='0'
-    )
-##  Input sinex file
-parser.add_argument('-s', '--sinex',
+##  Master STA file
+parser.add_argument('-m', '--master-sta',
     action='store',
     required=True,
-    help='The input sinex file (including path and extension)',
-    metavar='SINEX_FILE',
-    dest='sinex_file'
+    help='The master .sta file.',
+    metavar='MASTER_STA',
+    dest='master_sta'
+    )
+
+##  Secondary STA file
+parser.add_argument('-s', '--secondary-sta',
+    action='store',
+    required=True,
+    help='The secondary sta file.',
+    metavar='STAFILE',
+    dest='secondary_sta'
     )
 
 ##  Name of the campaign
@@ -119,8 +99,8 @@ parser.add_argument('-o', '--sta-out',
     action='store',
     required=True,
     help='The output sta file (no path, no extension)',
-    metavar='STAFILE',
-    dest='sta_file'
+    metavar='OUTPUT_STA',
+    dest='output_sta'
     )
 
 ##  The .FIX file 
@@ -149,7 +129,7 @@ parser.add_argument('--shell-script',
     action='store',
     required=False,
     help='If this switch is specified, then a bash shell script will be created'
-    'with the commands to actually run SNX2STA.PCF. Else, it will be written'
+    'with the commands to actually run ATX2PCV.PCF. Else, it will be written'
     'to stdout.',
     metavar='SHELL_SCRIPT',
     dest='shell_script'
@@ -188,30 +168,48 @@ if not os.path.isdir( campaign_dir ):
     print >> sys.stderr, 'ERROR. Invalid campaign (%s)'%campaign_dir
     sys.exit(1)
 
-##  sinex file:
+##  master sta file:
 ##+ check that it exists
 ##+ link to the campaigns STA dir
 ##+ mark for delete (if needed)
-if not os.path.isfile( args.sinex_file ):
-    print >> sys.stderr, 'ERROR. Invalid sinex file (%s)'%args.sinex_file
+if not os.path.isfile( args.master_sta ):
+    print >> sys.stderr, 'ERROR. Invalid sta file (\'%s\')'%args.master_sta
     sys.exit(1)
-sinex_filename = os.path.basename( args.sinex_file )
-sinex_src_dir  = os.path.dirname( os.path.abspath( args.sinex_file ) )
-symlink_source = os.path.join(sinex_src_dir, sinex_filename)
-symlink_target = os.path.join(campaign_dir, 'SOL', sinex_filename)
+master_sta_filename = os.path.basename( args.master_sta )
+master_sta_src_dir  = os.path.dirname( os.path.abspath( args.master_sta ) )
+symlink_source = os.path.join(master_sta_src_dir, master_sta_filename)
+symlink_target = os.path.join(campaign_dir, 'STA', master_sta_filename)
 if symlink_source != symlink_target:
     ## if such file already exists, first move it
-    if os.path.isfile( symlink_target ) or os.path.islink( symlink_target ):
+    if os.path.isfile( symlink_target ):
         shutil.move( symlink_target, symlink_target + '.bck' )
     os.symlink( symlink_source, symlink_target )
     files_to_delete.append( symlink_target )
 
-##  input .fix file
-##+ check that it exists (if any)
+##  secondary sta file:
+##+ check that it exists
+##+ link to the campaigns STA dir
+##+ mark for delete (if needed)
+if not os.path.isfile( args.secondary_sta ):
+    print >> sys.stderr, 'ERROR. Invalid sta file (\'%s\')'%args.secondary_sta
+    sys.exit(1)
+secondary_sta_filename = os.path.basename( args.secondary_sta )
+secondary_sta_src_dir  = os.path.dirname( os.path.abspath( args.secondary_sta ) )
+symlink_source = os.path.join(secondary_sta_src_dir, secondary_sta_filename)
+symlink_target = os.path.join(campaign_dir, 'STA', secondary_sta_filename)
+if symlink_source != symlink_target:
+    ## if such file already exists, first move it
+    if os.path.isfile( symlink_target ):
+        shutil.move( symlink_target, symlink_target + '.bck' )
+    os.symlink( symlink_source, symlink_target )
+    files_to_delete.append( symlink_target )
+
+##  input .fix file (if any)
+##+ check that it exists
 ##+ if needed, link it to STA dir
 if args.fix_file != '':
     if not os.path.isfile( args.fix_file ):
-        print >> sys.stderr, 'ERROR. Invalid .fix file (%s)'%( args.fix_file )
+        print >> sys.stderr, 'ERROR. Invalid input fix file (%s)'%( args.fix_file )
         sys.exit(1)
     fix_filename = os.path.basename( args.fix_file )
     fix_dir      = os.path.dirname( os.path.abspath( args.fix_file ) )
@@ -221,13 +219,14 @@ if args.fix_file != '':
         os.symlink( symlink_source, symlink_target )
         files_to_delete.append( symlink_target )
 else:
-  fix_filename = ''
+    fix_filename = ''
 
 ##  the output sta file should only be a filename
-if args.sta_file != os.path.basename( args.sta_file ):
+if args.output_sta != os.path.basename( args.output_sta ):
     print >> sys.stderr, \
-    'ERROR. Only provide a filename for the resulting sta; no path (%s)'%args.sta_file
+    'ERROR. Only provide a filename for the resulting sta; no path (%s)'%args.output_sta
     sys.exit(1)
+output_sta = re.sub('.STA', '', args.output_sta, flags=re.IGNORECASE)
 
 ##  set the variables in the PCF file
 pcf_file = os.path.join( bv['U'], 'PCF', PCF_FILENAME )
@@ -235,22 +234,23 @@ if not os.path.isfile( pcf_file ):
     print >> sys.stderr, 'ERROR. Invalid pcf file (%s)'%pcf_file
     sys.exit(1)
 pcf_inst = bernutils.bpcf.PcfFile( pcf_file )
-pcf_inst.set_variable(var_name='SNXINF', val=re.sub('.SNX', '', sinex_filename, flags=re.IGNORECASE))
-pcf_inst.set_variable(var_name='FIXINF', val=fix_filename.replace('.FIX',''))
-pcf_inst.set_variable(var_name='OUTSTA', val=args.sta_file.replace('.STA',''))
+pcf_inst.set_variable(var_name='MASSTA', val=re.sub('.STA', '', master_sta_filename, flags=re.IGNORECASE))
+pcf_inst.set_variable(var_name='SECSTA', val=re.sub('.STA', '', secondary_sta_filename, flags=re.IGNORECASE))
+pcf_inst.set_variable(var_name='OUTSTA', val=output_sta)
+pcf_inst.set_variable(var_name='FIXINF', val=fix_filename)
 pcf_inst.flush_variables()
 
-##  ok, now call the perl script, that actually call snx2sta ...
+##  ok, now call the perl script, that actually call stamrg ...
 perl_script = os.path.join( bv['U'], 'SCRIPT', PL_FILENAME )
 if not os.path.isfile( perl_script ):
     print >> sys.stderr, 'ERROR. Invalid pl file (%s)'%perl_script
     sys.exit(1)
 
 sys_command_1 = 'source %s'%(args.loadgps)
-year          = args.year
-doy           = args.doy
-session       = args.session
-sys_command_2 = '%s %04i %03i%1s %s'%(perl_script, year, doy, session, args.campaign)
+year          = 2015
+doy           = 1
+session       = 0
+sys_command_2 = '%s %04i %03i%01i %s'%(perl_script, year, doy, session, args.campaign)
 
 if args.verbosity_level < 2: sys_command_2 += ' 1>/dev/null'
 
@@ -258,30 +258,33 @@ if args.shell_script is not None:
     if year >= 2000 : yr2 = year - 2000
     else            : yr2 = year - 1900
     bpe_dir = os.path.join(campaign_dir, 'BPE')
-    log_proc= os.path.join(campaign_dir, 'SS%02i%03i%1s_001_000.LOG'%(yr2, doy, session))
-    sta_out = os.path.join(campaign_dir, 'STA', args.sta_file + '.STA')
+    log_proc= os.path.join(campaign_dir, 'SM%02i%03i%01i_001_000.LOG'%(yr2, doy, session))
+    sta_out = os.path.join(campaign_dir, 'STA',  output_sta + '.STA')
     with open( args.shell_script, 'w' ) as fout:
         print >> fout, '#! /bin/bash'
-        print >> fout, '## script automatically generated by prepare_snx2sta.py'
+        print >> fout, '## script automatically generated by prepare_stamrg.py'
         print >> fout, '%s'%(sys_command_1)
         print >> fout, '%s'%(sys_command_2)
-        print >> fout, 'if grep ERROR %s 1>/dev/null; then'%(os.path.join(bpe_dir, 'SNX2STA.RUN'))
-        print >> fout, '\techo \'ERROR. Could not transform the sinex file!\' 1>&2'
-        print >> fout, '\techo \'[INFO] error found at file: %s\''%(os.path.join(bpe_dir, 'SNX2STA.RUN'))
+        print >> fout, 'if grep ERROR %s 1>/dev/null; then'%(os.path.join(bpe_dir, 'STAMRG.RUN'))
+        print >> fout, '\techo \'ERROR. Could not merge the sta files!\' 1>&2'
+        print >> fout, '\techo \'[INFO] error found at file: %s\''%(os.path.join(bpe_dir, 'STAMRG.RUN'))
         print >> fout, '\tcat %s 1>&2'%(log_proc)
         print >> fout, '\texit 1'
         print >> fout, 'fi'
-        print >> fout, '#if grep ERROR %s 1>/dev/null; then'%(os.path.join(bpe_dir, 'SNX2STA.OUT'))
-        print >> fout, '#\techo \'ERROR. Could not transform the sinex file!\' 1>&2'
+        print >> fout, '#if grep ERROR %s 1>/dev/null; then'%(os.path.join(bpe_dir, 'STAMRG.OUT'))
+        print >> fout, '#\techo \'ERROR. Could not merge the sta files!\' 1>&2'
         print >> fout, '#\tcat %s 1>&2'%(log_proc)
         print >> fout, '#\texit 1'
         print >> fout, '#fi'
         print >> fout, 'if ! test -f %s ; then'%(sta_out)
-        print >> fout, '\techo \'ERROR. Could not transform the sinex file!\' 1>&2'
+        print >> fout, '\techo \'ERROR. Could not merge the sta files!\' 1>&2'
         print >> fout, '\techo \'[INFO] produced file seems empty: %s\''%(sta_out)
         print >> fout, '\texit 1'
         print >> fout, 'else'
-        print >> fout, '\techo .sta file created as \'%s\''%(sta_out)
+        if args.verbosity_level > 0:
+            print >> fout, '\techo \'[DEBUG] STA file created as %s.\''%(sta_out)
+        else:
+            print >> fout, '\t:'
         print >> fout, 'fi'
         for rmf in files_to_delete: print >> fout, 'rm %s'%(rmf)
         print >> fout, 'exit 0'
