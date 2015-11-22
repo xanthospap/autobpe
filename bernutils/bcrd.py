@@ -1,4 +1,6 @@
-import os
+import os, sys, re
+import datetime
+import shutil
 
 ## Variables for Bernese v5.2 .CRD files
 ## Describe the format of a .CRD data line
@@ -22,58 +24,37 @@ class CrdPoint:
       long and the flag (i.e. ``self.flag_``) is a char.
   '''
 
-  def __init__(self, name='', number='', xcmp=.0, ycmp=.0, zcmp=.0, flag=''):
+  def __init__(self, **kwargs):
     ''' Constructor; all initialized to empty strings and/or .0 
     '''
-    self.name_   = name.ljust(MARKER_NAME_LENGTH)[0:4] #: Station name (4-digit); e.g. 'ANKR'
-    self.number_ = number.ljust(MARKER_NUMBER_LENGTH) #: Station number; e.g. '20805M002'
-    self.flag_   = flag #: flag
-    try:
-      self.xcmp_ = float(xcmp)
-      self.ycmp_ = float(ycmp)
-      self.zcmp_ = float(zcmp)
-    except:
-      raise ArithmeticError('Invalid initilization of CrdPoint')
-      self.xcmp_ = self.ycmp_ = self.zcmp_ = .0
+    if 'line' in kwargs:
+        ln = kwargs['line']
+        self.name_   = ln[MARKER_NAME_INDEX:
+            MARKER_NAME_INDEX+MARKER_NAME_LENGTH+1+MARKER_NUMBER_LENGTH]
+        try:
+            self.xcmp_ = float(ln[XCOMP_INDEX:XCOMP_INDEX+XCOMP_LENGTH])
+            self.ycmp_ = float(ln[YCOMP_INDEX:YCOMP_INDEX+YCOMP_LENGTH])
+            self.zcmp_ = float(ln[ZCOMP_INDEX:ZCOMP_INDEX+ZCOMP_LENGTH])
+        except:
+            raise RuntimeError('Error reading point from crd file [%s]' %ln)
 
-  def setFromCrdLine(self, line):
-    ''' Set (re-initialize) a crdpoint from a .CRD data line. Bernese v5.2
-        .CRD files have a strict format and this function expects such a
-        format to be followed.
+        if len(ln) >= FLAG_INDEX:
+            self.flag_ = ln[FLAG_INDEX:].strip()
+        else:
+            self.flag_ = ''
+        return
+    if 'name' in kwargs : self.name_ = kwargs['name']
+    else:               self.name_ = ''
+    if 'flag' in kwargs : self.flag_ = kwargs['flag']
+    else:               self.flag_ = ''
+    if 'x'    in kwargs : self.xcmp_ = float(kwargs['x'])
+    else:               self.xcmp_ = .0
+    if 'y'    in kwargs : self.ycmp_ = float(kwargs['y'])
+    else:               self.ycmp_ = .0
+    if 'z'    in kwargs : self.zcmp_ = float(kwargs['z'])
+    else:               self.zcmp_ = .0
 
-        :param line: A line containing coordinate information, as extracted
-                     (read) from a .CRD file
-
-        :returns:    Nothing
-    '''
-
-    if len(line) < 65:
-      raise RuntimeError('Error reading point from crd file [%s]' %line)
-
-    self.name_   = line[MARKER_NAME_INDEX:
-            MARKER_NAME_INDEX+MARKER_NAME_LENGTH]
-    self.number_ = line[MARKER_NUMBER_INDEX:
-            MARKER_NUMBER_INDEX+MARKER_NUMBER_LENGTH]
-    try:
-        self.xcmp_ = float(line[XCOMP_INDEX:XCOMP_INDEX+XCOMP_LENGTH])
-        self.ycmp_ = float(line[YCOMP_INDEX:YCOMP_INDEX+YCOMP_LENGTH])
-        self.zcmp_ = float(line[ZCOMP_INDEX:ZCOMP_INDEX+ZCOMP_LENGTH])
-    except:
-        raise RuntimeError('Error reading point from crd file [%s]' %line)
-
-    if len(line) >= FLAG_INDEX:
-        self.flag_ = line[FLAG_INDEX:].strip()
-    else:
-        self.flag_ = ''
-
-  def name(self, use_marker_number=True):
-    ''' Return the full name of a station, i.e. ``marker_name`` + 
-        ``marker_number``. If ``use_marker_number`` is set to ``False`` 
-        then the instance's ``marker number`` will not be included in the 
-        name returned.
-    '''
-    if not use_marker_number: return self.name_
-    return self.name_ + ' ' + self.number_
+  def name(self): return self.name_
 
   def asString(self, aa=1):
     ''' Compile a Bernese v5.2 .CRD file record line, using the instance's
@@ -89,17 +70,7 @@ class CrdPoint:
     return "%03i  %-17s%15.5f%15.5f%15.5f   %-5s" \
             %(iaa, self.name(), self.xcmp_,self.ycmp_,self.zcmp_,self.flag_)
 
-class CrdFile:
-  ''' A class to hold a Bernese v5.2 format .CRD file. '''
-
-  def __init__(self, filename):
-    ''' Contructor; checks whether the file exists or not 
-    '''
-    self.filename_ = filename
-    if not os.path.isfile(self.filename_):
-      raise RuntimeError('Error. Cannot locate .CRD file %s' %filename)
-
-  def getListOfPoints(self, stalst=None, disregard_number=False):
+def __getListOfPoints__(crd_filename, stalst=None):
     ''' Read points off from a .CRD file; return all points as list.
         If the optional argument ``stalst`` is given, (which is supposed
         to hold a list of station names), then only stations matched
@@ -115,35 +86,63 @@ class CrdFile:
     '''
 
     points = []
-
-    try:
-      fin = open(self.filename_, 'r')
-    except:
-      raise IOError('Failed to open file %s' %self.filename_)
-
-    ## Skip the first header lines
-    for i in range(0,6): line = fin.readline()
-
-    pt  = CrdPoint()
-    ## Read off all the points and add them to the points list
-    pt = crdpoint()
-    for line in fin:
-      pt.setFromCrdLine(line)
-      if stalst is not None:
-        if disregard_number:
-          if pt.name_ in stalst:
-            points.append(pt)
-        else:
-          if pt.name() in stalst:
-            points.append(pt)
-      else:
-        points.append(pt)
-
-    ## Close the file
-    fin.close()
+    with open( crd_filename, 'r' ) as fin:
+        ## Skip the first header lines
+        for i in range(0,6):
+            ln = fin.readline()
+        ln = fin.readline()
+        ## Read off all the points and add them to the points list
+        while ln:
+            pt = CrdPoint( line=ln )
+            if stalst is not None:
+                if pt.name() in stalst:
+                    points.append(pt)
+            else:
+                points.append(pt)
+            ln = fin.readline()
 
     ## Return the list of points
+    print 'This is the list i collected:'
+    for i in points: print i.name()
     return points
+
+class CrdFile:
+  ''' A class to hold a Bernese v5.2 format .CRD file. '''
+
+  def __init__(self, filename):
+    ''' Contructor; checks whether the file exists or not 
+    '''
+    print 'setting the filename'
+    self.filename_ = filename
+    print 'checking if file exists'
+    if not os.path.isfile(self.filename_):
+      raise RuntimeError('Error. Cannot locate .CRD file %s' %filename)
+    print 'geting point list'
+    self.point_list_ = __getListOfPoints__(self.filename_)
+
+  def getPointList(self): return self.point_list_
+
+  def addPoint(self, crdpoint):
+    print 'adding point:',crdpoint.name(),'in a list of size',len(self.point_list_)
+    index = 0
+    for i in self.point_list_:
+        if i.name() == crdpoint.name():
+            self.point_list_[index] = crdpoint
+            return
+        index += 1
+    self.point_list_.append( crdpoint )
+    print 'ow the list is of size',len(self.point_list_)
+
+  def flush(self):
+    header = self.getFileHeader()
+    with open( self.filename_+'.tmp', 'w') as fout:
+        for i in header: print >> fout, i
+        aa = 1
+        for j in self.point_list_: 
+            print >> fout, j.asString(aa)
+            aa += 1
+    shutil.move( self.filename_ + '.tmp', self.filename_ )
+
 
   def getFileHeader(self):
     ''' Return the header of a .CRD file as a list of lines,
@@ -162,3 +161,65 @@ class CrdFile:
 
     fin.close()
     return header_lines
+
+  def set_reference_frame(self, ref_frame):
+    if len(ref_frame) > 5:
+        print >>sys.sderr, '[WARNING] Reference frame \"%s\" is more than 5 chars'%ref_frame
+    if len(ref_frame) < 5 : 
+        while len(ref_frame) == 5 : 
+            ref_frame += ' '
+    with open( self.filename_, 'r' ) as inf:
+        with open( self.filename_ + '.tmp', 'w' ) as outf:
+            for line in inf.readlines():
+                if re.match('^LOCAL GEODETIC DATUM: ([a-zA-Z0-9_]*)\s+EPOCH:.*', line):
+                    m = re.match('^LOCAL GEODETIC DATUM: ([a-zA-Z0-9_]*)\s+EPOCH:.*', line)
+                    old_datum = m.group(1)
+                    if len(old_datum) > 5:
+                        print >>sys.sderr, '[WARNING] Reference frame \"%s\" is more than 5 chars'%ref_frame
+                    if len(old_datum) < 5 :
+                        while len(old_datum) == 5 :
+                            old_datum += ' '
+                    print >> outf, line.replace(old_datum, ref_frame).strip()
+                else:
+                    print >> outf, line.strip()
+    shutil.move(self.filename_ + '.tmp', self.filename_)
+  
+  def set_reference_epoch(self, epoch):
+      epoch_str = epoch.strftime('%Y-%m-%d %H:%M:%S')
+      with open( self.filename_, 'r' ) as inf:
+          with open( self.filename_ + '.tmp', 'w' ) as outf:
+              for line in inf.readlines():
+                  if re.match('^LOCAL GEODETIC DATUM: [a-zA-Z0-9_]*\s+EPOCH: (.*)$', line):
+                      m = re.match('^LOCAL GEODETIC DATUM: [a-zA-Z0-9_]*\s+EPOCH: (.*)$', line)
+                      old_epoch = m.group(1)
+                      print >> outf, line.replace(old_epoch, epoch_str).strip()
+                  else:
+                      print >> outf, line.strip()
+      shutil.move(self.filename_ + '.tmp', self.filename_)
+
+def create_crd_file( filename, **kwargs ):
+    if os.path.isfile( filename ):
+        raise RuntimeError('Filed to crete crd file \"%s\". File already exists'%filename)
+
+    ## The epoch
+    if not epoch in kwargs:
+        epoch_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    else:
+        epoch_str = kwargs[epoch].strftime('%Y-%m-%d %H:%M:%S')
+
+    ## Creation date
+    created_at = datetime.datetime.now().strftime('%d-%b-%Y').upper()
+
+    ## Reference System
+    if not ref_system in kwargs: ref_system = 'IGb08'
+
+    with open( filename, 'w' ) as fout:
+        print >> fout, ''
+        'IGb08 coordinates for BERNESE GNSS SOFTWARE 5.2                      %s'%(created_at)
+        '--------------------------------------------------------------------------------'
+        'LOCAL GEODETIC DATUM: %5s             EPOCH: %s'%(ref_system, epoch_str)
+        ''
+        'NUM  STATION NAME           X (M)          Y (M)          Z (M)     FLAG'
+        ''
+    x = CrdFile( filename )
+    return x
