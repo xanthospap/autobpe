@@ -133,6 +133,7 @@ except:
 ##  Download the SSC file and save it here
 try:
     [[euref_ssc, remote_file]] = bernutils.webutils.grabFtpFile( EUREF_HOST, EUREF_DIR, EUREF_SSC )
+    files_to_delete.append( euref_ssc )
     ## [['/home/bpe/autobpe/bin/EPN_A_IGb08.SSC', \
     ##   'epncb.oma.be/epncb/station/coord/EPN/EPN_A_IGb08.SSC']]
 except:
@@ -172,7 +173,9 @@ with open( euref_ssc, 'r' ) as fin :
 i = 1
 for sta, lst in ssc_dict.iteritems() :
     x, y, z = extrapolate_crd( sta, lst, dtime )
-    print '%-3i %-20s %-15.4f %-15.4f %-15.4f '%(i, sta, x, y, z)
+    print '%3i  %-15s%15.4f%15.4f%15.4f '%(i, sta, x, y, z)
     i += 1
+
+for i in files_to_delete: os.remove( i )
 
 sys.exit (0)
