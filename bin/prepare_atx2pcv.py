@@ -286,12 +286,13 @@ session       = 0
 sys_command_2 = '%s %04i %03i%01i %s'%(perl_script, year, doy, session, args.campaign)
 
 if args.verbosity_level < 2: sys_command_2 += ' 1>/dev/null'
+if args.verbosity_level < 1: sys_command_2 += ' 2>/dev/null'
 
 if args.shell_script is not None:
     if year >= 2000 : yr2 = year - 2000
     else            : yr2 = year - 1900
     bpe_dir = os.path.join(campaign_dir, 'BPE')
-    log_proc= os.path.join(campaign_dir, 'AP%02i%03i%01i_001_000.LOG'%(yr2, doy, session))
+    log_proc= os.path.join(bpe_dir, 'BPE', 'AP%02i%03i%01i_001_000.LOG'%(yr2, doy, session))
     phg_out = os.path.join(campaign_dir, 'OUT', args.out_pcv_file + '.PHG')
     phg_gen = os.path.join(bv['X'], 'GEN', args.out_pcv_file + '.' + args.type_ext)
     with open( args.shell_script, 'w' ) as fout:
@@ -300,7 +301,8 @@ if args.shell_script is not None:
         print >> fout, '%s'%(sys_command_1)
         print >> fout, '%s'%(sys_command_2)
         print >> fout, 'if grep ERROR %s 1>/dev/null; then'%(os.path.join(bpe_dir, 'ATX2PCV.RUN'))
-        print >> fout, '\techo \'ERROR. Could not transform the atx file!\' 1>&2'
+        print >> fout, '\techo \'[ERROR] Could not transform the atx file!\' 1>&2'
+        print >> fout, '\techo \'        Check the log file \"%s\" for details.\' 1>&2'%(log_proc)
         print >> fout, '\techo \'[INFO] error found at file: %s\''%(os.path.join(bpe_dir, 'ATX2PCV.RUN'))
         print >> fout, '\tcat %s 1>&2'%(log_proc)
         print >> fout, '\texit 1'
@@ -311,7 +313,8 @@ if args.shell_script is not None:
         print >> fout, '#\texit 1'
         print >> fout, '#fi'
         print >> fout, 'if ! test -f %s ; then'%(phg_out)
-        print >> fout, '\techo \'ERROR. Could not transform the atx file!\' 1>&2'
+        print >> fout, '\techo \'[ERROR] Could not transform the atx file!\' 1>&2'
+        print >> fout, '\techo \'        Check the log file \"%s\" for details.\' 1>&2'%(log_proc)
         print >> fout, '\techo \'[INFO] produced file seems empty: %s\''%(phg_out)
         print >> fout, '\texit 1'
         print >> fout, 'else'
