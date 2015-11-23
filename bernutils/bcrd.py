@@ -67,7 +67,7 @@ class CrdPoint:
       iaa = int(aa)
     except:
       raise ArithmeticError('Invalid aa integer %s' %str(aa))
-    return "%03i  %-17s%15.5f%15.5f%15.5f   %-5s" \
+    return "%03i  %-16s%15.5f%15.5f%15.5f   %-5s" \
             %(iaa, self.name(), self.xcmp_,self.ycmp_,self.zcmp_,self.flag_)
 
 def __getListOfPoints__(crd_filename, stalst=None):
@@ -102,8 +102,6 @@ def __getListOfPoints__(crd_filename, stalst=None):
             ln = fin.readline()
 
     ## Return the list of points
-    print 'This is the list i collected:'
-    for i in points: print i.name()
     return points
 
 class CrdFile:
@@ -112,18 +110,14 @@ class CrdFile:
   def __init__(self, filename):
     ''' Contructor; checks whether the file exists or not 
     '''
-    print 'setting the filename'
     self.filename_ = filename
-    print 'checking if file exists'
     if not os.path.isfile(self.filename_):
       raise RuntimeError('Error. Cannot locate .CRD file %s' %filename)
-    print 'geting point list'
     self.point_list_ = __getListOfPoints__(self.filename_)
 
   def getPointList(self): return self.point_list_
 
   def addPoint(self, crdpoint):
-    print 'adding point:',crdpoint.name(),'in a list of size',len(self.point_list_)
     index = 0
     for i in self.point_list_:
         if i.name() == crdpoint.name():
@@ -131,7 +125,6 @@ class CrdFile:
             return
         index += 1
     self.point_list_.append( crdpoint )
-    print 'ow the list is of size',len(self.point_list_)
 
   def flush(self):
     header = self.getFileHeader()
@@ -202,16 +195,17 @@ def create_crd_file( filename, **kwargs ):
         raise RuntimeError('Filed to crete crd file \"%s\". File already exists'%filename)
 
     ## The epoch
-    if not epoch in kwargs:
+    if not 'epoch' in kwargs:
         epoch_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     else:
-        epoch_str = kwargs[epoch].strftime('%Y-%m-%d %H:%M:%S')
+        epoch_str = kwargs['epoch'].strftime('%Y-%m-%d %H:%M:%S')
 
     ## Creation date
     created_at = datetime.datetime.now().strftime('%d-%b-%Y').upper()
 
     ## Reference System
-    if not ref_system in kwargs: ref_system = 'IGb08'
+    if not 'ref_system' in kwargs: ref_system = 'IGb08'
+    else                         : ref_system = kwargs['ref_system']
 
     with open( filename, 'w' ) as fout:
         print >> fout, ''

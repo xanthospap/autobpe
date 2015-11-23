@@ -91,7 +91,11 @@ Switches: -a --analysis-center= specify the analysis center; this can be e.g.
            the pcv filename (provided via the -f switch) and all calibration-dependent
            Bernese processing files (e.g. SATELLITE.XXX). --see Note 2
 
-          -p --pcv-file= specify the .PCV file to be used --see Note 2
+          -p --pcv-file= specify the .PCV file to be used. The pcv file should
+           exist in the \'\${TABLES_DIR}\'. The extension of this file, should
+           match the \'\${PCV_EXT}\' variable, which is default set to \'I08\'.
+           So, given e.g. the argument \'--pcv-file=FOO\', the script will
+           search for the file \'${TABLES_DIR}/pcv/FOO.\${PCV_EXT}\'
 
           -r --save-dir= specify directory where the solution will be saved; note that
            if the directory does not exist, it will be created
@@ -135,8 +139,13 @@ Switches: -a --analysis-center= specify the analysis center; this can be e.g.
 
           --antex= Specify an antex file to transform to a PCV
 
-          --stainf= Specify the station information file (no extension; should be in tables dir)
+          --stainf= Specify the station information file (no extension). This
+           file should be placed either in the \'\${TABLES_DIR}/sta\' or the
+           \'\${P}/\${CAMPAIGN}/STA\' directory.
+
           --fix-file= Specify the name of the .FIX file
+
+          --blq-file= Specify the blq file
 
           --skip-remove Do not remove campaign-specifi files
 
@@ -165,51 +174,6 @@ check_tables () {
   done
 
   return 0
-}
-
-link_sta () {
-  if ! test -f ${TABLES_DIR}/sta/${CAMPAIGN}.STA; then
-    echoerr "ERROR. Cannot find sta file ${TABLES_DIR}/sta/${CAMPAIGN}.STA"
-    exit 1
-  fi
-  if ln -sf ${TABLES_DIR}/sta/${CAMPAIGN}.STA \
-    ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.STA 2>/dev/null; then
-    return 0
-  else
-    echoerr "ERROR. Failed to link sta file (from ${TABLES_DIR}/sta/${CAMPAIGN}.STA to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.STA"
-    return 1
-  fi
-}
-link_blq () {
-  if ! test -f ${TABLES_DIR}/blq/${CAMPAIGN}.BLQ; then
-    echoerr "ERROR. Cannot find blq file ${TABLES_DIR}/blq/${CAMPAIGN}.BLQ"
-    exit 1
-  fi
-  if ln -sf ${TABLES_DIR}/blq/${CAMPAIGN}.BLQ \
-    ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ 2>/dev/null; then
-    return 0
-  else
-    echoerr "ERROR. Failed to link blq file (from ${TABLES_DIR}/blq/${CAMPAIGN}.BLQ to ${P}/${CAMPAIGN}/STA/${CAMPAIGN}.BLQ"
-    return 1
-  fi
-}
-
-link_pcv () {
-  PCV_EXT="I08"
-  if test -z "$PCV_FILE" ; then
-    PCV_FILE=PCV_${CAMPAIGN:0:3}
-  fi
-  if ! test -f ${TABLES_DIR}/pcv/${PCV_FILE}.${PCV_EXT}; then
-    echoerr "ERROR. CAnnot find pcv file ${TABLES_DIR}/pcv/${PCV_FILE}.${PCV_EXT}"
-    exit 1
-  fi
-  if ln -sf ${TABLES_DIR}/pcv/${PCV_FILE}.${PCV_EXT} \
-    ${X}/GEN/${PCV_FILE}.${PCV_EXT} ; then
-    return 0
-  else
-    echoerr "ERROR. Failed to link pcv file (from ${TABLES_DIR}/pcv/${PCV_FILE}.${PCV_EXT} to ${X}/GEN/${PCV_FILE}.${PCV_EXT}"
-    return 1
-  fi
 }
 
 ##  year - doy to datetime in format '%Y-%m-%d %H-%M-%S'
@@ -385,6 +349,7 @@ USE_ATL=YES
 MAKE_PCV=NO
 PCV_EXT=I08
 PCVINF=       ##  will be set (later) to the filename of the PCV to be used
+# PCV_FILE
 
 ## station information file ##
 ## STAINF=                  ##  the filename (no path, no extension); unset
@@ -392,8 +357,11 @@ PCVINF=       ##  will be set (later) to the filename of the PCV to be used
 STAINF_EXT="STA"            ##  the extension
 
 ## fix file
-FIXAPR=${HOME}/tables/fix/IGB08.FIX
-## FIXINF=
+FIXINF=IGB08
+
+## blq file
+# BLQ_FILE=
+BLQINF=
 
 ##  exclude file/stations
 # STA_EXCLUDE_FILE=
@@ -450,7 +418,7 @@ getopt -T > /dev/null ## check getopt version
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
   ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e:a:p: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,no-atl,antex:,pcv-file:,stainf:,use-epn-exclude,exclude-list:,skip-remove \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,no-atl,antex:,pcv-file:,stainf:,use-epn-exclude,exclude-list:,skip-remove,fix-file:,blq-file: \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -605,7 +573,12 @@ do
       shift
       ;;
     --fix-file)
-      FIXAPR="${2}"
+      FIXINF="${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      shift
+      ;;
+    --blq-file)
+      BLQ_FILE="${2}"
       printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
@@ -788,37 +761,75 @@ if [ -z ${STAINF+x} ]; then
 fi
 
 if ! test -f ${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT} ; then
-  echoerr "ERROR. Cannot find the station information file 
-          \"${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT}\""
+  if ! test -f ${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT}; then
+    echoerr "[ERROR] Cannot find the station information file \'${STAINF}.${STAINF_EXT}\'."
+    echoerr "        It is neither locate in \'${TABLES}/sta\' nor in \'${P}/${CAMPAIGN}/STA\'."
   exit 1
+  else
+    STAINF_FILE=${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT}
+  fi
 else
-  if ! ln -sf ${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT} \
-              ${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT} ; then
-    echoerr "ERROR. Failed to link the station information file 
-            \"${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT}\""
+  STAINF_FILE=${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT}
+  if ! ln -sf ${STAINF_FILE} ${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT} ; then
+    echoerr "[ERROR] Failed to link the station information file \'${STAINF_FILE}\'."
+    exit 1
+  fi
+fi
+
+echodbg "[DEBUG] Using the the station information file \"${P}/STA/${STAINF}.${STAINF_EXT}\""
+
+## ------------------------------------------------------------------------- ##
+##                                                                           ##
+##  Validate the blq file: see that it exists, and copy it                   ##
+##+ from tables directory (or wherever it is) to the the campaign's sta      ##
+##+ dir.                                                                     ##
+##                                                                           ##
+## ------------------------------------------------------------------------- ##
+if [ -z ${BLQ_FILE+x} ] ; then
+  BLQ_FILE=${CAMPAIGN}
+fi
+
+if ! test -f ${TABLES_DIR}/blq/${BLQ_FILE}.BLQ ; then
+  if ! test -f ${P}/${CAMPAIGN}/STA/${BLQ_FILE}.BLQ ; then
+    echoerr "[ERROR] Cannot find the blq file \'${BLQ_FILE}.BLQ\'."
+    echoerr "        It is neither locate in \'${TABLES}/blq\' nor in \'${P}/${CAMPAIGN}/STA\'."
     exit 1
   else
-    echodbg "[DEBUG] Using the the station information file 
-            \"${P}/STA/${STAINF}.${STAINF_EXT}\""
-    STAINF_FILE="${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT}"
+    BLQINF=${BLQ_FILE}
   fi
+else
+  if ! ln -sf ${TABLES_DIR}/blq/${BLQ_FILE}.BLQ ${P}/${CAMPAIGN}/STA/${BLQ_FILE}.BLQ ; then
+    echoerr "[ERROR] Failed to link the blq file \'${TABLES_DIR}/blq/${BLQ_FILE}.BLQ\'."
+    exit 1
+  fi
+  BLQINF=${BLQ_FILE}
 fi
 
 ## ------------------------------------------------------------------------- ##
 ##                                                                           ##
 ##  Validate the fix file: see that it exists, and copy it                   ##
 ##+ from tables directory (or wherever it is) to the the campaign's sta      ##
-##+ dir as REF$YSS+0                                                         ##
+##+ dir.                                                                     ##
+##  Note that we need the actaul fix file to be later used by validate_ntw   ##
+##+ Let's name that FIX_FILE                                                 ##
 ##                                                                           ##
 ## ------------------------------------------------------------------------- ##
-if ! test -f "${FIXAPR}" ; then
-  echoerr "ERROR. Cannot find the .FIX file \"${FIXAPR}\""
-  exit 1
+if ! test -f ${TABLES_DIR}/fix/${FIXINF}.FIX ; then
+  if ! test -f ${P}/${CAMPAIGN}/STA/${FIXINF}.FIX ; then
+    echoerr "[ERROR] Cannot find the fix file \'\'${FIXINF}.FIX\'"
+    echoerr "        It is neither in \'\'${TABLES_DIR}/fix\' nor in \'${P}/${CAMPAIGN}/STA\'."
+    exit 1
+  else
+    FIX_FILE=${P}/${CAMPAIGN}/STA/${FIXINF}.FIX
+  fi
+else
+  FIX_FILE=${TABLES_DIR}/fix/${FIXINF}.FIX
+  if ! ln -sf ${FIX_FILE} ${P}/${CAMPAIGN}/STA/${FIXINF}.FIX ; then
+    echoerr "[ERROR] Could not link the fix file \'\${FIX_FILE}\'"
+    exit 1
+  fi
 fi
-FIXINF="${P}/${CAMPAIGN}/STA/REF${YEAR:2:2}${DOY_3C}0.FIX"
-cp -f ${FIXAPR} ${FIXINF}
-echodbg "[DEBUG] Using .FIX file \"${FIXAPR}\""
-echodbg "[DEBUG] \"${FIXAPR}\" copied to \"${FIXINF}\""
+echodbg "[DEBUG] Using .FIX file \"${FIX_FILE}\""
 
 ## ------------------------------------------------------------------------- ##
 ##                                                                           ##
@@ -952,6 +963,8 @@ if ! rnxdwnl.py \
               --year=${YEAR} \
               --doy=${DOY} \
               --path=${D} \
+              --marker-rename \
+              -v 2 \
               1>&2; then
   echoerr "ERROR. Failed to download RINEX files -> [rnxdwnl.py]"
   exit 1
@@ -985,7 +998,7 @@ if ! validate_ntwrnx.py \
             --db-user="${DB_USER}" \
             --year="${YEAR}" \
             --doy="${DOY}" \
-            --fix-file="${FIXINF}" \
+            --fix-file="${FIX_FILE}" \
             --network="${CAMPAIGN}" \
             --rinex-path="${D}" \
             --exclude-file="${X_STA_FL}" \
@@ -1290,7 +1303,7 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" 1>>${JSON_OUT} \
         C="${PRELIM_SOLUTION_ID}" \
         E="${FINAL_SOLUTION_ID}" \
         F="${REDUCED_SOLUTION_ID}" \
-        BLQINF="${CAMPAIGN}" \
+        BLQINF="${BLQINF}" \
         ATLINF="${ATLFILE}" \
         STAINF="${STAINF}" \
         CRDINF="${CAMPAIGN}" \
@@ -1298,6 +1311,7 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" 1>>${JSON_OUT} \
         PCV="${PCV_EXT}" \
         PCVINF="${PCVINF}" \
         ELANG="${ELEVATION_ANGLE}" \
+        FIXINF="${FIXINF}"\
         CLU="${FILES_PER_CLUSTER}"; then
   echoerr "ERROR. Failed to set variables in PCF file."
   exit 1
@@ -1333,25 +1347,6 @@ if ! awk -v FLAG=R -v REPLACE_ALL=NO -f \
   echoerr "ERROR. Could not create a-priori coordinate file."
   exit 1
 fi
-
-## ////////////////////////////////////////////////////////////////////////////
-##  LINK REQUIRED FILES FROM TABLES DIR
-##  ---------------------------------------------------------------------------
-## ////////////////////////////////////////////////////////////////////////////
-#if ! link_sta ; then
-#  echoerr "ERROR. Failed to link the sta file!"
-#  exit 1
-#fi
-
-if ! link_blq ; then
-  echoerr "ERROR. Failed to link the blq file!"
-  exit 1
-fi
-
-#if ! link_pcv ; then
-#  echoerr "ERROR. Failed to link the pcv file!"
-#  exit 1
-#fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  PROCESS THE DATA

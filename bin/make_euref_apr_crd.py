@@ -166,24 +166,19 @@ else:
 ##  Let's see about that crd file ...
 if args.crd_file != None:
     if os.path.isfile( args.crd_file ):
-        #try:
-        print '--Trying to open the file ...'
-        crd_file_obj = bernutils.bcrd.CrdFile( args.crd_file )
-        print 'opening ok.'
-        print '--Trying to get the list ...'
-        point_list   = crd_file_obj.getPointList()
-        print 'list ok'
-        if station_list is not None:
-            for i in point_list: 
-                if i.name() in station_list: 
-                    print >>sys.stderr, '[WARNING] Station \"%s\" already in crd file; it will be overwitten.'
-        #crd_file_obj.set_reference_epoch( dtime )
-        #except:
-        #    print >> sys.stderr, '[ERROR] Invalid .CRD file \'%s\''%(args.crd_file)
-        #    sys.exit (1)
+        try:
+            crd_file_obj = bernutils.bcrd.CrdFile( args.crd_file )
+            point_list   = crd_file_obj.getPointList()
+            if station_list is not None:
+                for i in point_list: 
+                    if i.name() in station_list: 
+                        print >>sys.stderr, '[WARNING] Station \"%s\" already in crd file; it will be overwitten.'
+            crd_file_obj.set_reference_epoch( dtime )
+        except:
+            print >> sys.stderr, '[ERROR] Invalid .CRD file \'%s\''%(args.crd_file)
+            sys.exit (1)
     else:
         crd_file_obj = bernutils.bcrd.create_crd_file(args.crd_file, epoch=dtime)
-    print 'I\'m out of here'
 
 ##  read through the ssc file and make a dictionary:
 ##+ the keys are the names of the stations (name_number)
@@ -210,7 +205,6 @@ if args.crd_file is None:
         print '%3i  %-15s%15.4f%15.4f%15.4f '%(i, sta, x, y, z)
         i += 1
 else:
-    print 'WRITING to .CRD file'
     for sta, lst in ssc_dict.iteritems() :
         px, py, pz = extrapolate_crd( sta, lst, dtime )
         point = bernutils.bcrd.CrdPoint(name=sta, x=px, y=py, z=pz, flag='A')

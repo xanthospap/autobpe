@@ -33,35 +33,20 @@ report any bugs to    :
 '''
 
 ## Import libraries
-import sys
-import os
+import sys, os, re
+import shutil
 import datetime
 import subprocess
-import getopt
 import glob
 import MySQLdb
 import traceback
-
-## Debug Mode
-DDEBUG_MODE = True
-
-## help function
-def help (i):
-    print ""
-    print ""
-    sys.exit(i)
+import argparse
 
 ## Global variables / default values
 HOST_NAME   = '147.102.110.73'
 USER_NAME   = 'hypatia'
 PASSWORD    = 'ypat;ia'
 DB_NAME     = 'procsta'
-stations    = []
-networks    = []
-rename_marker = False
-year        = 0
-doy         = 0
-outputdir   = ''
 touppercase = False
 uncompressZ = False
 forceRemove = False
@@ -74,87 +59,106 @@ ses_identifiers = {
   21:'v', 22:'w', 23:'x'
 }
 
+def vprint( message, min_verb_level, std_buf=None ):
+    if std_buf is None : std_buf = sys.stdout
+    if args.verbosity >= min_verb_level: print >> std_buf, message
+
 def executeShellCmd(command):
   ''' This function will execute a shell-like command
   '''
   try:
-    p = subprocess.Popen(command, shell=True,
+      p = subprocess.Popen(command, shell=True,
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, err = p.communicate()
-    returncode  = p.returncode
+      output, err = p.communicate()
+      returncode  = p.returncode
   # print >> sys.stderr, output
   # print >> sys.stderr, err
   except:
-    raise ValueError('ERROR. Cannot execute command: [%s].'%command)
+      raise ValueError('ERROR. Cannot execute command: [%s].'%command)
   if returncode:
-    raise ValueError('ERROR. Command failed: [%s].'%command)
+      raise ValueError('ERROR. Command failed: [%s].'%command)
 
 def UnixUncompress(inputf, outputf=None):
-  ''' Uncompress the UNIX-compressed file 'inputf' to 'outputf'
-      Return the uncompressed file-name
-  '''
-  if not outputf:
-    sys_command = 'uncompress -f %s'%inputf
-    dotZfile    = '%s'%inputf[:-2]
-  else:
-    sys_command = 'uncompress -f -c %s > %s'%(inputf, outputf)
-    dotZfile    = '%s'%outputf
+    ''' Uncompress the UNIX-compressed file 'inputf' to 'outputf'
+        Return the uncompressed file-name
+    '''
+    if not outputf:
+        sys_command = 'uncompress -f %s'%inputf
+        dotZfile    = '%s'%inputf[:-2]
+    else:
+        sys_command = 'uncompress -f -c %s > %s'%(inputf, outputf)
+        dotZfile    = '%s'%outputf
 
-  try:
-    p = subprocess.Popen(sys_command, shell=True,
+    try:
+        p = subprocess.Popen(sys_command, shell=True,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, err = p.communicate()
-    returncode  = p.returncode
-  except:
-    raise ValueError('ERROR. Cannot uncompress file: %s'%inputf)
+        output, err = p.communicate()
+        returncode  = p.returncode
+    except:
+        raise ValueError('ERROR. Cannot uncompress file: %s'%inputf)
 
-  if returncode:
-    raise ValueError('ERROR. Cannot uncompress file: %s'%inputf)
+    if returncode:
+        raise ValueError('ERROR. Cannot uncompress file: %s'%inputf)
 
-  return dotZfile
+    return dotZfile
 
 def UnixCompress(inputf, outputf=None):
-  ''' Compress the file inputf to outputf using UNIX-compress.
+    ''' Compress the file inputf to outputf using UNIX-compress.
       The function will return the name of the compressed file.
-  '''
-  sys_command = 'compress -f %s'%inputf
-  dotZfile    = '%s.Z'%inputf
+    '''
+    sys_command = 'compress -f %s'%inputf
+    dotZfile    = '%s.Z'%inputf
 
-  if outputf:
-    sys_command += '; mv %s.Z %s'%(inputf, outputf)
-    dotZfile    = '%s'%outputf
+    if outputf:
+        sys_command += '; mv %s.Z %s'%(inputf, outputf)
+        dotZfile    = '%s'%outputf
 
-  try:
-    p = subprocess.Popen(sys_command, shell=True,
+    try:
+        p = subprocess.Popen(sys_command, shell=True,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, err = p.communicate()
-    returncode  = p.returncode
-  except:
-    raise ValueError('ERROR. Cannot compress file: %s'%inputf)
+        output, err = p.communicate()
+        returncode  = p.returncode
+    except:
+        raise ValueError('ERROR. Cannot compress file: %s'%inputf)
 
-  if returncode:
-    raise ValueError('ERROR. Cannot compress file: %s'%inputf)
+    if returncode:
+        raise ValueError('ERROR. Cannot compress file: %s'%inputf)
 
-  return dotZfile
+    return dotZfile
 
 def getRinexMarkerName(filename):
-  ''' Given a rinex filename, this function will search the
+    ''' Given a rinex filename, this function will search the
       header to find and return the marker name.
       In case of error, an exception in thrown.
       If the file is (UNIX) compressed, i.e. ends with '.Z'
       then it is going to be de-compressed
-  '''
-  ufilename = filename
+    '''
+    ufilename = filename
 
-  if filename[-2:] == '.Z':
-    ufilename = UnixUncompress(filename)
+    if filename[-2:] == '.Z': ufilename = UnixUncompress(filename)
 
-  with open(ufilename, 'r') as fin:
-    for line in fin.readlines():
-      if line.strip()[60:71] == 'MARKER NAME':
-        return line[0:4]
+    with open(ufilename, 'r') as fin:
+        for line in fin.readlines():
+            if line.strip()[60:71] == 'MARKER NAME':
+                return line[0:4], ufilename
+    return '', ufilename
 
-  raise ValueError('ERROR. No MARKER NAME in Rinex file: %s'%ufilename)
+def subMarkerName( filename, marker_name ):
+    marker_in_rinex, rinex_filename = getRinexMarkerName( filename )
+    if marker_in_rinex == '':
+        print >> sys.stderr, '[ERROR] Cannot find \'MARKER NAME\' in Rinex file \'%s\''%(rinex_filename)
+    if marker_in_rinex != marker_name :
+        vprint('[DEBUG] Cahnging marker name from \'%s\' to \'%s\' for \'%s\''%(marker_in_rinex, marker_name, rinex_filename), 1)
+        with open(rinex_filename, 'r') as fin:
+            with open(rinex_filename+'.tmp', 'w') as fout:
+                for line in fin.readlines():
+                    if re.match('^%s.*\sMARKER NAME\s*$'%marker_in_rinex, line):
+                        print >> fout,'%s                                                        MARKER NAME'%(marker_name)
+                    else:
+                        print >> fout, line.rstrip('\n')
+        shutil.move( rinex_filename+'.tmp', rinex_filename )
+
+    return rinex_filename
 
 def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False):
   ''' Given a list (of information) as returned by the database query (for one
@@ -258,181 +262,217 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
   else:
     return (command_ + ' -O ' + savef_ + ' ' + os.path.join(host_, path_, filename_)), savef_
 
-## Resolve command line arguments
-def main(argv):
 
-  if len(argv) < 1: help(1)
+##  set the cmd parser
+parser = argparse.ArgumentParser(
+        description='Download RINEX files for any station/network included in'
+        'a given database.',
+        epilog     ='Ntua - 2015'
+        )
+##  input station list
+parser.add_argument('-s', '--stations',
+    nargs    = '*',
+    action   = 'store',
+    required = False,
+    help     = 'A whitespace seperated list of stations to download. The given names'
+    'are checked against the \"4-char ID\" in the database.',
+    metavar  = 'STATION_LIST',
+    dest     = 'stations',
+    default  = []
+    )
+##  input network names
+parser.add_argument('-n', '--networks',
+    nargs    = '*',
+    action   = 'store',
+    required = False,
+    help     = 'A whitespace seperated list of networks to download. The given names'
+    'are checked against the \"??\" in the database.',
+    metavar  = 'NETWORK_LIST',
+    dest     = 'networks',
+    default  = []
+    )
+##  year
+parser.add_argument('-y', '--year',
+    action   = 'store',
+    required = True,
+    type     = int,
+    help     = 'The year for which you want the station (integer).',
+    metavar  = 'YEAR',
+    dest     = 'year'
+    )
+##  day of year (doy)
+parser.add_argument('-d', '--doy',
+    action   = 'store',
+    required = True,
+    type     = int,
+    help     = 'The day of year for which you want the station (integer).',
+    metavar  = 'DOY',
+    dest     = 'doy'
+    )
+##  download path
+parser.add_argument('-p', '--path',
+    action   = 'store',
+    required = False,
+    help     = 'The directory where the downloaded files shall be placed.',
+    metavar  = 'OUTPUT_DIR',
+    dest     = 'output_dir',
+    default  = ''
+    )
+##  verbosity level
+parser.add_argument('-v', '--verbosity',
+    action   = 'store',
+    required = False,
+    type     = int,
+    help     = 'Output verbosity level; if set to null (default value) no message'
+    'is written on screen. If the level is set to 2, all messages appear on'
+    'stdout.',
+    metavar  = 'VERBOSITY',
+    dest     = 'verbosity',
+    default  = 0
+    )
+##  rename marker
+parser.add_argument('-r', '--marker-rename',
+    action   = 'store_true',
+    help     = 'If this flaf is set, then every downloaded rinex will be instpected'
+    'for the \'MARKER NAME\' field. If it is different from the DSO name, then'
+    'it will be altered.',
+    dest     = 'rename_markers'
+    )
 
-  try:
-    opts, args = getopt.getopt(argv,'hs:n:ry:d:p:uzf',[
-      'help','stations=','networks=','rename-marker','year=','doy=',
-      'path=','uppercase','uncompress','fore-remove'])
+##  Parse command line arguments
+args = parser.parse_args()
 
-  except getopt.GetoptError: help(1)
-
-  for opt, arg in opts:
-    if opt in ('-h', '--help'):
-      help(0)
-    elif opt in ('-s', '--stations'):
-      station_list = arg.split(',')
-      global stations
-      stations += station_list
-    elif opt in ('-n', '--networks'):
-      network_list = arg.split(',')
-      global networks
-      networks += network_list
-    elif opt in ('-r', '--rename-marker'):
-      global rename_marker
-      rename_marker = True
-    elif opt in ('-f', '--force-remove'):
-      global forceRemove
-      forceRemove = True
-    elif opt in ('-y', '--year'):
-      global year
-      year = arg
-    elif opt in ('-d', '--doy'):
-      global doy
-      doy = arg
-    elif opt in ('-u', '--uppercase'):
-      global touppercase
-      touppercase = True
-    elif opt in ('-p', '--path'):
-      global outputdir
-      outputdir = arg
-      if not os.path.exists(outputdir):
-        print >> sys.stderr, 'ERROR. Directory does not exist: %s'%arg
-        sys.exit(2)
-    elif opt in ('-z', '--uncompress'):
-      global uncompressZ
-      uncompressZ = True
-    else:
-      print >> sys.stderr, 'Invalid command line argument: %s'%opt
-
-## Start main
-if __name__ == "__main__":
-  main( sys.argv[1:] )
-
-  ## Resolve the input date
-  try:
-    dt = datetime.datetime.strptime('%s-%s'%(int(year),int(doy)),'%Y-%j')
-  except:
-    print >> sys.stderr, 'Invalid date: year = %s doy = %s'%(year, doy)
+## Resolve the input date
+try:
+    dt = datetime.datetime.strptime( '%s-%s'%(args.year, args.doy), '%Y-%j' )
+except:
+    print >> sys.stderr, 'ERROR. Invalid date: year [%4i] doy = [%3i]'\
+        %( args.year, args.doy )
     sys.exit(1)
 
-  ## Month as 3-char, e.g. Jan (sMon)
-  ## Month as 2-char, e.g. 01 (iMon)
-  ## Day of month as 2-char, e.g. 05 (DoM)
-  ## Day of year a 3-char, e.g. 157 (DoY)
-  Year, Cent, sMon, iMon, DoM, DoY = dt.strftime('%Y-%y-%b-%m-%d-%j').split('-')
+## Month as 3-char, e.g. Jan (sMon)
+## Month as 2-char, e.g. 01 (iMon)
+## Day of month as 2-char, e.g. 05 (DoM)
+## Day of year a 3-char, e.g. 157 (DoY)
+Year, Cent, sMon, iMon, DoM, DoY = dt.strftime('%Y-%y-%b-%m-%d-%j').split('-')
 
-  ##  This list is going to hold station-specific info, for every station to
-  ##+ be downloaded
-  station_info = []
+##  This list is going to hold station-specific info, for every station to
+##+ be downloaded
+station_info = []
 
   ## try connecting to the database server
-  try:
-    db  = MySQLdb.connect(host=HOST_NAME, user=USER_NAME, passwd=PASSWORD, db=DB_NAME)
+try:
+    db  = MySQLdb.connect(
+            host=HOST_NAME, 
+            user=USER_NAME, 
+            passwd=PASSWORD, 
+            db=DB_NAME)
+
     cur = db.cursor()
 
     ## ok, connected to db; now start quering for each station
-    for s in stations:
-      QUERY='SELECT station.station_id, station.mark_name_DSO, stacode.mark_name_OFF, stacode.station_name, ftprnx.dc_name, ftprnx.protocol, ftprnx.url_domain, ftprnx.pth2rnx30s, ftprnx.pth2rnx01s, ftprnx.ftp_usname, ftprnx.ftp_passwd, network.network_name FROM station JOIN stacode ON station.stacode_id=stacode.stacode_id JOIN dataperiod ON station.station_id=dataperiod.station_id JOIN ftprnx ON dataperiod.ftprnx_id=ftprnx.ftprnx_id JOIN  sta2nets ON sta2nets.station_id=station.station_id JOIN network ON network.network_id=sta2nets.network_id WHERE station.mark_name_DSO="%s" AND dataperiod.periodstart<"%s" AND dataperiod.periodstop>"%s";'%(s,dt.strftime('%Y-%m-%d'),dt.strftime('%Y-%m-%d'))
-      cur.execute(QUERY)
-      try:
-        SENTENCE = cur.fetchall()
-        # answer must only have one raw
-        if len(SENTENCE) > 1:
-          ## print >> sys.stderr, 'ERROR. More than one records matching for station %s'%s
-          ## station belongs to more than one networks; see bug 13
-          print >> sys.stderr, 'WARNING! station %s belongs in more than one networks'%s
-          add_sta = True
-          ref_line = SENTENCE[0]
-          for line in SENTENCE[1:]:
-            for idx, field in enumerate( ref_line[0:10] ):
-              if field != line[idx]:
-                add_sta = False
-                print >> sys.stderr, 'ERROR. Station %s belongs to more than one networks but independent fields don\'t match!'%s
-          if add_sta :
-            print >> sys.stderr, 'WARNING! station %s added to download list'%s
-            station_info.append( SENTENCE[0] )
-        elif len(SENTENCE) < 1:
-          print >> sys.stderr, 'ERROR. Cannot match station %s in the database.'%s
-        else:
-          station_info.append(SENTENCE[0])
-      except:
-        print >> sys.stderr, 'No matching station name in database for %s'%s
+    for s in args.stations :
+        QUERY='SELECT station.station_id, station.mark_name_DSO, stacode.mark_name_OFF, stacode.station_name, ftprnx.dc_name, ftprnx.protocol, ftprnx.url_domain, ftprnx.pth2rnx30s, ftprnx.pth2rnx01s, ftprnx.ftp_usname, ftprnx.ftp_passwd, network.network_name FROM station JOIN stacode ON station.stacode_id=stacode.stacode_id JOIN dataperiod ON station.station_id=dataperiod.station_id JOIN ftprnx ON dataperiod.ftprnx_id=ftprnx.ftprnx_id JOIN  sta2nets ON sta2nets.station_id=station.station_id JOIN network ON network.network_id=sta2nets.network_id WHERE station.mark_name_DSO="%s" AND dataperiod.periodstart<"%s" AND dataperiod.periodstop>"%s";'%(s,dt.strftime('%Y-%m-%d'),dt.strftime('%Y-%m-%d'))
+        
+        cur.execute( QUERY )
+
+        try:
+            SENTENCE = cur.fetchall()
+            # answer must only have one raw
+            if len(SENTENCE) > 1:
+                ## station belongs to more than one networks; see bug #13
+                ##print >> sys.stderr, '[WARNING] station %s belongs in more than one networks'%s
+                vprint('[DEBUG] station \"%s\" belongs to more than one networks.'%s, 2, sys.stderr )
+                add_sta = True
+                print SENTENCE[0]
+                ref_line = SENTENCE[0]
+                print 'ref line [%s]'%ref_line
+                for line in SENTENCE[1:]:
+                    print 'Comparing to line [%s]'%line
+                    for idx, field in enumerate( ref_line[0:10] ):
+                        if field != line[idx]:
+                            add_sta = False
+                            vprint('[WARNING] Station \"%s\" belongs to more than one networks but independent fields don\'t match!'%s, 1, sys.stderr)
+                            vprint('[WARNING] Station \"%s\" will be skipped'%s, 1, sys.stderr)
+                if add_sta :
+                    vprint('[DEBUG] station \"%s\" added to download list.'%s, 2, sys.stder)
+                    station_info.append( SENTENCE[0] )
+            elif len(SENTENCE) < 1:
+                vprint('[WARNING] Cannot match station \"%s\" in the database.'%s, 1, sys.stderr)
+            else:
+                station_info.append( SENTENCE[0] )
+        except:
+            vprint('[WARNING] No matching station name in database for \"%s\".'%s, 1, sys.stderr)
 
     # ok, now start asking for networks
-    for w in networks:
-      QUERY='SELECT station.station_id, station.mark_name_DSO, stacode.mark_name_OFF, stacode.station_name, ftprnx.dc_name, ftprnx.protocol, ftprnx.url_domain, ftprnx.pth2rnx30s, ftprnx.pth2rnx01s, ftprnx.ftp_usname, ftprnx.ftp_passwd, network.network_name FROM station JOIN stacode ON station.stacode_id=stacode.stacode_id JOIN dataperiod ON station.station_id=dataperiod.station_id JOIN ftprnx ON dataperiod.ftprnx_id=ftprnx.ftprnx_id JOIN  sta2nets ON sta2nets.station_id=station.station_id JOIN network ON network.network_id=sta2nets.network_id WHERE network.network_name="%s" AND dataperiod.periodstart<"%s" AND dataperiod.periodstop>"%s";'%(w,dt.strftime('%Y-%m-%d'),dt.strftime('%Y-%m-%d'))
-      cur.execute(QUERY)
-      try:
-        SENTENCE = cur.fetchall()
-        for row in SENTENCE: station_info.append(row)
-      except:
-        print >> sys.stderr, 'No matching station name in database for : %s'%s
+    for w in args.networks :
+        QUERY='SELECT station.station_id, station.mark_name_DSO, stacode.mark_name_OFF, stacode.station_name, ftprnx.dc_name, ftprnx.protocol, ftprnx.url_domain, ftprnx.pth2rnx30s, ftprnx.pth2rnx01s, ftprnx.ftp_usname, ftprnx.ftp_passwd, network.network_name FROM station JOIN stacode ON station.stacode_id=stacode.stacode_id JOIN dataperiod ON station.station_id=dataperiod.station_id JOIN ftprnx ON dataperiod.ftprnx_id=ftprnx.ftprnx_id JOIN  sta2nets ON sta2nets.station_id=station.station_id JOIN network ON network.network_id=sta2nets.network_id WHERE network.network_name="%s" AND dataperiod.periodstart<"%s" AND dataperiod.periodstop>"%s";'%(w,dt.strftime('%Y-%m-%d'),dt.strftime('%Y-%m-%d'))
+        
+        cur.execute( QUERY )
+        
+        try:
+            SENTENCE = cur.fetchall()
+            for row in SENTENCE: station_info.append( row )
+        except:
+            vprint('[WARNING] No matching station name in database for \"%s\".'%s, 1, sys.stderr)
 
-  except:
-    try: db.close()
+except:
+    try:    db.close()
     except: pass
-    print >> sys.stderr, '***ERROR ! Cannot connect to database server.'
+    vprint('[ERROR] Cannot connect to database server.', 0, sys.stderr )
     exc_type, exc_value, exc_traceback = sys.exc_info ()
     lines = traceback.format_exception (exc_type, exc_value, exc_traceback)
-    print ''.join('!!#' + line for line in lines)
+    error_mes =  ''.join('!!#' + line for line in lines)
+    vprint ( error_mes, 0, sys.stderr )
     sys.exit(2)
 
-  ## Goodbye database
-  db.close()
+## Goodbye database
+db.close()
 
-  ##  All station specific information are stacked in the station_info array
-  ##  get the command to be executed for each (including variables, e.g. _YYYY_)
-  ##  and the list of the corresponding files to be saved.
-  commands = []
-  svfiles  = []
-  for row in station_info:
+##  All station specific information are stacked in the station_info array
+##  get the command to be executed for each (including variables, e.g. _YYYY_)
+##  and the list of the corresponding files to be saved.
+commands = []
+svfiles  = []
+for row in station_info:
     try:
-      cmd, svfl = setDownloadCommand(row, dt, None, outputdir, touppercase)
-      commands.append(cmd)
-      svfiles.append(svfl)
+        cmd, svfl = setDownloadCommand( row, dt, None, args.output_dir, touppercase )
+        commands.append( cmd )
+        svfiles.append( svfl )
     except ValueError as e:
-      print >> sys.stderr, e.message
+        print >> sys.stderr, e.message
 
-  ## Now, execute each command in the commands array to actually download
-  ## the data.
-  for cmd, sf in zip(commands, svfiles):
-    ## replace variables (_YYYY_, _DDD_ )
-    cmd = cmd.replace('_YYYY_', Year)
-    cmd = cmd.replace('_DDD_', DoY);
-    cmd = cmd.replace('_YY_', Cent);
+    ## Now, execute each command in the commands array to actually download
+    ## the data.
+    for cmd, sf in zip( commands, svfiles ):
+        ## replace variables (_YYYY_, _DDD_ )
+        cmd = cmd.replace('_YYYY_', Year)
+        cmd = cmd.replace('_DDD_', DoY)
+        cmd = cmd.replace('_YY_', Cent)
 
     ## Execute the command
     ## WAIT !! do not download the file if it already exists AND has
     ## size > 0. Or just delete!
-    if os.path.isfile(sf) and os.path.getsize(sf):
-      if forceRemove:
-        os.remove(sf)
-      else:
-         print '## File %s already exists. Skipping download.'%sf
+    if os.path.isfile( sf ) and os.path.getsize( sf ):
+        if forceRemove:
+            os.remove( sf )
+        else:
+            vprint('[DEBUG] File \"%s\" already exists. Skipping download.'%sf, 1, sys.stdout)
     else:
-      print 'Command = [%s], station=%s'%(cmd, sf)
-      try:
-        executeShellCmd(cmd)
-      except ValueError as e:
-        print >> sys.stderr, 'ERROR. Failed to download file: %s'%sf
+        vprint('[DEBUG] Command = \"%s\", station = \"%s\"'%(cmd, sf), 2, sys.stdout)
+        try:
+            executeShellCmd( cmd )
+        except ValueError as e:
+            vprint('[ERROR]. Failed to download file \"%s\"'%sf, 1, sys.stderr)
 
     ## check for empty file
-    if os.path.isfile(sf) and not os.path.getsize(sf):
-      print >> sys.stderr, '## Removing empty file: %s'%sf
-      os.remove(sf)
+    if os.path.isfile( sf ) and not os.path.getsize( sf ):
+        vprint('[DEBUG] Removing empty file \"%s\"'%sf, 2, sys.stderr)
+        os.remove( sf )
+        
+    if os.path.isfile( sf ):
+        ## if needed, check/repair the marker name
+        if args.rename_markers: subMarkerName( sf, row[1].upper() )
 
-#    ## If specified, uncompress the downloaded files
-#    if uncompressZ:
-#        for fl in svfiles:
-#            if os.path.isfile(fl) and (fl[-2:] == '.Z') :
-#                try:
-#                    UnixUncompress(fl)
-#                except:
-#                    print >> sys.stderr, 'ERROR. Failed to uncompress file:',fl
 
-  ## db.close()
-  sys.exit(0)
+sys.exit(0)

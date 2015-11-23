@@ -5,7 +5,7 @@
 year=${1}
 doy=${2}
 
-campaign=EPNDENS_BT
+campaign=EPNDENS1
 LOADGPS=/home/bpe/bern52/BERN52/GPS/EXE/LOADGPS.setvar
 . ${LOADGPS}
 P2C=${P}/${campaign}
@@ -31,6 +31,11 @@ if ! /home/bpe/autobpe/bin/snx2sta.sh \
   echo 1>&2 "ERROR. Failed to create a .sta file from the sinex file."
   exit 1
 fi
+echo "[DEBUG] snx2sta OK: Transformed the Sinex file:"
+echo "       \"ftp://epncb.oma.be/epncb/station/general/euref.snx\""
+echo "       to Station Information File \"EUREF.STA\""
+
+wget -O ${P2C}/STA/EUREF.STA -q ftp://epncb.oma.be/epncb/station/general/EUREF52.STA
 
 ##  By now, we should have a .STA file in out campaign's STA/
 ##+ folder, named EUREF.STA. Let's merge that file with the
@@ -45,6 +50,8 @@ if ! /home/bpe/autobpe/bin/stamrg.sh \
   echo 1>&2 "ERROR. Failed to merge the .sta files."
   exit 1
 fi
+echo "[DEBUG] stamrg OK: Merged the Station Information files:"
+echo "       \"EUREF.STA\" and \"NTUA52.STA\" to \"EPNDENS.STA\""
 
 ##  Nice! Now we have our `super-STA` in our campaign's STA/ dir, named as
 ##+ 'EPNDENS.STA'. Now we need a '.PCV' file ... 
@@ -60,10 +67,24 @@ if ! /home/bpe/autobpe/bin/atx2pcv.sh \
                       --antex=EUREF.ATX \
                       --sta=${P2C}/STA/EPNDENS \
                       --campaign=${campaign} \
-                      --phg-out=PCV_EPN.I08 \
-                      --verbose=2 \
+                      --phg-out=PCV_EPN \
+                      --verbose=0 \
                       --loadgps=${LOADGPS} ; then
   echo 1>&2 "ERROR. Failed to transform the atx to pcv."
   exit 1
 fi
+echo "[DEBUG] atx2pcv OK: Transformed the Antex file:"
+echo "        \"ftp://epncb.oma.be/epncb/station/general/epn_08.atx\""
+echo "        to Phase Centre Variation file \"PCV_EPN.I08\""
 
+##  Yeah! Now we have a complete PCV file, for all antennas in the 
+##+ 'EPNDENS.STA' file, which is linked to the GEN dir, i.e.
+##+ '${X}/GEN/PCV_EPN.I08'
+
+##  One last thing! Let's make a-priori coordinates for the EUREF sites
+if ! /home/bpe/autobpe/bin/make_euref_apr_crd.py --year=${year} \
+                      --doy=${doy} \
+                      --append-to-crd=/home/bpe/tables/crd/EUREF.CRD ; then
+  echo 1>&2 "ERROR. Failed to make a-priori coordinates for EUREF."
+  exit 1
+fi

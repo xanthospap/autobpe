@@ -292,7 +292,7 @@ if args.shell_script is not None:
     if year >= 2000 : yr2 = year - 2000
     else            : yr2 = year - 1900
     bpe_dir = os.path.join(campaign_dir, 'BPE')
-    log_proc= os.path.join(bpe_dir, 'BPE', 'AP%02i%03i%01i_001_000.LOG'%(yr2, doy, session))
+    log_proc= os.path.join(bpe_dir, 'AP%02i%03i%01i_001_000.LOG'%(yr2, doy, session))
     phg_out = os.path.join(campaign_dir, 'OUT', args.out_pcv_file + '.PHG')
     phg_gen = os.path.join(bv['X'], 'GEN', args.out_pcv_file + '.' + args.type_ext)
     with open( args.shell_script, 'w' ) as fout:
