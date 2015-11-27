@@ -4,6 +4,7 @@ NAME=ddprocess
 VERSION="0.90"
 REVISION="20"
 LAST_UPDATE="Oct 2015"
+START_DD=$(date +%s.%N)
 
 # //////////////////////////////////////////////////////////////////////////////
 # FUNCTIONS
@@ -246,28 +247,45 @@ save_n_update () {
  
   local src_f=${solution_id}${YEAR:2:2}${DOY_3C}0.${1} ## source file
   local trg_f=${solution_id}${YEAR:2:2}${DOY_3C}0${APND_SUFFIX}.${1} ## target
-  compress -f ${src_f} && ${src_f}=${src_f}.Z && ${trg_f}=${trg_f}.Z
+  local src_p=${P}/${CAMPAIGN}/${2}
+  compress -f ${src_p}/${src_f} \
+      && src_f="${src_f}.Z" \
+      && trg_f="${trg_f}.Z"
   local status=0
   local host=
+
+  if ! -f ${src_p}/${src_f} ; then
+    echoerr "[ERROR] File to save: \"${src_p}/${src_f}\" does not exist!"
+    return 1
+  fi
 
   ## try to save the product
   if ! test -z "${SAVE_DIR_HOST}" ; then
     host=${SAVE_DIR_HOST}
-    ftp -inv $SAVE_DIR_HOST << EOF
+    rm .ftp.log 2>/dev/null
+    ftp -inv $SAVE_DIR_HOST << EOF > .ftp.log
 user $SAVE_DIR_URN $SAVE_DIR_PSS
 cd ${SAVE_DIR_DIR}/${YEAR}/${DOY_3C}
-put ${P}/${CAMPAIGN}/${2}/${src_f}
+put ${src_p}/${src_f} ${trg_f}
+close
 bye
 EOF
-  status="$?"
+    if grep "226 Transfer complete" 1>/dev/null .ftp.log ; then
+      status=0
+    else
+      status=1
+    fi
   else
     host=${HOSTNAME}
-    cp ${P}/${CAMPAIGN}/${2}/${src_f} ${SAVE_DIR}/${YEAR}/${DOY_3C}/${trg_f}
+    cp ${src_p}/${src_f} ${SAVE_DIR}/${YEAR}/${DOY_3C}/${trg_f}
     status="$?"
   fi
 
   if test "${status}" -ne 0 ; then
     echoerr "[ERROR] Failed to save file: \"${src_f}\"."
+    if test -f .ftp.log ; then
+      echoerr "        Check the log file \".ftp.log\"."
+    fi
     return 1
   else
     echodbg "[DEBUG] File \"$src_f\" saved at \"${host}\" as"
@@ -757,14 +775,24 @@ if test -z "${SAVE_DIR_HOST}" ; then ##  using this host for saving
     fi
   fi
 else ##  need to see if we have access to host
-  if ! ftp -inv $SAVE_DIR_HOST << EOF
+  ftp -inv $SAVE_DIR_HOST <<EOF > .ftp.log
 user $SAVE_DIR_URN $SAVE_DIR_PSS
-cd ${SAVE_DIR_DIR}/${YEAR}/${DOY_3C}
+cd ${SAVE_DIR_DIR}
+mkdir ${YEAR}
+cd ${YEAR}
+mkdir ${DOY_3C}
+cd ${DOY_3C}
+close
 bye
 EOF
-  then
+  if grep 1>/dev/null \
+          -e "Name or service not known" \
+          -e "Login failed" \
+          -e "No such file or directory" \
+          -e "Not connected" \
+          .ftp.log ; then
     echoerr "[ERROR] Cannot connect to host \"${SAVE_DIR_HOST}\"."
-    echoerr "        Check the username and password."
+    echoerr "        Check the username and password or see the log file: \".ftp.log\"."
     exit 1
   fi
 fi
@@ -1058,6 +1086,7 @@ printf "\n},\n"
 ##  Lastly, copy and uncompress (.Z && crx2rnx) the files in the campaign
 ##+ directory /RAW.
 ## ////////////////////////////////////////////////////////////////////////////
+START_RD=$(date +%s.%N)
 
 >.rnxsta.dat ## temporary file
 tmp_file_array+=('.rnxsta.dat')
@@ -1175,6 +1204,8 @@ done
 for sta in "${STA_ARRAY[@]}"; do echo $sta >> .station-names.dat; done
 tmp_file_array+=('.station-names.dat')
 
+STOP_RD=$(date +%s.%N)
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD IONOSPHERIC MODEL FILE
 ##  ---------------------------------------------------------------------------
@@ -1182,6 +1213,7 @@ tmp_file_array+=('.station-names.dat')
 ##  TODO :: mysql ...
 ##  If such a file does not exist, download CODE's ionospheric file.
 ## ////////////////////////////////////////////////////////////////////////////
+START_PD=$(date +%s.%N)
 printf 1>>${JSON_OUT} "\n\"products\":{"
 
 ION_DOWNLOADED=0
@@ -1311,6 +1343,8 @@ cat .vmf1.json 1>>${JSON_OUT} 2>/dev/null
 tmp_file_array+=(".vmf1.json")
 
 printf 1>>${JSON_OUT} "\n}," ## done with products
+
+STOP_PD=$(date +%s.%N)
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  MAKE THE CLUSTER FILE
@@ -1461,6 +1495,7 @@ fi
 ##  ---------------------------------------------------------------------------
 ##  Call the perl script which ignites the BPE via the PCF :)
 ## ////////////////////////////////////////////////////////////////////////////
+START_BP=$(date +%s.%N)
 BERN_TASK_ID="${CAMPAIGN:0:1}DD"
 
 ##  run the perl script to ignite the PCF
@@ -1480,6 +1515,7 @@ if ! check_bpe_run \
 else
   :
 fi
+STOP_BP=$(date +%s.%N)
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  COPY PRODUCTS TO HOST; UPDATE DATABASE ENTRIES
@@ -1633,5 +1669,18 @@ fi
 
 printf 1>>${JSON_OUT} "\n}"
 
+STOP_DD=$(date +%s.%N)
+
+
+##  PRINT TIME INFO
+
+DD_RT=$(echo "$START_DD - $STOP_DD" | bc)
+RD_RT=$(echo "$START_RD - $STOP_RD" | bc)
+PD_RT=$(echo "$START_PD - $STOP_PD" | bc)
+BP_RT=$(echo "$START_BP - $STOP_BP" | bc)
+echodbg "[DEBUG] Total running time                : $DD_RT"
+echodbg "[DEBUG] Rinex download and manipulation   : $RD_RT"
+echodbg "[DEBUG] Products download and manipulation: $PD_RT"
+echodbg "[DEBUG] Bernese processing                : $BP_RT"
 
 exit 0

@@ -127,10 +127,10 @@ USE_EPN_EXCLUDE_LIST = YES
 ##  Warning: The saved products will actually be placed **not** in the folder 
 ##+ 'SAVE_DIR_DIR' but in ${SAVE_DIR_DIR}/YYYY/DDD
 ##
-SAVE_DIR_HOST =
-SAVE_DIR_DIR  =
-SAVE_DIR_URN  = anonymous
-SAVE_DIR_PSS  = dso@ntua
+SAVE_DIR_HOST = 147.102.110.215
+SAVE_DIR_DIR  = pub/gnss/products
+SAVE_DIR_URN  = mitsos
+SAVE_DIR_PSS  = mitsos1985
 
 ##  Set this variable to 'YES' if you do not want to delete the files
 ##+ created at the campaign's directories during the ddprocess run.
