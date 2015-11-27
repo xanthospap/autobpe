@@ -47,9 +47,9 @@ HOST_NAME   = '147.102.110.73'
 USER_NAME   = 'hypatia'
 PASSWORD    = 'ypat;ia'
 DB_NAME     = 'procsta'
-touppercase = False
-uncompressZ = False
-forceRemove = False
+#touppercase = False
+#uncompressZ = False
+#forceRemove = False
 
 # a dictionary to hold start time (hours) for every session character
 ses_identifiers = {
@@ -333,10 +333,19 @@ parser.add_argument('-v', '--verbosity',
 ##  rename marker
 parser.add_argument('-r', '--marker-rename',
     action   = 'store_true',
-    help     = 'If this flaf is set, then every downloaded rinex will be instpected'
+    help     = 'If this flag is set, then every downloaded rinex will be instpected'
     'for the \'MARKER NAME\' field. If it is different from the DSO name, then'
     'it will be altered.',
     dest     = 'rename_markers'
+    )
+## force remove any previous rinex that match the one (to be) downloaded 
+parser.add_argument('--force-remove',
+    action   = 'store_true',
+    help     = 'If this flag is set, then before every download the script will'
+    'search for a matching RINEX file in the given path; e.g. for station \'DYNG\''
+    'it will search for \'dyngddds0.yyd.Z\', \'dyngddds0.yyd\', \'dyngddds0.yyo\''
+    ' and if found, they will be removed.',
+    dest     = 'force_remove'
     )
 
 ##  Parse command line arguments
@@ -436,7 +445,7 @@ commands = []
 svfiles  = []
 for row in station_info:
     try:
-        cmd, svfl = setDownloadCommand( row, dt, None, args.output_dir, touppercase )
+        cmd, svfl = setDownloadCommand( row, dt, None, args.output_dir, False )
         commands.append( cmd )
         svfiles.append( svfl )
     except ValueError as e:
@@ -453,12 +462,25 @@ for row in station_info:
     ## Execute the command
     ## WAIT !! do not download the file if it already exists AND has
     ## size > 0. Or just delete!
-    if os.path.isfile( sf ) and os.path.getsize( sf ):
-        if forceRemove:
-            os.remove( sf )
-        else:
-            vprint('[DEBUG] File \"%s\" already exists. Skipping download.'%sf, 1, sys.stdout)
-    else:
+    rinex_already_exists = False
+    possible_duplicates = [ 
+                sf, 
+                sf.replace('.Z', ''  ), 
+                sf.replace('d.Z', 'd'),
+                sf.replace('d.Z', 'o')
+                ]
+    for pd in possible_duplicates : 
+        if os.path.isfile( pd ) and os.path.getsize( pd ):
+            if args.force_remove:
+                vprint ('[DEBUG] Removing rinex file \'%s\'.'%pd, 1, sys.stdout)
+                os.remove( pd )
+            else:
+                vprint('[DEBUG] File \"%s\" already exists. Skipping download.'%sf, 1, sys.stdout)
+                rinex_already_exists = True
+                sf = pd
+            break
+    
+    if not rinex_already_exists :
         vprint('[DEBUG] Command = \"%s\", station = \"%s\"'%(cmd, sf), 2, sys.stdout)
         try:
             executeShellCmd( cmd )
@@ -473,6 +495,5 @@ for row in station_info:
     if os.path.isfile( sf ):
         ## if needed, check/repair the marker name
         if args.rename_markers: subMarkerName( sf, row[1].upper() )
-
 
 sys.exit(0)

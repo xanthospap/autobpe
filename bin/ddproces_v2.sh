@@ -651,79 +651,85 @@ fi
 
 ##  year must be set
 if test -z ${YEAR+x}; then
-  echoerr "ERROR. Year must be set!"
+  echoerr "[ERROR] Year must be set!"
   exit 1
 fi
 
 ##  doy must be set
 if test -z ${DOY+x}; then
-  echoerr "ERROR. Day of year must be set!"
+  echoerr "[ERROR] Day of year must be set!"
   exit 1
 else
   DOY=$(echo "${DOY}" | sed 's|^0*||g')
    DOY_3C=$( printf "%03i\n" $DOY )
 fi
 if test "${#DOY_3C}" -ne 3; then
-  echoerr "ERROR. Something funny happened with doy ..."
+  echoerr "[ERROR] Something funny happened with doy ..."
   exit 1
 fi
 
 if test -z ${ELEVATION_ANGLE+x}; then ELEVATION_ANGLE=3 ; fi
 if ! [[ $ELEVATION_ANGLE =~ ^[0-9]+$ ]]; then
-  echoerr "ERROR. Elevation angle must be a positive integer!"
+  echoerr "[ERROR] Elevation angle must be a positive integer!"
+  exit 1
+fi
+
+SAT_SYS="${SAT_SYS^^}"
+if test ${SAT_SYS} != "GPS" && test ${SAT_SYS} != "MIXED" ; then
+  echoerr "[ERROR] Invalid satellite system : ${SAT_SYS}"
   exit 1
 fi
 
 ##  bernese-variable file must be set; if it is, check that it exists 
 ##+ and source it.
 if test -z ${B_LOADGPS+x}; then
-  echoerr "ERROR. LOADGPS.setvar must be set!"
+  echoerr "[ERROR] LOADGPS.setvar must be set!"
   exit 1
 else
   if test -f ${B_LOADGPS} && . ${B_LOADGPS} ; then
     if test "${VERSION}" != "52"; then
-      echoerr "ERROR. Invalid Bernese version: ${VERSION}"
+      echoerr "[ERROR] Invalid Bernese version: ${VERSION}"
       exit 1
     fi
   else
-    echoerr "ERROR. Failed to load variable file: ${B_LOADGPS}"
+    echoerr "[ERROR] Failed to load variable file: ${B_LOADGPS}"
     exit 1
   fi
 fi
 
 ##  campaign must exist in campaign directory
 if test -z ${CAMPAIGN+x}; then
-  echoerr "ERROR. Campaign must be set!"
+  echoerr "[ERROR] Campaign must be set!"
   exit 1
 else
   CAMPAIGN=${CAMPAIGN^^}
   if ! test -d "${P}/${CAMPAIGN}"; then
-    echoerr "ERROR. Cannot find campaign directory: ${P}/${CAMPAIGN}"
+    echoerr "[ERROR] Cannot find campaign directory: ${P}/${CAMPAIGN}"
     exit 1
   fi
 fi
 
 ##  check the tables dir and its entries
 if ! test -d "${TABLES_DIR}" ; then
-  echoerr "ERROR. Cannot find tables directory: $TABLES_DIR"
+  echoerr "[ERROR] Cannot find tables directory: $TABLES_DIR"
   exit 1
 fi
 
 ##  solution id must be set
 if test -z ${SOLUTION_ID+x}; then
-  echoerr "ERROR. Solution identifier must be set!"
+  echoerr "[ERROR] Solution identifier must be set!"
   exit 1
 fi
 
 ##  save directoy must be set; if it doesn't exist, try to create it
 if test -z ${SAVE_DIR+x}; then
-  echoerr "ERROR. Save directory must be set!"
+  echoerr "[ERROR] Save directory must be set!"
   exit 1
 else
   SAVE_DIR="${SAVE_DIR%/}"
   if ! test -d ${SAVE_DIR}; then
     if ! mkdir -p ${SAVE_DIR}; then
-      echoerr "ERROR. Failed to create directory ${SAVE_DIR}"
+      echoerr "[ERROR] Failed to create directory ${SAVE_DIR}"
       exit 1
     fi
   fi
@@ -733,11 +739,11 @@ fi
 ##  cannot have both repro2 and repro13
 if test "${COD_REPRO13}" == "YES" ; then
   if test "${USE_REPRO2}" == "YES" ; then
-    echoerr "ERROR. CAnnot have both repro2 and code's repro13."
+    echoerr "[ERROR] CAnnot have both repro2 and code's repro13."
     exit 1
   fi
   if test "${AC^^}" != "COD"; then
-    echoerr "ERROR. repro13 products only available from CODE"
+    echoerr "[ERROR] repro13 products only available from CODE"
     exit 1
   fi
 fi
@@ -907,7 +913,7 @@ if [ ! -z "${PCVINF+x}" ] && [ ! -z "${ATXINF+x}" ] ; then
                   --pcv="${PCV_FILE}"
                   --phg-out="PCV_${CAMPAIGN:0:3}" \
                   --loadgps="${B_LOADGPS}" ; then
-    echoerr "ERROR. Failed to make the PCV file!"
+    echoerr "[ERROR] Failed to make the PCV file!"
     exit 1
   else
     PCVINF=PCV_${CAMPAIGN:0:3}
@@ -979,12 +985,12 @@ fi
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
 if ! START_OF_DAY_STR=$(ydoy2dt "${YEAR}" "${DOY_3C}") ; then
-  echoerr "ERROR. Failed to parse date"
+  echoerr "[ERROR] Failed to parse date."
   exit 1
 fi
 
 if ! END_OF_DAY_STR=$(ydoy2dt "${YEAR}" "${DOY_3C}" "23" "59" "30") ; then
-  echoerr "ERROR. Failed to parse date"
+  echoerr "[ERROR] Failed to parse date."
   exit 1
 fi
 
@@ -1030,9 +1036,9 @@ if ! rnxdwnl.py \
               --doy=${DOY} \
               --path=${D} \
               --marker-rename \
-              -v 2 \
+              -v "${DEBUG_MODE}" \
               1>&2; then
-  echoerr "ERROR. Failed to download RINEX files -> [rnxdwnl.py]"
+  echoerr "[ERROR] Failed to download RINEX files."
   exit 1
 fi
 
@@ -1069,7 +1075,7 @@ if ! validate_ntwrnx.py \
             --rinex-path="${D}" \
             --exclude-file="${X_STA_FL}" \
             1> .rnxsta.dat; then
-  echoerr "ERROR. Failed to compile rinex/station summary -> [validate_ntwrnx.py]"
+  echoerr "[ERROR] Failed to compile rinex/station summary."
   exit 1
 fi
 
@@ -1088,7 +1094,7 @@ MAX_NET_STA=$(cat .rnxsta.dat | tail -n+2 | wc -l)
 if [[ $MAX_NET_STA -lt 0 \
       || ${#STA_ARRAY[@]} -ne ${#RNX_ARRAY[@]} \
       || ! -f .rnxsta.dat ]]; then
-  echoerr "ERROR! Error in handling rinex files/station names!"
+  echoerr "[ERROR] Error in handling rinex files/station names."
   exit 1
 fi
 
@@ -1124,7 +1130,7 @@ for i in "${RNX_ARRAY[@]}"; do
   then
     :
   else
-    echoerr "ERROR. Failed to manipulate rinex file ${RNX}"
+    echoerr "[ERROR] Failed to manipulate rinex file \"${RNX}\"."
     exit 1
   fi
 done
@@ -1134,16 +1140,6 @@ done
 >.station-names.dat
 for sta in "${STA_ARRAY[@]}"; do echo $sta >> .station-names.dat; done
 tmp_file_array+=('.station-names.dat')
-
-## ////////////////////////////////////////////////////////////////////////////
-##  REPORT ..
-## ////////////////////////////////////////////////////////////////////////////
-#{
-#printf "<p>Number of stations available: %s/%s</p>\n" \
-#        "${#STA_ARRAY[@]}" "${MAX_NET_STA}"
-#printf "<p>Number of reference stations: %s</p>\n" \
-#        "${#REF_STA_ARRAY[@]}"
-#} 1>>${JSON_OUT}
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD IONOSPHERIC MODEL FILE
@@ -1193,8 +1189,6 @@ fi
 ##+ the following will download the best possible products; for more info, see
 ##+ the bernutils module documentation.
 ## ////////////////////////////////////////////////////////////////////////////
-if test 1 -eq 1 ;  then
-
 if test "$USE_REPRO2" == "YES" ; then
   add_option="--use-repro2"
 fi
@@ -1212,7 +1206,7 @@ if test ${ION_DOWNLOADED} -eq 1; then
           --destination="${P}/${CAMPAIGN}/ORB" \
           --satellite-system="${SAT_SYS}" \
           --report=json; then
-    echoerr "ERROR. Failed to download/copy/uncompress products."
+    echoerr "[ERROR] Failed to download/copy/uncompress products."
     exit 1
   fi
 else
@@ -1225,11 +1219,11 @@ else
           --satellite-system="${SAT_SYS}" \
           --download-ion \
           --report=json; then
-    echoerr "ERROR. Failed to download/copy/uncompress products."
+    echoerr "[ERROR] Failed to download/copy/uncompress products."
     exit 1
   fi
 fi
-fi
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD VMF1 GRID
 ##  ---------------------------------------------------------------------------
@@ -1244,15 +1238,20 @@ fi
 TMP_FL=.vmf1-${YEAR}${DOY}.dat
 tmp_file_array+=("${TMP_FL}")
 
-if ! getvmf1.py --year=${YEAR} --doy=${DOY} --outdir=${D} --json=".vmf1.json" 1>${TMP_FL}; then
-  echoerr "ERROR. Failed to get VMF1 grid file(s)"
+if ! getvmf1.py \
+            --year=${YEAR} \
+            --doy=${DOY} \
+            --outdir=${D} \
+            --json=".vmf1.json" \
+            1>${TMP_FL}; then
+  echoerr "[ERROR] Failed to get VMF1 grid file(s)."
   exit 1
 fi
 
 ##  grid files are downloaded to ${D} as individual files; merge them and move
 ##+ to /GRID
 if ! mapfile -t VMF_FL_ARRAY < <(filter_local_vmf1.awk ${TMP_FL}) ; then
-  echoerr "ERROR. Failed to merge VMF1 grid file(s)"
+  echoerr "[ERROR] Failed to merge VMF1 grid file(s)."
   exit 1
 else
   MERGED_VMF_FILE=${P}/${CAMPAIGN}/GRD/VMF${YEAR:2:2}${DOY_3C}0.GRD
@@ -1332,18 +1331,18 @@ FINAL_SOLUTION_ID="${SOLUTION_ID}"
 
 ##  Preliminary (ambiguity-float) results
 if test "${FINAL_SOLUTION_ID:(-1)}" == "P"; then
-  echoerr -n "WARNING. Last char of final solution is 'P'."
+  echoerr "[WARNING] Last char of final solution is 'P'."
   PRELIM_SOLUTION_ID="${SOLUTION_ID%?}P1"
-  echoerr "Truncating Preliminary to $PRELIM_SOLUTION_ID"
+  echoerr "          Truncating Preliminary to \"$PRELIM_SOLUTION_ID\"."
 else
   PRELIM_SOLUTION_ID="${SOLUTION_ID%?}P"
 fi
 
 ##  Size-reduced NEQ information
 if test "${FINAL_SOLUTION_ID:(-1)}" == "R"; then
-  echoerr -n "WARNING. Last char of final solution is 'R'."
+  echoerr "[WARNING] Last char of final solution is 'R'."
   REDUCED_SOLUTION_ID="${SOLUTION_ID%?}R1"
-  echoerr "Truncating Size-reduced to $REDUCED_SOLUTION_ID"
+  echoerr "          Truncating Size-reduced to \"$REDUCED_SOLUTION_ID\"."
 else
   REDUCED_SOLUTION_ID="${SOLUTION_ID%?}R"
 fi
@@ -1369,7 +1368,7 @@ else
 fi
 
 if ! test -f ${U}/PCF/${PCF_FILE}; then
-  echoerr "ERROR. Invalid pcf file ${U}/PCF/${PCF_FILE}"
+  echoerr "[ERROR] Invalid pcf file \"${U}/PCF/${PCF_FILE}\"."
   exit 1
 fi
 
@@ -1388,7 +1387,7 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" 1>>${JSON_OUT} \
         ELANG="${ELEVATION_ANGLE}" \
         FIXINF="${FIXINF}"\
         CLU="${FILES_PER_CLUSTER}"; then
-  echoerr "ERROR. Failed to set variables in PCF file."
+  echoerr "[ERROR] Failed to set variables in PCF file."
   exit 1
 fi
 
@@ -1419,7 +1418,7 @@ fi
 if ! awk -v FLAG=R -v REPLACE_ALL=NO -f \
         ${P2ETC}/change_crd_flags.awk ${TABLES_DIR}/crd/${CAMPAIGN}.CRD \
         1>${P}/${CAMPAIGN}/STA/REG${YEAR:2:2}${DOY_3C}0.CRD; then
-  echoerr "ERROR. Could not create a-priori coordinate file."
+  echoerr "[ERROR] Could not create a-priori coordinate file."
   exit 1
 fi
 
@@ -1442,7 +1441,7 @@ if ! check_bpe_run \
       ${P}/${CAMPAIGN}/BPE \
       "${CAMPAIGN:0:3}_${BERN_TASK_ID}.RUN" \
       "${CAMPAIGN:0:3}_${BERN_TASK_ID}.OUT" ; then
-  echoerr "[ERRO]. Fatal, processing stoped."
+  echoerr "[ERROR]. Fatal, processing stoped."
   exit 1
 else
   :
@@ -1464,9 +1463,9 @@ fi
 
 ##  create the directory ${SAVE_DIR}/YYYY/DDD (if it doesn't exist)
 if ! test -d "${SAVE_DIR}/${YEAR}/${DOY_3C}"; then
-  echo "Creating solution directory ${SAVE_DIR}/${YEAR}/${DOY_3C}/"
+  echodbg "[DEBUG] Creating solution directory \"${SAVE_DIR}/${YEAR}/${DOY_3C}/\"."
   if ! mkdir -p "${SAVE_DIR}/${YEAR}/${DOY_3C}"; then
-    echoerr "ERROR. Failed to create directory ${SAVE_DIR}/${YEAR}/${DOY_3C}/"
+    echoerr "[ERROR] Failed to create directory \"${SAVE_DIR}/${YEAR}/${DOY_3C}/\"."
     exit 1
   fi
 fi
@@ -1522,7 +1521,7 @@ find ${P}/${CAMPAIGN}/OUT/*${YEAR}${DOY_3C}0.ERR -not -empty -ls -exec \
 ##  warnings to json ..
 if test -s ${WRN_FILE} ; then
   if ! wrn2json.py ${WRN_FILE} 1>>${JSON_OUT} 2>/dev/null ; then
-    echoerr "ERROR. Failed to create json warning file!"
+    echoerr "[ERROR] Failed to create json warning file!"
     exit 1
   fi
 else
@@ -1542,11 +1541,15 @@ try:
   ambf = bernutils.bamb.AmbFile( "${AMBSM}" )
   ambf.toJson()
 except:
-  print>>sys.stderr,'ERROR. Cannot translate amb file to json!'
+  print>>sys.stderr,'[ERROR] Cannot translate amb file to json!'
   sys.exit(1)
 sys.exit(0)
 END
-if test "$?" -ne 0 ; then exit 1 ; fi
+if test "$?" -ne 0 ; then
+  echoerr "[ERROR] Failed to translate ambiguity summary file \"$AMBSM\""
+  echoerr "        to json format."
+  exit 1 
+fi
 
 ##  the final ADDNEQ summary file should be
 ADNQ=${P}/${CAMPAIGN}/OUT/${FINAL_SOLUTION_ID}${YEAR:2:2}${DOY_3C}0.OUT
@@ -1559,12 +1562,13 @@ try:
   adnf = bernutils.badnq.AddneqFile( "${ADNQ}" )
   adnf.toJson()
 except:
-  print>>sys.stderr,'ERROR. Cannot translate addneq file to json!'
+  print>>sys.stderr,'[ERROR] Cannot translate addneq file to json!'
   sys.exit(1)
 sys.exit(0)
 END
 if test "$?" -ne 0 ; then
-  echoerr "ERROR. Cannot translate addneq file to json!"
+  echoerr "[ERROR] Cannot translate ADDNEQ2 output file \"${ADNQ}\""
+  echoerr "        to json format!"
   exit 1
 fi
 
@@ -1578,7 +1582,7 @@ if test "${SKIP_REMOVE}" != "YES" ; then
 ##  we are going to remove any file in the campaign-specific folders, newer
 ##+ than .ddprocess-time-stamp (i.e. the stamp file), except from symlinks.
   if ! test -f ${TIME_STAMP_FILE} ; then
-    echoerr "[WARNING] Removing nothing cause file ${TIME_STAMP_FILE} is missing"
+    echoerr "[WARNING] Removing nothing cause file \"${TIME_STAMP_FILE}\" is missing."
   else
     b_wrnfile=$(basename ${WRN_FILE})
     find -P ${P}/${CAMPAIGN}/* \
@@ -1591,8 +1595,10 @@ if test "${SKIP_REMOVE}" != "YES" ; then
           -exec rm -rf {} \;
   fi
 else
-  echodbg "[DEBUG] Removing of file skiped!"
+  echodbg "[DEBUG] Removing of campaign files skiped!"
 fi
 
 printf 1>>${JSON_OUT} "\n}"
+
+
 exit 0

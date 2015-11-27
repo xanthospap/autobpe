@@ -118,4 +118,8 @@ PCVEXT = I08
 ##+ out (exclude from procssesing) the listed stations.
 USE_EPN_EXCLUDE_LIST = YES
 
+##  Set this variable to 'YES' if you do not want to delete the files
+##+ created at the campaign's directories during the ddprocess run.
+SKIP_REMOVE = NO
+
 ##  END OF CONFIG FILE
