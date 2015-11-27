@@ -135,7 +135,7 @@ Switches: -a --analysis-center= specify the analysis center; this can be e.g.
 
           --cod-repro13 Use CODE's REPRO2013 results.
 
-          --no-atl Do not use an .ATL correction file.
+          --atl-file Specify the ATL correction file.
 
           --antex= Specify an antex file to transform to a PCV
 
@@ -153,27 +153,6 @@ Switches: -a --analysis-center= specify the analysis center; this can be e.g.
 
           -v --version display version and exit
 /******************************************************************************/"
-}
-
-## validate entries in the TABLES_DIR directory
-## argv1 -> TABLES_DIR
-## argv2 -> CAMPAIGN NAME
-check_tables () {
-  for f in ${1}/pcv/${2} \
-           ${1}/blq/${2}.BLQ \
-           ${1}/atl/${2}.ATL \
-           ${1}/crd/${2}.CRD \
-           ${1}/atl/${2}.STA; do
-    if ! test -f $f ; then
-      echoerr "Missing file: $f"
-      ## return 1
-    #else
-    #  bfn=$(basename $f)
-    #  ln -sf ${f} ${P}/STA/${bfn}
-    fi
-  done
-
-  return 0
 }
 
 ##  year - doy to datetime in format '%Y-%m-%d %H-%M-%S'
@@ -343,13 +322,11 @@ ELEVATION_ANGLE=3
 PCF_FILE=NTUA_DDP.PCF
 USE_REPRO2=NO
 COD_REPRO13=NO
-USE_ATL=YES
 
 ## pcv and antex related variables ##
-MAKE_PCV=NO
 PCV_EXT=I08
-PCVINF=       ##  will be set (later) to the filename of the PCV to be used
-# PCV_FILE
+# PCVINF=
+# ATXINF=
 
 ## station information file ##
 ## STAINF=                  ##  the filename (no path, no extension); unset
@@ -360,8 +337,10 @@ STAINF_EXT="STA"            ##  the extension
 FIXINF=IGB08
 
 ## blq file
-# BLQ_FILE=
-BLQINF=
+# BLQINF=
+
+## atl file
+# ATLINF=
 
 ##  exclude file/stations
 # STA_EXCLUDE_FILE=
@@ -384,6 +363,9 @@ DB_DBNAME="procsta"
 PATH=${PATH}:${HOME}/autobpe/bin
 PATH=${PATH}:${HOME}/autobpe/bin/etc
 P2ETC=${HOME}/autobpe/bin/etc
+
+##  The config file (if any)
+# CONFIG=
 
 ##  an array to hold the filenames of all temporary files created
 ##+ by this script
@@ -418,7 +400,7 @@ getopt -T > /dev/null ## check getopt version
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
   ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e:a:p: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,no-atl,antex:,pcv-file:,stainf:,use-epn-exclude,exclude-list:,skip-remove,fix-file:,blq-file: \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,atl-file:,antex:,pcv-file:,stainf:,use-epn-exclude,exclude-list:,skip-remove,fix-file:,blq-file:,config: \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -523,10 +505,6 @@ do
       ;;
     -e|--elevation-angle)
       ELEVATION_ANGLE="${2}"
-      if ! [[ $ELEVATION_ANGLE =~ ^[0-9]+$ ]]; then
-        echoerr "ERROR. Elevation angle must be a positive integer!"
-        exit 1
-      fi
       printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
@@ -548,9 +526,10 @@ do
       printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       COD_REPRO13=YES
       ;;
-    --no-atl)
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
-      USE_ATL=NO
+    --atl-file)
+      ATLINF="${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      shift
       ;;
     -y|--year)
       YEAR="${2}"
@@ -558,7 +537,7 @@ do
       shift
       ;;
     --antex)
-      MAKE_PCV="${2}"
+      ATXINF="${2}"
       printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
@@ -568,7 +547,7 @@ do
       shift
       ;;
     -p|--pcv-file)
-      PCV_FILE="${2}"
+      PCVINF="${2}"
       printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
@@ -578,7 +557,7 @@ do
       shift
       ;;
     --blq-file)
-      BLQ_FILE="${2}"
+      BLQINF="${2}"
       printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
@@ -604,6 +583,11 @@ do
       printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
+    --config)
+      CONFIG_FILE="${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      shift
+      ;;
     --) # end of options
       printf 1>>${JSON_OUT} "\n],\n"
       shift
@@ -619,6 +603,11 @@ do
   if test "${#}" -gt 1 ; then printf 1>>${JSON_OUT} "," ; fi
 done
 
+##  Source the config file if any
+if ! test -z "${CONFIG_FILE+x}" ; then
+  eval $(etc/source_dd_config.sh $CONFIG_FILE)
+  echodbg "[DEBUG] Read config file \"${CONFIG_FILE}\"."
+fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  LOGFILE, STDERR & STDOUT
@@ -670,9 +659,18 @@ fi
 if test -z ${DOY+x}; then
   echoerr "ERROR. Day of year must be set!"
   exit 1
+else
+  DOY=$(echo "${DOY}" | sed 's|^0*||g')
+   DOY_3C=$( printf "%03i\n" $DOY )
 fi
 if test "${#DOY_3C}" -ne 3; then
   echoerr "ERROR. Something funny happened with doy ..."
+  exit 1
+fi
+
+if test -z ${ELEVATION_ANGLE+x}; then ELEVATION_ANGLE=3 ; fi
+if ! [[ $ELEVATION_ANGLE =~ ^[0-9]+$ ]]; then
+  echoerr "ERROR. Elevation angle must be a positive integer!"
   exit 1
 fi
 
@@ -709,10 +707,6 @@ fi
 if ! test -d "${TABLES_DIR}" ; then
   echoerr "ERROR. Cannot find tables directory: $TABLES_DIR"
   exit 1
-else
-  if ! check_tables ${TABLES_DIR} ${CAMPAIGN}; then
-    exit 1
-  fi
 fi
 
 ##  solution id must be set
@@ -755,8 +749,8 @@ fi
 ##                                                                           ##
 ## ------------------------------------------------------------------------- ##
 if [ -z ${STAINF+x} ]; then
-  echodbg "[DEBUG] Station information file not specified; 
-          seting it to \"$CAMPAIGN\""
+  echodbg "[DEBUG] Station information file not specified"
+  echodbg "        seting it to \"${CAMPAIGN}\"."
   STAINF="${CAMPAIGN}"
 fi
 
@@ -780,44 +774,77 @@ echodbg "[DEBUG] Using the the station information file \"${P}/STA/${STAINF}.${S
 
 ## ------------------------------------------------------------------------- ##
 ##                                                                           ##
-##  Validate the blq file: see that it exists, and copy it                   ##
-##+ from tables directory (or wherever it is) to the the campaign's sta      ##
-##+ dir.                                                                     ##
+##  Validate the blq file                                                    ##
 ##                                                                           ##
 ## ------------------------------------------------------------------------- ##
-if [ -z ${BLQ_FILE+x} ] ; then
-  BLQ_FILE=${CAMPAIGN}
-fi
-
-if ! test -f ${TABLES_DIR}/blq/${BLQ_FILE}.BLQ ; then
-  if ! test -f ${P}/${CAMPAIGN}/STA/${BLQ_FILE}.BLQ ; then
-    echoerr "[ERROR] Cannot find the blq file \'${BLQ_FILE}.BLQ\'."
-    echoerr "        It is neither locate in \'${TABLES}/blq\' nor in \'${P}/${CAMPAIGN}/STA\'."
-    exit 1
-  else
-    BLQINF=${BLQ_FILE}
-  fi
+if [ -z "${BLQINF+x}" ] || [ "${BLQINF}" == "" ]; then
+  echodbg "[DEBUG] Not using a BLQ file."
+  BLQINF=
 else
-  if ! ln -sf ${TABLES_DIR}/blq/${BLQ_FILE}.BLQ ${P}/${CAMPAIGN}/STA/${BLQ_FILE}.BLQ ; then
-    echoerr "[ERROR] Failed to link the blq file \'${TABLES_DIR}/blq/${BLQ_FILE}.BLQ\'."
-    exit 1
+  if test -f ${P}/${CAMPAIGN}/STA/${BLQINF}.BLQ ; then
+    echodbg "[DEBUG] Using BLQ file: \"${P}/${CAMPAIGN}/STA/${BLQINF}.BLQ\"."
+  else
+    if test -f ${TABLES_DIR}/blq/${BLQINF}.BLQ ; then
+      blq_src=${TABLES_DIR}/blq/${BLQINF}.BLQ
+      blq_trg=${P}/${CAMPAIGN}/STA/${BLQINF}.BLQ
+      if ! ln -sf ${blq_src} ${blq_trg} ; then
+        echoerr "[ERROR] Failed to link the BLQ file."
+        echoerr "        Link failed \"${blq_src}\" -> \"${blq_trg}\"."
+        echoerr "        Processing stoped."
+        exit 1
+      else
+        echodbg "[DEBUG] Using BLQ file: \"${blq_src}\"."
+      fi
+    else
+      echoerr "[ERROR] Cannot find the specified BLQ file: \"${BLQINF}\"."
+      echoerr "        Processing stoped."
+      exit 1
+    fi
   fi
-  BLQINF=${BLQ_FILE}
 fi
 
 ## ------------------------------------------------------------------------- ##
 ##                                                                           ##
-##  Validate the fix file: see that it exists, and copy it                   ##
-##+ from tables directory (or wherever it is) to the the campaign's sta      ##
-##+ dir.                                                                     ##
+##  Validate the atl file                                                    ##
+##                                                                           ##
+## ------------------------------------------------------------------------- ##
+if [ -z "${ATLINF+x}" ] || [ "${ATLINF}" == "" ] ; then
+  echodbg "[DEBUG] Not using an ATL file."
+  ATLINF=
+else
+  if test -f ${P}/${CAMPAIGN}/STA/${ATLINF}.ATL ; then
+    echodbg "[DEBUG] Using ATL file: \"${P}/${CAMPAIGN}/STA/${ATLINF}.ATL\"."
+  else
+    if test -f ${TABLES_DIR}/atl/${ATLINF}.ATL ; then
+      src_atl=${TABLES_DIR}/atl/${ATLINF}.ATL
+      trg_atl=${P}/${CAMPAIGN}/STA/${ATLINF}.ATL
+      if ! ln -sf ${src_atl} ${trg_atl} ; then
+        echoerr "[ERROR] Failed to link the ATL file ."
+        echoerr "        Link failed \"${src_atl}\" -> \"${trg_atl}\" ."
+        echoerr "        Processing stoped."
+        exit 1
+      else
+        echodbg "[DEBUG] Using ATL file: \"${src_atl}\" ."
+      fi
+    else
+      echoerr "[ERROR] Cannot find the specified ATL file: \"${ATLINF}\" ."
+      echoerr "        Processing stoped."
+      exit 1
+    fi
+  fi
+fi
+
+## ------------------------------------------------------------------------- ##
+##                                                                           ##
+##  Validate the fix file.                                                   ##
 ##  Note that we need the actaul fix file to be later used by validate_ntw   ##
 ##+ Let's name that FIX_FILE                                                 ##
 ##                                                                           ##
 ## ------------------------------------------------------------------------- ##
 if ! test -f ${TABLES_DIR}/fix/${FIXINF}.FIX ; then
   if ! test -f ${P}/${CAMPAIGN}/STA/${FIXINF}.FIX ; then
-    echoerr "[ERROR] Cannot find the fix file \'\'${FIXINF}.FIX\'"
-    echoerr "        It is neither in \'\'${TABLES_DIR}/fix\' nor in \'${P}/${CAMPAIGN}/STA\'."
+    echoerr "[ERROR] Cannot find the fix file \'${FIXINF}.FIX\'"
+    echoerr "        It is neither in \'${TABLES_DIR}/fix\' nor in \'${P}/${CAMPAIGN}/STA\'."
     exit 1
   else
     FIX_FILE=${P}/${CAMPAIGN}/STA/${FIXINF}.FIX
@@ -825,7 +852,7 @@ if ! test -f ${TABLES_DIR}/fix/${FIXINF}.FIX ; then
 else
   FIX_FILE=${TABLES_DIR}/fix/${FIXINF}.FIX
   if ! ln -sf ${FIX_FILE} ${P}/${CAMPAIGN}/STA/${FIXINF}.FIX ; then
-    echoerr "[ERROR] Could not link the fix file \'\${FIX_FILE}\'"
+    echoerr "[ERROR] Could not link the fix file \'${FIX_FILE}\'"
     exit 1
   fi
 fi
@@ -852,15 +879,32 @@ A2P_VRB=0
 if test "$DEBUG_MODE" -ne 0 ; then A2P_VRB=1 ; fi
 
 ##  Case a: We have both a PCV file and an antex file specified
-if [ "$MAKE_PCV" != "NO" ] && [ ! -z ${PCV_FILE+x} ] ; then
-  echodbg "[DEBUG] Both an antex file ($MAKE_PCV) 
-          and a pcv file ($PCV_FILE) given"
-  echodbg "[DEBUG] Updating pcv file using the atx2pcv.sh program"
-  if ! atx2pcv.sh --antex="${MAKE_PCV}" \
+if [ ! -z "${PCVINF+x}" ] && [ ! -z "${ATXINF+x}" ] ; then
+  echodbg "[DEBUG] Both an antex file (\"$ATXINF\") and"
+  echodbg "        a pcv file (\"$PCV_FILE\") given"
+  echodbg "        Updating pcv file using the atx2pcv.sh program"
+  if ! test -f ${TABLES_DIR}/atx/${ATXINF} ; then
+    echoerr "[ERROR] Cannot find the atnex file: \"${TABLES_DIR}/atx/${ATXINF}\"."
+    exit 1
+  fi
+  if ! test -f ${TABLES_DIR}/pcv/${PCVINF}.${PCV_EXT} ; then
+    if ! test -f ${P}/${CAMPAIGN}/OUT/${PCVINF}.${PCV_EXT} ; then
+      echoerr "[ERROR] Cannot find the PCV file: \"${PCVINF}.${PCV_EXT}\" in neither"
+      echoerr "        the \"${TABLES_DIR}/pcv/\" directory, nor in "
+      echoerr "        \"${P}/${CAMPAIGN}/OUT/\"."
+      echoerr "        Processing stoped."
+      exit 1
+    else
+      PCV_FILE=${P}/${CAMPAIGN}/OUT/${PCVINF}.${PCV_EXT}
+    fi
+  else
+    PCV_FILE=${TABLES_DIR}/pcv/${PCVINF}.${PCV_EXT}
+  fi
+  if ! atx2pcv.sh --antex="${TABLES_DIR}/atx/${ATXINF}" \
                   --verbose="${A2P_VRB}" \
-                  --sta="${P}/${CAMPAIGN}/STA/${CAMPAIGN}" \
+                  --sta="${P}/${CAMPAIGN}/STA/${STAINF}.STA" \
                   --campaign="${CAMPAIGN}" \
-                  --pcv="${TABLES_DIR}/pcv/${PCV_FILE}.${PCV_EXT}"
+                  --pcv="${PCV_FILE}"
                   --phg-out="PCV_${CAMPAIGN:0:3}" \
                   --loadgps="${B_LOADGPS}" ; then
     echoerr "ERROR. Failed to make the PCV file!"
@@ -871,40 +915,62 @@ if [ "$MAKE_PCV" != "NO" ] && [ ! -z ${PCV_FILE+x} ] ; then
 else
 ##
 ##  Case b: We have a PCV file and no antex file
-  if [ "$MAKE_PCV" = "NO" ] && [ ! -z ${PCV_FILE+x} ] ; then
-    echodbg "[DEBUG] Only specified a PCV file ($PCV_FILE); using this"
-    PCVINF=$(basename "${PCV_FILE}")
-    if ! test -f ${TABLES_DIR}/pcv/${PCVINF}.${PCV_EXT} ; then
-      echoerr "ERROR. Failed to find file ${TABLES_DIR}/pcv/${PCVINF}.${PCV_EXT}"
-      exit 1
+  if [ ! -z "${PCVINF+x}" ] && [ -z "${ATXINF+x}" ] ; then
+    ## if not in ${X}/GEN dir, link it there
+    pcv_trg=${X}/GEN/${PCVINF}.${PCV_EXT}
+    if ! test -f ${pcv_trg} ; then
+      if test -f ${TABLES_DIR}/pcv/${PCVINF}.${PCV_EXT} ; then
+        pcv_src=${TABLES_DIR}/pcv/${PCVINF}.${PCV_EXT}
+        if ! ln -sf ${pcv_src} ${pcv_trg} ; then
+          echoerr "[ERROR] Failed to link PCV file \"$pcv_src\" to"
+          echoerr "        \"${pcv_trg}\". Processing stoped."
+          exit 1
+        fi
+      else
+        echoerr "[ERROR] Failed to find the PCV file \"${PCVINF}.${PCV_EXT}\" "
+        echoerr "        in neither \"${X}/GEN/\" directory or in the"
+        echoerr "        \"${TABLES_DIR}/pcv/\" directory."
+        echoerr "        Processing stoped."
+        exit 1
+      fi
+    else
+      pcv_src=${pcv_trg}
     fi
-    ln -sf ${TABLES_DIR}/pcv/${PCVINF}.${PCV_EXT} ${X}/GEN/${PCVINF}.${PCV_EXT}
+    echodbg "[DEBUG] Only specified a PCV file: \"$PCVINF\";"
+    echodbg "        using this for processing. The actual file is"
+    echodbg "        \"${pcv_src}\"."
 ##
 ##  Case c We have an antex file but no pcv file
-  elif [ "$MAKE_PCV" != "NO" ] && [ -z ${PCV_FILE+x} ] ; then
-    echodbg "[DEBUG] Only specified an antex file 
-            ($MAKE_PCV); using this to create a pcv file"
-    if ! atx2pcv.sh --antex="${MAKE_PCV}" \
+  elif [ -z "${PCVINF}" ] && [ ! -z "${ATXINF+x}" ] ; then
+    echodbg "[DEBUG] Only specified an antex file: \"${ATXINF}\"."
+    echodbg "        Using this to create a pcv file."
+    if ! test -f ${TABLES_DIR}/atx/${ATXINF} ; then
+      echoerr "[ERROR] Cannot find file: \"${TABLES_DIR}/atx/${ATXINF}\"."
+      echoerr "        Processing stoped."
+      exit 1
+    fi
+    if ! atx2pcv.sh --antex="${TABLES_DIR}/atx/${ATXINF}" \
                     --verbose="${A2P_VRB}" \
-                    --sta="${P}/${CAMPAIGN}/STA/${CAMPAIGN}" \
+                    --sta="${P}/${CAMPAIGN}/STA/${STAINF}.STA" \
                     --campaign="${CAMPAIGN}" \
                     --phg-out="PCV_${CAMPAIGN:0:3}" \
                     --loadgps="${B_LOADGPS}" ; then
-      echoerr "ERROR. Failed to make the PCV file!"
+      echoerr "[ERROR] Failed to make the PCV file!"
+      echoerr "        Processing stoped."
       exit 1
     else
       PCVINF=PCV_${CAMPAIGN:0:3}
     fi
   else
-    echoerr "ERROR. WTF?? What PCV file do you want?"
+    echoerr "[ERROR] WTF?? What PCV file do you want?"
     exit 1
   fi
 fi
 ##
 ##  final check
 if ! test -f "${X}/GEN/${PCVINF}.${PCV_EXT}" ; then
-  echoerr "ERROR. Failed to make the PCV file (F)! 
-          cannot find ${X}/GEN/${PCVINF}.${PCV_EXT}"
+  echoerr "[ERROR] Failed to make the PCV file (F)! 
+                   Cannot find \"${X}/GEN/${PCVINF}.${PCV_EXT}\"."
   exit 1
 fi
 
@@ -1302,12 +1368,6 @@ else
   BERN_SAT_SYS="${SAT_SYS}"
 fi
 
-if test "$USE_ATL" == "NO" ; then
-  ATLFILE=""
-else
-  ATLFILE="${CAMPAIGN}"
-fi
-
 if ! test -f ${U}/PCF/${PCF_FILE}; then
   echoerr "ERROR. Invalid pcf file ${U}/PCF/${PCF_FILE}"
   exit 1
@@ -1319,7 +1379,7 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" 1>>${JSON_OUT} \
         E="${FINAL_SOLUTION_ID}" \
         F="${REDUCED_SOLUTION_ID}" \
         BLQINF="${BLQINF}" \
-        ATLINF="${ATLFILE}" \
+        ATLINF="${ATLINF}" \
         STAINF="${STAINF}" \
         CRDINF="${CAMPAIGN}" \
         SATSYS="${BERN_SAT_SYS}" \

@@ -1,0 +1,121 @@
+##
+##  This is a configuration template file for ddproccess.sh
+##  All lines starting with the character '#' are considered
+##+ comments and are *NOT* read.
+##
+##  To set a variables, use the form :
+##  VAR_NAME=VAR_VALUE, or
+##  VAR_NAME = VAR_VALUE
+##  without the leading '##'
+##
+##  Do not use the charactes '#' or ' ' in either the variable names or in
+##+ in variable values
+##
+
+##  set debuging mode
+DEBUG_MODE = 1
+
+## The year
+YEAR = 2015
+
+##  The doy to proccess
+DOY = 215
+
+##  The LOADGPS.setvar file
+B_LOADGPS = ${HOME}/bern52/BERN52/GPS/EXE/LOADGPS.setvar
+
+##  The name of the campaign
+CAMPAIGN = EPNDENS1
+
+##  The solution id
+SOLUTION_ID = DSO
+
+##  The directory where the products will be saved
+SAVE_DIR = ${HOME}/data/SAVEDISK
+
+##  Append suffix to saved products
+APND_SUFFIX = _foo
+
+##  json output file
+JSON_OUT = 
+
+##  The satellite system
+SAT_SYS = gps
+
+##  the path to 'tables' directory
+TABLES_DIR = ${HOME}/tables
+
+##  Name of the analysis center for gps/gnss products
+AC = COD
+
+##  Stations per cluster
+STATIONS_PER_CLUSTER = 3
+
+##  Files (i.e. baselines) per cluster
+FILES_PER_CLUSTER = 7
+
+##  Elevation angle in degrees (0, 90)
+ELEVATION_ANGLE = 3
+
+##  The filename of the .PCF file to use
+PCF_FILE = NTUA_DDP.PCF
+
+##  Use REPRO2 campaign products ('YES' or 'NO')
+USE_REPRO2 = NO
+
+##  Use CODE's REPRO13 products ('YES' or 'NO')
+COD_REPRO13 = NO
+
+##  Specify the station information file (.STA) to be used. Only provide the
+##+ filename, the extension is automatically set to '.STA'. The search path
+##+ for this file, is either ${TABLES_DIR}/sta/ or the campaign's /STA
+##+ directory
+STAINF = EPNDENS
+
+##  The filename of the atl (i.e atmospheric tidal loading) corrections file.
+##+ If the values is left blank, then no atl file is going to be used
+##  If you do specify a file, do **not** use an extension; also the file
+##+ should be placed either in the ${TABLES_DIR}/atl directory or in the 
+##+ campaign's /STA directory.
+ATLINF = 
+
+##  The filename of the blq (i.e tidal loading) corrections file.
+##+ If the values is left blank, then no blq file is going to be used
+##  If you do specify a file, do **not** use an extension; also the file
+##+ should be placed either in the ${TABLES_DIR}/blq directory or in the
+##+ campaign's /STA directory.
+BLQINF = 
+
+##  Specify the name of the .FIX file, i.e. the name of the file where the
+##+ reference stations are recorded. This file should be placed in either in 
+##+ the tables/fix directory or in the campaign's /STA directory.
+FIXINF = 
+
+##  Specify the filename, with **no extension** of the pcv (ie. phase centre
+##+ variations) file to be used. This option, works together with the 'ANTEX'
+##+ option;
+##  Case A. Both 'PCVINF' and 'ATXINF' are specified; this means that the
+##+         'PCVINF' file is going to be updated using the 'ATXINF' file.
+##+         The files needed, are:
+##+         ${TABLES_DIR}/atx/${ATXINF} and
+##+         ${TABLES_DIR}/pcv/${PCVINF}.${PCV_EXT}, or
+##+         ${P}/${CAMPAIGN}/OUT/${PCVINF}.${PCV_EXT}
+##  Case B. The 'PCVINF' but 'ATXINF' is empty; this means that the file
+##+         'PCVINF' is going to be used as is for the proccessing. In this
+##+         case the 'PCVINF' should be found in either:
+##+         ${TABLES_DIR}/pcv/${PCVINF}.${PCVEXT} , or
+##+         ${X}/GEN/${PCVINF}.${PCVEXT}
+##  Case C. Only 'ATXINF' is specified. In this case this (antex) file is
+##+         going to be used to produce a PCV file. The antex file should be
+##+         ${TABLES_DIR}/atx/${ATXINF}
+##
+PCVINF = PCV_EPN
+ATXINF =
+PCVEXT = I08
+
+##  Set this option to 'YES' or 'NO' to use EUREF's weekly exclusion list.
+##  This exclusion list will be downloaded from the web and used to mark
+##+ out (exclude from procssesing) the listed stations.
+USE_EPN_EXCLUDE_LIST = YES
+
+##  END OF CONFIG FILE
