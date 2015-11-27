@@ -1,0 +1,842 @@
+{"command":[
+
+{"switch":"-y", "arg": "2015"},
+{"switch":"-d", "arg": "306"},
+{"switch":"--bern-loadgps", "arg": "/home/bpe/bern52/BERN52/GPS/EXE/LOADGPS.setvar"},
+{"switch":"--campaign", "arg": "lefk15"},
+{"switch":"--satellite-system", "arg": "gps"},{"switch":"--tables-dir", "arg": "/home/bpe/tables"},
+{"switch":"--save-dir", "arg": "/home/bpe/data/GPSDATA/SAVEDISK/RNX2SNX"},
+{"switch":"--solution-id", "arg": "DSO"},
+{"switch":"--analysis-center", "arg": "cod"},
+{"switch":"--append-suffix", "arg": "_full"},
+{"switch":"--no-atl"},
+{"switch":"--antex", "arg": "/home/bpe/tables/atx/igs081869.atx"},
+{"switch":"--use-epn-exclude"},
+{"switch":"--json-out", "arg": "lefk153060.json"},
+{"switch":"--debug"},
+{"switch":"--skip-remove"}
+],
+
+"general_info":{
+"campaign": "LEFK15",
+"user": "bpe",
+"host":"hypatia",
+"program": {"name":"ddprocess","version":"52","revision":"-10","last_upd":"Oct 2015"},
+"day_processed": "2015-306",
+"interval": {"from":"2015-11-02 00:00:00", "to":"2015-11-02 23:59:30"}
+},
+
+"products":{"dcb": {"info": "Differential Code Bias", "ac": "cod", "format": "DCB", "filename": "", "satsys": "", "host": "ftp.unibe.ch", "type": "running (c1_rnx)"} ,
+"sp3": {"info": "GPS/GNSS Orbit and Clock Information", "ac": "cod", "format": "sp3", "filename": "ftp.unibe.ch/aiub/CODE/2015/COD18691.EPH.Z", "satsys": "gps+glonass", "host": "ftp.unibe.ch", "type": "final"} ,
+"erp": {"info": "Earth Rotation Parameters", "ac": "cod", "format": "erp", "filename": "ftp.unibe.ch/aiub/CODE/2015/COD18697.ERP.Z", "satsys": "", "host": "ftp.unibe.ch", "type": "final"} ,
+"ion": {"info": "Ionospheric correction file.", "ac": "COD", "format": "ION", "filename": "ftp.unibe.ch/aiub/CODE/2015/COD18691.ION.Z", "satsys": "", "host": "ftp.unibe.ch", "type": "final"} ,
+"vmf1":[
+{"info": "Vienna Mapping Function 1 Grid", "ac": "tuwien", "format": "GRD (ascii grid file)", "filename": "http://ggosatm.hg.tuwien.ac.at/DELAY/GRID/VMFG/2015/VMFG_20151102.H00", "satsys": "", "host": "http://ggosatm.hg.tuwien.ac.at", "type": ""} , {"info": "Vienna Mapping Function 1 Grid", "ac": "tuwien", "format": "GRD (ascii grid file)", "filename": "http://ggosatm.hg.tuwien.ac.at/DELAY/GRID/VMFG/2015/VMFG_20151102.H06", "satsys": "", "host": "http://ggosatm.hg.tuwien.ac.at", "type": ""} , {"info": "Vienna Mapping Function 1 Grid", "ac": "tuwien", "format": "GRD (ascii grid file)", "filename": "http://ggosatm.hg.tuwien.ac.at/DELAY/GRID/VMFG/2015/VMFG_20151102.H12", "satsys": "", "host": "http://ggosatm.hg.tuwien.ac.at", "type": ""} , {"info": "Vienna Mapping Function 1 Grid", "ac": "tuwien", "format": "GRD (ascii grid file)", "filename": "http://ggosatm.hg.tuwien.ac.at/DELAY/GRID/VMFG/2015/VMFG_20151102.H18", "satsys": "", "host": "http://ggosatm.hg.tuwien.ac.at", "type": ""} ]
+},
+"solution_identifiers":[
+{"description":"Final Solution", "id":"DSO"},
+{"description":"Size-Reduced", "id":"DSR"},
+{"description":"Preliminary Solution", "id":"DSP"}
+],
+"pcf_variables":[
+{"var_name":"A", "description": "A priori information", "value": "APR" },
+{"var_name":"B", "description": "Orbit/ERP, DCB, CLK information", "value": "COD" },
+{"var_name":"C", "description": "Preliminary (ambiguity-float) results", "value": "DSP" },
+{"var_name":"E", "description": "Final (ambiguity-fixed) results", "value": "DSO" },
+{"var_name":"F", "description": "Size-reduced NEQ information", "value": "DSR" },
+{"var_name":"I", "description": "NEQ iformation for ION estimation", "value": "DDI" },
+{"var_name":"N", "description": "Free network solution", "value": "FNS" },
+{"var_name":"RNXDIR", "description": "Directory with the RINEX files", "value": "RINEX" },
+{"var_name":"OBSSEL", "description": "Station selection file (blank: all)", "value": "" },
+{"var_name":"REFDIR", "description": "Directory with basic Bernese files", "value": "REF52" },
+{"var_name":"REFINF", "description": "Master/reference CRD/VEL filename", "value": "IGB08" },
+{"var_name":"CRDINF", "description": "Merged CRD/VEL filename", "value": "LEFK15" },
+{"var_name":"CRXINF", "description": "Accepted station inform. inconsistencies", "value": "" },
+{"var_name":"BLQINF", "description": "BLQ FILE NAME, CMC CORRECTIONS", "value": "LEFK15" },
+{"var_name":"ATLINF", "description": "ATL FILE NAME, CMC CORRECTIONS", "value": "" },
+{"var_name":"HOIFIL", "description": "Ionosphere model for higher order iono", "value": "HOI$YSS+0" },
+{"var_name":"RESULT", "description": "Directory name for the RNX2SNX results", "value": "RNX2SNX" },
+{"var_name":"SATSYS", "description": "Select the GNSS (GPS, GPS/GLO)", "value": "GPS" },
+{"var_name":"SAMPL", "description": "Sampling of the solutions", "value": "180" },
+{"var_name":"GNSSAR", "description": "GNSS to be used for ambiguity resolution", "value": "ALL" },
+{"var_name":"BL_AMB", "description": "Maximum baseline length for MW/L3 AR", "value": "6000" },
+{"var_name":"BL_QIF", "description": "Maximum baseline length for QIF AR", "value": "2000" },
+{"var_name":"BL_L53", "description": "Maximum baseline length for L5/L3 AR", "value": "200" },
+{"var_name":"BL_L12", "description": "Maximum baseline length for L1&L2 AR", "value": "10" },
+{"var_name":"HOURLY", "description": "Number of hourly sessions proc. together", "value": "8" },
+{"var_name":"MYATX", "description": "ANTEX file for update (name incl. ext)", "value": "" },
+{"var_name":"PCV", "description": "Absolute/relative PCV model", "value": "I08" },
+{"var_name":"SATINF", "description": "Satellite information file", "value": "SATELLIT" },
+{"var_name":"PCVINF", "description": "PCV information file", "value": "PCV_LEF" },
+{"var_name":"SATCRX", "description": "Satellite problem file", "value": "SAT_$Y+0" },
+{"var_name":"ELANG", "description": "Elevation angle (mask) in degrees", "value": "3" },
+{"var_name":"CLU", "description": "Maximum number of files per cluster", "value": "7" },
+{"var_name":"CLUEDT", "description": "Same as V_CLU but for GPSEDT", "value": "5" },
+{"var_name":"CLUFIN", "description": "N: to skip clustering in GPSCLU", "value": "Y" },
+{"var_name":"MINUS", "description": "Session range begin (for COMPAR)", "value": "-6" },
+{"var_name":"PLUS", "description": "Session range end", "value": "+0" },
+{"var_name":"SAV", "description": "Save results?", "value": "N" },
+{"var_name":"DEL", "description": "Delete results?", "value": "N" },
+{"var_name":"STAINF", "description": "None", "value": "LEFK15" }
+],
+
+"saved_products":[{"prod_type":"TRO_SNX","extension":"TRO","local_dir":"ATM","sol_type":"DSO","filename":"DSO153060.TRO","savedas":"DSO153060_full.TRO.Z","host":"147.102.110.69","host_dir":"/2015/306/"},{"prod_type":"SINEX","extension":"SNX","local_dir":"SOL","sol_type":"DSO","filename":"DSO153060.SNX","savedas":"DSO153060_full.SNX.Z","host":"147.102.110.69","host_dir":"/2015/306/"},{"prod_type":"NQ","extension":"NQ0","local_dir":"SOL","sol_type":"DSO","filename":"DSO153060.NQ0","savedas":"DSO153060_full.NQ0.Z","host":"147.102.110.69","host_dir":"/2015/306/"},{"prod_type":"NQ","extension":"NQ0","local_dir":"SOL","sol_type":"DSR","filename":"DSR153060.NQ0","savedas":"DSR153060_full.NQ0.Z","host":"147.102.110.69","host_dir":"/2015/306/"},{"prod_type":"CRD_FILE","extension":"CRD","local_dir":"STA","sol_type":"DSO","filename":"DSO153060.CRD","savedas":"DSO153060_full.CRD.Z","host":"147.102.110.69","host_dir":"/2015/306/"}],
+"warnings":[
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "AGRI", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "LARM 12610M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "LEUK", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "PAT0 12622M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "AMAL", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "ANKR 20805M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NICO 14302M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "AGRI", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "LARM 12610M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "LEUK", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "PAT0 12622M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "AMAL", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "ANKR 20805M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NICO 14302M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "ANKR 20805M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NOA1 12620M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "AUT1 12619M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "LARM 12610M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "HGOU", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "LEUK", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "MAT1 12734M009", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "ANKR 20805M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NOA1 12620M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "AUT1 12619M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "LARM 12610M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "HGOU", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "LEUK", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "MAT1 12734M009", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "LEUK", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "MAT1 12734M009", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NOT1 12717M004", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "WTZR 14201M010", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NOA1 12620M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "PAT0 12622M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "1", "ZENITH DELAY": "-6.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "2", "ZENITH DELAY": "-8.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "3", "ZENITH DELAY": "-10.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "4", "ZENITH DELAY": "-7.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "5", "ZENITH DELAY": "-7.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "6", "ZENITH DELAY": "-6.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "7", "ZENITH DELAY": "-6.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "8", "ZENITH DELAY": "-5.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "9", "ZENITH DELAY": "-5.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "10", "ZENITH DELAY": "-3.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "11", "ZENITH DELAY": "-4.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "12", "ZENITH DELAY": "-1.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "13", "ZENITH DELAY": "-1.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "66", "ZENITH DELAY": "-7.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "67", "ZENITH DELAY": "-8.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "68", "ZENITH DELAY": "-10.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "69", "ZENITH DELAY": "-7.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "70", "ZENITH DELAY": "-7.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "71", "ZENITH DELAY": "-6.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "72", "ZENITH DELAY": "-6.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "73", "ZENITH DELAY": "-5.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "74", "ZENITH DELAY": "-5.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "75", "ZENITH DELAY": "-4.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "76", "ZENITH DELAY": "-4.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "77", "ZENITH DELAY": "-2.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "78", "ZENITH DELAY": "-1.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "1", "ZENITH DELAY": "-6.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "2", "ZENITH DELAY": "-8.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "3", "ZENITH DELAY": "-10.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "4", "ZENITH DELAY": "-7.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "5", "ZENITH DELAY": "-7.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "6", "ZENITH DELAY": "-6.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "7", "ZENITH DELAY": "-6.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "8", "ZENITH DELAY": "-5.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "9", "ZENITH DELAY": "-5.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "10", "ZENITH DELAY": "-3.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "11", "ZENITH DELAY": "-4.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "12", "ZENITH DELAY": "-1.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "13", "ZENITH DELAY": "-1.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "66", "ZENITH DELAY": "-7.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "67", "ZENITH DELAY": "-8.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "68", "ZENITH DELAY": "-10.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "69", "ZENITH DELAY": "-7.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "70", "ZENITH DELAY": "-7.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "71", "ZENITH DELAY": "-6.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "72", "ZENITH DELAY": "-6.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "73", "ZENITH DELAY": "-5.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "74", "ZENITH DELAY": "-5.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "75", "ZENITH DELAY": "-4.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "76", "ZENITH DELAY": "-4.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "77", "ZENITH DELAY": "-2.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "78", "ZENITH DELAY": "-1.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "LEUK", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "MAT1 12734M009", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NOT1 12717M004", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "WTZR 14201M010", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NOA1 12620M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "PAT0 12622M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "1", "ZENITH DELAY": "-6.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "2", "ZENITH DELAY": "-8.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "3", "ZENITH DELAY": "-9.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "4", "ZENITH DELAY": "-7.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "5", "ZENITH DELAY": "-6.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "6", "ZENITH DELAY": "-5.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "7", "ZENITH DELAY": "-6.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "8", "ZENITH DELAY": "-5.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "9", "ZENITH DELAY": "-4.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "10", "ZENITH DELAY": "-3.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "11", "ZENITH DELAY": "-3.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "12", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "13", "ZENITH DELAY": "-1.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "66", "ZENITH DELAY": "-6.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "67", "ZENITH DELAY": "-8.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "68", "ZENITH DELAY": "-9.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "69", "ZENITH DELAY": "-7.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "70", "ZENITH DELAY": "-7.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "71", "ZENITH DELAY": "-6.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "72", "ZENITH DELAY": "-6.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "73", "ZENITH DELAY": "-5.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "74", "ZENITH DELAY": "-4.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "75", "ZENITH DELAY": "-3.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "76", "ZENITH DELAY": "-3.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "77", "ZENITH DELAY": "-1.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "78", "ZENITH DELAY": "-1.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "1", "ZENITH DELAY": "-6.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "2", "ZENITH DELAY": "-8.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "3", "ZENITH DELAY": "-9.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "4", "ZENITH DELAY": "-7.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "5", "ZENITH DELAY": "-6.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "6", "ZENITH DELAY": "-5.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "7", "ZENITH DELAY": "-6.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "8", "ZENITH DELAY": "-5.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "9", "ZENITH DELAY": "-4.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "10", "ZENITH DELAY": "-3.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "11", "ZENITH DELAY": "-3.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "12", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "13", "ZENITH DELAY": "-1.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "66", "ZENITH DELAY": "-6.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "67", "ZENITH DELAY": "-8.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "68", "ZENITH DELAY": "-9.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "69", "ZENITH DELAY": "-7.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "70", "ZENITH DELAY": "-7.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "71", "ZENITH DELAY": "-6.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "72", "ZENITH DELAY": "-6.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "73", "ZENITH DELAY": "-5.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "74", "ZENITH DELAY": "-4.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "75", "ZENITH DELAY": "-3.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "76", "ZENITH DELAY": "-3.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "77", "ZENITH DELAY": "-1.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "78", "ZENITH DELAY": "-1.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NOA1 12620M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "TUC2 12617M003", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "PAT0 12622M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "21", "ZENITH DELAY": "0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "22", "ZENITH DELAY": "0.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "24", "ZENITH DELAY": "0.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "25", "ZENITH DELAY": "0.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "26", "ZENITH DELAY": "0.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "27", "ZENITH DELAY": "0.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "28", "ZENITH DELAY": "0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "29", "ZENITH DELAY": "0.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "30", "ZENITH DELAY": "-0.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "31", "ZENITH DELAY": "-0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "32", "ZENITH DELAY": "-0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "33", "ZENITH DELAY": "-0.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "34", "ZENITH DELAY": "-1.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "35", "ZENITH DELAY": "-1.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "36", "ZENITH DELAY": "-1.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "37", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "38", "ZENITH DELAY": "-1.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "39", "ZENITH DELAY": "-2.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "47", "ZENITH DELAY": "0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "48", "ZENITH DELAY": "0.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "50", "ZENITH DELAY": "0.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "51", "ZENITH DELAY": "0.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "52", "ZENITH DELAY": "0.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "53", "ZENITH DELAY": "0.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "54", "ZENITH DELAY": "0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "55", "ZENITH DELAY": "0.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "56", "ZENITH DELAY": "-0.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "57", "ZENITH DELAY": "-0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "58", "ZENITH DELAY": "-1.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "59", "ZENITH DELAY": "-0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "60", "ZENITH DELAY": "-1.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "61", "ZENITH DELAY": "-1.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "62", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "63", "ZENITH DELAY": "-1.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "64", "ZENITH DELAY": "-2.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "65", "ZENITH DELAY": "-2.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "79", "ZENITH DELAY": "0.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "80", "ZENITH DELAY": "0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "81", "ZENITH DELAY": "0.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "82", "ZENITH DELAY": "-0.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "83", "ZENITH DELAY": "-0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "84", "ZENITH DELAY": "-0.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "85", "ZENITH DELAY": "-0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "86", "ZENITH DELAY": "-1.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "87", "ZENITH DELAY": "-1.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "88", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "89", "ZENITH DELAY": "-1.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "90", "ZENITH DELAY": "-2.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "91", "ZENITH DELAY": "-2.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "21", "ZENITH DELAY": "0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "22", "ZENITH DELAY": "0.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "24", "ZENITH DELAY": "0.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "25", "ZENITH DELAY": "0.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "26", "ZENITH DELAY": "0.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "27", "ZENITH DELAY": "0.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "28", "ZENITH DELAY": "0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "29", "ZENITH DELAY": "0.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "30", "ZENITH DELAY": "-0.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "31", "ZENITH DELAY": "-0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "32", "ZENITH DELAY": "-0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "33", "ZENITH DELAY": "-0.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "34", "ZENITH DELAY": "-1.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "35", "ZENITH DELAY": "-1.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "36", "ZENITH DELAY": "-1.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "37", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "38", "ZENITH DELAY": "-1.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "39", "ZENITH DELAY": "-2.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "47", "ZENITH DELAY": "0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "48", "ZENITH DELAY": "0.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "50", "ZENITH DELAY": "0.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "51", "ZENITH DELAY": "0.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "52", "ZENITH DELAY": "0.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "53", "ZENITH DELAY": "0.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "54", "ZENITH DELAY": "0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "55", "ZENITH DELAY": "0.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "56", "ZENITH DELAY": "-0.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "57", "ZENITH DELAY": "-0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "58", "ZENITH DELAY": "-1.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "59", "ZENITH DELAY": "-0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "60", "ZENITH DELAY": "-1.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "61", "ZENITH DELAY": "-1.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "62", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "63", "ZENITH DELAY": "-1.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "64", "ZENITH DELAY": "-2.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "65", "ZENITH DELAY": "-2.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "79", "ZENITH DELAY": "0.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "80", "ZENITH DELAY": "0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "81", "ZENITH DELAY": "0.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "82", "ZENITH DELAY": "-0.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "83", "ZENITH DELAY": "-0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "84", "ZENITH DELAY": "-0.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "85", "ZENITH DELAY": "-0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "86", "ZENITH DELAY": "-1.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "87", "ZENITH DELAY": "-1.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "88", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "89", "ZENITH DELAY": "-1.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "90", "ZENITH DELAY": "-2.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "91", "ZENITH DELAY": "-2.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NOA1 12620M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "TUC2 12617M003", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "PAT0 12622M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "21", "ZENITH DELAY": "0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "24", "ZENITH DELAY": "0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "25", "ZENITH DELAY": "0.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "26", "ZENITH DELAY": "0.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "27", "ZENITH DELAY": "-0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "28", "ZENITH DELAY": "-0.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "29", "ZENITH DELAY": "-0.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "30", "ZENITH DELAY": "-1.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "31", "ZENITH DELAY": "-1.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "32", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "33", "ZENITH DELAY": "-1.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "34", "ZENITH DELAY": "-2.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "35", "ZENITH DELAY": "-2.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "36", "ZENITH DELAY": "-2.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "37", "ZENITH DELAY": "-2.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "38", "ZENITH DELAY": "-2.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "39", "ZENITH DELAY": "-3.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "47", "ZENITH DELAY": "0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "50", "ZENITH DELAY": "0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "51", "ZENITH DELAY": "0.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "52", "ZENITH DELAY": "0.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "53", "ZENITH DELAY": "-0.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "54", "ZENITH DELAY": "-0.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "55", "ZENITH DELAY": "-0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "56", "ZENITH DELAY": "-1.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "57", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "58", "ZENITH DELAY": "-1.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "59", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "60", "ZENITH DELAY": "-2.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "61", "ZENITH DELAY": "-2.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "62", "ZENITH DELAY": "-2.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "63", "ZENITH DELAY": "-2.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "64", "ZENITH DELAY": "-2.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "65", "ZENITH DELAY": "-3.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "79", "ZENITH DELAY": "-0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "80", "ZENITH DELAY": "-0.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "81", "ZENITH DELAY": "-0.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "82", "ZENITH DELAY": "-1.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "83", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "84", "ZENITH DELAY": "-1.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "85", "ZENITH DELAY": "-1.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "86", "ZENITH DELAY": "-2.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "87", "ZENITH DELAY": "-2.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "88", "ZENITH DELAY": "-2.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "89", "ZENITH DELAY": "-2.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "90", "ZENITH DELAY": "-2.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "91", "ZENITH DELAY": "-3.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "21", "ZENITH DELAY": "0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "24", "ZENITH DELAY": "0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "25", "ZENITH DELAY": "0.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "26", "ZENITH DELAY": "0.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "27", "ZENITH DELAY": "-0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "28", "ZENITH DELAY": "-0.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "29", "ZENITH DELAY": "-0.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "30", "ZENITH DELAY": "-1.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "31", "ZENITH DELAY": "-1.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "32", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "33", "ZENITH DELAY": "-1.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "34", "ZENITH DELAY": "-2.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "35", "ZENITH DELAY": "-2.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "36", "ZENITH DELAY": "-2.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "37", "ZENITH DELAY": "-2.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "38", "ZENITH DELAY": "-2.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "39", "ZENITH DELAY": "-3.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "47", "ZENITH DELAY": "0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "50", "ZENITH DELAY": "0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "51", "ZENITH DELAY": "0.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "52", "ZENITH DELAY": "0.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "53", "ZENITH DELAY": "-0.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "54", "ZENITH DELAY": "-0.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "55", "ZENITH DELAY": "-0.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "56", "ZENITH DELAY": "-1.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "57", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "58", "ZENITH DELAY": "-1.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "59", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "60", "ZENITH DELAY": "-2.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "61", "ZENITH DELAY": "-2.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "62", "ZENITH DELAY": "-2.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "63", "ZENITH DELAY": "-2.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "64", "ZENITH DELAY": "-2.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "65", "ZENITH DELAY": "-3.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "79", "ZENITH DELAY": "-0.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "80", "ZENITH DELAY": "-0.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "81", "ZENITH DELAY": "-0.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "82", "ZENITH DELAY": "-1.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "83", "ZENITH DELAY": "-1.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "84", "ZENITH DELAY": "-1.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "85", "ZENITH DELAY": "-1.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "86", "ZENITH DELAY": "-2.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "87", "ZENITH DELAY": "-2.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "88", "ZENITH DELAY": "-2.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "89", "ZENITH DELAY": "-2.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "90", "ZENITH DELAY": "-2.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "91", "ZENITH DELAY": "-3.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ],
+"amb_res_summary":[
+{"baseline":"AGLA", "station1":"AGRI", "station2":"LARM", "length":  138.8, "method": "pbnl", "num_of_ambs":    56, "percent": 60.7, "satsys": "GPS" } ,
+{"baseline":"AGLE", "station1":"AGRI", "station2":"LEUK", "length":   65.0, "method": "pbnl", "num_of_ambs":    65, "percent": 81.5, "satsys": "GPS" } ,
+{"baseline":"AGPA", "station1":"AGRI", "station2":"PAT0", "length":   50.2, "method": "pbnl", "num_of_ambs":    64, "percent": 82.8, "satsys": "GPS" } ,
+{"baseline":"AMRL", "station1":"AMAL", "station2":"RLSO", "length":   30.4, "method": "pbnl", "num_of_ambs":    65, "percent": 50.8, "satsys": "GPS" } ,
+{"baseline":"AULA", "station1":"AUT1", "station2":"LARM", "length":  118.1, "method": "pbnl", "num_of_ambs":    94, "percent": 48.9, "satsys": "GPS" } ,
+{"baseline":"HGLE", "station1":"HGOU", "station2":"LEUK", "length":   82.8, "method": "pbnl", "num_of_ambs":    62, "percent": 85.5, "satsys": "GPS" } ,
+{"baseline":"NOPA", "station1":"NOA1", "station2":"PAT0", "length":  183.9, "method": "pbnl", "num_of_ambs":    87, "percent": 34.5, "satsys": "GPS" } ,
+{"baseline":"PARL", "station1":"PAT0", "station2":"RLSO", "length":   37.9, "method": "pbnl", "num_of_ambs":    60, "percent": 46.7, "satsys": "GPS" } ,
+{"baseline":"POSP", "station1":"PONT", "station2":"SPAN", "length":   19.6, "method": "pbnl", "num_of_ambs":    46, "percent": 56.5, "satsys": "GPS" } ,
+{"baseline":"POVL", "station1":"PONT", "station2":"VLSM", "length":   49.1, "method": "pbnl", "num_of_ambs":    46, "percent": 54.3, "satsys": "GPS" } ,
+{"baseline":"AGLA", "station1":"AGRI", "station2":"LARM", "length":  138.8, "method": "qif", "num_of_ambs":    44, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"AGLE", "station1":"AGRI", "station2":"LEUK", "length":   65.0, "method": "qif", "num_of_ambs":    24, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"AGPA", "station1":"AGRI", "station2":"PAT0", "length":   50.2, "method": "qif", "num_of_ambs":    22, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"AMRL", "station1":"AMAL", "station2":"RLSO", "length":   30.4, "method": "qif", "num_of_ambs":    64, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"ANNI", "station1":"ANKR", "station2":"NICO", "length":  529.7, "method": "qif", "num_of_ambs":    68, "percent":  2.9, "satsys": "GPS" } ,
+{"baseline":"ANNO", "station1":"ANKR", "station2":"NOA1", "length":  796.6, "method": "qif", "num_of_ambs":   118, "percent": 11.9, "satsys": "GPS" } ,
+{"baseline":"AULA", "station1":"AUT1", "station2":"LARM", "length":  118.1, "method": "qif", "num_of_ambs":    96, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"HGLE", "station1":"HGOU", "station2":"LEUK", "length":   82.8, "method": "qif", "num_of_ambs":    18, "percent": 11.1, "satsys": "GPS" } ,
+{"baseline":"HGMA", "station1":"HGOU", "station2":"MAT1", "length":  329.9, "method": "qif", "num_of_ambs":    68, "percent":  5.9, "satsys": "GPS" } ,
+{"baseline":"MANT", "station1":"MAT1", "station2":"NOT1", "length":  444.5, "method": "qif", "num_of_ambs":    56, "percent": 21.4, "satsys": "GPS" } ,
+{"baseline":"MAWT", "station1":"MAT1", "station2":"WTZR", "length":  990.0, "method": "qif", "num_of_ambs":   122, "percent": 13.1, "satsys": "GPS" } ,
+{"baseline":"NOPA", "station1":"NOA1", "station2":"PAT0", "length":  183.9, "method": "qif", "num_of_ambs":   114, "percent":  3.5, "satsys": "GPS" } ,
+{"baseline":"NOTU", "station1":"NOA1", "station2":"TUC2", "length":  279.6, "method": "qif", "num_of_ambs":   154, "percent": 11.7, "satsys": "GPS" } ,
+{"baseline":"PARL", "station1":"PAT0", "station2":"RLSO", "length":   37.9, "method": "qif", "num_of_ambs":    64, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"POSP", "station1":"PONT", "station2":"SPAN", "length":   19.6, "method": "qif", "num_of_ambs":    40, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"POVL", "station1":"PONT", "station2":"VLSM", "length":   49.1, "method": "qif", "num_of_ambs":    42, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"ANNI", "station1":"ANKR", "station2":"NICO", "length":  529.7, "method": "cbnl", "num_of_ambs":    62, "percent": 45.2, "satsys": "GPS" } ,
+{"baseline":"ANNO", "station1":"ANKR", "station2":"NOA1", "length":  796.6, "method": "cbnl", "num_of_ambs":    78, "percent": 24.4, "satsys": "GPS" } ,
+{"baseline":"HGMA", "station1":"HGOU", "station2":"MAT1", "length":  329.9, "method": "cbnl", "num_of_ambs":    76, "percent": 55.3, "satsys": "GPS" } ,
+{"baseline":"MANT", "station1":"MAT1", "station2":"NOT1", "length":  444.5, "method": "cbnl", "num_of_ambs":    68, "percent": 58.8, "satsys": "GPS" } ,
+{"baseline":"MAWT", "station1":"MAT1", "station2":"WTZR", "length":  990.0, "method": "cbnl", "num_of_ambs":    76, "percent": 19.7, "satsys": "GPS" } ,
+{"baseline":"NOPA", "station1":"NOA1", "station2":"PAT0", "length":  183.9, "method": "cbnl", "num_of_ambs":    87, "percent": 19.5, "satsys": "GPS" } ,
+{"baseline":"NOTU", "station1":"NOA1", "station2":"TUC2", "length":  279.6, "method": "cbnl", "num_of_ambs":    97, "percent": 20.6, "satsys": "GPS" } ,
+{"baseline":"ANNI", "station1":"ANKR", "station2":"NICO", "length":  529.7, "method": "cbwl", "num_of_ambs":    62, "percent": 48.4, "satsys": "GPS" } ,
+{"baseline":"ANNO", "station1":"ANKR", "station2":"NOA1", "length":  796.6, "method": "cbwl", "num_of_ambs":    78, "percent": 29.5, "satsys": "GPS" } ,
+{"baseline":"HGMA", "station1":"HGOU", "station2":"MAT1", "length":  329.9, "method": "cbwl", "num_of_ambs":    76, "percent": 56.6, "satsys": "GPS" } ,
+{"baseline":"MANT", "station1":"MAT1", "station2":"NOT1", "length":  444.5, "method": "cbwl", "num_of_ambs":    68, "percent": 63.2, "satsys": "GPS" } ,
+{"baseline":"MAWT", "station1":"MAT1", "station2":"WTZR", "length":  990.0, "method": "cbwl", "num_of_ambs":    76, "percent": 21.1, "satsys": "GPS" } ,
+{"baseline":"NOPA", "station1":"NOA1", "station2":"PAT0", "length":  183.9, "method": "cbwl", "num_of_ambs":    87, "percent": 23.0, "satsys": "GPS" } ,
+{"baseline":"NOTU", "station1":"NOA1", "station2":"TUC2", "length":  279.6, "method": "cbwl", "num_of_ambs":    47, "percent": 46.8, "satsys": "GPS" } ,
+{"baseline":"AGLA", "station1":"AGRI", "station2":"LARM", "length":  138.8, "method": "pbwl", "num_of_ambs":    56, "percent": 60.7, "satsys": "GPS" } ,
+{"baseline":"AGLE", "station1":"AGRI", "station2":"LEUK", "length":   65.0, "method": "pbwl", "num_of_ambs":    65, "percent": 90.8, "satsys": "GPS" } ,
+{"baseline":"AGPA", "station1":"AGRI", "station2":"PAT0", "length":   50.2, "method": "pbwl", "num_of_ambs":    64, "percent": 95.3, "satsys": "GPS" } ,
+{"baseline":"AMRL", "station1":"AMAL", "station2":"RLSO", "length":   30.4, "method": "pbwl", "num_of_ambs":    65, "percent": 64.6, "satsys": "GPS" } ,
+{"baseline":"AULA", "station1":"AUT1", "station2":"LARM", "length":  118.1, "method": "pbwl", "num_of_ambs":    94, "percent": 59.6, "satsys": "GPS" } ,
+{"baseline":"HGLE", "station1":"HGOU", "station2":"LEUK", "length":   82.8, "method": "pbwl", "num_of_ambs":    62, "percent": 95.2, "satsys": "GPS" } ,
+{"baseline":"NOPA", "station1":"NOA1", "station2":"PAT0", "length":  183.9, "method": "pbwl", "num_of_ambs":    87, "percent": 49.4, "satsys": "GPS" } ,
+{"baseline":"PARL", "station1":"PAT0", "station2":"RLSO", "length":   37.9, "method": "pbwl", "num_of_ambs":    60, "percent": 68.3, "satsys": "GPS" } ,
+{"baseline":"POSP", "station1":"PONT", "station2":"SPAN", "length":   19.6, "method": "pbwl", "num_of_ambs":    46, "percent": 63.0, "satsys": "GPS" } ,
+{"baseline":"POVL", "station1":"PONT", "station2":"VLSM", "length":   49.1, "method": "pbwl", "num_of_ambs":    46, "percent": 63.0, "satsys": "GPS" } ,
+{"baseline":"LESP", "station1":"LEUK", "station2":"SPAN", "length":    6.2, "method": "l12", "num_of_ambs":    98, "percent": 63.3, "satsys": "GPS" } ],
+"addneq_summary":[
+{ "name":"PONT", "xest":   4671272.5795, "yest":   1754437.1763,"zest":   3959389.4365,"xapr":   4671272.5773,"yapr":   1754437.1678,"zapr":   3959389.4277,"xcor":         0.0022,"ycor":         0.0085,"zcor":         0.0088,"xrms":         0.0028,"yrms":         0.0015,"zrms":         0.0023,"latest":        38.6190,"lonest":        20.5852,"hgtest":        48.8485,"latapr":        38.6190,"lonapr":        20.5852,"hgtapr":        48.8391,"latcor":         0.0037,"loncor":         0.0072,"hgtcor":         0.0094,"latrms":         0.0009,"lonrms":         0.0009,"hgtrms":         0.0037,"north":         0.0037,"east":         0.0072,"up":         0.0094,"adj":"ESTIM" } ,
+{ "name":"TUC2 12617M003", "xest":   4744543.8398, "yest":   2119412.0158,"zest":   3686258.7509,"xapr":   4744543.7870,"yapr":   2119411.9923,"zapr":   3686258.7210,"xcor":         0.0527,"ycor":         0.0234,"zcor":         0.0298,"xrms":         0.0018,"yrms":         0.0009,"zrms":         0.0015,"latest":        35.5332,"lonest":        24.0706,"hgtest":       160.9289,"latapr":        35.5332,"lonapr":        24.0706,"hgtapr":       160.8646,"latcor":        -0.0093,"loncor":        -0.0001,"hgtcor":         0.0643,"latrms":         0.0007,"lonrms":         0.0006,"hgtrms":         0.0024,"north":        -0.0093,"east":        -0.0001,"up":         0.0643,"adj":"ESTIM" } ,
+{ "name":"VLSM", "xest":   4699991.5648, "yest":   1765547.7677,"zest":   3921162.2032,"xapr":   4699991.5673,"yapr":   1765547.7604,"zapr":   3921162.1978,"xcor":        -0.0024,"ycor":         0.0073,"zcor":         0.0054,"xrms":         0.0032,"yrms":         0.0016,"zrms":         0.0025,"latest":        38.1768,"lonest":        20.5886,"hgtest":       437.1924,"latapr":        38.1768,"lonapr":        20.5886,"hgtapr":       437.1888,"latcor":         0.0041,"loncor":         0.0077,"hgtcor":         0.0036,"latrms":         0.0010,"lonrms":         0.0009,"hgtrms":         0.0041,"north":         0.0041,"east":         0.0077,"up":         0.0036,"adj":"ESTIM" } ,
+{ "name":"SPAN", "xest":   4658312.1726, "yest":   1757780.7806,"zest":   3973702.6044,"xapr":   4658312.1677,"yapr":   1757780.7756,"zapr":   3973702.6004,"xcor":         0.0049,"ycor":         0.0050,"zcor":         0.0041,"xrms":         0.0021,"yrms":         0.0010,"zrms":         0.0017,"latest":        38.7813,"lonest":        20.6736,"hgtest":       451.3346,"latapr":        38.7813,"lonapr":        20.6736,"hgtapr":       451.3271,"latcor":        -0.0008,"loncor":         0.0029,"hgtcor":         0.0075,"latrms":         0.0008,"lonrms":         0.0006,"hgtrms":         0.0027,"north":        -0.0008,"east":         0.0029,"up":         0.0075,"adj":"ESTIM" } ,
+{ "name":"HGOU", "xest":   4623593.6927, "yest":   1707374.7682,"zest":   4034710.5095,"xapr":   4623593.6946,"yapr":   1707374.7694,"zapr":   4034710.5151,"xcor":        -0.0019,"ycor":        -0.0013,"zcor":        -0.0057,"xrms":         0.0014,"yrms":         0.0007,"zrms":         0.0012,"latest":        39.4927,"lonest":        20.2679,"hgtest":        56.0575,"latapr":        39.4927,"lonapr":        20.2679,"hgtapr":        56.0628,"latcor":        -0.0030,"loncor":        -0.0005,"hgtcor":        -0.0053,"latrms":         0.0005,"lonrms":         0.0004,"hgtrms":         0.0019,"north":        -0.0030,"east":        -0.0005,"up":        -0.0053,"adj":"ESTIM" } ,
+{ "name":"PAT0 12622M001", "xest":   4655002.7813, "yest":   1860619.7218,"zest":   3930281.8174,"xapr":   4655002.7769,"yapr":   1860619.7195,"zapr":   3930281.8104,"xcor":         0.0043,"ycor":         0.0023,"zcor":         0.0071,"xrms":         0.0013,"yrms":         0.0006,"zrms":         0.0011,"latest":        38.2837,"lonest":        21.7868,"hgtest":       121.0382,"latapr":        38.2837,"lonapr":        21.7868,"hgtapr":       121.0300,"latcor":         0.0025,"loncor":         0.0005,"hgtcor":         0.0082,"latrms":         0.0005,"lonrms":         0.0004,"hgtrms":         0.0017,"north":         0.0025,"east":         0.0005,"up":         0.0082,"adj":"ESTIM" } ,
+{ "name":"AMAL", "xest":   4699931.7779, "yest":   1837661.5613,"zest":   3887632.3976,"xapr":   4699931.7717,"yapr":   1837661.5593,"zapr":   3887632.3956,"xcor":         0.0062,"ycor":         0.0020,"zcor":         0.0019,"xrms":         0.0023,"yrms":         0.0011,"zrms":         0.0019,"latest":        37.7959,"lonest":        21.3554,"hgtest":        99.5452,"latapr":        37.7959,"lonapr":        21.3554,"hgtapr":        99.5388,"latcor":        -0.0025,"loncor":        -0.0004,"hgtcor":         0.0063,"latrms":         0.0008,"lonrms":         0.0007,"hgtrms":         0.0030,"north":        -0.0025,"east":        -0.0004,"up":         0.0063,"adj":"ESTIM" } ,
+{ "name":"AGRI", "xest":   4645369.2801, "yest":   1821233.6461,"zest":   3959822.8532,"xapr":   4645369.2796,"yapr":   1821233.6468,"zapr":   3959822.8549,"xcor":         0.0006,"ycor":        -0.0007,"zcor":        -0.0017,"xrms":         0.0014,"yrms":         0.0006,"zrms":         0.0012,"latest":        38.6235,"lonest":        21.4078,"hgtest":       124.4664,"latapr":        38.6235,"lonapr":        21.4078,"hgtapr":       124.4673,"latcor":        -0.0015,"loncor":        -0.0009,"hgtcor":        -0.0009,"latrms":         0.0005,"lonrms":         0.0004,"hgtrms":         0.0018,"north":        -0.0015,"east":        -0.0009,"up":        -0.0009,"adj":"ESTIM" } ,
+{ "name":"LEUK", "xest":   4653778.6224, "yest":   1759300.8045,"zest":   3977650.4251,"xapr":   4653778.6217,"yapr":   1759300.8052,"zapr":   3977650.4260,"xcor":         0.0007,"ycor":        -0.0008,"zcor":        -0.0008,"xrms":         0.0014,"yrms":         0.0006,"zrms":         0.0012,"latest":        38.8299,"lonest":        20.7085,"hgtest":        38.8641,"latapr":        38.8299,"lonapr":        20.7085,"hgtapr":        38.8643,"latcor":        -0.0009,"loncor":        -0.0010,"hgtcor":        -0.0002,"latrms":         0.0005,"lonrms":         0.0004,"hgtrms":         0.0018,"north":        -0.0009,"east":        -0.0010,"up":        -0.0002,"adj":"ESTIM" } ,
+{ "name":"WTZR 14201M010", "xest":   4075580.3747, "yest":    931853.9827,"zest":   4801568.2382,"xapr":   4075580.3734,"yapr":    931853.9832,"zapr":   4801568.2395,"xcor":         0.0013,"ycor":        -0.0005,"zcor":        -0.0013,"xrms":         0.0012,"yrms":         0.0006,"zrms":         0.0012,"latest":        49.1442,"lonest":        12.8789,"hgtest":       666.0186,"latapr":        49.1442,"lonapr":        12.8789,"hgtapr":       666.0189,"latcor":        -0.0017,"loncor":        -0.0008,"hgtcor":        -0.0002,"latrms":         0.0005,"lonrms":         0.0004,"hgtrms":         0.0017,"north":        -0.0017,"east":        -0.0008,"up":        -0.0002,"adj":"HELMR" } ,
+{ "name":"NICO 14302M001", "xest":   4359415.5294, "yest":   2874117.1938,"zest":   3650777.9744,"xapr":   4359415.5184,"yapr":   2874117.1913,"zapr":   3650777.9656,"xcor":         0.0109,"ycor":         0.0024,"zcor":         0.0088,"xrms":         0.0018,"yrms":         0.0010,"zrms":         0.0016,"latest":        35.1410,"lonest":        33.3964,"hgtest":       190.0339,"latapr":        35.1410,"lonapr":        33.3964,"hgtapr":       190.0203,"latcor":         0.0012,"loncor":        -0.0040,"hgtcor":         0.0136,"latrms":         0.0007,"lonrms":         0.0007,"hgtrms":         0.0024,"north":         0.0012,"east":        -0.0040,"up":         0.0136,"adj":"HELMR" } ,
+{ "name":"NOA1 12620M001", "xest":   4599641.9611, "yest":   2034827.4290,"zest":   3909890.5485,"xapr":   4599641.9733,"yapr":   2034827.4219,"zapr":   3909890.5430,"xcor":        -0.0122,"ycor":         0.0071,"zcor":         0.0054,"xrms":         0.0016,"yrms":         0.0008,"zrms":         0.0014,"latest":        38.0471,"lonest":        23.8640,"hgtest":       537.8255,"latapr":        38.0471,"lonapr":        23.8640,"hgtapr":       537.8287,"latcor":         0.0094,"loncor":         0.0114,"hgtcor":        -0.0031,"latrms":         0.0006,"lonrms":         0.0005,"hgtrms":         0.0021,"north":         0.0094,"east":         0.0114,"up":        -0.0031,"adj":"ESTIM" } ,
+{ "name":"NOT1 12717M004", "xest":   4934546.0325, "yest":   1321265.1944,"zest":   3806456.2867,"xapr":   4934546.0398,"yapr":   1321265.1979,"zapr":   3806456.2914,"xcor":        -0.0072,"ycor":        -0.0036,"zcor":        -0.0047,"xrms":         0.0013,"yrms":         0.0006,"zrms":         0.0011,"latest":        36.8758,"lonest":        14.9898,"hgtest":       126.3282,"latapr":        36.8758,"lonapr":        14.9898,"hgtapr":       126.3374,"latcor":         0.0009,"loncor":        -0.0016,"hgtcor":        -0.0092,"latrms":         0.0004,"lonrms":         0.0004,"hgtrms":         0.0016,"north":         0.0009,"east":        -0.0016,"up":        -0.0092,"adj":"HELMR" } ,
+{ "name":"MAT1 12734M009", "xest":   4641951.2507, "yest":   1393053.8642,"zest":   4133281.0222,"xapr":   4641951.2556,"yapr":   1393053.8625,"zapr":   4133281.0250,"xcor":        -0.0050,"ycor":         0.0017,"zcor":        -0.0028,"xrms":         0.0008,"yrms":         0.0004,"zrms":         0.0007,"latest":        40.6491,"lonest":        16.7045,"hgtest":       534.5253,"latapr":        40.6491,"lonapr":        16.7045,"hgtapr":       534.5304,"latcor":         0.0006,"loncor":         0.0030,"hgtcor":        -0.0051,"latrms":         0.0003,"lonrms":         0.0003,"hgtrms":         0.0011,"north":         0.0006,"east":         0.0030,"up":        -0.0051,"adj":"HELMR" } ,
+{ "name":"LARM 12610M002", "xest":   4549396.9388, "yest":   1874003.4703,"zest":   4045167.7231,"xapr":   4549396.9415,"yapr":   1874003.4634,"zapr":   4045167.7209,"xcor":        -0.0027,"ycor":         0.0069,"zcor":         0.0022,"xrms":         0.0015,"yrms":         0.0007,"zrms":         0.0012,"latest":        39.6141,"lonest":        22.3879,"hgtest":       151.3087,"latapr":        39.6141,"lonapr":        22.3879,"hgtapr":       151.3072,"latcor":         0.0017,"loncor":         0.0074,"hgtcor":         0.0015,"latrms":         0.0005,"lonrms":         0.0005,"hgtrms":         0.0019,"north":         0.0017,"east":         0.0074,"up":         0.0015,"adj":"ESTIM" } ,
+{ "name":"RLSO", "xest":   4679938.9945, "yest":   1840151.2297,"zest":   3910407.6673,"xapr":   4679938.9807,"yapr":   1840151.2207,"zapr":   3910407.6579,"xcor":         0.0138,"ycor":         0.0090,"zcor":         0.0094,"xrms":         0.0019,"yrms":         0.0009,"zrms":         0.0016,"latest":        38.0558,"lonest":        21.4647,"hgtest":       132.9136,"latapr":        38.0558,"lonapr":        21.4647,"hgtapr":       132.8951,"latcor":        -0.0026,"loncor":         0.0033,"hgtcor":         0.0185,"latrms":         0.0007,"lonrms":         0.0006,"hgtrms":         0.0025,"north":        -0.0026,"east":         0.0033,"up":         0.0185,"adj":"ESTIM" } ,
+{ "name":"ANKR 20805M002", "xest":   4121948.4558, "yest":   2652187.8732,"zest":   4069023.8501,"xapr":   4121948.4397,"yapr":   2652187.8626,"zapr":   4069023.8511,"xcor":         0.0162,"ycor":         0.0106,"zcor":        -0.0009,"xrms":         0.0019,"yrms":         0.0010,"zrms":         0.0016,"latest":        39.8874,"lonest":        32.7585,"hgtest":       976.0299,"latapr":        39.8874,"lonapr":        32.7585,"hgtapr":       976.0157,"latcor":        -0.0131,"loncor":         0.0002,"hgtcor":         0.0142,"latrms":         0.0007,"lonrms":         0.0007,"hgtrms":         0.0025,"north":        -0.0131,"east":         0.0002,"up":         0.0142,"adj":"ESTIM" } ,
+{ "name":"AUT1 12619M002", "xest":   4466283.2692, "yest":   1896167.1032,"zest":   4126096.8328,"xapr":   4466283.2752,"yapr":   1896167.1018,"zapr":   4126096.8366,"xcor":        -0.0060,"ycor":         0.0014,"zcor":        -0.0038,"xrms":         0.0020,"yrms":         0.0009,"zrms":         0.0016,"latest":        40.5668,"lonest":        23.0037,"hgtest":       150.0760,"latapr":        40.5668,"lonapr":        23.0037,"hgtapr":       150.0823,"latcor":         0.0003,"loncor":         0.0037,"hgtcor":        -0.0063,"latrms":         0.0007,"lonrms":         0.0006,"hgtrms":         0.0026,"north":         0.0003,"east":         0.0037,"up":        -0.0063,"adj":"ESTIM" } 
+]
+
+}

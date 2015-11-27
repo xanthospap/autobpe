@@ -19,7 +19,7 @@ DEBUG_MODE = 1
 YEAR = 2015
 
 ##  The doy to proccess
-DOY = 215
+DOY = 216
 
 ##  The LOADGPS.setvar file
 B_LOADGPS = ${HOME}/bern52/BERN52/GPS/EXE/LOADGPS.setvar

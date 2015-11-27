@@ -1,0 +1,21 @@
+Connected to 147.102.110.215.
+220---------- Welcome to Pure-FTPd [privsep] [TLS] ----------
+220-You are user number 3 of 300 allowed.
+220-Local time is now 18:53. Server port: 21.
+220-This is a private system - No anonymous login
+220-IPv6 connections are also welcome on this server.
+220 You will be disconnected after 15 minutes of inactivity.
+331 User mitsos OK. Password required
+230-This server supports FXP transfers
+230 OK. Current restricted directory is /
+Remote system type is UNIX.
+Using binary mode to transfer files.
+250 OK. Current directory is /pub/gnss/products/2015/216
+local: /home/bpe/data/GPSDATA/CAMPAIGN52/EPNDENS1/STA/DSO152160.CRD.Z remote: DSO152160_foo.CRD.Z
+200 PORT command successful
+150 Connecting to port 43247
+226-File successfully transferred
+226 0.017 seconds (measured here), 0.97 Mbytes per second
+17580 bytes sent in 0.00 secs (578.1240 MB/s)
+221-Goodbye. You uploaded 18 and downloaded 0 kbytes.
+221 Logout.

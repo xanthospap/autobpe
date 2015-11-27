@@ -1,0 +1,445 @@
+{"command":[
+
+{"switch":"-y", "arg": "2015"},
+{"switch":"-d", "arg": "328"},
+{"switch":"--bern-loadgps", "arg": "/home/bpe/bern52/BERN52/GPS/EXE/LOADGPS.setvar"},
+{"switch":"--campaign", "arg": "lefk15"},
+{"switch":"--satellite-system", "arg": "gps"},{"switch":"--tables-dir", "arg": "/home/bpe/tables/"},
+{"switch":"--save-dir", "arg": "/home/bpe/data/GPSDATA/SAVEDISK/RNX2SNX"},
+{"switch":"--solution-id", "arg": "DSO"},
+{"switch":"--analysis-center", "arg": "cod"},
+{"switch":"--append-suffix", "arg": "_full"},
+{"switch":"--no-atl"},
+{"switch":"--antex", "arg": "/home/bpe/tables/atx/igs081869.atx"},
+{"switch":"--use-epn-exclude"},
+{"switch":"--json-out", "arg": "lefk153280.json"},
+{"switch":"--debug"},
+{"switch":"--skip-remove"}
+],
+
+"general_info":{
+"campaign": "LEFK15",
+"user": "bpe",
+"host":"hypatia",
+"program": {"name":"ddprocess","version":"52","revision":"-10","last_upd":"Oct 2015"},
+"day_processed": "2015-328",
+"interval": {"from":"2015-11-24 00:00:00", "to":"2015-11-24 23:59:30"}
+},
+
+"products":{"dcb": {"info": "Differential Code Bias", "ac": "cod", "format": "DCB", "filename": "", "satsys": "", "host": "ftp.unibe.ch", "type": "running (c1_rnx)"} ,
+"sp3": {"info": "GPS/GNSS Orbit and Clock Information", "ac": "cod", "format": "sp3", "filename": "ftp.unibe.ch/aiub/CODECOD18722.EPH_R", "satsys": "gps+glonass", "host": "ftp.unibe.ch", "type": "rapid (early)"} ,
+"erp": {"info": "Earth Rotation Parameters", "ac": "cod", "format": "erp", "filename": "ftp.unibe.ch/aiub/CODECOD18722.ERP_R", "satsys": "", "host": "ftp.unibe.ch", "type": "rapid (early)"} ,
+"ion": {"info": "Ionospheric correction file.", "ac": "COD", "format": "ION", "filename": "ftp.unibe.ch/aiub/CODECOD18722.ION_R", "satsys": "", "host": "ftp.unibe.ch", "type": "rapid"} ,
+"vmf1":[
+{"info": "Vienna Mapping Function 1 Grid", "ac": "tuwien", "format": "GRD (ascii grid file)", "filename": "http://ggosatm.hg.tuwien.ac.at/DELAY/GRID/VMFG/2015/VMFG_20151124.H00", "satsys": "", "host": "http://ggosatm.hg.tuwien.ac.at", "type": ""} , {"info": "Vienna Mapping Function 1 Grid", "ac": "tuwien", "format": "GRD (ascii grid file)", "filename": "http://ggosatm.hg.tuwien.ac.at/DELAY/GRID/VMFG/2015/VMFG_20151124.H06", "satsys": "", "host": "http://ggosatm.hg.tuwien.ac.at", "type": ""} , {"info": "Vienna Mapping Function 1 Grid", "ac": "tuwien", "format": "GRD (ascii grid file)", "filename": "http://ggosatm.hg.tuwien.ac.at/DELAY/GRID/VMFG/2015/VMFG_20151124.H12", "satsys": "", "host": "http://ggosatm.hg.tuwien.ac.at", "type": ""} , {"info": "Vienna Mapping Function 1 Grid", "ac": "tuwien", "format": "GRD (ascii grid file)", "filename": "http://ggosatm.hg.tuwien.ac.at/DELAY/GRID/VMFG/2015/VMFG_20151124.H18", "satsys": "", "host": "http://ggosatm.hg.tuwien.ac.at", "type": ""} ]
+},
+"solution_identifiers":[
+{"description":"Final Solution", "id":"DSO"},
+{"description":"Size-Reduced", "id":"DSR"},
+{"description":"Preliminary Solution", "id":"DSP"}
+],
+"pcf_variables":[
+{"var_name":"A", "description": "A priori information", "value": "APR" },
+{"var_name":"B", "description": "Orbit/ERP, DCB, CLK information", "value": "COD" },
+{"var_name":"C", "description": "Preliminary (ambiguity-float) results", "value": "DSP" },
+{"var_name":"E", "description": "Final (ambiguity-fixed) results", "value": "DSO" },
+{"var_name":"F", "description": "Size-reduced NEQ information", "value": "DSR" },
+{"var_name":"I", "description": "NEQ iformation for ION estimation", "value": "DDI" },
+{"var_name":"N", "description": "Free network solution", "value": "FNS" },
+{"var_name":"RNXDIR", "description": "Directory with the RINEX files", "value": "RINEX" },
+{"var_name":"OBSSEL", "description": "Station selection file (blank: all)", "value": "" },
+{"var_name":"REFDIR", "description": "Directory with basic Bernese files", "value": "REF52" },
+{"var_name":"REFINF", "description": "Master/reference CRD/VEL filename", "value": "IGB08" },
+{"var_name":"CRDINF", "description": "Merged CRD/VEL filename", "value": "LEFK15" },
+{"var_name":"CRXINF", "description": "Accepted station inform. inconsistencies", "value": "" },
+{"var_name":"BLQINF", "description": "BLQ FILE NAME, CMC CORRECTIONS", "value": "LEFK15" },
+{"var_name":"ATLINF", "description": "ATL FILE NAME, CMC CORRECTIONS", "value": "" },
+{"var_name":"HOIFIL", "description": "Ionosphere model for higher order iono", "value": "HOI$YSS+0" },
+{"var_name":"RESULT", "description": "Directory name for the RNX2SNX results", "value": "RNX2SNX" },
+{"var_name":"SATSYS", "description": "Select the GNSS (GPS, GPS/GLO)", "value": "GPS" },
+{"var_name":"SAMPL", "description": "Sampling of the solutions", "value": "180" },
+{"var_name":"GNSSAR", "description": "GNSS to be used for ambiguity resolution", "value": "ALL" },
+{"var_name":"BL_AMB", "description": "Maximum baseline length for MW/L3 AR", "value": "6000" },
+{"var_name":"BL_QIF", "description": "Maximum baseline length for QIF AR", "value": "2000" },
+{"var_name":"BL_L53", "description": "Maximum baseline length for L5/L3 AR", "value": "200" },
+{"var_name":"BL_L12", "description": "Maximum baseline length for L1&L2 AR", "value": "10" },
+{"var_name":"HOURLY", "description": "Number of hourly sessions proc. together", "value": "8" },
+{"var_name":"MYATX", "description": "ANTEX file for update (name incl. ext)", "value": "" },
+{"var_name":"PCV", "description": "Absolute/relative PCV model", "value": "I08" },
+{"var_name":"SATINF", "description": "Satellite information file", "value": "SATELLIT" },
+{"var_name":"PCVINF", "description": "PCV information file", "value": "PCV_LEF" },
+{"var_name":"SATCRX", "description": "Satellite problem file", "value": "SAT_$Y+0" },
+{"var_name":"ELANG", "description": "Elevation angle (mask) in degrees", "value": "3" },
+{"var_name":"CLU", "description": "Maximum number of files per cluster", "value": "7" },
+{"var_name":"CLUEDT", "description": "Same as V_CLU but for GPSEDT", "value": "5" },
+{"var_name":"CLUFIN", "description": "N: to skip clustering in GPSCLU", "value": "Y" },
+{"var_name":"MINUS", "description": "Session range begin (for COMPAR)", "value": "-6" },
+{"var_name":"PLUS", "description": "Session range end", "value": "+0" },
+{"var_name":"SAV", "description": "Save results?", "value": "N" },
+{"var_name":"DEL", "description": "Delete results?", "value": "N" },
+{"var_name":"STAINF", "description": "None", "value": "LEFK15" },
+{"var_name":"FIXINF", "description": "File with a list of reference stations", "value": "IGB08" }
+],
+
+"saved_products":[{"prod_type":"TRO_SNX","extension":"TRO","local_dir":"ATM","sol_type":"DSO","filename":"DSO153280.TRO","savedas":"DSO153280_full.TRO.Z","host":"147.102.110.69","host_dir":"/2015/328/"},{"prod_type":"SINEX","extension":"SNX","local_dir":"SOL","sol_type":"DSO","filename":"DSO153280.SNX","savedas":"DSO153280_full.SNX.Z","host":"147.102.110.69","host_dir":"/2015/328/"},{"prod_type":"NQ","extension":"NQ0","local_dir":"SOL","sol_type":"DSO","filename":"DSO153280.NQ0","savedas":"DSO153280_full.NQ0.Z","host":"147.102.110.69","host_dir":"/2015/328/"},{"prod_type":"NQ","extension":"NQ0","local_dir":"SOL","sol_type":"DSR","filename":"DSR153280.NQ0","savedas":"DSR153280_full.NQ0.Z","host":"147.102.110.69","host_dir":"/2015/328/"},{"prod_type":"CRD_FILE","extension":"CRD","local_dir":"STA","sol_type":"DSO","filename":"DSO153280.CRD","savedas":"DSO153280_full.CRD.Z","host":"147.102.110.69","host_dir":"/2015/328/"}],
+"warnings":[
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "AGRI", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "PAT0 12622M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "AMAL", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "ANKR 20805M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NICO 14302M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NOA1 12620M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "AGRI", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "PAT0 12622M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "AMAL", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "ANKR 20805M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NICO 14302M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NOA1 12620M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "ARTA", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "HGOU", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "LARM 12610M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "AUT1 12619M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "ARTA", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "HGOU", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "LARM 12610M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "AUT1 12619M002", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "MAT1 12734M009", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "KEFA", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NOT1 12717M004", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "WTZR 14201M010", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "MAT1 12734M009", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "KEFA", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NOT1 12717M004", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "WTZR 14201M010", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NOA1 12620M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "PAT0 12622M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "TUC2 12617M003", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "27", "ZENITH DELAY": "-22.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "28", "ZENITH DELAY": "-23.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "29", "ZENITH DELAY": "-21.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "30", "ZENITH DELAY": "-21.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "31", "ZENITH DELAY": "-20.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "32", "ZENITH DELAY": "-19.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "33", "ZENITH DELAY": "-19.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "34", "ZENITH DELAY": "-18.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "35", "ZENITH DELAY": "-18.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "36", "ZENITH DELAY": "-17.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "37", "ZENITH DELAY": "-16.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "38", "ZENITH DELAY": "-16.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "39", "ZENITH DELAY": "-13.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "53", "ZENITH DELAY": "-22.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "54", "ZENITH DELAY": "-23.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "55", "ZENITH DELAY": "-21.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "56", "ZENITH DELAY": "-21.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "57", "ZENITH DELAY": "-20.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "58", "ZENITH DELAY": "-19.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "59", "ZENITH DELAY": "-19.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "60", "ZENITH DELAY": "-18.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "61", "ZENITH DELAY": "-18.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "62", "ZENITH DELAY": "-17.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "63", "ZENITH DELAY": "-16.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "64", "ZENITH DELAY": "-16.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "65", "ZENITH DELAY": "-14.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "27", "ZENITH DELAY": "-22.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "28", "ZENITH DELAY": "-23.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "29", "ZENITH DELAY": "-21.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "30", "ZENITH DELAY": "-21.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "31", "ZENITH DELAY": "-20.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "32", "ZENITH DELAY": "-19.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "33", "ZENITH DELAY": "-19.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "34", "ZENITH DELAY": "-18.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "35", "ZENITH DELAY": "-18.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "36", "ZENITH DELAY": "-17.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "37", "ZENITH DELAY": "-16.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "38", "ZENITH DELAY": "-16.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "39", "ZENITH DELAY": "-13.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "53", "ZENITH DELAY": "-22.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "54", "ZENITH DELAY": "-23.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "55", "ZENITH DELAY": "-21.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "56", "ZENITH DELAY": "-21.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "57", "ZENITH DELAY": "-20.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "58", "ZENITH DELAY": "-19.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "59", "ZENITH DELAY": "-19.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "60", "ZENITH DELAY": "-18.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "61", "ZENITH DELAY": "-18.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "62", "ZENITH DELAY": "-17.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "63", "ZENITH DELAY": "-16.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "64", "ZENITH DELAY": "-16.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "65", "ZENITH DELAY": "-14.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "NOA1 12620M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "PAT0 12622M001", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"OCEAN LOADING CORRECTION VALUES NOT FOUND", "id":"SR", "routine":"GTOCNL",  "message":{ "STATION NAME": "TUC2 12617M003", "FILE NAME": "${P}/LEFK15/STA/LEFK15.BLQ", "RETURN CODE": "2"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "27", "ZENITH DELAY": "-21.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "28", "ZENITH DELAY": "-23.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "29", "ZENITH DELAY": "-21.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "30", "ZENITH DELAY": "-21.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "31", "ZENITH DELAY": "-21.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "32", "ZENITH DELAY": "-20.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "33", "ZENITH DELAY": "-20.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "34", "ZENITH DELAY": "-19.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "35", "ZENITH DELAY": "-19.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "36", "ZENITH DELAY": "-19.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "37", "ZENITH DELAY": "-18.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "38", "ZENITH DELAY": "-19.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "39", "ZENITH DELAY": "-16.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "53", "ZENITH DELAY": "-22.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "54", "ZENITH DELAY": "-23.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "55", "ZENITH DELAY": "-21.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "56", "ZENITH DELAY": "-21.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "57", "ZENITH DELAY": "-21.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "58", "ZENITH DELAY": "-20.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "59", "ZENITH DELAY": "-20.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "60", "ZENITH DELAY": "-19.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "61", "ZENITH DELAY": "-20.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "62", "ZENITH DELAY": "-19.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "63", "ZENITH DELAY": "-18.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "64", "ZENITH DELAY": "-19.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "65", "ZENITH DELAY": "-16.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "27", "ZENITH DELAY": "-21.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "28", "ZENITH DELAY": "-23.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "29", "ZENITH DELAY": "-21.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "30", "ZENITH DELAY": "-21.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "31", "ZENITH DELAY": "-21.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "32", "ZENITH DELAY": "-20.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "33", "ZENITH DELAY": "-20.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "34", "ZENITH DELAY": "-19.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "35", "ZENITH DELAY": "-19.8 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "36", "ZENITH DELAY": "-19.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "37", "ZENITH DELAY": "-18.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "38", "ZENITH DELAY": "-19.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "39", "ZENITH DELAY": "-16.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "53", "ZENITH DELAY": "-22.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "54", "ZENITH DELAY": "-23.2 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "55", "ZENITH DELAY": "-21.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "56", "ZENITH DELAY": "-21.5 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "57", "ZENITH DELAY": "-21.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "58", "ZENITH DELAY": "-20.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "59", "ZENITH DELAY": "-20.1 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "60", "ZENITH DELAY": "-19.9 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "61", "ZENITH DELAY": "-20.0 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "62", "ZENITH DELAY": "-19.6 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "63", "ZENITH DELAY": "-18.7 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "64", "ZENITH DELAY": "-19.4 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ,
+{ "info":"TILTING ANGLE AND ITS RMS ERROR NOT COMPUTED", "id":"SR", "routine":"TRPVEC",  "message":{ "REQUEST NUMBER": "65", "ZENITH DELAY": "-16.3 M", "MINIMUM ZENITH DELAY TOLERATED": "1.0 M"
+} } ],
+"amb_res_summary":[
+{"baseline":"AGPA", "station1":"AGRI", "station2":"PAT0", "length":   50.2, "method": "pbnl", "num_of_ambs":    74, "percent": 73.0, "satsys": "GPS" } ,
+{"baseline":"AGSP", "station1":"AGRI", "station2":"SPAN", "length":   66.2, "method": "pbnl", "num_of_ambs":    54, "percent": 46.3, "satsys": "GPS" } ,
+{"baseline":"AMRL", "station1":"AMAL", "station2":"RLSO", "length":   30.4, "method": "pbnl", "num_of_ambs":    67, "percent": 43.3, "satsys": "GPS" } ,
+{"baseline":"ARHG", "station1":"ARTA", "station2":"HGOU", "length":   73.3, "method": "pbnl", "num_of_ambs":    51, "percent": 94.1, "satsys": "GPS" } ,
+{"baseline":"ARLA", "station1":"ARTA", "station2":"LARM", "length":  129.9, "method": "pbnl", "num_of_ambs":    48, "percent": 56.2, "satsys": "GPS" } ,
+{"baseline":"ARSP", "station1":"ARTA", "station2":"SPAN", "length":   50.4, "method": "pbnl", "num_of_ambs":    47, "percent": 53.2, "satsys": "GPS" } ,
+{"baseline":"AULA", "station1":"AUT1", "station2":"LARM", "length":  118.1, "method": "pbnl", "num_of_ambs":    95, "percent": 36.8, "satsys": "GPS" } ,
+{"baseline":"HGKA", "station1":"HGOU", "station2":"KASI", "length":   40.1, "method": "pbnl", "num_of_ambs":    48, "percent": 43.8, "satsys": "GPS" } ,
+{"baseline":"KEPO", "station1":"KEFA", "station2":"PONT", "length":   48.7, "method": "pbnl", "num_of_ambs":    48, "percent": 50.0, "satsys": "GPS" } ,
+{"baseline":"KEVL", "station1":"KEFA", "station2":"VLSM", "length":   13.4, "method": "pbnl", "num_of_ambs":    50, "percent": 38.0, "satsys": "GPS" } ,
+{"baseline":"NOPA", "station1":"NOA1", "station2":"PAT0", "length":  183.9, "method": "pbnl", "num_of_ambs":    80, "percent": 46.2, "satsys": "GPS" } ,
+{"baseline":"PARL", "station1":"PAT0", "station2":"RLSO", "length":   37.9, "method": "pbnl", "num_of_ambs":    67, "percent": 46.3, "satsys": "GPS" } ,
+{"baseline":"POSP", "station1":"PONT", "station2":"SPAN", "length":   19.6, "method": "pbnl", "num_of_ambs":    48, "percent": 50.0, "satsys": "GPS" } ,
+{"baseline":"AGPA", "station1":"AGRI", "station2":"PAT0", "length":   50.2, "method": "qif", "num_of_ambs":    40, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"AGSP", "station1":"AGRI", "station2":"SPAN", "length":   66.2, "method": "qif", "num_of_ambs":    58, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"AMRL", "station1":"AMAL", "station2":"RLSO", "length":   30.4, "method": "qif", "num_of_ambs":    76, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"ANNI", "station1":"ANKR", "station2":"NICO", "length":  529.7, "method": "qif", "num_of_ambs":    94, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"ANNO", "station1":"ANKR", "station2":"NOA1", "length":  796.6, "method": "qif", "num_of_ambs":   112, "percent": 16.1, "satsys": "GPS" } ,
+{"baseline":"ARHG", "station1":"ARTA", "station2":"HGOU", "length":   73.3, "method": "qif", "num_of_ambs":     6, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"ARLA", "station1":"ARTA", "station2":"LARM", "length":  129.9, "method": "qif", "num_of_ambs":    42, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"ARSP", "station1":"ARTA", "station2":"SPAN", "length":   50.4, "method": "qif", "num_of_ambs":    44, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"AULA", "station1":"AUT1", "station2":"LARM", "length":  118.1, "method": "qif", "num_of_ambs":   120, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"HGKA", "station1":"HGOU", "station2":"KASI", "length":   40.1, "method": "qif", "num_of_ambs":    54, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"KAMA", "station1":"KASI", "station2":"MAT1", "length":  292.8, "method": "qif", "num_of_ambs":    88, "percent":  6.8, "satsys": "GPS" } ,
+{"baseline":"KEPO", "station1":"KEFA", "station2":"PONT", "length":   48.7, "method": "qif", "num_of_ambs":    48, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"KEVL", "station1":"KEFA", "station2":"VLSM", "length":   13.4, "method": "qif", "num_of_ambs":    62, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"MANT", "station1":"MAT1", "station2":"NOT1", "length":  444.5, "method": "qif", "num_of_ambs":    68, "percent": 26.5, "satsys": "GPS" } ,
+{"baseline":"MAWT", "station1":"MAT1", "station2":"WTZR", "length":  990.0, "method": "qif", "num_of_ambs":   106, "percent":  7.5, "satsys": "GPS" } ,
+{"baseline":"NOPA", "station1":"NOA1", "station2":"PAT0", "length":  183.9, "method": "qif", "num_of_ambs":    86, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"NOTU", "station1":"NOA1", "station2":"TUC2", "length":  279.6, "method": "qif", "num_of_ambs":   144, "percent": 18.1, "satsys": "GPS" } ,
+{"baseline":"PARL", "station1":"PAT0", "station2":"RLSO", "length":   37.9, "method": "qif", "num_of_ambs":    72, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"POSP", "station1":"PONT", "station2":"SPAN", "length":   19.6, "method": "qif", "num_of_ambs":    48, "percent":  0.0, "satsys": "GPS" } ,
+{"baseline":"ANNI", "station1":"ANKR", "station2":"NICO", "length":  529.7, "method": "cbnl", "num_of_ambs":    73, "percent": 35.6, "satsys": "GPS" } ,
+{"baseline":"ANNO", "station1":"ANKR", "station2":"NOA1", "length":  796.6, "method": "cbnl", "num_of_ambs":    73, "percent": 23.3, "satsys": "GPS" } ,
+{"baseline":"KAMA", "station1":"KASI", "station2":"MAT1", "length":  292.8, "method": "cbnl", "num_of_ambs":    59, "percent": 25.4, "satsys": "GPS" } ,
+{"baseline":"MANT", "station1":"MAT1", "station2":"NOT1", "length":  444.5, "method": "cbnl", "num_of_ambs":    75, "percent": 54.7, "satsys": "GPS" } ,
+{"baseline":"MAWT", "station1":"MAT1", "station2":"WTZR", "length":  990.0, "method": "cbnl", "num_of_ambs":    73, "percent": 27.4, "satsys": "GPS" } ,
+{"baseline":"NOPA", "station1":"NOA1", "station2":"PAT0", "length":  183.9, "method": "cbnl", "num_of_ambs":    80, "percent": 17.5, "satsys": "GPS" } ,
+{"baseline":"NOTU", "station1":"NOA1", "station2":"TUC2", "length":  279.6, "method": "cbnl", "num_of_ambs":    88, "percent": 18.2, "satsys": "GPS" } ,
+{"baseline":"ANNI", "station1":"ANKR", "station2":"NICO", "length":  529.7, "method": "cbwl", "num_of_ambs":    73, "percent": 35.6, "satsys": "GPS" } ,
+{"baseline":"ANNO", "station1":"ANKR", "station2":"NOA1", "length":  796.6, "method": "cbwl", "num_of_ambs":    73, "percent": 24.7, "satsys": "GPS" } ,
+{"baseline":"KAMA", "station1":"KASI", "station2":"MAT1", "length":  292.8, "method": "cbwl", "num_of_ambs":    59, "percent": 40.7, "satsys": "GPS" } ,
+{"baseline":"MANT", "station1":"MAT1", "station2":"NOT1", "length":  444.5, "method": "cbwl", "num_of_ambs":    75, "percent": 57.3, "satsys": "GPS" } ,
+{"baseline":"MAWT", "station1":"MAT1", "station2":"WTZR", "length":  990.0, "method": "cbwl", "num_of_ambs":    73, "percent": 27.4, "satsys": "GPS" } ,
+{"baseline":"NOPA", "station1":"NOA1", "station2":"PAT0", "length":  183.9, "method": "cbwl", "num_of_ambs":    80, "percent": 22.5, "satsys": "GPS" } ,
+{"baseline":"NOTU", "station1":"NOA1", "station2":"TUC2", "length":  279.6, "method": "cbwl", "num_of_ambs":    41, "percent": 41.5, "satsys": "GPS" } ,
+{"baseline":"AGPA", "station1":"AGRI", "station2":"PAT0", "length":   50.2, "method": "pbwl", "num_of_ambs":    74, "percent": 91.9, "satsys": "GPS" } ,
+{"baseline":"AGSP", "station1":"AGRI", "station2":"SPAN", "length":   66.2, "method": "pbwl", "num_of_ambs":    54, "percent": 61.1, "satsys": "GPS" } ,
+{"baseline":"AMRL", "station1":"AMAL", "station2":"RLSO", "length":   30.4, "method": "pbwl", "num_of_ambs":    67, "percent": 62.7, "satsys": "GPS" } ,
+{"baseline":"ARHG", "station1":"ARTA", "station2":"HGOU", "length":   73.3, "method": "pbwl", "num_of_ambs":    51, "percent": 100.0, "satsys": "GPS" } ,
+{"baseline":"ARLA", "station1":"ARTA", "station2":"LARM", "length":  129.9, "method": "pbwl", "num_of_ambs":    48, "percent": 64.6, "satsys": "GPS" } ,
+{"baseline":"ARSP", "station1":"ARTA", "station2":"SPAN", "length":   50.4, "method": "pbwl", "num_of_ambs":    47, "percent": 61.7, "satsys": "GPS" } ,
+{"baseline":"AULA", "station1":"AUT1", "station2":"LARM", "length":  118.1, "method": "pbwl", "num_of_ambs":    95, "percent": 53.7, "satsys": "GPS" } ,
+{"baseline":"HGKA", "station1":"HGOU", "station2":"KASI", "length":   40.1, "method": "pbwl", "num_of_ambs":    48, "percent": 64.6, "satsys": "GPS" } ,
+{"baseline":"KEPO", "station1":"KEFA", "station2":"PONT", "length":   48.7, "method": "pbwl", "num_of_ambs":    48, "percent": 62.5, "satsys": "GPS" } ,
+{"baseline":"KEVL", "station1":"KEFA", "station2":"VLSM", "length":   13.4, "method": "pbwl", "num_of_ambs":    50, "percent": 64.0, "satsys": "GPS" } ,
+{"baseline":"NOPA", "station1":"NOA1", "station2":"PAT0", "length":  183.9, "method": "pbwl", "num_of_ambs":    80, "percent": 47.5, "satsys": "GPS" } ,
+{"baseline":"PARL", "station1":"PAT0", "station2":"RLSO", "length":   37.9, "method": "pbwl", "num_of_ambs":    67, "percent": 67.2, "satsys": "GPS" } ,
+{"baseline":"POSP", "station1":"PONT", "station2":"SPAN", "length":   19.6, "method": "pbwl", "num_of_ambs":    48, "percent": 62.5, "satsys": "GPS" } ],
+"addneq_summary":[
+{ "name":"PONT", "xest":   4671272.8280, "yest":   1754437.0525,"zest":   3959389.1071,"xapr":   4671272.5773,"yapr":   1754437.1678,"zapr":   3959389.4277,"xcor":         0.2507,"ycor":        -0.1153,"zcor":        -0.3206,"xrms":         0.0038,"yrms":         0.0021,"zrms":         0.0032,"latest":        38.6190,"lonest":        20.5852,"hgtest":        48.7907,"latapr":        38.6190,"lonapr":        20.5852,"hgtapr":        48.8391,"latcor":        -0.3722,"loncor":        -0.1956,"hgtcor":        -0.0484,"latrms":         0.0012,"lonrms":         0.0012,"hgtrms":         0.0051,"north":        -0.3716,"east":        -0.1961,"up":        -0.0484,"adj":"ESTIM" } ,
+{ "name":"TUC2 12617M003", "xest":   4744543.8316, "yest":   2119412.0131,"zest":   3686258.7499,"xapr":   4744543.7870,"yapr":   2119411.9923,"zapr":   3686258.7210,"xcor":         0.0446,"ycor":         0.0208,"zcor":         0.0288,"xrms":         0.0027,"yrms":         0.0014,"zrms":         0.0024,"latest":        35.5332,"lonest":        24.0706,"hgtest":       160.9213,"latapr":        35.5332,"lonapr":        24.0706,"hgtapr":       160.8646,"latcor":        -0.0052,"loncor":         0.0008,"hgtcor":         0.0568,"latrms":         0.0009,"lonrms":         0.0009,"hgtrms":         0.0037,"north":        -0.0051,"east":         0.0008,"up":         0.0568,"adj":"ESTIM" } ,
+{ "name":"VLSM", "xest":   4699991.5752, "yest":   1765547.7832,"zest":   3921162.1956,"xapr":   4699991.5673,"yapr":   1765547.7604,"zapr":   3921162.1978,"xcor":         0.0080,"ycor":         0.0228,"zcor":        -0.0022,"xrms":         0.0046,"yrms":         0.0025,"zrms":         0.0037,"latest":        38.1768,"lonest":        20.5886,"hgtest":       437.1996,"latapr":        38.1768,"lonapr":        20.5886,"hgtapr":       437.1888,"latcor":        -0.0113,"loncor":         0.0185,"hgtcor":         0.0108,"latrms":         0.0014,"lonrms":         0.0015,"hgtrms":         0.0061,"north":        -0.0113,"east":         0.0185,"up":         0.0108,"adj":"ESTIM" } ,
+{ "name":"SPAN", "xest":   4658312.2363, "yest":   1757780.7256,"zest":   3973702.5607,"xapr":   4658312.1677,"yapr":   1757780.7756,"zapr":   3973702.6004,"xcor":         0.0686,"ycor":        -0.0500,"zcor":        -0.0397,"xrms":         0.0029,"yrms":         0.0015,"zrms":         0.0025,"latest":        38.7813,"lonest":        20.6736,"hgtest":       451.3385,"latapr":        38.7813,"lonapr":        20.6736,"hgtapr":       451.3271,"latcor":        -0.0602,"loncor":        -0.0708,"hgtcor":         0.0114,"latrms":         0.0009,"lonrms":         0.0009,"hgtrms":         0.0039,"north":        -0.0601,"east":        -0.0710,"up":         0.0114,"adj":"ESTIM" } ,
+{ "name":"HGOU", "xest":   4623593.6851, "yest":   1707374.7606,"zest":   4034710.5173,"xapr":   4623593.6946,"yapr":   1707374.7694,"zapr":   4034710.5151,"xcor":        -0.0095,"ycor":        -0.0088,"zcor":         0.0022,"xrms":         0.0025,"yrms":         0.0013,"zrms":         0.0020,"latest":        39.4927,"lonest":        20.2679,"hgtest":        56.0549,"latapr":        39.4927,"lonapr":        20.2679,"hgtapr":        56.0628,"latcor":         0.0093,"loncor":        -0.0049,"hgtcor":        -0.0079,"latrms":         0.0009,"lonrms":         0.0008,"hgtrms":         0.0033,"north":         0.0093,"east":        -0.0050,"up":        -0.0079,"adj":"ESTIM" } ,
+{ "name":"PAT0 12622M001", "xest":   4655002.7924, "yest":   1860619.7275,"zest":   3930281.8272,"xapr":   4655002.7769,"yapr":   1860619.7195,"zapr":   3930281.8104,"xcor":         0.0155,"ycor":         0.0080,"zcor":         0.0169,"xrms":         0.0025,"yrms":         0.0013,"zrms":         0.0022,"latest":        38.2837,"lonest":        21.7868,"hgtest":       121.0541,"latapr":        38.2837,"lonapr":        21.7868,"hgtapr":       121.0300,"latcor":         0.0025,"loncor":         0.0017,"hgtcor":         0.0240,"latrms":         0.0008,"lonrms":         0.0008,"hgtrms":         0.0034,"north":         0.0025,"east":         0.0017,"up":         0.0241,"adj":"ESTIM" } ,
+{ "name":"AMAL", "xest":   4699931.7796, "yest":   1837661.5629,"zest":   3887632.4024,"xapr":   4699931.7717,"yapr":   1837661.5593,"zapr":   3887632.3956,"xcor":         0.0079,"ycor":         0.0036,"zcor":         0.0068,"xrms":         0.0032,"yrms":         0.0017,"zrms":         0.0028,"latest":        37.7959,"lonest":        21.3554,"hgtest":        99.5499,"latapr":        37.7959,"lonapr":        21.3554,"hgtapr":        99.5388,"latcor":         0.0000,"loncor":         0.0005,"hgtcor":         0.0110,"latrms":         0.0011,"lonrms":         0.0011,"hgtrms":         0.0043,"north":         0.0000,"east":         0.0005,"up":         0.0110,"adj":"ESTIM" } ,
+{ "name":"LARM 12610M002", "xest":   4549396.9391, "yest":   1874003.4724,"zest":   4045167.7329,"xapr":   4549396.9415,"yapr":   1874003.4634,"zapr":   4045167.7209,"xcor":        -0.0025,"ycor":         0.0090,"zcor":         0.0120,"xrms":         0.0036,"yrms":         0.0018,"zrms":         0.0030,"latest":        39.6141,"lonest":        22.3879,"hgtest":       151.3158,"latapr":        39.6141,"lonapr":        22.3879,"hgtapr":       151.3072,"latcor":         0.0086,"loncor":         0.0092,"hgtcor":         0.0086,"latrms":         0.0011,"lonrms":         0.0011,"hgtrms":         0.0048,"north":         0.0085,"east":         0.0092,"up":         0.0086,"adj":"ESTIM" } ,
+{ "name":"WTZR 14201M010", "xest":   4075580.3698, "yest":    931853.9817,"zest":   4801568.2388,"xapr":   4075580.3725,"yapr":    931853.9842,"zapr":   4801568.2401,"xcor":        -0.0026,"ycor":        -0.0025,"zcor":        -0.0013,"xrms":         0.0020,"yrms":         0.0010,"zrms":         0.0020,"latest":        49.1442,"lonest":        12.8789,"hgtest":       666.0159,"latapr":        49.1442,"lonapr":        12.8789,"hgtapr":       666.0189,"latcor":         0.0015,"loncor":        -0.0019,"hgtcor":        -0.0030,"latrms":         0.0008,"lonrms":         0.0008,"hgtrms":         0.0028,"north":         0.0015,"east":        -0.0019,"up":        -0.0030,"adj":"HELMR" } ,
+{ "name":"ARTA", "xest":   4623474.6291, "yest":   1774784.5540,"zest":   4005880.0901,"xapr":   4623474.6228,"yapr":   1774784.5595,"zapr":   4005880.0854,"xcor":         0.0063,"ycor":        -0.0055,"zcor":         0.0047,"xrms":         0.0035,"yrms":         0.0017,"zrms":         0.0029,"latest":        39.1568,"lonest":        21.0000,"hgtest":        75.9998,"latapr":        39.1568,"lonapr":        21.0000,"hgtapr":        75.9938,"latcor":         0.0012,"loncor":        -0.0074,"hgtcor":         0.0060,"latrms":         0.0011,"lonrms":         0.0010,"hgtrms":         0.0046,"north":         0.0012,"east":        -0.0074,"up":         0.0060,"adj":"ESTIM" } ,
+{ "name":"NICO 14302M001", "xest":   4359415.5207, "yest":   2874117.1883,"zest":   3650777.9721,"xapr":   4359415.5174,"yapr":   2874117.1920,"zapr":   3650777.9663,"xcor":         0.0033,"ycor":        -0.0038,"zcor":         0.0057,"xrms":         0.0024,"yrms":         0.0014,"zrms":         0.0023,"latest":        35.1410,"lonest":        33.3964,"hgtest":       190.0242,"latapr":        35.1410,"lonapr":        33.3964,"hgtapr":       190.0203,"latcor":         0.0043,"loncor":        -0.0050,"hgtcor":         0.0039,"latrms":         0.0009,"lonrms":         0.0010,"hgtrms":         0.0034,"north":         0.0043,"east":        -0.0050,"up":         0.0039,"adj":"HELMR" } ,
+{ "name":"KASI", "xest":   4616572.4742, "yest":   1674415.6547,"zest":   4056441.3614,"xapr":   4616572.4796,"yapr":   1674415.6441,"zapr":   4056441.3481,"xcor":        -0.0054,"ycor":         0.0107,"zcor":         0.0133,"xrms":         0.0022,"yrms":         0.0011,"zrms":         0.0018,"latest":        39.7464,"lonest":        19.9355,"hgtest":       108.8653,"latapr":        39.7464,"lonapr":        19.9355,"hgtapr":       108.8578,"latcor":         0.0111,"loncor":         0.0118,"hgtcor":         0.0074,"latrms":         0.0008,"lonrms":         0.0008,"hgtrms":         0.0029,"north":         0.0111,"east":         0.0119,"up":         0.0074,"adj":"ESTIM" } ,
+{ "name":"NOT1 12717M004", "xest":   4934546.0303, "yest":   1321265.1955,"zest":   3806456.2868,"xapr":   4934546.0387,"yapr":   1321265.1990,"zapr":   3806456.2924,"xcor":        -0.0083,"ycor":        -0.0035,"zcor":        -0.0056,"xrms":         0.0022,"yrms":         0.0010,"zrms":         0.0019,"latest":        36.8758,"lonest":        14.9898,"hgtest":       126.3268,"latapr":        36.8758,"lonapr":        14.9898,"hgtapr":       126.3374,"latcor":         0.0009,"loncor":        -0.0012,"hgtcor":        -0.0105,"latrms":         0.0007,"lonrms":         0.0007,"hgtrms":         0.0029,"north":         0.0009,"east":        -0.0012,"up":        -0.0105,"adj":"HELMR" } ,
+{ "name":"MAT1 12734M009", "xest":   4641951.2489, "yest":   1393053.8648,"zest":   4133281.0270,"xapr":   4641951.2545,"yapr":   1393053.8637,"zapr":   4133281.0259,"xcor":        -0.0056,"ycor":         0.0011,"zcor":         0.0011,"xrms":         0.0016,"yrms":         0.0009,"zrms":         0.0014,"latest":        40.6491,"lonest":        16.7045,"hgtest":       534.5273,"latapr":        40.6491,"lonapr":        16.7045,"hgtapr":       534.5305,"latcor":         0.0041,"loncor":         0.0027,"hgtcor":        -0.0031,"latrms":         0.0006,"lonrms":         0.0006,"hgtrms":         0.0021,"north":         0.0041,"east":         0.0027,"up":        -0.0031,"adj":"HELMR" } ,
+{ "name":"AGRI", "xest":   4645369.2863, "yest":   1821233.6473,"zest":   3959822.8633,"xapr":   4645369.2796,"yapr":   1821233.6468,"zapr":   3959822.8549,"xcor":         0.0067,"ycor":         0.0005,"zcor":         0.0084,"xrms":         0.0028,"yrms":         0.0014,"zrms":         0.0024,"latest":        38.6235,"lonest":        21.4078,"hgtest":       124.4775,"latapr":        38.6235,"lonapr":        21.4078,"hgtapr":       124.4673,"latcor":         0.0025,"loncor":        -0.0020,"hgtcor":         0.0103,"latrms":         0.0009,"lonrms":         0.0009,"hgtrms":         0.0037,"north":         0.0025,"east":        -0.0020,"up":         0.0103,"adj":"ESTIM" } ,
+{ "name":"NOA1 12620M001", "xest":   4599641.9780, "yest":   2034827.4286,"zest":   3909890.5456,"xapr":   4599641.9733,"yapr":   2034827.4219,"zapr":   3909890.5430,"xcor":         0.0047,"ycor":         0.0067,"zcor":         0.0026,"xrms":         0.0024,"yrms":         0.0013,"zrms":         0.0022,"latest":        38.0471,"lonest":        23.8640,"hgtest":       537.8358,"latapr":        38.0471,"lonapr":        23.8640,"hgtapr":       537.8287,"latcor":        -0.0023,"loncor":         0.0042,"hgtcor":         0.0072,"latrms":         0.0008,"lonrms":         0.0008,"hgtrms":         0.0033,"north":        -0.0023,"east":         0.0042,"up":         0.0071,"adj":"ESTIM" } ,
+{ "name":"KEFA", "xest":   4703108.5596, "yest":   1752637.1484,"zest":   3922567.5987,"xapr":   4703108.5513,"yapr":   1752637.1387,"zapr":   3922567.5981,"xcor":         0.0083,"ycor":         0.0097,"zcor":         0.0006,"xrms":         0.0044,"yrms":         0.0025,"zrms":         0.0036,"latest":        38.1957,"lonest":        20.4382,"hgtest":        44.5941,"latapr":        38.1957,"lonapr":        20.4382,"hgtapr":        44.5850,"latcor":        -0.0065,"loncor":         0.0062,"hgtcor":         0.0091,"latrms":         0.0014,"lonrms":         0.0014,"hgtrms":         0.0059,"north":        -0.0065,"east":         0.0062,"up":         0.0091,"adj":"ESTIM" } ,
+{ "name":"RLSO", "xest":   4679938.9896, "yest":   1840151.2290,"zest":   3910407.6692,"xapr":   4679938.9807,"yapr":   1840151.2207,"zapr":   3910407.6579,"xcor":         0.0089,"ycor":         0.0083,"zcor":         0.0114,"xrms":         0.0028,"yrms":         0.0015,"zrms":         0.0025,"latest":        38.0558,"lonest":        21.4647,"hgtest":       132.9111,"latapr":        38.0558,"lonapr":        21.4647,"hgtapr":       132.8951,"latcor":         0.0019,"loncor":         0.0044,"hgtcor":         0.0159,"latrms":         0.0009,"lonrms":         0.0009,"hgtrms":         0.0038,"north":         0.0019,"east":         0.0044,"up":         0.0160,"adj":"ESTIM" } ,
+{ "name":"ANKR 20805M002", "xest":   4121948.4524, "yest":   2652187.8710,"zest":   4069023.8516,"xapr":   4121948.4392,"yapr":   2652187.8623,"zapr":   4069023.8516,"xcor":         0.0132,"ycor":         0.0087,"zcor":         0.0000,"xrms":         0.0024,"yrms":         0.0014,"zrms":         0.0022,"latest":        39.8874,"lonest":        32.7585,"hgtest":       976.0278,"latapr":        39.8874,"lonapr":        32.7585,"hgtapr":       976.0157,"latcor":        -0.0101,"loncor":         0.0001,"hgtcor":         0.0122,"latrms":         0.0009,"lonrms":         0.0010,"hgtrms":         0.0033,"north":        -0.0101,"east":         0.0001,"up":         0.0122,"adj":"HELMR" } ,
+{ "name":"AUT1 12619M002", "xest":   4466283.2703, "yest":   1896167.1075,"zest":   4126096.8417,"xapr":   4466283.2752,"yapr":   1896167.1018,"zapr":   4126096.8366,"xcor":        -0.0049,"ycor":         0.0057,"zcor":         0.0050,"xrms":         0.0041,"yrms":         0.0020,"zrms":         0.0033,"latest":        40.5668,"lonest":        23.0037,"hgtest":       150.0839,"latapr":        40.5668,"lonapr":        23.0037,"hgtapr":       150.0823,"latcor":         0.0053,"loncor":         0.0071,"hgtcor":         0.0016,"latrms":         0.0013,"lonrms":         0.0012,"hgtrms":         0.0053,"north":         0.0053,"east":         0.0071,"up":         0.0016,"adj":"ESTIM" } 
+]
+
+}
