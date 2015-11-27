@@ -95,7 +95,7 @@ Switches: -a --analysis-center= specify the analysis center; this can be e.g.
            exist in the \'\${TABLES_DIR}\'. The extension of this file, should
            match the \'\${PCV_EXT}\' variable, which is default set to \'I08\'.
            So, given e.g. the argument \'--pcv-file=FOO\', the script will
-           search for the file \'${TABLES_DIR}/pcv/FOO.\${PCV_EXT}\'
+           search for the file \'\${TABLES_DIR}/pcv/FOO.\${PCV_EXT}\'
 
           -r --save-dir= specify directory where the solution will be saved; note that
            if the directory does not exist, it will be created
@@ -1032,14 +1032,29 @@ if test ${#REF_STA_ARRAY[@]} -lt 5; then
 fi
 
 ## transfer all available rinex to RAW/ and uncompress them
+unix_ucmpr() { ##  run uncompress if file ends with '.Z'
+  if test "${1:(-2)}" == ".Z" ; then
+    uncompress -f $1
+    return $?
+  else
+    return 0
+  fi
+}
+crx2rnx_if() { ##  run CRX2RNX if file ends with 'd' or 'D'
+  if [[ "${1:(-1)}" =~ [dD] ]] ; then
+    CRX2RNX -f ${1}
+    return $?
+  else
+    return 0
+  fi
+}
 for i in "${RNX_ARRAY[@]}"; do
   if RNX=${i} \
-        && cp ${D}/${RNX} ${P}/${CAMPAIGN}/RAW/ \
-        && uncompress -f ${P}/${CAMPAIGN}/RAW/${RNX} \
-        && CRX2RNX -f ${P}/${CAMPAIGN}/RAW/${RNX%.Z} \
-        && j=${RNX/%d.Z/o} \
-        && j=${j^^} \
-        && mv ${P}/${CAMPAIGN}/RAW/${RNX/%d.Z/o} ${P}/${CAMPAIGN}/RAW/${j}
+        && cp ${D}/${RNX} ${P}/${CAMPAIGN}/RAW/${RNX^^} \
+        && RNX=${RNX^^} \
+        && unix_ucmpr ${P}/${CAMPAIGN}/RAW/${RNX} \
+        && RNX=${RNX%.Z} \
+        && crx2rnx_if ${P}/${CAMPAIGN}/RAW/${RNX}
   then
     :
   else

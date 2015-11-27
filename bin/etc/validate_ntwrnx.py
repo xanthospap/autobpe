@@ -187,8 +187,16 @@ try:
     print '%-15s %-16s %-9s %-9s %-8s'\
         %("RINEX", "MARKER NAME", "AVAILABLE", "REFERENCE", "EXCLUDED")
     for tpl in SENTENCE:
-        rnx_file      = os.path.join(args.pth2rnx, 
-                      tpl[0] + ('%s%s.%sd.Z'%(DoY, args.session, Cent)) )
+        ## Rinex can be:
+        ## Hatanaka & UNIX compressed,
+        ## Hatanaka and not UNIX compressed
+        ## plain, uncompressed RINEX
+        rnx_fn_a      = tpl[0] + ('%s%s.%sd.Z'%(DoY, args.session, Cent))
+        rnx_fn_b      = tpl[0] + ('%s%s.%sd'%(DoY, args.session, Cent))
+        rnx_fn_c      = tpl[0] + ('%s%s.%so'%(DoY, args.session, Cent))
+        possible_rinex= [ os.path.join(args.pth2rnx, x) 
+                        for x in [rnx_fn_a, rnx_fn_b, rnx_fn_c] ]
+        #rnx_file      = os.path.join(args.pth2rnx, rnx_filename)
         marker_name   = tpl[1]
         marker_number = tpl[2]
         rnx_exists    = 'No' ##  initial guess ...
@@ -204,7 +212,11 @@ try:
             print >> sys.stderr, 'ERROR ! Invalid marker number %s for station %s'%(marker_name, tpl[0])
             raise RuntimeError('')
 
-        if os.path.isfile( rnx_file ): rnx_exists = 'Yes'
+        rnx_file = ''
+        for rnx in possible_rinex:
+            if os.path.isfile( rnx ):
+                rnx_file   = rnx
+                rnx_exists = 'Yes'
         
         if filter( lambda x: re.search(r'^%s\s+'%(used_name.upper()), x), lines):
             rnx_is_ref = 'Yes'
