@@ -208,10 +208,13 @@ END
 
 ##
 ##  argv1 -> file extension (e.g. 'SNX')
-##  argv2 -> campaign dir (e.g. 'SOL')
-##  argv3 -> product type (e.g. 'SINEX')
-##  argv4 -> (optional) sol type, i.e 'F' for final, 'R' for size-reduced and
-##+          'P' for preliminery.
+##  argv2 -> campaign dir   (e.g. 'SOL')
+##  argv3 -> product type   (e.g. 'SINEX')
+##  argv4 -> (optional) sol type
+##+          'F' for final, 
+##+          'R' for size-reduced and
+##+          'P' for preliminery
+##
 save_n_update () {
 
   local solution_id=
@@ -228,13 +231,13 @@ save_n_update () {
         solution_id=${PRELIM_SOLUTION_ID}
         ;;
       *)
-        echoerr "Invalid one-char solution id!"
+        echoerr "[ERROR] Invalid one-char solution id!"
         return 1
         ;;
     esac
   else
     if test "$#" -ne 3 ; then
-      echoerr "Invalid call to save_n_update()."
+      echoerr "[ERROR] Invalid call to save_n_update()."
       return 1
     else
       solution_id=${FINAL_SOLUTION_ID}
@@ -243,33 +246,51 @@ save_n_update () {
  
   local src_f=${solution_id}${YEAR:2:2}${DOY_3C}0.${1} ## source file
   local trg_f=${solution_id}${YEAR:2:2}${DOY_3C}0${APND_SUFFIX}.${1} ## target
+  compress -f ${src_f} && ${src_f}=${src_f}.Z && ${trg_f}=${trg_f}.Z
+  local status=0
+  local host=
 
-  if cp ${P}/${CAMPAIGN}/${2}/${src_f} ${SAVE_DIR}/${YEAR}/${DOY_3C}/${trg_f} \
-     && compress -f ${SAVE_DIR}/${YEAR}/${DOY_3C}/${trg_f} \
-     && add_products_2db.py \
+  ## try to save the product
+  if ! test -z "${SAVE_DIR_HOST}" ; then
+    host=${SAVE_DIR_HOST}
+    ftp -inv $SAVE_DIR_HOST << EOF
+user $SAVE_DIR_URN $SAVE_DIR_PSS
+cd ${SAVE_DIR_DIR}/${YEAR}/${DOY_3C}
+put ${P}/${CAMPAIGN}/${2}/${src_f}
+bye
+EOF
+  status="$?"
+  else
+    host=${HOSTNAME}
+    cp ${P}/${CAMPAIGN}/${2}/${src_f} ${SAVE_DIR}/${YEAR}/${DOY_3C}/${trg_f}
+    status="$?"
+  fi
+
+  if test "${status}" -ne 0 ; then
+    echoerr "[ERROR] Failed to save file: \"${src_f}\"."
+    return 1
+  else
+    echodbg "[DEBUG] File \"$src_f\" saved at \"${host}\" as"
+    echodbg "        \"$trg_f\"."
+  fi
+
+  if add_products_2db.py \
           --campaign-name=${CAMPAIGN} \
           --satellite-system=${DB_SAT_SYS} \
           --solution-type=DDFINAL \
           --product-type="${3}" \
           --start-epoch="${START_OF_DAY_STR/ /_}" \
           --end-epoch="${END_OF_DAY_STR/ /_}" \
-          --host-ip="147.102.110.69" \
+          --host-ip="${host}" \
           --host-dir="${SOL_DIR}/${YEAR}/${DOY_3C}/" \
           --product-filename="${trg_f}.Z" ; then
-#  printf "[SAVED::%s] File %s saved as %s.Z; " \
-#          "$1" "$src_f" "$trg_f"
-#  printf "Database entry inserted at 147.102.110.69%s\n" \
-#          "${SOL_DIR}/${YEAR}/${DOY_3C}/"
-#  printf "<tr><td>%s</td><td><code>%s</code></td><td><code>%s</code></td><td><code>%s</code></td><td>%s</td><td>%s</td></tr>\n" \
-#          "${3}" "${src_f}" "${trg_f}.Z" "${SOL_DIR}/${YEAR}/${DOY_3C}/" \
-#          "${START_OF_DAY_STR/ /_}" "${END_OF_DAY_STR/ /_}"
     printf 1>>${JSON_OUT} "{\"prod_type\":\"%s\",\"extension\":\"%s\",\"local_dir\":\"%s\",\"sol_type\":\"%s\",\"filename\":\"%s\",\"savedas\":\"%s\",\"host\":\"%s\",\"host_dir\":\"%s\"}" \
-      "${3}" "${1}" "${2}" "${solution_id}" "${src_f}" "${trg_f}.Z" "147.102.110.69" "${SOL_DIR}/${YEAR}/${DOY_3C}/"
-  return 0
-else
-  echoerr "ERROR. Failed to save/record ${1} sinex : ${trg_f}"
-  return 1
-fi
+      "${3}" "${1}" "${2}" "${solution_id}" "${src_f}" "${trg_f}" "${host}" "${SOL_DIR}/${YEAR}/${DOY_3C}/"
+      echodbg "[DEBUG] DB updated to include file \"${src_f}\"."
+    else
+      echoerr "[ERROR] Failed to update DB."
+      return 1
+  fi
 }
 
 set_json_out () {
@@ -427,7 +448,7 @@ do
       shift
       ;;
     -r|--save-dir)
-      SAVE_DIR="${2}"
+      SAVE_DIR_DIR="${2}"
       printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
@@ -722,16 +743,29 @@ if test -z ${SOLUTION_ID+x}; then
 fi
 
 ##  save directoy must be set; if it doesn't exist, try to create it
-if test -z ${SAVE_DIR+x}; then
-  echoerr "[ERROR] Save directory must be set!"
-  exit 1
-else
-  SAVE_DIR="${SAVE_DIR%/}"
-  if ! test -d ${SAVE_DIR}; then
-    if ! mkdir -p ${SAVE_DIR}; then
-      echoerr "[ERROR] Failed to create directory ${SAVE_DIR}"
-      exit 1
+if test -z "${SAVE_DIR_HOST}" ; then ##  using this host for saving
+  if test -z ${SAVE_DIR+x}; then
+    echoerr "[ERROR] Save directory must be set!"
+    exit 1
+  else
+    SAVE_DIR="${SAVE_DIR%/}"
+    if ! test -d ${SAVE_DIR}; then
+      if ! mkdir -p ${SAVE_DIR}; then
+        echoerr "[ERROR] Failed to create directory ${SAVE_DIR}"
+        exit 1
+      fi
     fi
+  fi
+else ##  need to see if we have access to host
+  if ! ftp -inv $SAVE_DIR_HOST << EOF
+user $SAVE_DIR_URN $SAVE_DIR_PSS
+cd ${SAVE_DIR_DIR}/${YEAR}/${DOY_3C}
+bye
+EOF
+  then
+    echoerr "[ERROR] Cannot connect to host \"${SAVE_DIR_HOST}\"."
+    echoerr "        Check the username and password."
+    exit 1
   fi
 fi
 
@@ -1453,7 +1487,6 @@ fi
 ## ////////////////////////////////////////////////////////////////////////////
 printf 1>>${JSON_OUT} "\n\"saved_products\":["
 
-if test 1 -eq 1 ; then
 ##  warning: in the db mixed := GPS+GLO
 if test "${SAT_SYS^^}" = "MIXED"; then
   DB_SAT_SYS="GPS+GLO"
@@ -1493,7 +1526,7 @@ if ! save_n_update NQ0 SOL NQ R ; then exit 1 ; else printf "," ; fi
 ## final coordinates
 if ! save_n_update CRD STA CRD_FILE ; then exit 1 ; fi
 } 1>>${JSON_OUT}
-fi
+
 printf 1>>${JSON_OUT} "],\n"
 
 ## ////////////////////////////////////////////////////////////////////////////

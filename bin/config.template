@@ -118,6 +118,20 @@ PCVEXT = I08
 ##+ out (exclude from procssesing) the listed stations.
 USE_EPN_EXCLUDE_LIST = YES
 
+##  Specify where the saved (output) files are going to be placed. If you want
+##+ them to be saved at this HOST, then only set the 'SAVE_DIR_DIR' variable.
+##+ Else, you also need to specify a HOST ('SAVE_DIR_HOST') and a username
+##+ ('SAVE_DIR_URN') and password ('SAVE_DIR_PSS') if needed.
+##  Note that the program 'ftp' will be used to do the transfer (if needed)
+##
+##  Warning: The saved products will actually be placed **not** in the folder 
+##+ 'SAVE_DIR_DIR' but in ${SAVE_DIR_DIR}/YYYY/DDD
+##
+SAVE_DIR_HOST =
+SAVE_DIR_DIR  =
+SAVE_DIR_URN  = anonymous
+SAVE_DIR_PSS  = dso@ntua
+
 ##  Set this variable to 'YES' if you do not want to delete the files
 ##+ created at the campaign's directories during the ddprocess run.
 SKIP_REMOVE = NO
