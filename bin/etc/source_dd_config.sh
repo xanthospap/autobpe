@@ -19,6 +19,6 @@ fi
 
 grep "^\s*[^#].*=.*$" config.template \
         | sed 's/ //g' \
-        | awk -F"=" '/.*=.+/ {print "export",$0}'
+        | awk -F"=" '/.*=.+/ {print "export",$0";"}'
 
 exit 0

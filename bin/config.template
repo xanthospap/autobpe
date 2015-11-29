@@ -39,8 +39,10 @@ APND_SUFFIX = _foo
 ##  json output file
 JSON_OUT = 
 
-##  The satellite system
-SAT_SYS = gps
+##  The satellite system. You can choose between
+##+   * gps, or
+##+   * mixed (i.e. gps+glonass)
+SAT_SYS = mixed
 
 ##  the path to 'tables' directory
 TABLES_DIR = ${HOME}/tables
@@ -65,6 +67,21 @@ USE_REPRO2 = NO
 
 ##  Use CODE's REPRO13 products ('YES' or 'NO')
 COD_REPRO13 = NO
+
+##  Specify the a-priori coordinate file (.CRD) to be used. Only provide the
+##+ filename, the extension is automatically set to '.CRD'. The search path
+##+ for this file, is either ${TABLES_DIR}/sta/ or the campaign's /STA
+##+ directory.
+##  A-priori coordinates are only needed for the sites that:
+##  1. are not recorded in the IGB08_R.[CRD|VEL] files, or
+##  2. are not listed in the EPN class A SSC file (if the 'USE_EPN_A_SSC' var
+##+    is set to 'YES'
+##  If 'USE_EPN_A_SSC' is set to 'YES', then the (remote) file 'EPN_A_IGb08.SSC'
+##+ will be used to etrapolate coordinates, for all class A EPN stations, to
+##+ the given epoch. These coordinates will be merged in the a-priori 
+##+ coordinate file 'APRINF'
+APRINF        = NTUA52
+USE_EPN_A_SSC = YES
 
 ##  Specify the station information file (.STA) to be used. Only provide the
 ##+ filename, the extension is automatically set to '.STA'. The search path
@@ -109,7 +126,7 @@ FIXINF =
 ##+         going to be used to produce a PCV file. The antex file should be
 ##+         ${TABLES_DIR}/atx/${ATXINF}
 ##
-PCVINF = PCV_EPN
+PCVINF = PCV_IGS
 ATXINF =
 PCVEXT = I08
 
@@ -131,6 +148,18 @@ SAVE_DIR_HOST = 147.102.110.215
 SAVE_DIR_DIR  = pub/gnss/products
 SAVE_DIR_URN  = mitsos
 SAVE_DIR_PSS  = mitsos1985
+
+##  The following information affect the database with which the processing
+##+ will interoperate. This database will be used for:
+##  *  RINEX file downloading and validation (rnxdwnl.py, validate_ntwrnx.py)
+##  *  Add new products (optional)
+##  If you do not want to update the database with the (saved) solution files,
+##+ set the variable 'UPD_DB_PROD' to 'NO'.
+DB_HOST     = "147.102.110.73"
+DB_USER     = "hypatia"
+DB_PASS     = "ypat;ia"
+DB_NAME     = "procsta"
+UPD_DB_PROD = YES
 
 ##  Set this variable to 'YES' if you do not want to delete the files
 ##+ created at the campaign's directories during the ddprocess run.

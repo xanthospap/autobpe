@@ -11,7 +11,7 @@ rm run_atx2pcv.sh 2>/dev/null
 ##  call prepare_atx2pcv.py to create the script
 ##+ that call the perl module, plus makes all
 ##+ the required checks.
-if ! ./prepare_atx2pcv.py "$@" --shell-script=run_atx2pcv.sh ; then
+if ! prepare_atx2pcv.py "$@" --shell-script=run_atx2pcv.sh ; then
   exit 1
 fi
 
@@ -26,6 +26,6 @@ done
 chmod +x run_atx2pcv.sh
 ./run_atx2pcv.sh
 
-rm run_atx2pcv.sh
+rm run_atx2pcv.sh 2>/dev/null
 
 exit $?

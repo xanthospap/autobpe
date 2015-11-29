@@ -30,7 +30,7 @@ class CrdPoint:
     if 'line' in kwargs:
         ln = kwargs['line']
         self.name_   = ln[MARKER_NAME_INDEX:
-            MARKER_NAME_INDEX+MARKER_NAME_LENGTH+1+MARKER_NUMBER_LENGTH]
+            MARKER_NAME_INDEX+MARKER_NAME_LENGTH+1+MARKER_NUMBER_LENGTH].strip()
         try:
             self.xcmp_ = float(ln[XCOMP_INDEX:XCOMP_INDEX+XCOMP_LENGTH])
             self.ycmp_ = float(ln[YCOMP_INDEX:YCOMP_INDEX+YCOMP_LENGTH])
@@ -93,12 +93,14 @@ def __getListOfPoints__(crd_filename, stalst=None):
         ln = fin.readline()
         ## Read off all the points and add them to the points list
         while ln:
-            pt = CrdPoint( line=ln )
-            if stalst is not None:
-                if pt.name() in stalst:
+            ## ignore empty lines ...
+            if not re.match('\s*$', ln) :
+                pt = CrdPoint( line=ln )
+                if stalst is not None:
+                    if pt.name() in stalst:
+                        points.append(pt)
+                else:
                     points.append(pt)
-            else:
-                points.append(pt)
             ln = fin.readline()
 
     ## Return the list of points
@@ -208,12 +210,11 @@ def create_crd_file( filename, **kwargs ):
     else                         : ref_system = kwargs['ref_system']
 
     with open( filename, 'w' ) as fout:
+        print >> fout, 'IGb08 coordinates for BERNESE GNSS SOFTWARE 5.2                      %s'%(created_at)
+        print >> fout, '--------------------------------------------------------------------------------'
+        print >> fout, 'LOCAL GEODETIC DATUM: %5s             EPOCH: %s'%(ref_system, epoch_str)
         print >> fout, ''
-        'IGb08 coordinates for BERNESE GNSS SOFTWARE 5.2                      %s'%(created_at)
-        '--------------------------------------------------------------------------------'
-        'LOCAL GEODETIC DATUM: %5s             EPOCH: %s'%(ref_system, epoch_str)
-        ''
-        'NUM  STATION NAME           X (M)          Y (M)          Z (M)     FLAG'
-        ''
+        print >> fout, 'NUM  STATION NAME           X (M)          Y (M)          Z (M)     FLAG'
+        print >> fout, ''
     x = CrdFile( filename )
     return x

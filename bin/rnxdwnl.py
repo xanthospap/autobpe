@@ -43,13 +43,6 @@ import traceback
 import argparse
 
 ## Global variables / default values
-HOST_NAME   = '147.102.110.73'
-USER_NAME   = 'hypatia'
-PASSWORD    = 'ypat;ia'
-DB_NAME     = 'procsta'
-#touppercase = False
-#uncompressZ = False
-#forceRemove = False
 
 # a dictionary to hold start time (hours) for every session character
 ses_identifiers = {
@@ -262,7 +255,6 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
   else:
     return (command_ + ' -O ' + savef_ + ' ' + os.path.join(host_, path_, filename_)), savef_
 
-
 ##  set the cmd parser
 parser = argparse.ArgumentParser(
         description='Download RINEX files for any station/network included in'
@@ -347,6 +339,42 @@ parser.add_argument('--force-remove',
     ' and if found, they will be removed.',
     dest     = 'force_remove'
     )
+##  Database host-name/ip
+parser.add_argument('--db-host',
+    action   = 'store',
+    required = True,
+    help     = 'The host of the database to query.',
+    metavar  = 'DB_HOST',
+    dest     = 'db_host',
+    default  = ''
+    )
+##  Database user 
+parser.add_argument('--db-user',
+    action   = 'store',
+    required = True,
+    help     = 'The username for the database to query.',
+    metavar  = 'DB_USER',
+    dest     = 'db_user',
+    default  = ''
+    )
+##  Database password
+parser.add_argument('--db-pass',
+    action   = 'store',
+    required = True,
+    help     = 'The password for the database to query.',
+    metavar  = 'DB_PASS',
+    dest     = 'db_pass',
+    default  = ''
+    )
+##  Database name 
+parser.add_argument('--db-name',
+    action   = 'store',
+    required = True,
+    help     = 'The name of the database to query.',
+    metavar  = 'DB_NAME',
+    dest     = 'db_name',
+    default  = ''
+    )
 
 ##  Parse command line arguments
 args = parser.parse_args()
@@ -372,10 +400,11 @@ station_info = []
   ## try connecting to the database server
 try:
     db  = MySQLdb.connect(
-            host=HOST_NAME, 
-            user=USER_NAME, 
-            passwd=PASSWORD, 
-            db=DB_NAME)
+            host   = args.db_host, 
+            user   = args.db_user, 
+            passwd = args.db_pass, 
+            db     = args.db_name
+        )
 
     cur = db.cursor()
 
@@ -485,7 +514,7 @@ for row in station_info:
         try:
             executeShellCmd( cmd )
         except ValueError as e:
-            vprint('[ERROR]. Failed to download file \"%s\"'%sf, 1, sys.stderr)
+            vprint('[ERROR] Failed to download file \"%s\"'%sf, 1, sys.stderr)
 
     ## check for empty file
     if os.path.isfile( sf ) and not os.path.getsize( sf ):

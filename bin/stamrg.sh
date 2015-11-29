@@ -11,7 +11,7 @@ rm run_stamrg.sh 2>/dev/null
 ##  call prepare_stamrg.py to create the script
 ##+ that call the perl module, plus makes all
 ##+ the required checks.
-if ! ./prepare_stamrg.py "$@" --shell-script=run_stamrg.sh ; then
+if ! prepare_stamrg.py "$@" --shell-script=run_stamrg.sh ; then
   exit 1
 fi
 
@@ -26,6 +26,6 @@ done
 chmod +x run_stamrg.sh
 ./run_stamrg.sh
 
-# rm run_stamrg.sh
+rm run_stamrg.sh 2>/dev/null
 
 exit $?

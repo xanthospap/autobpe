@@ -37,10 +37,10 @@ check_bpe_run () {
   ##  Grep the status file for /error/. If found, cat all log files
   ##+ to stderr.
   if grep "error" ${status_f} &>/dev/null ; then
-    for i in `ls ${bpe_path}/*.LOG`; do
-      cat ${i} >&2
+    for i in `ls ${bpe_path}/${BERN_TASK_ID}${YEAR:2:2}${DOY_3C}*.LOG`; do
+      cat ${i} >> ${PROC_LOG}
     done
-    cat ${outout_f} >&2
+    cat ${outout_f} >> ${PROC_LOG}
     return 1
   else ## no error hurray !!!!
     return 0
@@ -302,7 +302,7 @@ EOF
           --start-epoch="${START_OF_DAY_STR/ /_}" \
           --end-epoch="${END_OF_DAY_STR/ /_}" \
           --host-ip="${host}" \
-          --host-dir="${SOL_DIR}/${YEAR}/${DOY_3C}/" \
+          --host-dir="${SAVE_DIR_DIR}/${YEAR}/${DOY_3C}/" \
           --product-filename="${trg_f}.Z" ; then
     printf 1>>${JSON_OUT} "{\"prod_type\":\"%s\",\"extension\":\"%s\",\"local_dir\":\"%s\",\"sol_type\":\"%s\",\"filename\":\"%s\",\"savedas\":\"%s\",\"host\":\"%s\",\"host_dir\":\"%s\"}" \
       "${3}" "${1}" "${2}" "${solution_id}" "${src_f}" "${trg_f}" "${host}" "${SOL_DIR}/${YEAR}/${DOY_3C}/"
@@ -311,6 +311,40 @@ EOF
       echoerr "[ERROR] Failed to update DB."
       return 1
   fi
+}
+
+##  This function will remove all files within the
+##+ tmp_file_array array ant ehn exit with the integer
+##+ provided as the first command line argument.
+clear_n_exit () {
+  for f in "${tmp_file_array[@]}" ; do
+    rm $f 2>/dev/null
+  done
+  exit $1
+}
+
+##
+##  Search through a list of command line arguments (short and/or
+##+ long options included), find the long option '--config=<ARG>'
+##+ and return the <ARG>. If not found, return ''
+##
+find_config_file () {
+  local cf=
+  OLD_IFS=${IFS}
+  IFS='='
+  for i in "$@" ; do
+    read -ra arr <<< "$i"
+    if test "${arr[0]}" == "--config" ; then
+      if test ${#arr[@]} -ne 2; then
+        echoerr "ERROR. Invalid cmd: $i"
+        exit 1
+      fi
+      cf="${arr[1]}"
+      break
+    fi
+  done
+  IFS=${OLD_IFS}
+  echo $cf
 }
 
 set_json_out () {
@@ -394,11 +428,12 @@ USE_EUREF_EXCLUDE_LIST=NO
 MY_PRODUCT_AREA=/media/Seagate/solutions52 ## add yyyy/ddd later on
 # MY_PRODUCT_ID optionaly set via cmd, if we are going to search our products
 
-##  database for local/user products
-DB_HOST="147.102.110.73"
-DB_USER="hypatia"
-DB_PASSWORD="ypat;ia"
-DB_DBNAME="procsta"
+##  database for local/user products and RINEX info
+DB_HOST=
+DB_USER=
+DB_PASS=
+DB_NAME=
+UPD_DB_PROD=
 
 ##  FIXME: This needs to be the path to the autobpe/bin directory
 PATH=${PATH}:${HOME}/autobpe/bin
@@ -424,9 +459,16 @@ touch ${TIME_STAMP_FILE}
 date > ${TIME_STAMP_FILE}
 tmp_file_array+=("${TIME_STAMP_FILE}")
 
-## search through the cmd's to find the JSON_OUT (if any)
+##  search through the cmd's to find the JSON_OUT (if any)
 set_json_out $@
 
+##  load the configuration file (if any). This has to be done before
+##+ storing the command line args.
+CONFIG_FILE=$(find_config_file "$@")
+if [ ! -z "${CONFIG_FILE+x}" ] && [ "${CONFIG_FILE}" != "" ] ; then
+  eval $(etc/source_dd_config.sh $CONFIG_FILE)
+  echo "[DEBUG] Found and loaded configuration file: \"${CONFIG_FILE}\"."
+fi
 ## ////////////////////////////////////////////////////////////////////////////
 ## GET/EXPAND COMMAND LINE ARGUMENTS
 ## ////////////////////////////////////////////////////////////////////////////
@@ -645,10 +687,10 @@ do
 done
 
 ##  Source the config file if any
-if ! test -z "${CONFIG_FILE+x}" ; then
-  eval $(etc/source_dd_config.sh $CONFIG_FILE)
-  echodbg "[DEBUG] Read config file \"${CONFIG_FILE}\"."
-fi
+#if ! test -z "${CONFIG_FILE+x}" ; then
+#  eval $(etc/source_dd_config.sh $CONFIG_FILE)
+#  echodbg "[DEBUG] Read config file \"${CONFIG_FILE}\"."
+#fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  LOGFILE, STDERR & STDOUT
@@ -828,7 +870,7 @@ if ! test -f ${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT} ; then
   if ! test -f ${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT}; then
     echoerr "[ERROR] Cannot find the station information file \'${STAINF}.${STAINF_EXT}\'."
     echoerr "        It is neither locate in \'${TABLES}/sta\' nor in \'${P}/${CAMPAIGN}/STA\'."
-  exit 1
+    clear_n_exit 1
   else
     STAINF_FILE=${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT}
   fi
@@ -836,7 +878,7 @@ else
   STAINF_FILE=${TABLES_DIR}/sta/${STAINF}.${STAINF_EXT}
   if ! ln -sf ${STAINF_FILE} ${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT} ; then
     echoerr "[ERROR] Failed to link the station information file \'${STAINF_FILE}\'."
-    exit 1
+    clear_n_exit 1
   fi
 fi
 
@@ -861,14 +903,14 @@ else
         echoerr "[ERROR] Failed to link the BLQ file."
         echoerr "        Link failed \"${blq_src}\" -> \"${blq_trg}\"."
         echoerr "        Processing stoped."
-        exit 1
+        clear_n_exit 1
       else
         echodbg "[DEBUG] Using BLQ file: \"${blq_src}\"."
       fi
     else
       echoerr "[ERROR] Cannot find the specified BLQ file: \"${BLQINF}\"."
       echoerr "        Processing stoped."
-      exit 1
+      clear_n_exit 1
     fi
   fi
 fi
@@ -892,14 +934,14 @@ else
         echoerr "[ERROR] Failed to link the ATL file ."
         echoerr "        Link failed \"${src_atl}\" -> \"${trg_atl}\" ."
         echoerr "        Processing stoped."
-        exit 1
+        clear_n_exit 1
       else
         echodbg "[DEBUG] Using ATL file: \"${src_atl}\" ."
       fi
     else
       echoerr "[ERROR] Cannot find the specified ATL file: \"${ATLINF}\" ."
       echoerr "        Processing stoped."
-      exit 1
+      clear_n_exit 1
     fi
   fi
 fi
@@ -915,7 +957,7 @@ if ! test -f ${TABLES_DIR}/fix/${FIXINF}.FIX ; then
   if ! test -f ${P}/${CAMPAIGN}/STA/${FIXINF}.FIX ; then
     echoerr "[ERROR] Cannot find the fix file \'${FIXINF}.FIX\'"
     echoerr "        It is neither in \'${TABLES_DIR}/fix\' nor in \'${P}/${CAMPAIGN}/STA\'."
-    exit 1
+    clear_n_exit 1
   else
     FIX_FILE=${P}/${CAMPAIGN}/STA/${FIXINF}.FIX
   fi
@@ -923,7 +965,7 @@ else
   FIX_FILE=${TABLES_DIR}/fix/${FIXINF}.FIX
   if ! ln -sf ${FIX_FILE} ${P}/${CAMPAIGN}/STA/${FIXINF}.FIX ; then
     echoerr "[ERROR] Could not link the fix file \'${FIX_FILE}\'"
-    exit 1
+    clear_n_exit 1
   fi
 fi
 echodbg "[DEBUG] Using .FIX file \"${FIX_FILE}\""
@@ -955,7 +997,7 @@ if [ ! -z "${PCVINF+x}" ] && [ ! -z "${ATXINF+x}" ] ; then
   echodbg "        Updating pcv file using the atx2pcv.sh program"
   if ! test -f ${TABLES_DIR}/atx/${ATXINF} ; then
     echoerr "[ERROR] Cannot find the atnex file: \"${TABLES_DIR}/atx/${ATXINF}\"."
-    exit 1
+    clear_n_exit 1
   fi
   if ! test -f ${TABLES_DIR}/pcv/${PCVINF}.${PCV_EXT} ; then
     if ! test -f ${P}/${CAMPAIGN}/OUT/${PCVINF}.${PCV_EXT} ; then
@@ -963,7 +1005,7 @@ if [ ! -z "${PCVINF+x}" ] && [ ! -z "${ATXINF+x}" ] ; then
       echoerr "        the \"${TABLES_DIR}/pcv/\" directory, nor in "
       echoerr "        \"${P}/${CAMPAIGN}/OUT/\"."
       echoerr "        Processing stoped."
-      exit 1
+      clear_n_exit 1
     else
       PCV_FILE=${P}/${CAMPAIGN}/OUT/${PCVINF}.${PCV_EXT}
     fi
@@ -978,7 +1020,7 @@ if [ ! -z "${PCVINF+x}" ] && [ ! -z "${ATXINF+x}" ] ; then
                   --phg-out="PCV_${CAMPAIGN:0:3}" \
                   --loadgps="${B_LOADGPS}" ; then
     echoerr "[ERROR] Failed to make the PCV file!"
-    exit 1
+    clear_n_exit 1
   else
     PCVINF=PCV_${CAMPAIGN:0:3}
   fi
@@ -994,14 +1036,14 @@ else
         if ! ln -sf ${pcv_src} ${pcv_trg} ; then
           echoerr "[ERROR] Failed to link PCV file \"$pcv_src\" to"
           echoerr "        \"${pcv_trg}\". Processing stoped."
-          exit 1
+          clear_n_exit 1
         fi
       else
         echoerr "[ERROR] Failed to find the PCV file \"${PCVINF}.${PCV_EXT}\" "
         echoerr "        in neither \"${X}/GEN/\" directory or in the"
         echoerr "        \"${TABLES_DIR}/pcv/\" directory."
         echoerr "        Processing stoped."
-        exit 1
+        clear_n_exit 1
       fi
     else
       pcv_src=${pcv_trg}
@@ -1017,7 +1059,7 @@ else
     if ! test -f ${TABLES_DIR}/atx/${ATXINF} ; then
       echoerr "[ERROR] Cannot find file: \"${TABLES_DIR}/atx/${ATXINF}\"."
       echoerr "        Processing stoped."
-      exit 1
+      clear_n_exit 1
     fi
     if ! atx2pcv.sh --antex="${TABLES_DIR}/atx/${ATXINF}" \
                     --verbose="${A2P_VRB}" \
@@ -1027,13 +1069,13 @@ else
                     --loadgps="${B_LOADGPS}" ; then
       echoerr "[ERROR] Failed to make the PCV file!"
       echoerr "        Processing stoped."
-      exit 1
+      clear_n_exit 1
     else
       PCVINF=PCV_${CAMPAIGN:0:3}
     fi
   else
-    echoerr "[ERROR] WTF?? What PCV file do you want?"
-    exit 1
+    echoerr "[ERROR] Eisai malakas?  What PCV file do you want?"
+    clear_n_exit 1
   fi
 fi
 ##
@@ -1041,7 +1083,7 @@ fi
 if ! test -f "${X}/GEN/${PCVINF}.${PCV_EXT}" ; then
   echoerr "[ERROR] Failed to make the PCV file (F)! 
                    Cannot find \"${X}/GEN/${PCVINF}.${PCV_EXT}\"."
-  exit 1
+  clear_n_exit 1
 fi
 
 ## ////////////////////////////////////////////////////////////////////////////
@@ -1050,12 +1092,12 @@ fi
 ## ////////////////////////////////////////////////////////////////////////////
 if ! START_OF_DAY_STR=$(ydoy2dt "${YEAR}" "${DOY_3C}") ; then
   echoerr "[ERROR] Failed to parse date."
-  exit 1
+  clear_n_exit 1
 fi
 
 if ! END_OF_DAY_STR=$(ydoy2dt "${YEAR}" "${DOY_3C}" "23" "59" "30") ; then
   echoerr "[ERROR] Failed to parse date."
-  exit 1
+  clear_n_exit 1
 fi
 
 ## ////////////////////////////////////////////////////////////////////////////
@@ -1101,10 +1143,14 @@ if ! rnxdwnl.py \
               --doy=${DOY} \
               --path=${D} \
               --marker-rename \
+              --db-host="${DB_HOST}" \
+              --db-user="${DB_USER}" \
+              --db-pass="${DB_PASS}" \
+              --db-name="${DB_NAME}" \
               -v "${DEBUG_MODE}" \
               1>&2; then
   echoerr "[ERROR] Failed to download RINEX files."
-  exit 1
+  clear_n_exit 1
 fi
 
 ##  make a file with all excluded stations (if any)
@@ -1133,6 +1179,8 @@ fi
 if ! validate_ntwrnx.py \
             --db-host="${DB_HOST}" \
             --db-user="${DB_USER}" \
+            --db-pass="${DB_PASS}" \
+            --db-name="${DB_NAME}" \
             --year="${YEAR}" \
             --doy="${DOY}" \
             --fix-file="${FIX_FILE}" \
@@ -1141,7 +1189,7 @@ if ! validate_ntwrnx.py \
             --exclude-file="${X_STA_FL}" \
             1> .rnxsta.dat; then
   echoerr "[ERROR] Failed to compile rinex/station summary."
-  exit 1
+  clear_n_exit 1
 fi
 
 declare -a RNX_ARRAY     ##  array to hold available rinex files;
@@ -1160,7 +1208,7 @@ if [[ $MAX_NET_STA -lt 0 \
       || ${#STA_ARRAY[@]} -ne ${#RNX_ARRAY[@]} \
       || ! -f .rnxsta.dat ]]; then
   echoerr "[ERROR] Error in handling rinex files/station names."
-  exit 1
+  clear_n_exit 1
 fi
 
 ## make sure number reference stations > 4
@@ -1196,7 +1244,7 @@ for i in "${RNX_ARRAY[@]}"; do
     :
   else
     echoerr "[ERROR] Failed to manipulate rinex file \"${RNX}\"."
-    exit 1
+    clear_n_exit 1
   fi
 done
 
@@ -1220,31 +1268,32 @@ printf 1>>${JSON_OUT} "\n\"products\":{"
 
 ION_DOWNLOADED=0
 
-if mysql -h "${DB_HOST}" \
-        --user="${DB_USER}" \
-        --password="${DB_PASSWORD}" \
-        --database="${DB_NAME}" \
-        --execute="use procsta; \
-         SELECT product.pth2dir, product.filename \
-         FROM product \
-         JOIN prodtype \
-         ON product.prodtype_id=prodtype.prodtype_id \
-         JOIN network \
-         ON product.network_id=network.network_id \
-         WHERE prodtype.prodtype_name=\"ION\" \
-         AND network.network_name=\"${CAMPAIGN}\" \
-         AND product.dateobs_start<=\"${START_OF_DAY_STR}\" \
-         AND product.dateobs_stop>=\"${END_OF_DAY_STR}\";" \
-      | grep -v "+----" \
-      | tail -n +2 \
-      | awk '{print $1$2}' > .procsta-answer.dat \
-    && grep "[a-z,A-Z]*" .procsta-answer.dat &>/dev/null ; then
-  my_ion_file=$(cat .procsta-answer.dat)
-  echoerr "ERROR. NTUA's ION file found but ddprocess does not yet handle that!"
-  echoerr "Write more code bitch!"
-else
-  echoerr "[WARNING]. No NTUA .ION file found."
-fi
+# if mysql -h "${DB_HOST}" \
+#         --user="${DB_USER}" \
+#         --password="${DB_PASSWORD}" \
+#         --database="${DB_NAME}" \
+#         --execute="use procsta; \
+#          SELECT product.pth2dir, product.filename \
+#          FROM product \
+#          JOIN prodtype \
+#          ON product.prodtype_id=prodtype.prodtype_id \
+#          JOIN network \
+#          ON product.network_id=network.network_id \
+#          WHERE prodtype.prodtype_name=\"ION\" \
+#          AND network.network_name=\"${CAMPAIGN}\" \
+#          AND product.dateobs_start<=\"${START_OF_DAY_STR}\" \
+#          AND product.dateobs_stop>=\"${END_OF_DAY_STR}\";" \
+#       | grep -v "+----" \
+#       | tail -n +2 \
+#       | awk '{print $1$2}' > .procsta-answer.dat \
+#     && grep "[a-z,A-Z]*" .procsta-answer.dat &>/dev/null ; then
+#   my_ion_file=$(cat .procsta-answer.dat)
+#   echoerr "ERROR. NTUA's ION file found but ddprocess does not yet handle that!"
+#   echoerr "Write more code bitch!"
+# else
+#   echoerr "[WARNING]. No NTUA .ION file found."
+# fi
+tmp_file_array+=('.procsta-answer.dat')
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  DOWNLOAD PRODUCTS
@@ -1275,7 +1324,7 @@ if test ${ION_DOWNLOADED} -eq 1; then
           --satellite-system="${SAT_SYS}" \
           --report=json; then
     echoerr "[ERROR] Failed to download/copy/uncompress products."
-    exit 1
+    clear_n_exit 1
   fi
 else
   if ! handle_dd_products.py 1>>${JSON_OUT} ${add_option} \
@@ -1288,7 +1337,7 @@ else
           --download-ion \
           --report=json; then
     echoerr "[ERROR] Failed to download/copy/uncompress products."
-    exit 1
+    clear_n_exit 1
   fi
 fi
 
@@ -1313,14 +1362,14 @@ if ! getvmf1.py \
             --json=".vmf1.json" \
             1>${TMP_FL}; then
   echoerr "[ERROR] Failed to get VMF1 grid file(s)."
-  exit 1
+  clear_n_exit 1
 fi
 
 ##  grid files are downloaded to ${D} as individual files; merge them and move
 ##+ to /GRID
 if ! mapfile -t VMF_FL_ARRAY < <(filter_local_vmf1.awk ${TMP_FL}) ; then
   echoerr "[ERROR] Failed to merge VMF1 grid file(s)."
-  exit 1
+  clear_n_exit 1
 else
   MERGED_VMF_FILE=${P}/${CAMPAIGN}/GRD/VMF${YEAR:2:2}${DOY_3C}0.GRD
   >${MERGED_VMF_FILE}
@@ -1329,18 +1378,6 @@ else
   done
 fi
 
-##  write a nice report like the one given by handle_products.
-##if ! mapfile -t VMF_FL_ARRAY < <(cat ${TMP_FL} | awk '{print $2}') ; then
-##  echoerr "ERROR. Failed to report VMF1 grid file(s). Strange !!"
-##  exit 1
-##fi
-##let c=${#VMF_FL_ARRAY[@]}-1
-##tmp_="<code>${VMF_FL_ARRAY[0]}"
-##for i in `seq 1 $c`; do tmp_="${tmp_}, ${VMF_FL_ARRAY[${i}]}"; done
-##tmp_="${tmp_}</code>"
-##printf "<p>Product type: <strong>vmf1</strong> :\
-##  downloaded file(s) %s ; moved to %s</p>\n" \
-##      "$tmp_" "$MERGED_VMF_FILE"
 cat .vmf1.json 1>>${JSON_OUT} 2>/dev/null
 tmp_file_array+=(".vmf1.json")
 
@@ -1388,6 +1425,7 @@ awk -v num_of_clu=${STATIONS_PER_CLUSTER} -f \
 ##+      FINAL_SOLUTION_ID   = 'FFG'
 ##+      PRELIM_SOLUTION_ID  = 'FFP'
 ##+      REDUCED_SOLUTION_ID = 'FFR'
+##       FREENET_SOLUTION_ID = 'FFN'
 ##
 ##  e.g. --solution-id=FFR will result to:
 ##+      FINAL_SOLUTION_ID   = 'FFR'
@@ -1417,9 +1455,18 @@ else
   REDUCED_SOLUTION_ID="${SOLUTION_ID%?}R"
 fi
 
+##  Free network NEQ information
+if test "${FINAL_SOLUTION_ID:(-1)}" == "N"; then
+  echoerr "[WARNING] Last char of final solution is 'N'."
+  FREENET_SOLUTION_ID="${SOLUTION_ID%?}N1"
+  echoerr "          Truncating Free-Network to \"$FREENET_SOLUTION_ID\"."
+else
+  FREENET_SOLUTION_ID="${SOLUTION_ID%?}N"
+fi
 ##  report ..
 {
 printf "\n{\"description\":\"Final Solution\", \"id\":\"%s\"}," "$FINAL_SOLUTION_ID"
+printf "\n{\"description\":\"Free Network Solution\", \"id\":\"%s\"}," "$FREENET_SOLUTION_ID"
 printf "\n{\"description\":\"Size-Reduced\", \"id\":\"%s\"}," "$REDUCED_SOLUTION_ID"
 printf "\n{\"description\":\"Preliminary Solution\", \"id\":\"%s\"}" "$PRELIM_SOLUTION_ID"
 printf "\n],\n"
@@ -1439,7 +1486,7 @@ fi
 
 if ! test -f ${U}/PCF/${PCF_FILE}; then
   echoerr "[ERROR] Invalid pcf file \"${U}/PCF/${PCF_FILE}\"."
-  exit 1
+  clear_n_exit 1
 fi
 
 if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" 1>>${JSON_OUT} \
@@ -1447,6 +1494,7 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" 1>>${JSON_OUT} \
         C="${PRELIM_SOLUTION_ID}" \
         E="${FINAL_SOLUTION_ID}" \
         F="${REDUCED_SOLUTION_ID}" \
+        N="${FREENET_SOLUTION_ID}" \
         BLQINF="${BLQINF}" \
         ATLINF="${ATLINF}" \
         STAINF="${STAINF}" \
@@ -1458,7 +1506,7 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" 1>>${JSON_OUT} \
         FIXINF="${FIXINF}"\
         CLU="${FILES_PER_CLUSTER}"; then
   echoerr "[ERROR] Failed to set variables in PCF file."
-  exit 1
+  clear_n_exit 1
 fi
 
 ##  TODO:    This needs to change... fix the program / make new
@@ -1470,7 +1518,7 @@ fi
 LNS=`/bin/grep POLUPDH ${U}/PCF/${PCF_FILE} | /bin/grep -v "#" | wc -l`
 if test "$LNS" -ne 1 ; then
   echoerr "Non-unique line for POLUPDH in the PCF file; Don't know what to do!"
-  exit 1
+  clear_n_exit 1
 fi
 PAN=`/bin/grep POLUPDH ${U}/PCF/${PCF_FILE} | /bin/grep -v "#" | awk '{print $3}'`
 if ! setpolupdh.sh --bernese-loadvar=${B_LOADGPS} \
@@ -1478,18 +1526,53 @@ if ! setpolupdh.sh --bernese-loadvar=${B_LOADGPS} \
         --pan=${PAN}
 then
   echo "bernese-loadvar=${B_LOADGPS}"
-  exit 1
+  clear_n_exit 1
 fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  A-PRIORI COORDINATES FOR REGIONAL SITES
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
+if test -z "${APRINF+x}" ; then
+  echoerr "[ERROR] You need to specify a valid a-priori coordinate file."
+  clear_n_exit 1
+fi
+
+##  Find the a-priori coordinate file
+if ! test -f ${TABLES_DIR}/crd/${APRINF}.CRD ; then
+  if ! test -f ${P}/${CAMPAIGN}/STA/${APRINF}.CRD ; then
+    echoerr "[ERROR] Failed to find a-priori coordinate file: \"${APRINF}.CRD\""
+    echoerr "        either in \"${TABLES_DIR}/crd\" or in"
+    echoerr "        \"${P}/${CAMPAIGN}/STA\"".
+    clear_n_exit 1
+  else
+    APRCRD_FILE=${P}/${CAMPAIGN}/STA/${APRINF}.CRD
+  fi
+else
+  APRCRD_FILE=${TABLES_DIR}/crd/${APRINF}.CRD
+  echodbg "[DEBUG] Using a-priori coordinate file: \"${APRCRD_FILE}\"."
+fi
+
+##  Should we compile a .CRD file for EPN CLASS A stations ?
+if [ ! -z "${USE_EPN_A_SSC}" ] && [ "${USE_EPN_A_SSC}" = "YES" ] ; then
+  echodbg "[DEBUG] Compiling a-priori coordinate file for EPN class A sites."
+  cat $APRCRD_FILE > TEMP.CRD ##  create a temp so that we don't mess it up
+  APRCRD_FILE=TEMP.CRD
+  tmp_file_array+=('TEMP.CRD')
+  if ! make_euref_apr_crd.py --year="${YEAR}" \
+                          --doy="${DOY}" \
+                          --append-to-crd="${APRCRD_FILE}" ; then
+    echoerr "[ERROR] Failed to make a-priori coordinates for EPN class A sites."
+    clear_n_exit 1
+  fi
+  echodbg "[DEBUG] EPN class A site coordinates appended to file \"${APRCRD_FILE}\"."
+fi
+
 if ! awk -v FLAG=R -v REPLACE_ALL=NO -f \
-        ${P2ETC}/change_crd_flags.awk ${TABLES_DIR}/crd/${CAMPAIGN}.CRD \
+        ${P2ETC}/change_crd_flags.awk ${APRCRD_FILE} \
         1>${P}/${CAMPAIGN}/STA/REG${YEAR:2:2}${DOY_3C}0.CRD; then
   echoerr "[ERROR] Could not create a-priori coordinate file."
-  exit 1
+  clear_n_exit 1
 fi
 
 ## ////////////////////////////////////////////////////////////////////////////
@@ -1499,13 +1582,17 @@ fi
 ## ////////////////////////////////////////////////////////////////////////////
 START_BP=$(date +%s.%N)
 BERN_TASK_ID="${CAMPAIGN:0:1}DD"
+PROC_LOG=.proc${BERN_TASK_ID}${DOY_3C}.log
 
 ##  run the perl script to ignite the PCF
+echodbg "[DEBUG] Fired up the processing engine."
 ${U}/SCRIPT/ntua_pcs.pl ${YEAR} \
           ${DOY_3C}0 \
           NTUA_DDP USER \
           ${CAMPAIGN} \
-          ${BERN_TASK_ID}
+          ${BERN_TASK_ID} \
+          1>${PROC_LOG} \
+          2>${PROC_LOG}
 
 ##  check the status
 if ! check_bpe_run \
@@ -1513,9 +1600,11 @@ if ! check_bpe_run \
       "${CAMPAIGN:0:3}_${BERN_TASK_ID}.RUN" \
       "${CAMPAIGN:0:3}_${BERN_TASK_ID}.OUT" ; then
   echoerr "[ERROR]. Fatal, processing stoped."
-  exit 1
+  echoerr "         Check the log file \"${PROC_LOG}\" for details."
+  clear_n_exit 1
 else
-  :
+  tmp_file_array+=("${PROC_LOG}")
+  echodbg "[DEBUG] Processing done. No errors detected."
 fi
 STOP_BP=$(date +%s.%N)
 
@@ -1523,6 +1612,7 @@ STOP_BP=$(date +%s.%N)
 ##  COPY PRODUCTS TO HOST; UPDATE DATABASE ENTRIES
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
+echo "1"
 printf 1>>${JSON_OUT} "\n\"saved_products\":["
 
 ##  warning: in the db mixed := GPS+GLO
@@ -1537,7 +1627,7 @@ if ! test -d "${SAVE_DIR}/${YEAR}/${DOY_3C}"; then
   echodbg "[DEBUG] Creating solution directory \"${SAVE_DIR}/${YEAR}/${DOY_3C}/\"."
   if ! mkdir -p "${SAVE_DIR}/${YEAR}/${DOY_3C}"; then
     echoerr "[ERROR] Failed to create directory \"${SAVE_DIR}/${YEAR}/${DOY_3C}/\"."
-    exit 1
+    clear_n_exit 1
   fi
 fi
 
@@ -1555,6 +1645,10 @@ if ! save_n_update TRO ATM TRO_SNX ; then exit 1 ; else printf "," ; fi
 ## final SINEX
 if ! save_n_update SNX SOL SINEX ; then exit 1 ; else printf "," ; fi
 
+## Free network SINEX
+## FIXME add free network solution sinex
+## if ! save_n_update SNX SOL SINEX ; then exit 1 ; else printf "," ; fi
+
 ## final NQ0
 if ! save_n_update NQ0 SOL NQ ; then exit 1 ; else printf "," ; fi
 
@@ -1566,12 +1660,12 @@ if ! save_n_update CRD STA CRD_FILE ; then exit 1 ; fi
 } 1>>${JSON_OUT}
 
 printf 1>>${JSON_OUT} "],\n"
-
+echo "2"
 ## ////////////////////////////////////////////////////////////////////////////
 ##  COMPILE (NON-FATAL) ERROR/WARNINGS FILE
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-
+echo "3"
 ##  check that the campaign has a /LOG directory
 if test -d ${P}/${CAMPAIGN}/LOG ; then
   LOG_DIR=LOG
@@ -1593,17 +1687,17 @@ find ${P}/${CAMPAIGN}/OUT/*${YEAR}${DOY_3C}0.ERR -not -empty -ls -exec \
 if test -s ${WRN_FILE} ; then
   if ! wrn2json.py ${WRN_FILE} 1>>${JSON_OUT} 2>/dev/null ; then
     echoerr "[ERROR] Failed to create json warning file!"
-    exit 1
+    clear_n_exit 1
   fi
 else
   echodbg "[DEBUG] Warnings file is empty."
 fi
-
+echo "4"
 ## ////////////////////////////////////////////////////////////////////////////
 ##  ADDNEQ SUMMARY TO HTML
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-
+echo "5"
 ##  the ambiguity summary file
 AMBSM=${P}/${CAMPAIGN}/OUT/AMB${YEAR:2:2}${DOY_3C}0.SUM
 python - <<END 1>>${JSON_OUT}
@@ -1619,7 +1713,7 @@ END
 if test "$?" -ne 0 ; then
   echoerr "[ERROR] Failed to translate ambiguity summary file \"$AMBSM\""
   echoerr "        to json format."
-  exit 1 
+  clear_n_exit 1
 fi
 
 ##  the final ADDNEQ summary file should be
@@ -1637,14 +1731,14 @@ END
 if test "$?" -ne 0 ; then
   echoerr "[ERROR] Cannot translate ADDNEQ2 output file \"${ADNQ}\""
   echoerr "        to json format!"
-  exit 1
+  clear_n_exit 1
 fi
-
+echo "6"
 ## ////////////////////////////////////////////////////////////////////////////
 ##  REMOVE CAMPAIGN FILES
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-
+echo "7"
 if test "${SKIP_REMOVE}" != "YES" ; then
 
 ##  we are going to remove any file in the campaign-specific folders, newer
@@ -1669,17 +1763,22 @@ fi
 printf 1>>${JSON_OUT} "\n}"
 
 STOP_DD=$(date +%s.%N)
-
-
+echo "8"
 ##  PRINT TIME INFO
-
-DD_RT=$(echo "$STOP_DD - $START_DD" | bc)
-RD_RT=$(echo "$STOP_RD - $START_RD" | bc)
-PD_RT=$(echo "$STOP_PD - $START_PD" | bc)
-BP_RT=$(echo "$STOP_BP - $START_BP" | bc)
-echodbg "[DEBUG] Total running time                : $DD_RT"
-echodbg "[DEBUG] Rinex download and manipulation   : $RD_RT"
-echodbg "[DEBUG] Products download and manipulation: $PD_RT"
-echodbg "[DEBUG] Bernese processing                : $BP_RT"
-
-exit 0
+DD_RT=$(echo "scale=2; ($STOP_DD - $START_DD)/1" | bc)
+RD_RT=$(echo "scale=2; ($STOP_RD - $START_RD)/1" | bc)
+RD_PC=$(echo "scale=2; ($RD_RT / $DD_RT) * 100" | bc)
+PD_RT=$(echo "scale=2; ($STOP_PD - $START_PD)/1" | bc)
+PD_PC=$(echo "scale=2; ($PD_RT / $DD_RT) * 100" | bc)
+BP_RT=$(echo "scale=2; ($STOP_BP - $START_BP)/1" | bc)
+BP_PC=$(echo "scale=2; ($BP_RT / $DD_RT) * 100" | bc)
+#echodbg "[DEBUG] Total running time                : $DD_RT ~ 100%"
+#echodbg "[DEBUG] Rinex download and manipulation   : $RD_RT ~ $RD_PC %"
+#echodbg "[DEBUG] Products download and manipulation: $PD_RT ~ $PD_PC %"
+#echodbg "[DEBUG] Bernese processing                : $BP_RT ~ $BP_PC %"
+printf "[DEBUG] Total running time                : %6.2f ~ 100.0%%\n" "$DD_RT"
+printf "[DEBUG] Rinex download and manipulation   : %6.2f ~ %3.1f%%\n" "$RD_RT" "$RD_PC"
+printf "[DEBUG] Products download and manipulation: %6.2f ~ %3.1f%%\n" "$PD_RT" "$PD_PC"
+printf "[DEBUG] Bernese processing                : %6.2f ~ %3.1f%%\n" "$BP_RT" "$BP_PC"
+echo "8"
+clear_n_exit 0

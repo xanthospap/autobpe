@@ -48,87 +48,87 @@ parser = argparse.ArgumentParser(description='Validate rinex/stations.')
 
 ##  database host name
 parser.add_argument('--db-host',
-                    action='store',
-                    required=False,
-                    default='147.102.110.73',
-                    help='The hostname/ip of the MySQL server hosting the database.',
-                    metavar='DB_HOST',
-                    dest='DB_HOST')
+        action    = 'store',
+        required  = True,
+        default   = '',
+        help      = 'The hostname/ip of the MySQL server hosting the database.',
+        metavar   = 'DB_HOST',
+        dest      = 'db_host')
 ##  database user name
 parser.add_argument('--db-user',
-                    action='store',
-                    required=False,
-                    default='hypatia',
-                    help='The user asking permission to query the database.',
-                    metavar='DB_USER',
-                    dest='DB_USER')
+        action   = 'store',
+        required = True,
+        default  = '',
+        help     = 'The user asking permission to query the database.',
+        metavar  = 'DB_USER',
+        dest     = 'db_user')
 ##  database password
 parser.add_argument('--db-pass',
-                    action='store',
-                    required=False,
-                    default='ypat;ia',
-                    help='The password to connect to the database.',
-                    metavar='DB_PASS',
-                    dest='DB_PASS')
+        action   = 'store',
+        required = True,
+        default  = '',
+        help     = 'The password to connect to the database.',
+        metavar  = 'DB_PASS',
+        dest     = 'db_pass')
 ##  database name 
 parser.add_argument('--db-name',
-                    action='store',
-                    required=False,
-                    default='procsta',
-                    help='The name of the database to query.',
-                    metavar='DB_NAME',
-                    dest='DB_NAME')
+        action   = 'store',
+        required = True,
+        default  = '',
+        help     = 'The name of the database to query.',
+        metavar  = 'DB_NAME',
+        dest     = 'db_name')
 ##  The year (4-digit)
 parser.add_argument('-y', '--year',
-                    action='store',
-                    required=True,
-                    help='The year as a four-digit integer.',
-                    metavar='YEAR',
-                    dest='year')
+        action   = 'store',
+        required = True,
+        help     = 'The year as a four-digit integer.',
+        metavar  = 'YEAR',
+        dest     = 'year')
 ##  The day of year (doy) 
 parser.add_argument('-d', '--doy',
-                    action='store',
-                    required=True,
-                    help='The day of year (doy) as integer.',
-                    metavar='DOY',
-                    dest='doy')
+        action   = 'store',
+        required = True,
+        help     = 'The day of year (doy) as integer.',
+        metavar  = 'DOY',
+        dest     = 'doy')
 ##  The .FIX file, i.e. the list of reference files 
 parser.add_argument('-f', '--fix-file',
-                    action='store',
-                    required=True,
-                    help='The .FIX file, i.e. the file holding the names of the'
-                    'reference stations.',
-                    metavar='FIX_FILE',
-                    dest='fix_file')
+        action   = 'store',
+        required = True,
+        help     = 'The .FIX file, i.e. the file holding the names of the'
+        'reference stations.',
+        metavar  = 'FIX_FILE',
+        dest     = 'fix_file')
 ##  The name of the network 
 parser.add_argument('-n', '--network',
-                    action='store',
-                    required=True,
-                    help='The name of the network.',
-                    metavar='NETWORK',
-                    dest='network')
+        action   = 'store',
+        required = True,
+        help     = 'The name of the network.',
+        metavar  = 'NETWORK',
+        dest     = 'network')
 ##  The path to RINEX files 
 parser.add_argument('-p', '--rinex-path',
-                    action='store',
-                    required=True,
-                    help='The path to the rinex file to validate.',
-                    metavar='PTH2RNX',
-                    dest='pth2rnx') 
+        action   = 'store',
+        required = True,
+        help     = 'The path to the rinex file to validate.',
+        metavar  = 'PTH2RNX',
+        dest     = 'pth2rnx') 
 ##  The session
 parser.add_argument('-s', '--session',
-                    action='store',
-                    required=False,
-                    default='0',
-                    help='The session.',
-                    metavar='SESSION',
-                    dest='session') 
+        action   = 'store',
+        required = False,
+        default  = '0',
+        help     = 'The session.',
+        metavar  = 'SESSION',
+        dest     = 'session') 
 ##  File with stations to exclude
 parser.add_argument('-e', '--exclude-file',
-                    action='store',
-                    required=False,
-                    help='A file with stations to be ecluded.',
-                    metavar='EXCLUDE_FILE',
-                    dest='exclude_file') 
+        action   = 'store',
+        required = False,
+        help     = 'A file with stations to be ecluded.',
+        metavar  = 'EXCLUDE_FILE',
+        dest     = 'exclude_file') 
 
 ##  Parse command line arguments
 args = parser.parse_args()
@@ -141,13 +141,13 @@ else:
 
 ## validate cmd arguments
 if not os.path.isfile( args.fix_file ):
-    print >>sys.stderr, 'Invalid Reference fix file: %s'%( args.fix_file )
+    print >>sys.stderr, '[ERROR] Invalid Reference fix file: %s'%( args.fix_file )
     sys.exit(1)
 if not os.path.isdir( args.pth2rnx ):
-    print >>sys.stderr, 'Invalid path to RINEX: %s'%( args.pth2rnx )
+    print >>sys.stderr, '[ERROR] Invalid path to RINEX: %s'%( args.pth2rnx )
     sys.exit(1)
 if len( args.session ) != 1:
-    print >>sys.stderr, 'Invalid session identifier: %s'%( args.session )
+    print >>sys.stderr, '[ERROR] Invalid session identifier: %s'%( args.session )
     sys.exit(1)
 
 ## read all lines from the .FIX file
@@ -158,7 +158,7 @@ try:
     dt = datetime.datetime.strptime('%s-%s'%(int(args.year),int(args.doy)),
                                     '%Y-%j')
 except:
-    print >>sys.stderr, 'Invalid date: year = %s doy = %s'%(args.year, args.doy)
+    print >>sys.stderr, '[ERROR] Invalid date: year = %s doy = %s'%(args.year, args.doy)
     sys.exit(1)
 
 ## Month as 3-char, e.g. Jan (sMon)
@@ -169,10 +169,10 @@ Year, Cent, sMon, iMon, DoM, DoY = dt.strftime('%Y-%y-%b-%m-%d-%j').split('-')
 
 ## try connecting to the database server
 try:
-    db  = MySQLdb.connect(host   = args.DB_HOST, 
-                          user   = args.DB_USER, 
-                          passwd = args.DB_PASS, 
-                          db     = args.DB_NAME)
+    db  = MySQLdb.connect(host   = args.db_host, 
+                          user   = args.db_user, 
+                          passwd = args.db_pass, 
+                          db     = args.db_name)
     cur = db.cursor()
 
     QUERY='SELECT stacode.mark_name_DSO, stacode.mark_name_OFF, stacode.mark_numb_OFF, stacode.station_name FROM stacode JOIN station ON stacode.stacode_id=station.stacode_id JOIN  sta2nets ON sta2nets.station_id=station.station_id JOIN network ON network.network_id=sta2nets.network_id WHERE network.network_name="%s";'%( args.network )
@@ -229,7 +229,7 @@ try:
 except:
     try: db.close()
     except: pass
-    print >> sys.stderr, '***ERROR ! Cannot connect/query database server.'
+    print >> sys.stderr, '[ERROR] Cannot connect/query database server.'
     EXIT_STATUS = FAILURE
 
 sys.exit( EXIT_STATUS )
