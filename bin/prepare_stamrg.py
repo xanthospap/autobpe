@@ -20,6 +20,7 @@ import re
 import os, sys
 import shutil
 import subprocess
+import datetime
 import bernutils.bpcf
 
 def resolve_loadvar( gpsloadvar ):
@@ -114,6 +115,28 @@ parser.add_argument('-f', '--fix-file',
     dest='fix_file'
     )
 
+## The year 
+parser.add_argument('-y', '--year',
+    action='store',
+    required=False,
+    type=int,
+    help='The year',
+    default=datetime.datetime.now().year,
+    metavar='YEAR',
+    dest='year'
+    )
+
+## The day of year 
+parser.add_argument('-d', '--doy',
+    action='store',
+    required=False,
+    type=int,
+    help='The day of year',
+    default=int(datetime.datetime.now().strftime('%j')),
+    metavar='DOY',
+    dest='doy'
+    )
+
 ##  The LOADGPS.setvar file
 parser.add_argument('-b', '--loadgps',
     action='store',
@@ -167,6 +190,12 @@ campaign_dir = os.path.join( bv['P'], args.campaign )
 if not os.path.isdir( campaign_dir ):
     print >> sys.stderr, 'ERROR. Invalid campaign (%s)'%campaign_dir
     sys.exit(1)
+
+##  Resolve the date
+dt      = datetime.datetime.strptime('%04i-%03i'%(args.year, args.doy), '%Y-%j')
+year    = int( dt.strftime('%Y') )
+doy     = int( dt.strftime('%j') )
+session = 0
 
 ##  master sta file:
 ##+ check that it exists
@@ -247,9 +276,6 @@ if not os.path.isfile( perl_script ):
     sys.exit(1)
 
 sys_command_1 = 'source %s'%(args.loadgps)
-year          = 2015
-doy           = 1
-session       = 0
 sys_command_2 = '%s %04i %03i%01i %s'%(perl_script, year, doy, session, args.campaign)
 
 if args.verbosity_level < 2: sys_command_2 += ' 1>/dev/null'

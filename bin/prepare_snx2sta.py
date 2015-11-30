@@ -20,6 +20,7 @@ import re
 import os, sys
 import shutil
 import subprocess
+import datetime
 import bernutils.bpcf
 
 def resolve_loadvar( gpsloadvar ):
@@ -75,8 +76,9 @@ parser.add_argument('-y', '--year',
     help='The year as a four digit integer.',
     metavar='YEAR',
     dest='year',
-    default=2015
+    default=datetime.datetime.now().year,
     )
+
 ## day of year 
 parser.add_argument('-d', '--doy',
     action='store',
@@ -85,17 +87,19 @@ parser.add_argument('-d', '--doy',
     help='The day of year as integer.',
     metavar='DOY',
     dest='doy',
-    default=1
+    default=int(datetime.datetime.now().strftime('%j')),
     )
+
 ## the session
-parser.add_argument('--session',
-    action='store',
-    required=False,
-    help='The session as char.',
-    metavar='SESSION',
-    dest='session',
-    default='0'
-    )
+#parser.add_argument('--session',
+#    action='store',
+#    required=False,
+#    help='The session as char.',
+#    metavar='SESSION',
+#    dest='session',
+#    default='0'
+#    )
+
 ##  Input sinex file
 parser.add_argument('-s', '--sinex',
     action='store',
@@ -188,6 +192,12 @@ if not os.path.isdir( campaign_dir ):
     print >> sys.stderr, 'ERROR. Invalid campaign (%s)'%campaign_dir
     sys.exit(1)
 
+##  Resolve the date
+dt      = datetime.datetime.strptime('%04i-%03i'%(args.year, args.doy), '%Y-%j')
+year    = int( dt.strftime('%Y') )
+doy     = int( dt.strftime('%j') )
+session = 0
+
 ##  sinex file:
 ##+ check that it exists
 ##+ link to the campaigns STA dir
@@ -247,10 +257,7 @@ if not os.path.isfile( perl_script ):
     sys.exit(1)
 
 sys_command_1 = 'source %s'%(args.loadgps)
-year          = args.year
-doy           = args.doy
-session       = args.session
-sys_command_2 = '%s %04i %03i%1s %s'%(perl_script, year, doy, session, args.campaign)
+sys_command_2 = '%s %04i %03i%01i %s'%(perl_script, year, doy, session, args.campaign)
 
 if args.verbosity_level < 2: sys_command_2 += ' 1>/dev/null'
 if args.verbosity_level < 1: sys_command_2 += ' 2>/dev/null'
