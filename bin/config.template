@@ -87,21 +87,21 @@ USE_EPN_A_SSC = YES
 ##+ filename, the extension is automatically set to '.STA'. The search path
 ##+ for this file, is either ${TABLES_DIR}/sta/ or the campaign's /STA
 ##+ directory
-STAINF = EPNDENS
+STAINF = EPN
 
 ##  The filename of the atl (i.e atmospheric tidal loading) corrections file.
 ##+ If the values is left blank, then no atl file is going to be used
 ##  If you do specify a file, do **not** use an extension; also the file
 ##+ should be placed either in the ${TABLES_DIR}/atl directory or in the 
 ##+ campaign's /STA directory.
-ATLINF = 
+ATLINF =  EPNDENS
 
 ##  The filename of the blq (i.e tidal loading) corrections file.
 ##+ If the values is left blank, then no blq file is going to be used
 ##  If you do specify a file, do **not** use an extension; also the file
 ##+ should be placed either in the ${TABLES_DIR}/blq directory or in the
 ##+ campaign's /STA directory.
-BLQINF = 
+BLQINF = EPN_FES2004
 
 ##  Specify the name of the .FIX file, i.e. the name of the file where the
 ##+ reference stations are recorded. This file should be placed in either in 

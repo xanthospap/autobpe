@@ -23,6 +23,29 @@ import subprocess
 import datetime
 import bernutils.bpcf
 
+
+
+def set_antnum( inpfile, option=False ):
+    field_found = 0
+    with open( inpfile + 'tmp' , 'w' ) as out:
+        with open( inpfile, 'r' ) as f :
+            for line in f.readlines():
+                if re.match( '^ANTNUM 1  \"[0|1]\"', line ):
+                    #gr = re.match( '^ANTNUM 1  \"([0|1])\"', line )
+                    i_option = '0'
+                    if option : i_option = '1'
+                    print >> out, re.sub("\"([0|1])\"\s*$", "\"%s\""%(i_option), line).rstrip('\n')
+                    field_found += 1
+                elif re.match( '^NOZERO 1  \"[0|1]\"', line ):
+                   i_option = '1'
+                   if option : i_option = '0'
+                   print >> out, re.sub("\"([0|1])\"\s*$", "\"%s\""%(i_option), line).rstrip('\n')
+                   field_found += 1
+                else :
+                    print >> out, line.strip('\n')
+    shutil.move( inpfile + 'tmp', inpfile )
+    return ( field_found == 2 )
+
 def resolve_loadvar( gpsloadvar ):
 #''' Given a Bernese LOADGPS.setvar file, this function will return all
 #    exported variables in a dictionary; this dictionary will be returned.
@@ -58,6 +81,7 @@ def resolve_bern_var_dict( bern_dict ):
 ## -------------------------------------------- ##
 PCF_FILENAME = 'ATX2PCV.PCF'
 PL_FILENAME  = 'ntua_a2p.pl'
+INP_FILENAME = 'ATX2PCV.INP'
 
 ##  Set the cmd parser.
 parser = argparse.ArgumentParser(
@@ -181,6 +205,24 @@ parser.add_argument('--shell-script',
     dest='shell_script'
     )
 
+##  Do not link the output PHG file to ${X}/GEN
+parser.add_argument('--no-link',
+    action='store_false',
+    help='If this switch is specified, then a link will **NOT** be made from'
+    'the output PHG file to ${X}/EGN directory. By default, this link will'
+    'be made (changing .PHG to .I08).',
+    dest='link_to_gen'
+    )
+
+##  Set individual calibration for antennas
+parser.add_argument('--enable-individual-calibration',
+    action='store_true',
+    help='If this switch is specified, then the value of the \"ANTNUM\" variable'
+    'in the \"ATX2PCV.INP\" file will be set to \"1\". This is used to enable'
+    'individual antenna calibrations.',
+    dest='set_ind_clbr'
+    )
+
 ##  Verbosity level
 parser.add_argument('-v', '--verbose',
     action='store',
@@ -302,6 +344,15 @@ pcf_inst.set_variable(var_name='PCV',    val=args.type_ext)
 pcf_inst.set_variable(var_name='PHGINF', val=args.out_pcv_file)
 pcf_inst.flush_variables()
 
+##  set the option (or not) to enable individual calibration
+INP_FILE = os.path.join( bv['U'], 'OPT', 'A2P_GEN', INP_FILENAME )
+if not os.path.isfile( INP_FILE ):
+    print >> sys.stderr, "[ERROR] INP file \"%s\" does not exist."%(INP_FILE)
+    sys.exit( 1 )
+if not set_antnum( INP_FILE, args.set_ind_clbr ):
+    print >> sys.stderr, "[ERROR] Could not set varibles in the INP file \"%s\""%(INP_FILE)
+    sys.exit( 1 )
+
 ##  ok, now call the perl script, that actually call atx2pcv ...
 perl_script = os.path.join( bv['U'], 'SCRIPT', PL_FILENAME )
 if not os.path.isfile( perl_script ):
@@ -344,10 +395,16 @@ if args.shell_script is not None:
         print >> fout, '\techo \'[INFO] produced file seems empty: %s\''%(phg_out)
         print >> fout, '\texit 1'
         print >> fout, 'else'
-        print >> fout, '\tln -sf %s %s'%(phg_out, phg_gen)
+        if args.link_to_gen :
+            print >> fout, '\tln -sf %s %s'%(phg_out, phg_gen)
         if args.verbosity_level > 0:
             print >> fout, '\techo \'[DEBUG] PCV file %s created as %s.\''%(args.out_pcv_file, phg_out)
+        if args.link_to_gen and args.verbosity_level > 0:
             print >> fout, '\techo \'[DEBUG] PCV file linked to %s\''%(phg_gen)
+        elif not args.link_to_gen and args.verbosity_level > 0:
+            print >> fout, '\techo \'[DEBUG] PCV file not linked to %s dir\''%(os.path.join(bv['X'], 'GEN'))
+        elif not args.link_to_gen and not args.verbosity_level > 0:
+            print >> fout, '\t:'
         print >> fout, 'fi'
         for rmf in files_to_delete: print >> fout, 'rm %s'%(rmf)
         print >> fout, 'exit 0'

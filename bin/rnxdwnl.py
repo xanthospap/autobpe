@@ -141,7 +141,7 @@ def subMarkerName( filename, marker_name ):
     if marker_in_rinex == '':
         print >> sys.stderr, '[ERROR] Cannot find \'MARKER NAME\' in Rinex file \'%s\''%(rinex_filename)
     if marker_in_rinex != marker_name :
-        vprint('[DEBUG] Cahnging marker name from \'%s\' to \'%s\' for \'%s\''%(marker_in_rinex, marker_name, rinex_filename), 1)
+        vprint('[DEBUG] Changing marker name from \'%s\' to \'%s\' for \'%s\''%(marker_in_rinex, marker_name, rinex_filename), 1)
         with open(rinex_filename, 'r') as fin:
             with open(rinex_filename+'.tmp', 'w') as fout:
                 for line in fin.readlines():

@@ -924,20 +924,20 @@ if [ -z "${ATLINF+x}" ] || [ "${ATLINF}" == "" ] ; then
   echodbg "[DEBUG] Not using an ATL file."
   ATLINF=
 else
-  if test -f ${P}/${CAMPAIGN}/STA/${ATLINF}.ATL ; then
-    echodbg "[DEBUG] Using ATL file: \"${P}/${CAMPAIGN}/STA/${ATLINF}.ATL\"."
+  if test -f ${TABLES_DIR}/atl/${ATLINF}.ATL ; then
+    src_atl=${TABLES_DIR}/atl/${ATLINF}.ATL
+    trg_atl=${P}/${CAMPAIGN}/STA/${ATLINF}.ATL
+    if ! ln -sf ${src_atl} ${trg_atl} ; then
+      echoerr "[ERROR] Failed to link the ATL file ."
+      echoerr "        Link failed \"${src_atl}\" -> \"${trg_atl}\" ."
+      echoerr "        Processing stoped."
+      clear_n_exit 1
+    else
+      echodbg "[DEBUG] Using ATL file: \"${src_atl}\" ."
+    fi
   else
-    if test -f ${TABLES_DIR}/atl/${ATLINF}.ATL ; then
-      src_atl=${TABLES_DIR}/atl/${ATLINF}.ATL
-      trg_atl=${P}/${CAMPAIGN}/STA/${ATLINF}.ATL
-      if ! ln -sf ${src_atl} ${trg_atl} ; then
-        echoerr "[ERROR] Failed to link the ATL file ."
-        echoerr "        Link failed \"${src_atl}\" -> \"${trg_atl}\" ."
-        echoerr "        Processing stoped."
-        clear_n_exit 1
-      else
-        echodbg "[DEBUG] Using ATL file: \"${src_atl}\" ."
-      fi
+    if test -f ${P}/${CAMPAIGN}/STA/${ATLINF}.ATL ; then
+      echodbg "[DEBUG] Using ATL file: \"${P}/${CAMPAIGN}/STA/${ATLINF}.ATL\"."
     else
       echoerr "[ERROR] Cannot find the specified ATL file: \"${ATLINF}\" ."
       echoerr "        Processing stoped."
@@ -1612,7 +1612,6 @@ STOP_BP=$(date +%s.%N)
 ##  COPY PRODUCTS TO HOST; UPDATE DATABASE ENTRIES
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-echo "1"
 printf 1>>${JSON_OUT} "\n\"saved_products\":["
 
 ##  warning: in the db mixed := GPS+GLO
@@ -1660,12 +1659,10 @@ if ! save_n_update CRD STA CRD_FILE ; then exit 1 ; fi
 } 1>>${JSON_OUT}
 
 printf 1>>${JSON_OUT} "],\n"
-echo "2"
 ## ////////////////////////////////////////////////////////////////////////////
 ##  COMPILE (NON-FATAL) ERROR/WARNINGS FILE
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-echo "3"
 ##  check that the campaign has a /LOG directory
 if test -d ${P}/${CAMPAIGN}/LOG ; then
   LOG_DIR=LOG
@@ -1692,12 +1689,10 @@ if test -s ${WRN_FILE} ; then
 else
   echodbg "[DEBUG] Warnings file is empty."
 fi
-echo "4"
 ## ////////////////////////////////////////////////////////////////////////////
 ##  ADDNEQ SUMMARY TO HTML
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-echo "5"
 ##  the ambiguity summary file
 AMBSM=${P}/${CAMPAIGN}/OUT/AMB${YEAR:2:2}${DOY_3C}0.SUM
 python - <<END 1>>${JSON_OUT}
@@ -1733,12 +1728,10 @@ if test "$?" -ne 0 ; then
   echoerr "        to json format!"
   clear_n_exit 1
 fi
-echo "6"
 ## ////////////////////////////////////////////////////////////////////////////
 ##  REMOVE CAMPAIGN FILES
 ##  ---------------------------------------------------------------------------
 ## ////////////////////////////////////////////////////////////////////////////
-echo "7"
 if test "${SKIP_REMOVE}" != "YES" ; then
 
 ##  we are going to remove any file in the campaign-specific folders, newer
@@ -1780,5 +1773,5 @@ printf "[DEBUG] Total running time                : %6.2f ~ 100.0%%\n" "$DD_RT"
 printf "[DEBUG] Rinex download and manipulation   : %6.2f ~ %3.1f%%\n" "$RD_RT" "$RD_PC"
 printf "[DEBUG] Products download and manipulation: %6.2f ~ %3.1f%%\n" "$PD_RT" "$PD_PC"
 printf "[DEBUG] Bernese processing                : %6.2f ~ %3.1f%%\n" "$BP_RT" "$BP_PC"
-echo "8"
+echo "9"
 clear_n_exit 0
