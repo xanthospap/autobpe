@@ -23,6 +23,10 @@ import subprocess
 import datetime
 import bernutils.bpcf
 
+def vprint( message, min_verb_level, std_buf=None ):
+    if std_buf is None : std_buf = sys.stdout
+    if args.verbosity_level >= min_verb_level: print >> std_buf, message
+
 def resolve_loadvar( gpsloadvar ):
 #''' Given a Bernese LOADGPS.setvar file, this function will return all
 #    exported variables in a dictionary; this dictionary will be returned.
@@ -211,7 +215,9 @@ symlink_target = os.path.join(campaign_dir, 'STA', master_sta_filename)
 if symlink_source != symlink_target:
     ## if such file already exists, first move it
     if os.path.isfile( symlink_target ):
+        vprint('[DEBUG] Moving old STA file \"%s\" to \"%s\"'%(symlink_target, symlink_target + '.bck'), 2, sys.stdout)
         shutil.move( symlink_target, symlink_target + '.bck' )
+    vprint('[DEBUG] Creating link: \"%s\" -> \"%s\"'%(symlink_source, symlink_target), 2)
     os.symlink( symlink_source, symlink_target )
     files_to_delete.append( symlink_target )
 
@@ -229,11 +235,13 @@ symlink_target = os.path.join(campaign_dir, 'STA', secondary_sta_filename)
 if symlink_source != symlink_target:
     ## if such file already exists, first move it
     if os.path.isfile( symlink_target ):
+        vprint('[DEBUG] Moving old STA file \"%s\" to \"%s\"'%(symlink_target, symlink_target + '.bck'), 2, sys.stdout)
         shutil.move( symlink_target, symlink_target + '.bck' )
+    vprint('[DEBUG] Creating link: \"%s\" -> \"%s\"'%(symlink_source, symlink_target), 2)
     os.symlink( symlink_source, symlink_target )
     files_to_delete.append( symlink_target )
 
-##  input .fix file (if any)
+##  Input .fix file (if any)
 ##+ check that it exists
 ##+ if needed, link it to STA dir
 if args.fix_file != '':
@@ -245,6 +253,7 @@ if args.fix_file != '':
     if fix_dir  != os.path.join(bv['P'], 'STA'):
         symlink_source = os.path.join( fix_dir, fix_filename )
         symlink_target = os.path.join(bv['P'], 'STA', fix_filename)
+        vprint('[DEBUG] Creating link: \"%s\" -> \"%s\"'%(symlink_source, symlink_target), 2)
         os.symlink( symlink_source, symlink_target )
         files_to_delete.append( symlink_target )
 else:
@@ -306,7 +315,7 @@ if args.shell_script is not None:
         print >> fout, '#fi'
         print >> fout, 'if ! test -f %s ; then'%(sta_out)
         print >> fout, '\techo \'ERROR. Could not merge the sta files!\' 1>&2'
-        print >> fout, '\techo \'        Check the log file \'%s\' for details\' 1>&2'%(log_proc)
+        print >> fout, '\techo \'       Check the log file \'%s\' for details\' 1>&2'%(log_proc)
         print >> fout, '\techo \'[INFO] produced file seems empty: %s\''%(sta_out)
         print >> fout, '\texit 1'
         print >> fout, 'else'
@@ -316,6 +325,8 @@ if args.shell_script is not None:
             print >> fout, '\t:'
         print >> fout, 'fi'
         for rmf in files_to_delete: print >> fout, 'rm %s'%(rmf)
+        if args.verbosity_level > 1:
+            for rmf in files_to_delete: print >> fout, 'echo \"[DEBUG] Removed file %s\"'%(rmf)
         print >> fout, 'exit 0'
 
 else:

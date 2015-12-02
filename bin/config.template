@@ -34,7 +34,7 @@ SOLUTION_ID = DSO
 SAVE_DIR = ${HOME}/data/SAVEDISK
 
 ##  Append suffix to saved products
-APND_SUFFIX = _foo
+APND_SUFFIX = _gps
 
 ##  json output file
 JSON_OUT = 
@@ -42,7 +42,7 @@ JSON_OUT =
 ##  The satellite system. You can choose between
 ##+   * gps, or
 ##+   * mixed (i.e. gps+glonass)
-SAT_SYS = mixed
+SAT_SYS = gps
 
 ##  the path to 'tables' directory
 TABLES_DIR = ${HOME}/tables
@@ -101,12 +101,12 @@ ATLINF =  EPNDENS
 ##  If you do specify a file, do **not** use an extension; also the file
 ##+ should be placed either in the ${TABLES_DIR}/blq directory or in the
 ##+ campaign's /STA directory.
-BLQINF = EPN_FES2004
+BLQINF = EPN
 
 ##  Specify the name of the .FIX file, i.e. the name of the file where the
 ##+ reference stations are recorded. This file should be placed in either in 
 ##+ the tables/fix directory or in the campaign's /STA directory.
-FIXINF = 
+FIXINF = IGB08
 
 ##  Specify the filename, with **no extension** of the pcv (ie. phase centre
 ##+ variations) file to be used. This option, works together with the 'ANTEX'
@@ -126,7 +126,7 @@ FIXINF =
 ##+         going to be used to produce a PCV file. The antex file should be
 ##+         ${TABLES_DIR}/atx/${ATXINF}
 ##
-PCVINF = PCV_IGS
+PCVINF = PCV_EPN
 ATXINF =
 PCVEXT = I08
 
@@ -134,6 +134,10 @@ PCVEXT = I08
 ##  This exclusion list will be downloaded from the web and used to mark
 ##+ out (exclude from procssesing) the listed stations.
 USE_EPN_EXCLUDE_LIST = YES
+
+##  Optionaly, you can specify a file with a list of stations (one 'MARKER DOME'
+##+ per line) to be excluded from the processing.
+STA_EXCLUDE_FILE = /home/bpe/tables/sta/EPNDENS.EXC
 
 ##  Specify where the saved (output) files are going to be placed. If you want
 ##+ them to be saved at this HOST, then only set the 'SAVE_DIR_DIR' variable.
@@ -163,6 +167,6 @@ UPD_DB_PROD = YES
 
 ##  Set this variable to 'YES' if you do not want to delete the files
 ##+ created at the campaign's directories during the ddprocess run.
-SKIP_REMOVE = NO
+SKIP_REMOVE = YES
 
 ##  END OF CONFIG FILE

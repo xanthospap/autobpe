@@ -213,8 +213,9 @@ END
 ##  argv3 -> product type   (e.g. 'SINEX')
 ##  argv4 -> (optional) sol type
 ##+          'F' for final, 
-##+          'R' for size-reduced and
+##+          'R' for size-reduced
 ##+          'P' for preliminery
+##+          'N' for free-network
 ##
 save_n_update () {
 
@@ -230,6 +231,9 @@ save_n_update () {
         ;;
       P|p)
         solution_id=${PRELIM_SOLUTION_ID}
+        ;;
+      N|n)
+        solution_id=${FREENET_SOLUTION_ID}
         ;;
       *)
         echoerr "[ERROR] Invalid one-char solution id!"
@@ -409,7 +413,7 @@ PCV_EXT=I08
 STAINF_EXT="STA"            ##  the extension
 
 ## fix file
-FIXINF=IGB08
+# FIXINF=
 
 ## blq file
 # BLQINF=
@@ -893,20 +897,22 @@ if [ -z "${BLQINF+x}" ] || [ "${BLQINF}" == "" ]; then
   echodbg "[DEBUG] Not using a BLQ file."
   BLQINF=
 else
-  if test -f ${P}/${CAMPAIGN}/STA/${BLQINF}.BLQ ; then
-    echodbg "[DEBUG] Using BLQ file: \"${P}/${CAMPAIGN}/STA/${BLQINF}.BLQ\"."
+  #if test -f ${P}/${CAMPAIGN}/STA/${BLQINF}.BLQ ; then
+  #  echodbg "[DEBUG] Using BLQ file: \"${P}/${CAMPAIGN}/STA/${BLQINF}.BLQ\"."
+  if test -f ${TABLES_DIR}/blq/${BLQINF}.BLQ ; then
+    blq_src=${TABLES_DIR}/blq/${BLQINF}.BLQ
+    blq_trg=${P}/${CAMPAIGN}/STA/${BLQINF}.BLQ
+    if ! ln -sf ${blq_src} ${blq_trg} ; then
+      echoerr "[ERROR] Failed to link the BLQ file."
+      echoerr "        Link failed \"${blq_src}\" -> \"${blq_trg}\"."
+      echoerr "        Processing stoped."
+      clear_n_exit 1
+    else
+      echodbg "[DEBUG] Using BLQ file: \"${blq_src}\"."
+    fi
   else
-    if test -f ${TABLES_DIR}/blq/${BLQINF}.BLQ ; then
-      blq_src=${TABLES_DIR}/blq/${BLQINF}.BLQ
-      blq_trg=${P}/${CAMPAIGN}/STA/${BLQINF}.BLQ
-      if ! ln -sf ${blq_src} ${blq_trg} ; then
-        echoerr "[ERROR] Failed to link the BLQ file."
-        echoerr "        Link failed \"${blq_src}\" -> \"${blq_trg}\"."
-        echoerr "        Processing stoped."
-        clear_n_exit 1
-      else
-        echodbg "[DEBUG] Using BLQ file: \"${blq_src}\"."
-      fi
+    if test -f ${P}/${CAMPAIGN}/STA/${BLQINF}.BLQ ; then
+      echodbg "[DEBUG] Using BLQ file: \"${P}/${CAMPAIGN}/STA/${BLQINF}.BLQ\"."
     else
       echoerr "[ERROR] Cannot find the specified BLQ file: \"${BLQINF}\"."
       echoerr "        Processing stoped."
@@ -953,6 +959,11 @@ fi
 ##+ Let's name that FIX_FILE                                                 ##
 ##                                                                           ##
 ## ------------------------------------------------------------------------- ##
+if test -z "${FIXINF+x}" ; then
+  echoerr "[ERROR] Must specify a \".FIX\" file for reference frame realization."
+  clear_n_exit 1
+fi
+
 if ! test -f ${TABLES_DIR}/fix/${FIXINF}.FIX ; then
   if ! test -f ${P}/${CAMPAIGN}/STA/${FIXINF}.FIX ; then
     echoerr "[ERROR] Cannot find the fix file \'${FIXINF}.FIX\'"
@@ -1159,6 +1170,7 @@ X_STA_FL=.sta2exclude
 tmp_file_array+=("${X_STA_FL}")
 
 if test "${USE_EUREF_EXCLUDE_LIST}" = "YES" ; then
+  echodbg "[DEBUG] Using EUREF's exclusion list."
   if ! ${P2ETC}/get_euref_excl_list.sh ${YEAR} ${DOY} 1>${X_STA_FL} ; then
     echoerr "[WARNING] Failed to download Euref exclusion list!"
   fi
@@ -1191,6 +1203,10 @@ if ! validate_ntwrnx.py \
   echoerr "[ERROR] Failed to compile rinex/station summary."
   clear_n_exit 1
 fi
+
+## FIXME : remove that shit
+#echodbg "[DEBUG] Going to show you the RINEX info (just for debuging)"
+#cat .rnxsta.dat
 
 declare -a RNX_ARRAY     ##  array to hold available rinex files;
                          ##+ no path; compressed
@@ -1233,6 +1249,19 @@ crx2rnx_if() { ##  run CRX2RNX if file ends with 'd' or 'D'
     return 0
   fi
 }
+
+##  Note: We need to clear the RAW/ and OBS/ folders of older data so that
+##+ they don't get processed.
+for i in ${P}/${CAMPAIGN}/RAW/????${DOY_3C}0.${YEAR:2:2}O ; do
+  echodbg "[DEBUG] Removing old rinex file: \"${i}\"."
+  rm $i
+done
+
+for i in ${P}/${CAMPAIGN}/OBS/????${DOY_3C}0.??? ; do
+  echodbg "[DEBUG] Removing old observation file: \"$i\"."
+  rm $i
+done
+
 for i in "${RNX_ARRAY[@]}"; do
   if RNX=${i} \
         && cp ${D}/${RNX} ${P}/${CAMPAIGN}/RAW/${RNX^^} \
@@ -1645,14 +1674,16 @@ if ! save_n_update TRO ATM TRO_SNX ; then exit 1 ; else printf "," ; fi
 if ! save_n_update SNX SOL SINEX ; then exit 1 ; else printf "," ; fi
 
 ## Free network SINEX
-## FIXME add free network solution sinex
-## if ! save_n_update SNX SOL SINEX ; then exit 1 ; else printf "," ; fi
+if ! save_n_update SNX SOL SINEX N; then exit 1 ; else printf "," ; fi
 
 ## final NQ0
 if ! save_n_update NQ0 SOL NQ ; then exit 1 ; else printf "," ; fi
 
 ## reduced NQ0
 if ! save_n_update NQ0 SOL NQ R ; then exit 1 ; else printf "," ; fi
+
+## free-network NQ0
+#if ! save_n_update NQ0 SOL NQ N ; then exit 1 ; else printf "," ; fi
 
 ## final coordinates
 if ! save_n_update CRD STA CRD_FILE ; then exit 1 ; fi
@@ -1756,7 +1787,7 @@ fi
 printf 1>>${JSON_OUT} "\n}"
 
 STOP_DD=$(date +%s.%N)
-echo "8"
+
 ##  PRINT TIME INFO
 DD_RT=$(echo "scale=2; ($STOP_DD - $START_DD)/1" | bc)
 RD_RT=$(echo "scale=2; ($STOP_RD - $START_RD)/1" | bc)
@@ -1765,13 +1796,9 @@ PD_RT=$(echo "scale=2; ($STOP_PD - $START_PD)/1" | bc)
 PD_PC=$(echo "scale=2; ($PD_RT / $DD_RT) * 100" | bc)
 BP_RT=$(echo "scale=2; ($STOP_BP - $START_BP)/1" | bc)
 BP_PC=$(echo "scale=2; ($BP_RT / $DD_RT) * 100" | bc)
-#echodbg "[DEBUG] Total running time                : $DD_RT ~ 100%"
-#echodbg "[DEBUG] Rinex download and manipulation   : $RD_RT ~ $RD_PC %"
-#echodbg "[DEBUG] Products download and manipulation: $PD_RT ~ $PD_PC %"
-#echodbg "[DEBUG] Bernese processing                : $BP_RT ~ $BP_PC %"
 printf "[DEBUG] Total running time                : %6.2f ~ 100.0%%\n" "$DD_RT"
 printf "[DEBUG] Rinex download and manipulation   : %6.2f ~ %3.1f%%\n" "$RD_RT" "$RD_PC"
 printf "[DEBUG] Products download and manipulation: %6.2f ~ %3.1f%%\n" "$PD_RT" "$PD_PC"
 printf "[DEBUG] Bernese processing                : %6.2f ~ %3.1f%%\n" "$BP_RT" "$BP_PC"
-echo "9"
+
 clear_n_exit 0
