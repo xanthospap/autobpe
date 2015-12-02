@@ -54,7 +54,7 @@ AC = COD
 STATIONS_PER_CLUSTER = 3
 
 ##  Files (i.e. baselines) per cluster
-FILES_PER_CLUSTER = 7
+FILES_PER_CLUSTER = 5
 
 ##  Elevation angle in degrees (0, 90)
 ELEVATION_ANGLE = 3
