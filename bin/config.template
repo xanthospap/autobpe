@@ -34,7 +34,7 @@ SOLUTION_ID = DSO
 SAVE_DIR = ${HOME}/data/SAVEDISK
 
 ##  Append suffix to saved products
-APND_SUFFIX = _gps
+APND_SUFFIX = _mxdepn
 
 ##  json output file
 JSON_OUT = 
@@ -42,7 +42,7 @@ JSON_OUT =
 ##  The satellite system. You can choose between
 ##+   * gps, or
 ##+   * mixed (i.e. gps+glonass)
-SAT_SYS = gps
+SAT_SYS = mixed
 
 ##  the path to 'tables' directory
 TABLES_DIR = ${HOME}/tables
@@ -67,6 +67,15 @@ USE_REPRO2 = NO
 
 ##  Use CODE's REPRO13 products ('YES' or 'NO')
 COD_REPRO13 = NO
+
+##  Set this variable to 'YES' to skip RINEX downloading. Only the files
+##+ found in the campaign's /RAW folder will be processed (either in lower or
+##+ in upper case). The database will **not** be quried about the station/rinex
+##+ information; station information (i.e. 'MARKER NAME' and 'MARKER NUMBER')
+##+ is extracted off from the RINEX files.
+##  The RINEX files should comply with the naming convention ssssddd0.yy[o|O];
+##+ **not** (UNIX) compressed, **not** Hatanaka.
+SKIP_RNX_DOWNLOAD = YES
 
 ##  Specify the a-priori coordinate file (.CRD) to be used. Only provide the
 ##+ filename, the extension is automatically set to '.CRD'. The search path
@@ -133,11 +142,11 @@ PCVEXT = I08
 ##  Set this option to 'YES' or 'NO' to use EUREF's weekly exclusion list.
 ##  This exclusion list will be downloaded from the web and used to mark
 ##+ out (exclude from procssesing) the listed stations.
-USE_EPN_EXCLUDE_LIST = YES
+USE_EPN_EXCLUDE_LIST = 
 
 ##  Optionaly, you can specify a file with a list of stations (one 'MARKER DOME'
 ##+ per line) to be excluded from the processing.
-STA_EXCLUDE_FILE = /home/bpe/tables/sta/EPNDENS.EXC
+##  STA_EXCLUDE_FILE = /home/bpe/tables/sta/EPNDENS.EXC
 
 ##  Specify where the saved (output) files are going to be placed. If you want
 ##+ them to be saved at this HOST, then only set the 'SAVE_DIR_DIR' variable.

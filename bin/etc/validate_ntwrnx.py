@@ -37,12 +37,27 @@ import datetime
 import MySQLdb
 import traceback
 import argparse
+import glob
 
 ## Global variables / default values
 USE_MARKER_NR = True
 SUCCESS=0
 FAILURE=1
 EXIT_STATUS=SUCCESS
+
+##  get marker name from RINEX
+def get_marker_name( rinex ):
+    with open(rinex, 'r') as fin:
+        for line in fin.readlines():
+            if line.strip()[60:71] == 'MARKER NAME':
+                return line[0:4]
+    return ''
+def get_marker_number( rinex ):
+    with open(rinex, 'r') as fin:
+        for line in fin.readlines():
+            if line.strip()[60:73] == 'MARKER NUMBER':
+                return line[0:20].rstrip()
+    return ''
 
 parser = argparse.ArgumentParser(description='Validate rinex/stations.')
 
@@ -122,6 +137,11 @@ parser.add_argument('-s', '--session',
         help     = 'The session.',
         metavar  = 'SESSION',
         dest     = 'session') 
+##  Skip the database query
+parser.add_argument('--skip-database',
+        action   = 'store_true',
+        help     = 'Skip the database query.',
+        dest     = 'skip_database')
 ##  File with stations to exclude
 parser.add_argument('-e', '--exclude-file',
         action   = 'store',
@@ -166,6 +186,41 @@ except:
 ## Day of month as 2-char, e.g. 05 (DoM)
 ## Day of year a 3-char, e.g. 157 (DoY)
 Year, Cent, sMon, iMon, DoM, DoY = dt.strftime('%Y-%y-%b-%m-%d-%j').split('-')
+
+##  Skip database
+if args.skip_database :
+    ## get a list of all RINEX file in the rinex folder (args.pth2rnx)
+    generic_rinex='????%s0.%s[oO]'%(DoY, Cent)
+    rinex_list = [ os.path.abspath(x) for x in glob.glob( os.path.join(args.pth2rnx, generic_rinex) ) ]
+    if len(rinex_list) == 0:
+        print >> sys.stderr, '[ERROR] No RINEX files found in \"%s\".'%(args.pth2rnx)
+        sys.exit( 1 )
+    print '%-15s %-16s %-9s %-9s %-8s'\
+        %("RINEX", "MARKER NAME", "AVAILABLE", "REFERENCE", "EXCLUDED")
+    for rnx in rinex_list :
+        rnx_name = os.path.basename( rnx )
+        rnx_path = os.path.dirname( rnx )
+        RNX_FILE = os.path.join( rnx_path, rnx_name.upper() )
+        rnx_file = os.path.join( rnx_path, rnx_name.lower() )
+        if RNX_FILE != rnx : shutil.move( rnx, RNX_FILE )
+        marker_name   = get_marker_name( RNX_FILE )
+        marker_number = get_marker_number( RNX_FILE )
+        if marker_name == '':
+            print >> sys.stderr, '[ERROR] Failed to read RINEX marker name for \"%s\"'%(RNX_FILE)
+            sys.exit( 1 )
+        used_name  = '%s %s'%(marker_name, marker_number)
+        rnx_is_ref = 'No'
+        rnx_is_excl= 'No'
+        rnx_exists = 'Yes'
+        if filter( lambda x: re.search(r'^%s\s+'%(used_name.upper()), x), lines):
+            rnx_is_ref = 'Yes'
+        if filter( lambda x: re.search(r'^%s\s*'%(used_name.upper().strip()), x), exclude_lines):
+            rnx_is_excl = 'Yes'
+            ## Rename to lower so that it doesn't get used !
+            shutil.move( RNX_FILE, rnx_file )
+            RNX_FILE    = rnx_file
+        print '%-15s %-16s %-9s %-9s %-8s'%(os.path.basename(RNX_FILE), used_name.upper(), rnx_exists, rnx_is_ref, rnx_is_excl)
+    sys.exit( 0 )
 
 ## try connecting to the database server
 try:

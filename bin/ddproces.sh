@@ -960,7 +960,7 @@ fi
 ##                                                                           ##
 ## ------------------------------------------------------------------------- ##
 if test -z "${FIXINF+x}" ; then
-  echoerr "[ERROR] Must specify a \".FIX\" file for reference frame realization."
+  echoerr "[ERROR] Must specify a \"FIX\" file for reference frame realization."
   clear_n_exit 1
 fi
 
@@ -979,7 +979,7 @@ else
     clear_n_exit 1
   fi
 fi
-echodbg "[DEBUG] Using .FIX file \"${FIX_FILE}\""
+echodbg "[DEBUG] Using FIX file \"${FIX_FILE}\""
 
 ## ------------------------------------------------------------------------- ##
 ##                                                                           ##
@@ -1146,22 +1146,24 @@ START_RD=$(date +%s.%N)
 >.rnxsta.dat ## temporary file
 tmp_file_array+=('.rnxsta.dat')
 
-##  download the rinex files for the input network; the database knows 
-##+ the details .... Call rnxdwnl.py
-if ! rnxdwnl.py \
-              --networks=${CAMPAIGN} \
-              --year=${YEAR} \
-              --doy=${DOY} \
-              --path=${D} \
-              --marker-rename \
-              --db-host="${DB_HOST}" \
-              --db-user="${DB_USER}" \
-              --db-pass="${DB_PASS}" \
-              --db-name="${DB_NAME}" \
-              -v "${DEBUG_MODE}" \
-              1>&2; then
-  echoerr "[ERROR] Failed to download RINEX files."
-  clear_n_exit 1
+if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
+  ##  download the rinex files for the input network; the database knows 
+  ##+ the details .... Call rnxdwnl.py
+  if ! rnxdwnl.py \
+                --networks=${CAMPAIGN} \
+                --year=${YEAR} \
+                --doy=${DOY} \
+                --path=${D} \
+                --marker-rename \
+                --db-host="${DB_HOST}" \
+                --db-user="${DB_USER}" \
+                --db-pass="${DB_PASS}" \
+                --db-name="${DB_NAME}" \
+                -v "${DEBUG_MODE}" \
+                1>&2; then
+    echoerr "[ERROR] Failed to download RINEX files."
+    clear_n_exit 1
+  fi
 fi
 
 ##  make a file with all excluded stations (if any)
@@ -1179,29 +1181,49 @@ if ! test -z ${STA_EXCLUDE_FILE+x} ; then
   if ! test -f ${STA_EXCLUDE_FILE} ; then
     echoerr "[WARNING] Station exclusion file \"${STA_EXCLUDE_FILE}\" does not exist."
   else
-    echodb "[DEBUG] Using ${STA_EXCLUDE_FILE} exclusion file."
+    echodbg "[DEBUG] Using ${STA_EXCLUDE_FILE} exclusion file."
     cat ${STA_EXCLUDE_FILE} >> ${X_STA_FL}
   fi
 fi
 
 ##  make a table with available rinex/station names, reference stations, etc ..
 ##  dump output to the .rnxsta.dat file (filter it later on)
-
-##  do not include --no-marker-numbers
-if ! validate_ntwrnx.py \
-            --db-host="${DB_HOST}" \
-            --db-user="${DB_USER}" \
-            --db-pass="${DB_PASS}" \
-            --db-name="${DB_NAME}" \
-            --year="${YEAR}" \
-            --doy="${DOY}" \
-            --fix-file="${FIX_FILE}" \
-            --network="${CAMPAIGN}" \
-            --rinex-path="${D}" \
-            --exclude-file="${X_STA_FL}" \
-            1> .rnxsta.dat; then
-  echoerr "[ERROR] Failed to compile rinex/station summary."
-  clear_n_exit 1
+if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
+  ##  Consult the database ...
+  if ! validate_ntwrnx.py \
+              --db-host="${DB_HOST}" \
+              --db-user="${DB_USER}" \
+              --db-pass="${DB_PASS}" \
+              --db-name="${DB_NAME}" \
+              --year="${YEAR}" \
+              --doy="${DOY}" \
+              --fix-file="${FIX_FILE}" \
+              --network="${CAMPAIGN}" \
+              --rinex-path="${D}" \
+              --exclude-file="${X_STA_FL}" \
+              1> .rnxsta.dat; then
+    echoerr "[ERROR] Failed to compile rinex/station summary."
+    clear_n_exit 1
+  fi
+else
+  ##  Fuck the database; rinex should be placed in /RAW in lower and/or
+  ##+ uppercase filenames.
+  if ! validate_ntwrnx.py \
+              --db-host="" \
+              --db-user="" \
+              --db-pass="" \
+              --db-name="" \
+              --year="${YEAR}" \
+              --doy="${DOY}" \
+              --fix-file="${FIX_FILE}" \
+              --network="${CAMPAIGN}" \
+              --rinex-path="${P}/${CAMPAIGN}/RAW" \
+              --exclude-file="${X_STA_FL}" \
+              --skip-database \
+              1> .rnxsta.dat; then
+    echoerr "[ERROR] Failed to compile rinex/station summary."
+    clear_n_exit 1
+  fi
 fi
 
 ## FIXME : remove that shit
@@ -1249,40 +1271,44 @@ crx2rnx_if() { ##  run CRX2RNX if file ends with 'd' or 'D'
     return 0
   fi
 }
-
 ##  Note: We need to clear the RAW/ and OBS/ folders of older data so that
 ##+ they don't get processed.
-for i in ${P}/${CAMPAIGN}/RAW/????${DOY_3C}0.${YEAR:2:2}O ; do
-  echodbg "[DEBUG] Removing old rinex file: \"${i}\"."
-  rm $i
-done
+if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
+  for i in ${P}/${CAMPAIGN}/RAW/????${DOY_3C}0.${YEAR:2:2}O ; do
+    echodbg "[DEBUG] Removing old rinex file: \"${i}\"."
+    rm $i
+  done
+fi
 
 for i in ${P}/${CAMPAIGN}/OBS/????${DOY_3C}0.??? ; do
   echodbg "[DEBUG] Removing old observation file: \"$i\"."
   rm $i
 done
 
-for i in "${RNX_ARRAY[@]}"; do
-  if RNX=${i} \
-        && cp ${D}/${RNX} ${P}/${CAMPAIGN}/RAW/${RNX^^} \
-        && RNX=${RNX^^} \
-        && unix_ucmpr ${P}/${CAMPAIGN}/RAW/${RNX} \
-        && RNX=${RNX%.Z} \
-        && crx2rnx_if ${P}/${CAMPAIGN}/RAW/${RNX}
-  then
-    :
-  else
-    echoerr "[ERROR] Failed to manipulate rinex file \"${RNX}\"."
-    clear_n_exit 1
-  fi
-done
+if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
+  ## Uncompress/Copy/...
+  for i in "${RNX_ARRAY[@]}"; do
+    if RNX=${i} \
+          && cp ${D}/${RNX} ${P}/${CAMPAIGN}/RAW/${RNX^^} \
+          && RNX=${RNX^^} \
+          && unix_ucmpr ${P}/${CAMPAIGN}/RAW/${RNX} \
+          && RNX=${RNX%.Z} \
+          && crx2rnx_if ${P}/${CAMPAIGN}/RAW/${RNX}
+    then
+      :
+    else
+      echoerr "[ERROR] Failed to manipulate rinex file \"${RNX}\"."
+      clear_n_exit 1
+    fi
+  done
+fi
 
 ##  dump all (available) station names to a file for later use; one station
 ##+ per line.
 >.station-names.dat
 for sta in "${STA_ARRAY[@]}"; do echo $sta >> .station-names.dat; done
 tmp_file_array+=('.station-names.dat')
-
+ 
 STOP_RD=$(date +%s.%N)
 
 ## ////////////////////////////////////////////////////////////////////////////
