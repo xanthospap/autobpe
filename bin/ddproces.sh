@@ -25,9 +25,9 @@ echodbg() {
 ##  argv3 -> output filename (no path)
 check_bpe_run () {
 
-  bpe_path="$1"
-  status_f="${bpe_path}/${2}"
-  outout_f="${bpe_path}/${3}"
+  local bpe_path="$1"
+  local status_f="${bpe_path}/${2}"
+  local outout_f="${bpe_path}/${3}"
 
   if ! test -f ${status_f}; then
     echoerr "[ERROR] Cannot find the bpe status file \"$status_f\""
@@ -55,105 +55,8 @@ echo "
 Program Name : $NAME
 Version      : $VERSION
 Last Update  : $LAST_UPDATE
-
 Purpose : Process a network using DD approach via a given PCF file
-
-Usage   :
-
-Switches: -a --analysis-center= specify the analysis center; this can be e.g.
-           * igs, or
-           * cod (default)
-
-          -b --bern-loadgps= specify the Bernese LOADGPS.setvar file; this
-           is needed to resolve the Bernese-related path variables; it will be
-           sourced.
-
-          -c --campaign= specify the campaign name; the argument passed will be
-           truncated to uppercase (thus passing 'greece' is the same as 'GREECE'
-           --see Note 3
-
-          -d --doy= specify doy
-
-          -e --elevation-angle specify the elevation angle (degrees, integer)
-           default value is 3 degrees
-
-          -f --ion-products= specify (a-priori) ionospheric correction file identifier.
-           If more than one, use a comma-seperated list (e.g. -f FFG,RFG) --see Note 5
-
-          -g --tables-dir specify the TABLES directory
-
-          -i --solution-id= specify solution id (e.g. FFG) --see Note 1
-
-          -l --stations-per-cluster= specify the number of stations per cluster
-           (default is 5)
-
-          -m --calibration-model he extension (model) used for antenna calibration.
-           This can be e.g. I01, I05 or I08. What you enter here, will be appended to
-           the pcv filename (provided via the -f switch) and all calibration-dependent
-           Bernese processing files (e.g. SATELLITE.XXX). --see Note 2
-
-          -p --pcv-file= specify the .PCV file to be used. The pcv file should
-           exist in the \'\${TABLES_DIR}\'. The extension of this file, should
-           match the \'\${PCV_EXT}\' variable, which is default set to \'I08\'.
-           So, given e.g. the argument \'--pcv-file=FOO\', the script will
-           search for the file \'\${TABLES_DIR}/pcv/FOO.\${PCV_EXT}\'
-
-          -r --save-dir= specify directory where the solution will be saved; note that
-           if the directory does not exist, it will be created
-
-          -s --satellite-system specify the satellite system; this can be
-           * gps, or
-           * mixed (for gps + glonass)
-           uppercase or lowercase. Default value is 'gps'
-
-          -t --solution-type specify the dolution type; this can be:
-           * final, or
-           * urapid
-
-          -u --update= specify which records/files should be updated; valid values are:
-           * crd update the default network crd file
-           * sta update station-specific files, i.e. time-series records for the stations
-           * ntw update update network-specific records
-           * all both the above
-           More than one options can be provided, in a comma seperated string e.g. 
-           --update=crd,sta
-           See Note 6 for this option
-
-          -y --year= specify year (4-digit)
-
-          -x --xml-output produce an xml (actually docbook) output summary
-
-          --force-remove-previous remove any files from the specified save directory (-r --save-dir=)
-           prior to start of processing.
-
-          --debug set debugging mode
-
-          --add-suffix= add a suffix (e.g. _GPS) to saved products of the processing
-
-          --json-out= Output file in json format.
-
-          --repro2-prods Use IGS repro2 campaign products.
-
-          --cod-repro13 Use CODE's REPRO2013 results.
-
-          --atl-file Specify the ATL correction file.
-
-          --antex= Specify an antex file to transform to a PCV
-
-          --stainf= Specify the station information file (no extension). This
-           file should be placed either in the \'\${TABLES_DIR}/sta\' or the
-           \'\${P}/\${CAMPAIGN}/STA\' directory.
-
-          --fix-file= Specify the name of the .FIX file
-
-          --blq-file= Specify the blq file
-
-          --skip-remove Do not remove campaign-specifi files
-
-          -h --help display (this) help message and exit
-
-          -v --version display version and exit
-/******************************************************************************/"
+Usage   :"
 }
 
 ##  year - doy to datetime in format '%Y-%m-%d %H-%M-%S'
@@ -188,7 +91,6 @@ import sys
 exit_status=0
 
 try:
-  # print "[python] trying to parse date [${year}-${doy} ${hour}:${min}:${sec}]"
   print datetime.datetime.strptime('${year}-${doy} ${hour}:${min}:${sec}', \
     '%Y-%j %H:%M:%S').strftime("%Y-%m-%d %H:%M:%S")
 except:
@@ -321,9 +223,7 @@ EOF
 ##+ tmp_file_array array ant ehn exit with the integer
 ##+ provided as the first command line argument.
 clear_n_exit () {
-  for f in "${tmp_file_array[@]}" ; do
-    rm $f 2>/dev/null
-  done
+  for f in "${tmp_file_array[@]}" ; do rm $f 2>/dev/null ; done
   exit $1
 }
 
@@ -690,12 +590,6 @@ do
   if test "${#}" -gt 1 ; then printf 1>>${JSON_OUT} "," ; fi
 done
 
-##  Source the config file if any
-#if ! test -z "${CONFIG_FILE+x}" ; then
-#  eval $(etc/source_dd_config.sh $CONFIG_FILE)
-#  echodbg "[DEBUG] Read config file \"${CONFIG_FILE}\"."
-#fi
-
 ## ////////////////////////////////////////////////////////////////////////////
 ##  LOGFILE, STDERR & STDOUT
 ##  ---------------------------------------------------------------------------
@@ -849,7 +743,7 @@ fi
 ##  cannot have both repro2 and repro13
 if test "${COD_REPRO13}" == "YES" ; then
   if test "${USE_REPRO2}" == "YES" ; then
-    echoerr "[ERROR] CAnnot have both repro2 and code's repro13."
+    echoerr "[ERROR] Cannot have both repro2 and code's repro13."
     exit 1
   fi
   if test "${AC^^}" != "COD"; then
@@ -883,6 +777,8 @@ else
   if ! ln -sf ${STAINF_FILE} ${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT} ; then
     echoerr "[ERROR] Failed to link the station information file \'${STAINF_FILE}\'."
     clear_n_exit 1
+  else
+    tmp_file_array+=("${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT}")
   fi
 fi
 
@@ -909,6 +805,7 @@ else
       clear_n_exit 1
     else
       echodbg "[DEBUG] Using BLQ file: \"${blq_src}\"."
+      tmp_file_array+=("${blq_trg}")
     fi
   else
     if test -f ${P}/${CAMPAIGN}/STA/${BLQINF}.BLQ ; then
@@ -940,6 +837,7 @@ else
       clear_n_exit 1
     else
       echodbg "[DEBUG] Using ATL file: \"${src_atl}\" ."
+      tmp_file_array+=("${trg_atl}")
     fi
   else
     if test -f ${P}/${CAMPAIGN}/STA/${ATLINF}.ATL ; then
@@ -977,6 +875,8 @@ else
   if ! ln -sf ${FIX_FILE} ${P}/${CAMPAIGN}/STA/${FIXINF}.FIX ; then
     echoerr "[ERROR] Could not link the fix file \'${FIX_FILE}\'"
     clear_n_exit 1
+  else
+    tmp_file_array+=("${P}/${CAMPAIGN}/STA/${FIXINF}.FIX")
   fi
 fi
 echodbg "[DEBUG] Using FIX file \"${FIX_FILE}\""
@@ -1274,16 +1174,20 @@ crx2rnx_if() { ##  run CRX2RNX if file ends with 'd' or 'D'
 ##  Note: We need to clear the RAW/ and OBS/ folders of older data so that
 ##+ they don't get processed.
 if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
-  for i in ${P}/${CAMPAIGN}/RAW/????${DOY_3C}0.${YEAR:2:2}O ; do
-    echodbg "[DEBUG] Removing old rinex file: \"${i}\"."
+  if ls ${P}/${CAMPAIGN}/RAW/????${DOY_3C}0.${YEAR:2:2}O &>/dev/null ; then
+    echodbg "[DEBUG] Removing old rinex files from \"/RAW\" dir."
+    for i in ${P}/${CAMPAIGN}/RAW/????${DOY_3C}0.${YEAR:2:2}O 2>/dev/null; do
+      rm $i
+    done
+  fi
+fi
+
+if ls ${P}/${CAMPAIGN}/OBS/????${DOY_3C}0.??? &>/dev/null ; then
+  for i in ${P}/${CAMPAIGN}/OBS/????${DOY_3C}0.??? ; do
+    echodbg "[DEBUG] Removing old observation file: \"$i\"."
     rm $i
   done
 fi
-
-for i in ${P}/${CAMPAIGN}/OBS/????${DOY_3C}0.??? ; do
-  echodbg "[DEBUG] Removing old observation file: \"$i\"."
-  rm $i
-done
 
 if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
   ## Uncompress/Copy/...

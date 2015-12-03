@@ -19,7 +19,7 @@ DEBUG_MODE = 1
 YEAR = 2015
 
 ##  The doy to proccess
-DOY = 216
+DOY = 217
 
 ##  The LOADGPS.setvar file
 B_LOADGPS = ${HOME}/bern52/BERN52/GPS/EXE/LOADGPS.setvar
@@ -34,7 +34,7 @@ SOLUTION_ID = DSO
 SAVE_DIR = ${HOME}/data/SAVEDISK
 
 ##  Append suffix to saved products
-APND_SUFFIX = _mxdepn
+APND_SUFFIX = _mits
 
 ##  json output file
 JSON_OUT = 
@@ -103,7 +103,7 @@ STAINF = EPN
 ##  If you do specify a file, do **not** use an extension; also the file
 ##+ should be placed either in the ${TABLES_DIR}/atl directory or in the 
 ##+ campaign's /STA directory.
-ATLINF =  EPNDENS
+ATLINF =  
 
 ##  The filename of the blq (i.e tidal loading) corrections file.
 ##+ If the values is left blank, then no blq file is going to be used
@@ -115,7 +115,7 @@ BLQINF = EPN
 ##  Specify the name of the .FIX file, i.e. the name of the file where the
 ##+ reference stations are recorded. This file should be placed in either in 
 ##+ the tables/fix directory or in the campaign's /STA directory.
-FIXINF = IGB08
+FIXINF = CODE
 
 ##  Specify the filename, with **no extension** of the pcv (ie. phase centre
 ##+ variations) file to be used. This option, works together with the 'ANTEX'
