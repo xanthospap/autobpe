@@ -276,6 +276,38 @@ set_json_out () {
   IFS=${OLD_IFS}
 }
 
+##  This function will set the limits for reference system stations rejection.
+##  argv1 -> The HELMCHK perl script where the limits are set
+##  argv2 -> Limit for north offset (in mm)
+##  argv3 -> Limit for east offset (in mm)
+##  argv4 -> Limit for up offset (in mm)
+set_hemlchk_limits () {
+  if ! test -f ${1} ; then
+    echoerr "[ERROR] Invalid file: \"${1}\". Cannot set limits for"
+    echoerr "        reference station rejection."
+    return 1
+  fi
+  ## set north limit
+  if ! grep '\$bpe->putKey(\"\$ENV{U}/PAN/HELMR1.INP\",\"NLIMIT\",[0-9]*);' ${1} &>/dev/null ; then
+    echoerr "[ERROR] Invalid file: \"${1}\". Cannot find north limit!"
+    return 1
+  fi
+  sed -i "s|\$bpe->putKey(\"\$ENV{U}/PAN/HELMR1.INP\",\"NLIMIT\",[0-9]*);|\$bpe->putKey(\"\$ENV{U}/PAN/HELMR1.INP\",\"NLIMIT\",${2});|" ${1}
+  ## set east limit
+  if ! grep '\$bpe->putKey(\"\$ENV{U}/PAN/HELMR1.INP\",\"ELIMIT\",[0-9]*);' ${1} &>/dev/null ; then
+    echoerr "[ERROR] Invalid file: \"${1}\". Cannot find east limit!"
+    return 1
+  fi
+  sed -i "s|\$bpe->putKey(\"\$ENV{U}/PAN/HELMR1.INP\",\"ELIMIT\",[0-9]*);|\$bpe->putKey(\"\$ENV{U}/PAN/HELMR1.INP\",\"ELIMIT\",${3});|" ${1}
+  ## set up limit
+  if ! grep '\$bpe->putKey(\"\$ENV{U}/PAN/HELMR1.INP\",\"ULIMIT\",[0-9]*);' ${1} &>/dev/null ; then
+    echoerr "[ERROR] Invalid file: \"${1}\". Cannot find up limit!"
+    return 1
+  fi
+  sed -i "s|\$bpe->putKey(\"\$ENV{U}/PAN/HELMR1.INP\",\"ULIMIT\",[0-9]*);|\$bpe->putKey(\"\$ENV{U}/PAN/HELMR1.INP\",\"ULIMIT\",${4});|" ${1}
+  return 0
+}
+
 # //////////////////////////////////////////////////////////////////////////////
 # GLOBAL VARIABLES
 # //////////////////////////////////////////////////////////////////////////////
@@ -1534,6 +1566,35 @@ if ! awk -v FLAG=R -v REPLACE_ALL=NO -f \
   echoerr "[ERROR] Could not create a-priori coordinate file."
   clear_n_exit 1
 fi
+
+## ////////////////////////////////////////////////////////////////////////////
+##  SET REFERENCE FRAME STATION REJECTION CRITERIA 
+##  ---------------------------------------------------------------------------
+## ////////////////////////////////////////////////////////////////////////////
+if [[ -z "${REF_NLIMIT+x}" ]] || [[ ! ${REF_NLIMIT} =~ ^[0-9]+$ ]] ; then
+  echodbg "[DEBUG] Reference frame rejection criterion not set for north;"
+  echodbg "        Setting it to 10 mm"
+  ${REF_NLIMIT}=10
+fi
+if [[ -z "${REF_ELIMIT+x}" ]] || [[ ! ${REF_ELIMIT} =~ ^[0-9]+$ ]] ; then
+  echodbg "[DEBUG] Reference frame rejection criterion not set for east;"
+  echodbg "        Setting it to 10 mm"
+  ${REF_ELIMIT}=10
+fi
+if [[ -z "${REF_ULIMIT+x}" ]] || [[ ! ${REF_ULIMIT} =~ ^[0-9]+$ ]] ; then
+  echodbg "[DEBUG] Reference frame rejection criterion not set for up;"
+  echodbg "        Setting it to 30 mm"
+  ${REF_ULIMIT}=30
+fi
+if ! set_hemlchk_limits ${U}/SCRIPT/HELMCHK \
+                        ${REF_NLIMIT} ${REF_ELIMIT} ${REF_ULIMIT} ; then
+  echoerr "[ERROR] Processing stoped!"
+  clear_n_exit 1
+fi
+echodbg "[DEBUG] Reference frame rejection criteria set to:"
+echodbg "        North: ${REF_NLIMIT} mm"
+echodbg "        East : ${REF_ELIMIT} mm"
+echodbg "        Up   : ${REF_ULIMIT} mm"
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  PROCESS THE DATA
