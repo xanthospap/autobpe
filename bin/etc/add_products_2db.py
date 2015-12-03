@@ -36,38 +36,14 @@ import getopt
 import glob
 import MySQLdb
 import traceback
-
-## Debug Mode
-DDEBUG_MODE = True
-
-## help function
-def help (i):
-    print ""
-    print ""
-    sys.exit(i)
+import argparse
 
 ## globals
-campaign    = None
-sat_sys     = 'GPS'
-sol_type    = None
-prod_type   = None
-start_epoch = None
-stop_epoch  = None
-proc_at     = datetime.datetime.now()
-host_ip     = None
-host_dir    = None
-filename    = None
-software    = 'BERN52'
-
-## database
-DB_HOST='147.102.110.73'
-DB_USER="hypatia"
-DB_PASSWORD="ypat;ia"
-DB_NAME='procsta'
+dtnow = datetime.datetime.now()
 
 satsys_dict = {
   'GPS'     : 'GPS',
-  'GLO'     :'GLONASS',
+  'GLO'     : 'GLONASS',
   'GPS+GLO' : 'GPS+GLO'
 }
 
@@ -112,108 +88,163 @@ def to_datetime(date_str):
   except:
     raise RuntimeError("Invalid input date [%s]"%date_str)
 
+
+##  set the cmd parser
+parser = argparse.ArgumentParser(
+    description='Update/Insert records in a given database concerning GNSS'
+    'products',
+    epilog ='Ntua - 2015'
+    )
+
+##  Name of the processed campaign
+parser.add_argument('-c', '--campaign',
+    action   = 'store',
+    required = True,
+    help     = 'The name of the processed campaign.',
+    metavar  = 'CAMPAIGN',
+    dest     = 'campaign'
+    )
+
+##  The satellite system of the product
+parser.add_argument('-s', '--satellite=system',
+    action   = 'store',
+    required = True,
+    help     = 'The satellite system of the product.',
+    metavar  = 'SAT_SYS',
+    choices  = list(satsys_dict.keys()),
+    dest     = 'sat_sys'
+    )
+
+##  The solution type
+parser.add_argument('-t', '--solution-type',
+    action   = 'store',
+    required = True,
+    help     = 'The type of the solution.',
+    metavar  = 'SOL_TYPE',
+    choices  = list(soltype_dict.keys()),
+    dest     = 'solution_type'
+    )
+
+##  The starting epoch in product
+parser.add_argument('-f', '--start-epoch',
+    action   = 'store',
+    required = True,
+    help     = 'The starting epoch (i.e. datetime) of the product. Date format'
+    'is \'%Y-%j_%H:%M:%S\' or \'%Y-%j %H:%M:%S\',',
+    metavar  = 'START_EPOCH',
+    dest     = 'start_epoch'
+    )
+
+##  The last epoch in the product file
+parser.add_argument('-l', '--stop-epoch',
+    action   = 'store',
+    required = True,
+    help     = 'The last epoch (i.e. datetime) of the product. Date format'
+    'is \'%Y-%j_%H:%M:%S\' or \'%Y-%j %H:%M:%S\',',
+    metavar  = 'STOP_EPOCH',
+    dest     = 'stop_epoch'
+    )
+
+##  The epoch the product file was produced
+parser.add_argument('-a', '--produced-at',
+    action   = 'store',
+    required = False,
+    help     = 'The epoch the product file was produced. Date format'
+    'is \'%Y-%j_%H:%M:%S\' or \'%Y-%j %H:%M:%S\',',
+    metavar  = 'PROC_EPOCH',
+    dest     = 'proc_epoch',
+    default  = dtnow
+    )
+
+##  The products filename
+parser.add_argument('-n', '--filename',
+    action   = 'store',
+    required = True,
+    help     = 'The product\'s filename.',
+    metavar  = 'FILENAME',
+    dest     = 'proc_filename'
+    )
+
+##  The product type
+parser.add_argument('-p', '--product-type',
+    action   = 'store',
+    required = True,
+    help     = 'The type of the product.',
+    metavar  = 'PROD_TYPE',
+    choices  = list(prodtype_dict.keys()),
+    dest     = 'product_type'
+    )
+
+##  The  software used
+parser.add_argument('-s', '--software',
+    action   = 'store',
+    required = True,
+    help     = 'The software used.',
+    metavar  = 'SOFTWARE',
+    choices  = list(software_dict.keys()),
+    dest     = 'software'
+    )
+
+##  The path to the produc file
+parser.add_argument('-t', '--save-dir',
+    action   = 'store',
+    required = True,
+    help     = 'The directory (path) of the saved product file.',
+    metavar  = 'SAVE_DIR',
+    dest     = 'save_dir'
+    )
+
+##  The database host
+parser.add_argument('--db-host',
+    action   = 'store',
+    required = True,
+    help     = 'The database host (ip).',
+    metavar  = 'DB_HOST',
+    dest     = 'db_host'
+    )
+
+##  The database username
+parser.add_argument('--db-user',
+    action   = 'store',
+    required = True,
+    help     = 'The database user.',
+    metavar  = 'DB_USER',
+    dest     = 'db_user'
+    )
+
+##  The database password
+parser.add_argument('--db-pass',
+    action   = 'store',
+    required = True,
+    help     = 'The database password.',
+    metavar  = 'DB_PASSWORD',
+    dest     = 'db_pass'
+    )
+
+##  The database name
+parser.add_argument('--db-name',
+    action   = 'store',
+    required = True,
+    help     = 'The database name.',
+    metavar  = 'DB_NAME',
+    dest     = 'db_name'
+    )
+
+##  Parse command line arguments
+args = parser.parse_args()
+
 ## Resolve command line arguments
-def main (argv):
-
-  try:
-    opts, args = getopt.getopt(argv,'h',[
-      'help','campaign-name=','satellite-system=','solution-type=','product-type=','start-epoch=',
-      'end-epoch=','processed-at=','host-ip=','host-dir=','product-filename=', 'software='])
-
-  except getopt.GetoptError as err:
-    print >>sys.stderr, str(err)
-    raise RuntimeError("ERROR. Cannot parse options!")
-    sys.exit(1)
-
-  for opt, arg in opts:
-    if opt in ('-h', '--help'):
-      help(0)
-
-    elif opt in ('--campaign-name'):
-      global campaign
-      campaign = arg
-
-    elif opt in ('--satellite-system'):
-      global sat_sys
-      try: 
-        sat_sys = satsys_dict[arg.upper()]
-      except:
-        raise RuntimeError("Invalid satellite system [%s]"%arg)
-
-    elif opt in ('--solution-type'):
-      global sol_type
-      try:
-        sol_type = soltype_dict[arg.upper()]
-      except:
-        raise RuntimeError("Invalid solution type [%s]"%arg)
-
-    elif opt in ('--product-type'):
-      global prod_type
-      try:
-        prod_type = prodtype_dict[arg.upper()]
-      except:
-        raise RuntimeError("Invalid product type [%s]"%arg)
-
-    elif opt in ('--start-epoch'):
-      global start_epoch
-      try:
-        start_epoch = to_datetime(arg)
-      except:
-        raise
-
-    elif opt in ('--end-epoch'):
-      global stop_epoch
-      try:
-        stop_epoch = to_datetime(arg)
-      except:
-        raise
-
-    elif opt in ('--processed-at'):
-      global proc_at
-      try:
-        proc_at = to_datetime(arg)
-      except:
-        raise
-
-    elif opt in ('--host-ip'):
-      global host_ip
-      host_ip = arg
-
-    elif opt in ('--host-dir'):
-      global host_dir
-      host_dir = arg
-
-    elif opt in ('--product-filename'):
-      global filename
-      filename = arg
-
-    elif opt in ('--software'):
-      global software
-      try:
-        software = software_dict[arg]
-      except:
-        raise RuntimeError("Invalid software [%s]"%arg)
-
-    else:
-      print >> sys.stderr,'[WARNING] Invalid command line argument: %s'%opt
-
-## Start main
-if __name__ == "__main__":
-  try:
-    main( sys.argv[1:] )
-  except:
-    print >>sys.stderr,'*** Stack Rewind:'
-    exc_type, exc_value, exc_traceback = sys.exc_info()
-    traceback.print_exception(exc_type, exc_value, exc_traceback, \
-            limit=10, file=sys.stderr)
-    print >>sys.stderr,'*** End'
-    sys.exit(1)
-
-for entry in [campaign, sat_sys, sol_type, prod_type, start_epoch, stop_epoch, \
-        proc_at, host_ip, host_dir, filename]:
-  if not entry:
-    print >>sys.stderr, 'ERROR. Missing command line argument!'
-    sys.exit(1)
+product_type  = prodtype_dict[args.product_type]
+software      = software_dict[args.software]
+sat_sys       = satsys_dict[args.sat_sys]
+solution_type = soltype_dict[args.solution_type]
+try:
+    d = args.start_epoch; start_epoch = to_datetime( d )
+    d = args.stop_epoch ; stop_epoch  = to_datetime( d )
+    d = args.proc_epoch ; proc_epoch  = to_datetime( d )
+except:
+    print >> sys.stderr, '[ERROR] Failed to parse date: \"%s\"'%(d)
+    sys.exit( 1 )
 
 SQL_INSERT_CMD = "INSERT INTO product \
 (\
@@ -241,19 +272,22 @@ VALUES ( \
   \"%s\", \
   \"%s\", \
   \"%s\" \
-  );"%(campaign, software, sat_sys, sol_type, prod_type, \
-        proc_at.strftime("%Y-%m-%d %H:%M:%S"), \
+  );"%(args.campaign, args.software, sat_sys, solution_type, product_type, \
+        proc_epoch.strftime("%Y-%m-%d %H:%M:%S"), \
         start_epoch.strftime("%Y-%m-%d %H:%M:%S"), \
         stop_epoch.strftime("%Y-%m-%d %H:%M:%S"), \
-        host_ip, host_dir, filename)
+        args.db_host, args.save_dir, args.proc_filename)
 
-exit_status = 0
 ## try connecting to the database server
 try:
-  db  = MySQLdb.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWORD, db=DB_NAME)
+  db  = MySQLdb.connect( host   = args.db_host,
+                         user   = args.db_user, 
+                         passwd = args.db_pass, 
+                         db     = args.db_name)
   cur = db.cursor()
   cur.execute(SQL_INSERT_CMD)
   db.commit()
+  exit_status = 0
 except:
   exit_status = 1
   print >>sys.stderr,'*** Stack Rewind:'
@@ -264,6 +298,7 @@ except:
   db.rollback()
   ## print SQL_INSERT_CMD
 
-db.close()
+try   : db.close()
+except: pass
 
-sys.exit(exit_status)
+sys.exit( exit_status )

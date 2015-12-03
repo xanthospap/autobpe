@@ -34,7 +34,7 @@ SOLUTION_ID = DSO
 SAVE_DIR = ${HOME}/data/SAVEDISK
 
 ##  Append suffix to saved products
-APND_SUFFIX = _mxdepn
+APND_SUFFIX = _mxdcod
 
 ##  json output file
 JSON_OUT = 
@@ -135,7 +135,7 @@ FIXINF = IGB08
 ##+         going to be used to produce a PCV file. The antex file should be
 ##+         ${TABLES_DIR}/atx/${ATXINF}
 ##
-PCVINF = PCV_EPN
+PCVINF = PCV_COD
 ATXINF =
 PCVEXT = I08
 
@@ -169,8 +169,8 @@ SAVE_DIR_PSS  = mitsos1985
 ##  If you do not want to update the database with the (saved) solution files,
 ##+ set the variable 'UPD_DB_PROD' to 'NO'.
 DB_HOST     = "147.102.110.73"
-DB_USER     = "hypatia"
-DB_PASS     = "ypat;ia"
+DB_USER     = "paraskevas"
+DB_PASS     = "paraskey;aw"
 DB_NAME     = "procsta"
 UPD_DB_PROD = YES
 
