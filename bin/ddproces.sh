@@ -1574,17 +1574,17 @@ fi
 if [[ -z "${REF_NLIMIT+x}" ]] || [[ ! ${REF_NLIMIT} =~ ^[0-9]+$ ]] ; then
   echodbg "[DEBUG] Reference frame rejection criterion not set for north;"
   echodbg "        Setting it to 10 mm"
-  ${REF_NLIMIT}=10
+  REF_NLIMIT=10
 fi
 if [[ -z "${REF_ELIMIT+x}" ]] || [[ ! ${REF_ELIMIT} =~ ^[0-9]+$ ]] ; then
   echodbg "[DEBUG] Reference frame rejection criterion not set for east;"
   echodbg "        Setting it to 10 mm"
-  ${REF_ELIMIT}=10
+  REF_ELIMIT=10
 fi
 if [[ -z "${REF_ULIMIT+x}" ]] || [[ ! ${REF_ULIMIT} =~ ^[0-9]+$ ]] ; then
   echodbg "[DEBUG] Reference frame rejection criterion not set for up;"
   echodbg "        Setting it to 30 mm"
-  ${REF_ULIMIT}=30
+  REF_ULIMIT=30
 fi
 if ! set_hemlchk_limits ${U}/SCRIPT/HELMCHK \
                         ${REF_NLIMIT} ${REF_ELIMIT} ${REF_ULIMIT} ; then
