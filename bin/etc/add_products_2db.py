@@ -39,7 +39,7 @@ import traceback
 import argparse
 
 ## globals
-dtnow = datetime.datetime.now()
+dtnow = datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
 
 satsys_dict = {
   'GPS'     : 'GPS',
@@ -106,7 +106,7 @@ parser.add_argument('-c', '--campaign',
     )
 
 ##  The satellite system of the product
-parser.add_argument('-s', '--satellite=system',
+parser.add_argument('-s', '--satellite-system',
     action   = 'store',
     required = True,
     help     = 'The satellite system of the product.',
@@ -176,7 +176,7 @@ parser.add_argument('-p', '--product-type',
     )
 
 ##  The  software used
-parser.add_argument('-s', '--software',
+parser.add_argument('-w', '--software',
     action   = 'store',
     required = True,
     help     = 'The software used.',
@@ -185,8 +185,17 @@ parser.add_argument('-s', '--software',
     dest     = 'software'
     )
 
-##  The path to the produc file
-parser.add_argument('-t', '--save-dir',
+##  The hostname where the product file will be saved
+parser.add_argument('-o', '--save-host',
+    action   = 'store',
+    required = True,
+    help     = 'The hostname where the product file will be saved.',
+    metavar  = 'SAVE_HOST',
+    dest     = 'save_host'
+    )
+
+##  The path to the product file
+parser.add_argument('-r', '--save-dir',
     action   = 'store',
     required = True,
     help     = 'The directory (path) of the saved product file.',
@@ -272,11 +281,11 @@ VALUES ( \
   \"%s\", \
   \"%s\", \
   \"%s\" \
-  );"%(args.campaign, args.software, sat_sys, solution_type, product_type, \
+  );"%(args.campaign, software, sat_sys, solution_type, product_type, \
         proc_epoch.strftime("%Y-%m-%d %H:%M:%S"), \
         start_epoch.strftime("%Y-%m-%d %H:%M:%S"), \
         stop_epoch.strftime("%Y-%m-%d %H:%M:%S"), \
-        args.db_host, args.save_dir, args.proc_filename)
+        args.save_host, args.save_dir, args.proc_filename)
 
 ## try connecting to the database server
 try:

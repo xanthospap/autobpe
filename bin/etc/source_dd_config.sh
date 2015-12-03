@@ -9,7 +9,7 @@
 ##  The variables will be written to stdout, as e.g.
 ##+ 'export FOO=BAR'
 ##+ so in the parent script, you will need to:
-##+ eval $(./source_dd_config.sh)
+##+ eval $(./source_dd_config.sh my.config)
 ##
 
 if test "${#}" -ne 1 ; then
@@ -17,7 +17,9 @@ if test "${#}" -ne 1 ; then
   exit 1
 fi
 
-grep "^\s*[^#].*=.*$" config.template \
+echo ""
+
+grep "^\s*[^#].*=.*$" ${1} \
         | sed 's/ //g' \
         | awk -F"=" '/.*=.+/ {print "export",$0";"}'
 
