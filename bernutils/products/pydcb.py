@@ -121,10 +121,13 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
     saveas   = filename
     if out_dir: saveas = os.path.join(out_dir, filename)
     try:
-      localfile, webfile = list(itertools.chain(*_getRunningDcb_(filename, saveas)))
-      ret_list           = [localfile, webfile]
-      #ret_list = _getRunningDcb_(filename, saveas)
+      #localfile, webfile = list(itertools.chain(*_getRunningDcb_(filename, saveas)))
+      ret_list   = _getRunningDcb_(filename,saveas)
+      localfile  = ret_list[0][0]
+      remotefile = ret_list[0][1]
+      ret_list   = [localfile, remotefile]
       jdict['type']      = 'running (%s)'%stype
+      #print >> sys.stderr, 'Pydcb: loop 1'
     except:
       raise
 
@@ -138,7 +141,11 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
     try:
       #localfile, webfile = _getFinalDcb_(iyear,filename,saveas)
       #ret_list           = [localfile, webfile]
-      ret_list = _getFinalDcb_(iyear,filename,saveas)
+      ret_list = _getFinalDcb_(iyear,filename,saveas)  
+      localfile  = ret_list[0][0]
+      remotefile = ret_list[0][1]
+      ret_list   = [localfile, remotefile]
+      #print >> sys.stderr, 'Pydcb: loop 2'
       jdict['type']      = 'final (%s)'%stype
     except:
       filename = generic_file.replace('yymm', '')
@@ -148,7 +155,12 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
       try:
         #localfile, webfile = _getRunningDcb_(filename,saveas)
         #ret_list           = [localfile, webfile]
-        ret_list = _getRunningDcb_(filename,saveas)
+        #ret_list = list(itertools.chain(*_getRunningDcb_(filename, saveas)))
+        ret_list   = _getRunningDcb_(filename,saveas)
+        localfile  = ret_list[0][0]
+        remotefile = ret_list[0][1]
+        ret_list   = [localfile, remotefile]
+        #print >> sys.stderr, 'Pydcb: loop 3'
         jdict['type']      = 'running (%s)'%stype
       except:
         raise
@@ -167,6 +179,7 @@ def getCodDcb(stype, datetm, out_dir=None, tojson=False):
       localfile  = ret_list[0][0]
       remotefile = ret_list[0][1]
       ret_list   = [localfile, remotefile]
+      #print >> sys.stderr, 'Pydcb: loop 4'
       jdict['type'] = 'final (%s)'%stype
     except:
       raise
