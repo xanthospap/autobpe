@@ -67,7 +67,7 @@ class CrdPoint:
       iaa = int(aa)
     except:
       raise ArithmeticError('Invalid aa integer %s' %str(aa))
-    return "%03i  %-16s%15.5f%15.5f%15.5f   %-5s" \
+    return "%03i  %-16s%15.5f%15.5f%15.5f    %-5s" \
             %(iaa, self.name(), self.xcmp_,self.ycmp_,self.zcmp_,self.flag_)
 
 def __getListOfPoints__(crd_filename, stalst=None):

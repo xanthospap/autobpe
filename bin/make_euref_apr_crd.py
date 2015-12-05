@@ -117,6 +117,15 @@ parser.add_argument('-s', '--station-file',
     dest='station_file',
     default=None
     )
+##  set coordinate flag
+parser.add_argument('-f', '--flag',
+    action='store',
+    required=False,
+    help='The flag to be set for every station.',
+    metavar='FLAG',
+    dest='flag',
+    default=''
+    )
 ## flush coordinate to a .CRD file
 parser.add_argument('-a', '--append-to-crd',
     action='store',
@@ -202,12 +211,12 @@ if args.crd_file is None:
     i = 1
     for sta, lst in ssc_dict.iteritems() :
         x, y, z = extrapolate_crd( sta, lst, dtime )
-        print '%3i  %-15s%15.4f%15.4f%15.4f '%(i, sta, x, y, z)
+        print '%3i  %-15s%15.4f%15.4f%15.4f %s'%(i, sta, x, y, z, args.flag)
         i += 1
 else:
     for sta, lst in ssc_dict.iteritems() :
         px, py, pz = extrapolate_crd( sta, lst, dtime )
-        point = bernutils.bcrd.CrdPoint(name=sta, x=px, y=py, z=pz, flag='A')
+        point = bernutils.bcrd.CrdPoint(name=sta, x=px, y=py, z=pz, flag=args.flag)
         crd_file_obj.addPoint( point )
     crd_file_obj.flush()
 

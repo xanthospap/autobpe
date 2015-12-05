@@ -1390,7 +1390,6 @@ STOP_PD=$(date +%s.%N)
 ##+ holds the *FILES* per cluster (i.e. baselines) and not the *STATIONS*
 ##+ per cluster
 ## ////////////////////////////////////////////////////////////////////////////
-
 CLUSTER_FILE=${P}/${CAMPAIGN}/STA/${CAMPAIGN}.CLU
 
 awk -v num_of_clu=${STATIONS_PER_CLUSTER} -f \
@@ -1545,26 +1544,28 @@ else
   echodbg "[DEBUG] Using a-priori coordinate file: \"${APRCRD_FILE}\"."
 fi
 
-##  Should we compile a .CRD file for EPN CLASS A stations ?
-if [ ! -z "${USE_EPN_A_SSC}" ] && [ "${USE_EPN_A_SSC}" = "YES" ] ; then
-  echodbg "[DEBUG] Compiling a-priori coordinate file for EPN class A sites."
-  cat $APRCRD_FILE > TEMP.CRD ##  create a temp so that we don't mess it up
-  APRCRD_FILE=TEMP.CRD
-  tmp_file_array+=('TEMP.CRD')
-  if ! make_euref_apr_crd.py --year="${YEAR}" \
-                          --doy="${DOY}" \
-                          --append-to-crd="${APRCRD_FILE}" ; then
-    echoerr "[ERROR] Failed to make a-priori coordinates for EPN class A sites."
-    clear_n_exit 1
-  fi
-  echodbg "[DEBUG] EPN class A site coordinates appended to file \"${APRCRD_FILE}\"."
-fi
-
+##  Set the flags of all stations in the apriori coordinate file to 'R'.
+##  send the result to a valid crd file
 if ! awk -v FLAG=R -v REPLACE_ALL=NO -f \
         ${P2ETC}/change_crd_flags.awk ${APRCRD_FILE} \
         1>${P}/${CAMPAIGN}/STA/REG${YEAR:2:2}${DOY_3C}0.CRD; then
   echoerr "[ERROR] Could not create a-priori coordinate file."
   clear_n_exit 1
+fi
+
+##  Should we compile a .CRD file for EPN CLASS A stations ?
+if [ ! -z "${USE_EPN_A_SSC}" ] && [ "${USE_EPN_A_SSC}" = "YES" ] ; then
+  echodbg "[DEBUG] Compiling a-priori coordinate file for EPN class A sites."
+  EPNCA_FILE=${P}/${CAMPAIGN}/STA/EPNA${YEAR:2:2}${DOY_3C}0.CRD
+  rm $EPNCA_FILE 2>/dev/null
+  if ! make_euref_apr_crd.py --year="${YEAR}" \
+                          --doy="${DOY}" \
+                          --append-to-crd="${EPNCA_FILE}" \
+                          --flag=IGb08 ; then
+    echoerr "[ERROR] Failed to make a-priori coordinates for EPN class A sites."
+    clear_n_exit 1
+  fi
+  echodbg "[DEBUG] EPN class A site coordinates appended to file \"${EPNCA_FILE}\"."
 fi
 
 ## ////////////////////////////////////////////////////////////////////////////

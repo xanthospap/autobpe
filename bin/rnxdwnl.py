@@ -419,23 +419,19 @@ try:
             # answer must only have one raw
             if len(SENTENCE) > 1:
                 ## station belongs to more than one networks; see bug #13
-                ##print >> sys.stderr, '[WARNING] station %s belongs in more than one networks'%s
-                vprint('[DEBUG] station \"%s\" belongs to more than one networks.'%s, 2, sys.stderr )
+                vprint('[DEBUG] station \"%s\" belongs to more than one networks.'%s, 2, sys.stdout )
                 add_sta = True
-                print SENTENCE[0]
                 ref_line = SENTENCE[0]
-                print 'ref line [%s]'%ref_line
                 for line in SENTENCE[1:]:
-                    print 'Comparing to line [%s]'%line
                     for idx, field in enumerate( ref_line[0:10] ):
                         if field != line[idx]:
                             add_sta = False
                             vprint('[WARNING] Station \"%s\" belongs to more than one networks but independent fields don\'t match!'%s, 1, sys.stderr)
                             vprint('[WARNING] Station \"%s\" will be skipped'%s, 1, sys.stderr)
-                if add_sta :
-                    vprint('[DEBUG] station \"%s\" added to download list.'%s, 2, sys.stder)
+                if add_sta is True :
+                    vprint('[DEBUG] station \"%s\" added to download list.'%s, 2, sys.stdout)
                     station_info.append( SENTENCE[0] )
-            elif len(SENTENCE) < 1:
+            elif len(SENTENCE) == 0:
                 vprint('[WARNING] Cannot match station \"%s\" in the database.'%s, 1, sys.stderr)
             else:
                 station_info.append( SENTENCE[0] )
@@ -455,8 +451,8 @@ try:
             vprint('[WARNING] No matching station name in database for \"%s\".'%s, 1, sys.stderr)
 
 except:
-    try:    db.close()
-    except: pass
+    # try:    db.close()
+    # except: pass
     vprint('[ERROR] Cannot connect to database server.', 0, sys.stderr )
     exc_type, exc_value, exc_traceback = sys.exc_info ()
     lines = traceback.format_exception (exc_type, exc_value, exc_traceback)
