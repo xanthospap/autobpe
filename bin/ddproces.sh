@@ -1,8 +1,8 @@
 #! /bin/bash
 
 NAME=ddprocess
-VERSION="0.90"
-REVISION="20"
+VERSION="1.0"
+REVISION="00"
 LAST_UPDATE="Oct 2015"
 START_DD=$(date +%s.%N)
 
