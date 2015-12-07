@@ -308,7 +308,7 @@ parser.add_argument('-p', '--path',
     help     = 'The directory where the downloaded files shall be placed.',
     metavar  = 'OUTPUT_DIR',
     dest     = 'output_dir',
-    default  = ''
+    default  = os.getcwd()
     )
 ##  verbosity level
 parser.add_argument('-v', '--verbosity',
