@@ -1,170 +1,194 @@
 #! /usr/bin/python
 
-import os
-import sys
+import os, sys
 import datetime
-import getopt
-import bernutils.webutils
+import argparse
 import gzip
 import json
-
-## help function
-def help (i):
-    print ""
-    print ""
-    sys.exit(i)
+import bernutils.webutils
 
 ## global
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
 HOST         = 'http://ggosatm.hg.tuwien.ac.at'
-OUT_DIR      = ''
-year         = None
-doy          = None
-hour         = None
-JSON_OUT     = None
 
-## Resolve command line arguments
-def main (argv):
+def vprint( message, min_verb_level, std_buf=None ):
+    if std_buf is None : std_buf = sys.stdout
+    if args.verbosity >= min_verb_level: print >> std_buf, message
 
-    if len(argv) < 1:
-        help(1)
+##  set the cmd parser
+parser = argparse.ArgumentParser(
+        description='Download VMF1 grid files for a given date.',
+        epilog     ='Ntua - 2015'
+        )
+##  year
+parser.add_argument('-y', '--year',
+    action   = 'store',
+    required = True,
+    type     = int,
+    help     = 'The year (integer).',
+    metavar  = 'YEAR',
+    dest     = 'year'
+    )
+##  day of year (doy)
+parser.add_argument('-d', '--doy',
+    action   = 'store',
+    required = True,
+    type     = int,
+    help     = 'The day of year (integer).',
+    metavar  = 'DOY',
+    dest     = 'doy'
+    )
+##  hour of day
+parser.add_argument('--hour',
+    action   = 'store',
+    required = False,
+    type     = int,
+    help     = 'The hour of day (integer in range [0-23]).',
+    metavar  = 'HOUR',
+    dest     = 'hour',
+    default  = None
+    )
+##  download path
+parser.add_argument('-p', '--path',
+    action   = 'store',
+    required = False,
+    help     = 'The directory where the downloaded files shall be placed.',
+    metavar  = 'OUTPUT_DIR',
+    dest     = 'output_dir',
+    default  = os.getcwd()
+    )
+## json output file 
+parser.add_argument('-j', '--json',
+    action   = 'store',
+    required = False,
+    help     = 'Output file (summary) in json format.',
+    metavar  = 'JSON_OUT',
+    dest     = 'json_out',
+    default  = ''
+    )
+##  verbosity level
+parser.add_argument('-v', '--verbosity',
+    action   = 'store',
+    required = False,
+    type     = int,
+    help     = 'Output verbosity level; if set to null (default value) no message'
+    'is written on screen. If the level is set to 2, all messages appear on'
+    'stdout.',
+    metavar  = 'VERBOSITY',
+    dest     = 'verbosity',
+    default  = 0
+    )
 
-    try:
-      opts, args = getopt.getopt(argv,'hy:d:r:o:j:',[
-        'help','year=','doy=','hour=','outdir=','json='])
-    except getopt.GetoptError:
-        help(1)
-
-    for opt, arg in opts:
-        if opt in ('-h', 'help'):
-            help(0)
-        elif opt in ('-y', '--year'):
-            global year
-            year = arg
-        elif opt in ('-d', '--doy'):
-            global doy
-            doy = arg
-        elif opt in ('-r', '--hour'):
-            global hour
-            hour = arg
-        elif opt in ('-o', '--outdir'):
-            global OUT_DIR
-            OUT_DIR = arg
-        elif opt in ('-j', '--json'):
-            global JSON_OUT
-            JSON_OUT = arg
-        else:
-            print >> sys.stderr, "Invalid command line argument:",opt
-
-## Start main
-if __name__ == "__main__":
-    main( sys.argv[1:] )
-
-## year and doy must be set and valid
-if not year:
-    print >> sys.stderr, 'ERROR. Year must be set and valid !'
-    sys.exit(EXIT_FAILURE)
-if not doy:
-    print >> sys.stderr, 'ERROR. Doy must be set and valid !'
-    sys.exit(EXIT_FAILURE)
-try:
-    iyear = int(year)
-    idoy  = int(doy)
-    if hour is not None:
-        # hour can be float so that int(hour) would fail !
-        ihour = int(float(hour))
-except:
-    print >> sys.stderr, 'ERROR. Invalid date argument(s) ![1]'
-    sys.exit(EXIT_FAILURE)
+##  Parse command line arguments
+args = parser.parse_args()
 
 # output directory must exist !
-if OUT_DIR != '':
-    if OUT_DIR[-1] == '/': OUT_DIR = OUT_DIR[:-1]
-    if not os.path.isdir(OUT_DIR):
-        print >> sys.stderr, 'ERROR. Invalid/non-existent directory given:',OUT_DIR
-        sys.exit(EXIT_FAILURE)
+if not os.path.isdir( args.output_dir ):
+    print >> sys.stderr, '[ERROR] Invalid/non-existent directory given: \"%s\".'%(args.output_dir)
+    sys.exit( EXIT_FAILURE )
 
 ## make year, doy and hour a valid datetime instance
-if not hour:
-    date_string = '%04i %03i 0 0 0' %(iyear,idoy)
-else:
-    date_string = '%04i %03i %02i 0 0' %(iyear,idoy,ihour)
-
 try:
-    dt = datetime.datetime.strptime(date_string,'%Y %j %H %M %S')
+    if args.hour is not None:
+        # hour can be float so that int(hour) would fail !
+        ihour       = int( float(args.hour) )
+        date_string = '%04i %03i %02i 0 0' %(args.year,args.doy,ihour)
+        dt          = datetime.datetime.strptime(date_string,'%Y %j %H %M %S')
+    else:
+        date_string = '%04i %03i 0 0 0' %(args.year,args.doy)
+        dt          = datetime.datetime.strptime(date_string,'%Y %j %H %M %S')
 except:
-    print >> sys.stderr, 'ERROR. Invalid date argument(s) ![2]'
-    sys.exit(EXIT_FAILURE)
+    print >> sys.stderr, '[ERROR] Invalid date argument(s) !'
+    sys.exit( EXIT_FAILURE )
 
-## difference in (days) from today
+## difference (in days) from today
 today  = datetime.date.today()
 daydif = today - dt.date()
 
 # date requested older than today (use normal folders)
 if daydif.days >= 1:
-    DIRN = ( '/DELAY/GRID/VMFG/%04i' %iyear )
+    DIRN = ( '/DELAY/GRID/VMFG/%04i' %args.year )
+    vprint('[DEBUG] Delta days = %+3i'%(daydif.days), 1)
+    vprint('[DEBUG] Using standard VMF dealy folder: \"%s\"'%DIRN, 1)
 else: # else, use prediction folder
-    DIRN = ( '/DELAY/GRID/VMFG_FC/%04i' %iyear )
+    DIRN = ( '/DELAY/GRID/VMFG_FC/%04i' %args.year )
+    vprint('[DEBUG] Using predicted VMF dealy folder: \"%s\"'%DIRN, 1)
 
-# make a list with the file(s) we want
-request_list     = []
-generic_filename = 'VMFG_%04i%s%s.H' %(iyear,dt.strftime('%m'),dt.strftime('%d'))
-if not hour:
-    for i in [0,6,12,18]:
-        request_list.append(generic_filename+('%02i'%i))
+# make a list with the file(s) we want, i.e. request_list
+generic_filename = 'VMFG_%04i%s%s.H' %(args.year,
+                    dt.strftime('%m'),
+                    dt.strftime('%d'))
+if not args.hour:
+    request_list = [ generic_filename+('%02i'%i) for i in [0, 6, 12, 18] ]
 else:
     i = divmod(ihour,6)[0] * 6
-    request_list.append(generic_filename+('%02i'%i))
+    request_list = [ generic_filename+('%02i'%i) ]
 
 # WARNING pre-2008, all files are zipped into filename.gz
-if iyear <= 2008:
+if args.year <= 2008:
     for i, f in enumerate(request_list):
         request_list[i] = (f + '.gz')
 
 # try downloading the file(s)
-URL = ('%s%s' %(HOST,DIRN))
-saveas_list = list(request_list)
-if OUT_DIR != '':
-    for i, f in enumerate(saveas_list):
-        saveas_list[i] = os.path.join(OUT_DIR,f)
+status      = EXIT_SUCCESS
+URL         = ( '%s%s' %(HOST,DIRN) )
+saveas_list = [ os.path.join(args.output_dir, i) for i in request_list ]
 try:
     retlist = bernutils.webutils.grabHttpFile(URL,request_list,saveas_list)
 except Exception, e:
-    ## TODO should delete files if this step fails
-    print >> sys.stderr, 'ERROR.',str(e)
-    sys.exit(EXIT_FAILURE)
+    ## try for prediction if delta days == 1
+    if daydif.days == 1:
+        try:
+            NOR_DIRN      = ( '/DELAY/GRID/VMFG/%04i' %args.year )
+            PRE_DIRN      = ( '/DELAY/GRID/VMFG_FC/%04i' %args.year )
+            request_list2 = [ i.replace(NOR_DIRN, PRE_DIRN) for i in request_list ]
+            vprint('[DEBUG] Final VMF1 grid not found! Trying for prediction', 1)
+            retlist = bernutils.webutils.grabHttpFile(URL,request_list2,saveas_list)
+            request_list  = request_list2
+        except:
+            #print >> sys.stderr, '[ERROR] %s'%(str(e))
+            print >> sys.stderr, '[ERROR] Failed to download VMF1 grid file(s).'
+            status = EXIT_FAILURE
+    else:
+        #print >> sys.stderr, '[ERROR] %s'%(str(e))
+        print >> sys.stderr, '[ERROR] Failed to download VMF1 grid file(s).'
+        status = EXIT_FAILURE
+
+## TODO should delete files if this step fails
+if status == EXIT_FAILURE: sys.exit( EXIT_FAILURE )
 
 # WARNING pre-2008, all files are zipped into filename.gz
-if iyear <= 2008:
-    for i, f in enumerate(retlist):
-        gzfilename = f[1]
-        if gzfilename[-3:] == '.gz':
-            new_saveas = gzfilename[:-3]
-            with open(new_saveas,'w') as fn:
-                fn.write(gzip.open(gzfilename).read())
-            f[1] = new_saveas
-            os.remove(gzfilename)
+if args.year <= 2008:
+   for i, f in enumerate( retlist ):
+       gzfilename = f[1]
+       if gzfilename[-3:] == '.gz':
+           new_saveas = gzfilename[:-3]
+           with open(new_saveas,'w') as fn:
+               fn.write( gzip.open(gzfilename).read() )
+           f[1] = new_saveas
+           os.remove( gzfilename )
 
 # print results
-if JSON_OUT:
-    with open(JSON_OUT, 'w') as jout:
-      print>>jout,"\"%s\":["%("vmf1")
-      for idx, i in enumerate(retlist):
-          jdict = {
-              'info'    : 'Vienna Mapping Function 1 Grid',
-              'format'  : 'GRD (ascii grid file)',
-              'satsys'  : '',
-              'ac'      : 'tuwien',
-              'type'    : '',
-              'host'    : HOST,
-              'filename': i[0]
-            }
-          if idx == len(retlist) - 1: end = ']'
-          else: end = ','
-          print>>jout,"%s %s"%(json.dumps(jdict), end),
+if args.json_out != '' :
+   with open(args.json_out, 'w') as jout:
+     print >> jout, "\"%s\":["%("vmf1")
+     for idx, i in enumerate( retlist ):
+         jdict = {
+             'info'    : 'Vienna Mapping Function 1 Grid',
+             'format'  : 'GRD (ascii grid file)',
+             'satsys'  : '',
+             'ac'      : 'tuwien',
+             'type'    : '',
+             'host'    : HOST,
+             'filename': i[0]
+           }
+         if idx == len(retlist) - 1: end = ']'
+         else: end = ','
+         print >> jout, "%s %s"%(json.dumps(jdict), end),
 
-for i in retlist: print 'Downloaded',i[0],'to',i[1]
+if args.verbosity > 0 :
+    for i in retlist: print '[DEBUG] Downloaded \"%s\" to \"%s\".'%(i[0],i[1])
 
 # exit with sucess
-sys.exit(EXIT_SUCCESS)
+sys.exit( EXIT_SUCCESS )
