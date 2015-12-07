@@ -916,7 +916,10 @@ else
     tmp_file_array+=("${P}/${CAMPAIGN}/STA/${FIXINF}.FIX")
   fi
 fi
-echodbg "[DEBUG] Using FIX file \"${FIX_FILE}\""
+cat ${FIX_FILE} > ${P}/${CAMPAIGN}/STA/REF${YEAR:2:2}${DOY_3C}0.FIX
+echodbg "[DEBUG] Using FIX file \"${FIX_FILE}\"."
+FIX_FILE=${P}/${CAMPAIGN}/STA/REF${YEAR:2:2}${DOY_3C}0.FIX
+echodbg "        Renamed to: \"${FIX_FILE}\"."
 
 ## ------------------------------------------------------------------------- ##
 ##                                                                           ##
