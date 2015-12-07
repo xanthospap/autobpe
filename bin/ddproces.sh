@@ -1344,31 +1344,43 @@ fi
 ## ////////////////////////////////////////////////////////////////////////////
 
 ## temporary file to hold getvmf1.py output
-TMP_FL=.vmf1-${YEAR}${DOY}.dat
-tmp_file_array+=("${TMP_FL}")
+#TMP_FL=.vmf1-${YEAR}${DOY}.dat
+#tmp_file_array+=("${TMP_FL}")
+MERGED_VMF_FILE=${P}/${CAMPAIGN}/GRD/VMF${YEAR:2:2}${DOY_3C}0.GRD
 
 if ! getvmf1.py \
-            --year=${YEAR} \
-            --doy=${DOY} \
-            --outdir=${D} \
+            --year="${YEAR}" \
+            --doy="${DOY}" \
+            --path=${D} \
             --json=".vmf1.json" \
-            1>${TMP_FL}; then
+            --merge="${MERGED_VMF_FILE}" ; then
   echoerr "[ERROR] Failed to get VMF1 grid file(s)."
   clear_n_exit 1
 fi
 
+#f ! getvmf1.py \
+#           --year="${YEAR}" \
+#           --doy="${DOY}" \
+#           --path=${D} \
+#           --json=".vmf1.json" \
+#           --merge="${MERGED_VMF_FILE}"
+#           1>${TMP_FL}; then
+# echoerr "[ERROR] Failed to get VMF1 grid file(s)."
+# clear_n_exit 1
+#i
+
 ##  grid files are downloaded to ${D} as individual files; merge them and move
 ##+ to /GRID
-if ! mapfile -t VMF_FL_ARRAY < <(filter_local_vmf1.awk ${TMP_FL}) ; then
-  echoerr "[ERROR] Failed to merge VMF1 grid file(s)."
-  clear_n_exit 1
-else
-  MERGED_VMF_FILE=${P}/${CAMPAIGN}/GRD/VMF${YEAR:2:2}${DOY_3C}0.GRD
-  >${MERGED_VMF_FILE}
-  for fl in ${VMF_FL_ARRAY[@]}; do
-    cat ${fl} >> ${MERGED_VMF_FILE}
-  done
-fi
+#if ! mapfile -t VMF_FL_ARRAY < <(filter_local_vmf1.awk ${TMP_FL}) ; then
+#  echoerr "[ERROR] Failed to merge VMF1 grid file(s)."
+#  clear_n_exit 1
+#else
+#  MERGED_VMF_FILE=${P}/${CAMPAIGN}/GRD/VMF${YEAR:2:2}${DOY_3C}0.GRD
+#  >${MERGED_VMF_FILE}
+#  for fl in ${VMF_FL_ARRAY[@]}; do
+#    cat ${fl} >> ${MERGED_VMF_FILE}
+#  done
+#fi
 
 cat .vmf1.json 1>>${JSON_OUT} 2>/dev/null
 tmp_file_array+=(".vmf1.json")

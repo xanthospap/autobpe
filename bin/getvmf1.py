@@ -67,6 +67,15 @@ parser.add_argument('-j', '--json',
     dest     = 'json_out',
     default  = ''
     )
+##  merge individual (hourly) files
+parser.add_argument('-m', '--merge',
+    action   = 'store',
+    required = False,
+    help     = 'Merge individual (hourly) files.',
+    metavar  = 'MERGED_FILE',
+    dest     = 'merge_to',
+    default  = None
+    )
 ##  verbosity level
 parser.add_argument('-v', '--verbosity',
     action   = 'store',
@@ -168,6 +177,14 @@ if args.year <= 2008:
                fn.write( gzip.open(gzfilename).read() )
            f[1] = new_saveas
            os.remove( gzfilename )
+
+##  merge hourly files if needed
+if args.merge_to is not None:
+    with open( args.merge_to, 'w' ) as mrg :
+        for lst in retlist:
+            with open( lst[1], 'r' ) as infile:
+                mrg.write( infile.read() )
+                vprint('[DEBUG] Cat file \"%s\" to \"%s\".'%(lst[1], args.merge_to), 1)
 
 # print results
 if args.json_out != '' :
