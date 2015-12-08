@@ -8,3 +8,4 @@ doc/_static/
 doc/_templates/
 doc/_build/
 obsolete/
+/bin/log/

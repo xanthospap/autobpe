@@ -15,8 +15,40 @@ echoerr () { echo "$@" 1>&2; }
 
 ##  echo to stdout only if debuging flag is set, i.e. if the variable 
 ##+ "DEBUG_MODE" > 0.
-echodbg() { 
+echodbg () { 
   test "${DEBUG_MODE}" -gt 0 && echo "$@" 
+}
+
+##  given a year and day of year, this function will return the
+##+ gps week, i.e. print it to stdout.
+##  arg1 -> year
+##  arg2 -> doy
+yd2gpsw () {
+  local gweek=
+  gweek=$(echo -ne "import bernutils.gpstime\nw,s = bernutils.gpstime.ydoy2gps(${1},${2})\nprint \"%4i\"%(w)" | python)
+  if ! [[ $gweek =~ ^[0-9]{4}$ ]]; then
+    echoerr "[ERROR] Could not resolve gps week."
+    return 1
+  else
+    echo $gweek
+    return 0
+  fi
+}
+
+##  given a year and day of year, this function will return the
+##+ day of gps week, i.e. print it to stdout.
+##  arg1 -> year
+##  arg2 -> doy
+yd2gpsd () {
+  local gweekd=
+  gweekd=$(echo -ne "import bernutils.gpstime\nw,s = bernutils.gpstime.ydoy2gps(${1},${2})\nprint \"%1i\"%(s/bernutils.gpstime.SEC_PER_DAY)" | python)
+  if ! [[ $gweekd =~ ^[0-9]$ ]]; then
+    echoerr "[ERROR] Could not resolve gps day of week."
+    return 1
+  else
+    echo $gweekd
+    return 0
+  fi
 }
 
 ##  control perl script output
@@ -113,46 +145,79 @@ END
 ##  argv1 -> file extension (e.g. 'SNX')
 ##  argv2 -> campaign dir   (e.g. 'SOL')
 ##  argv3 -> product type   (e.g. 'SINEX')
-##  argv4 -> (optional) sol type
+##  argv4 -> solution type:
 ##+          'F' for final, 
 ##+          'R' for size-reduced
 ##+          'P' for preliminery
 ##+          'N' for free-network
+##  argv5 -> type of date used in saved file:
+##+          'g' for gpsweek, day of week
+##+          'y' for year, day of year
+##  argv6 -> : (sub) directory where the products will be saved
+##+          i.e. ${SAVE_DIR_DIR}/${6}
 ##
 save_n_update () {
 
-  local solution_id=
-
-  if test "$#" -eq 4 ; then
-    case "${4}" in
-      F|f)
-        solution_id=${FINAL_SOLUTION_ID}
-        ;;
-      R|r)
-        solution_id=${REDUCED_SOLUTION_ID}
-        ;;
-      P|p)
-        solution_id=${PRELIM_SOLUTION_ID}
-        ;;
-      N|n)
-        solution_id=${FREENET_SOLUTION_ID}
-        ;;
-      *)
-        echoerr "[ERROR] Invalid one-char solution id!"
-        return 1
-        ;;
-    esac
-  else
-    if test "$#" -ne 3 ; then
-      echoerr "[ERROR] Invalid call to save_n_update()."
-      return 1
-    else
-      solution_id=${FINAL_SOLUTION_ID}
-    fi
+  if test "$#" -ne 6 ; then
+    echoerr "[ERROR] Invalid call to save_n_update()."
+    return 1
   fi
- 
-  local src_f=${solution_id}${YEAR:2:2}${DOY_3C}0.${1} ## source file
-  local trg_f=${solution_id}${YEAR:2:2}${DOY_3C}0${APND_SUFFIX}.${1} ## target
+  
+  local solution_id=
+  local save_date=
+  local save_dir_p=${6}
+
+  case "${4}" in
+    F|f)
+      solution_id=${FINAL_SOLUTION_ID}
+      ;;
+    R|r)
+      solution_id=${REDUCED_SOLUTION_ID}
+      ;;
+    P|p)
+      solution_id=${PRELIM_SOLUTION_ID}
+      ;;
+    N|n)
+      solution_id=${FREENET_SOLUTION_ID}
+      ;;
+    *)
+      echoerr "[ERROR] Invalid one-char solution id!"
+      return 1
+      ;;
+  esac
+
+  case "${5}" in
+    G|g)
+      save_date=$(echo -ne "import bernutils.gpstime\nw,s = bernutils.gpstime.ydoy2gps(${YEAR},${DOY})\nprint \"%4i%1i\"%(w,s/bernutils.gpstime.SEC_PER_DAY)" | python)
+      ;;
+    Y|y)
+      save_date=${YEAR:2:2}${DOY_3C}0
+      ;;
+    *)
+      echoerr "[ERROR] Invalid one-char solution id!"
+      return 1
+      ;;
+  esac
+  if ! [[ $save_date =~ ^[0-9]{5,6}$ ]]; then
+    echoerr "[ERROR] Could not resolve save date format."
+    return 1
+  fi
+  
+# case "${6}" in
+#   G|g)
+#     save_dir_p=$(echo -ne "import bernutils.gpstime\nw,s = bernutils.gpstime.ydoy2gps(${YEAR},${DOY})\nprint \"%4i%1i\"%(w,s/bernutils.gpstime.SEC_PER_DAY)" | python)
+#     ;;
+#   Y|y)
+#     save_dir_p=${YEAR}/${DOY_3C}
+#     ;;
+#   *)
+#     echoerr "[ERROR] Invalid one-char solution id!"
+#     return 1
+#     ;;
+# esac
+
+  local src_f=${solution_id}${YEAR:2:2}${DOY_3C}0.${1}      ## source file
+  local trg_f=${solution_id}${save_date}${APND_SUFFIX}.${1} ## target
   local src_p=${P}/${CAMPAIGN}/${2}
   compress -f ${src_p}/${src_f} \
       && src_f="${src_f}.Z" \
@@ -171,7 +236,7 @@ save_n_update () {
     rm .ftp.log 2>/dev/null
     ftp -inv $SAVE_DIR_HOST << EOF > .ftp.log
 user $SAVE_DIR_URN $SAVE_DIR_PSS
-cd ${SAVE_DIR_DIR}/${YEAR}/${DOY_3C}
+cd ${SAVE_DIR_DIR}/${save_dir_p}
 put ${src_p}/${src_f} ${trg_f}
 close
 bye
@@ -185,7 +250,7 @@ EOF
     fi
   else
     host=${HOSTNAME}
-    cp ${src_p}/${src_f} ${SAVE_DIR_DIR}/${YEAR}/${DOY_3C}/${trg_f}
+    cp ${src_p}/${src_f} ${SAVE_DIR_DIR}/${save_dir_p}/${trg_f}
     status="$?"
   fi
 
@@ -196,7 +261,7 @@ EOF
     fi
     return 1
   else
-    echodbg "[DEBUG] File \"$src_f\" saved at \"${host}\" as"
+    echodbg "[DEBUG] File \"$src_f\" saved at \"${host}/${save_dir_p}\" as"
     echodbg "        \"$trg_f\"."
   fi
   
@@ -208,7 +273,7 @@ EOF
           --start-epoch="${START_OF_DAY_STR/ /_}" \
           --stop-epoch="${END_OF_DAY_STR/ /_}" \
           --save-host="${host}" \
-          --save-dir="${SAVE_DIR_DIR}/${YEAR}/${DOY_3C}/" \
+          --save-dir="${SAVE_DIR_DIR}/${save_dir_p}/" \
           --filename="${trg_f}.Z" \
           --software=BERN52 \
           --db-host="${DB_HOST}" \
@@ -216,9 +281,9 @@ EOF
           --db-pass="${DB_PASS}" \
           --db-name="${DB_NAME}" ; then
     printf 1>>${JSON_OUT} "{\"prod_type\":\"%s\",\"extension\":\"%s\",\"local_dir\":\"%s\",\"sol_type\":\"%s\",\"filename\":\"%s\",\"savedas\":\"%s\",\"host\":\"%s\",\"host_dir\":\"%s\"}" \
-      "${3}" "${1}" "${2}" "${solution_id}" "${src_f}" "${trg_f}" "${host}" "${SOL_DIR}/${YEAR}/${DOY_3C}/"
+      "${3}" "${1}" "${2}" "${solution_id}" "${src_f}" "${trg_f}" "${host}" "${SOL_DIR}/${save_dir_p}/"
       echodbg "[DEBUG] DB updated to include file \"${src_f}\" as :"
-      echodbg "        \"${SAVE_DIR_DIR}/${YEAR}/${DOY_3C}/${trg_f}.Z\" @ \"${host}\"."
+      echodbg "        \"${SAVE_DIR_DIR}/${save_dir_p}/${trg_f}.Z\" @ \"${host}\"."
     else
       echoerr "[ERROR] Failed to update DB."
       return 1
@@ -740,15 +805,25 @@ if test -z ${SOLUTION_ID+x}; then
 fi
 
 ##  save directoy must be set; if it doesn't exist, try to create it
-if test -z "${SAVE_DIR_HOST}" ; then ##  using this host for saving
+if [ -z "${SAVE_DIR_FORMAT+x}" ] || [ ${SAVE_DIR_FORMAT} == "GPSW" ] ; then
+  SAVE_DIR_FORMAT=G
+  echodbg "[DEBUG] Using Gps Week format for save directory."
+  save_dir_dir=$(yd2gpsw ${YEAR} ${DOY})
+else
+  SAVE_DIR_FORMAT=Y
+  echodbg "[DEBUG] Using Year/Day of Year format for save directory."
+  save_dir_dir=${YEAR}/${DOY_3C}
+fi
+
+if test -z "${SAVE_DIR_HOST+x}" ; then ##  using this host for saving
   if test -z ${SAVE_DIR_DIR+x}; then
     echoerr "[ERROR] Save directory must be set!"
     exit 1
   else
     SAVE_DIR="${SAVE_DIR_DIR%/}"
-    if ! test -d ${SAVE_DIR}/${YEAR}/${DOY_3C}; then
-      if ! mkdir -p ${SAVE_DIR}/${YEAR}/${DOY_3C}; then
-        echoerr "[ERROR] Failed to create directory ${SAVE_DIR}/${YEAR}/${DOY_3C}"
+    if ! test -d ${SAVE_DIR}/${save_dir_dir}; then
+      if ! mkdir -p ${SAVE_DIR}/${save_dir_dir}; then
+        echoerr "[ERROR] Failed to create directory ${SAVE_DIR}/${save_dir_dir}"
         exit 1
       fi
     fi
@@ -757,10 +832,8 @@ else ##  need to see if we have access to host
   ftp -inv $SAVE_DIR_HOST <<EOF > .ftp.log
 user $SAVE_DIR_URN $SAVE_DIR_PSS
 cd ${SAVE_DIR_DIR}
-mkdir ${YEAR}
-cd ${YEAR}
-mkdir ${DOY_3C}
-cd ${DOY_3C}
+mkdir ${save_dir_dir}
+cd ${save_dir_dir}
 close
 bye
 EOF
@@ -774,6 +847,15 @@ EOF
     echoerr "        Check the username and password or see the log file: \".ftp.log\"."
     exit 1
   fi
+fi
+
+##  set the format of the product filename; i.e. yyddd0 or wwwwd
+if [ -z "${SAVE_PRD_FORMAT+x}" ] || [ ${SAVE_PRD_FORMAT} == "GPSW" ] ; then
+  SAVE_PRD_FORMAT=G
+  echodbg "[DEBUG] Saving product files based on Gps Week."
+else
+  SAVE_PRD_FORMAT=Y
+  echodbg "[DEBUG] Saving product files based on Year/Day of Year."
 fi
 
 ##  check validity of products/ac
@@ -1664,28 +1746,54 @@ fi
 ##  argv1 -> file extension (e.g. 'SNX')
 ##  argv2 -> campaign dir (e.g. 'SOL')
 ##  argv3 -> product type (e.g. 'SINEX')
+##  argv4 -> sol;ution type (e.g. 'F', 'R', 'P', 'N')
+##  argv5 -> save filename (product) format ('Y' or 'G')
+##  argv6 -> save sub-directory; already set as 'save_dir_dir'
 
 {
 ##  final tropospheric sinex
-if ! save_n_update TRO ATM TRO_SNX ; then exit 1 ; else printf "," ; fi
+if ! save_n_update TRO ATM TRO_SNX F $SAVE_PRD_FORMAT $save_dir_dir ; then 
+  exit 1 
+else 
+  printf "," 
+fi
 
 ## final SINEX
-if ! save_n_update SNX SOL SINEX ; then exit 1 ; else printf "," ; fi
+if ! save_n_update SNX SOL SINEX   F $SAVE_PRD_FORMAT $save_dir_dir ; then 
+  exit 1 
+else 
+  printf "," 
+fi
 
 ## Free network SINEX
-if ! save_n_update SNX SOL SINEX N; then exit 1 ; else printf "," ; fi
+if ! save_n_update SNX SOL SINEX   N $SAVE_PRD_FORMAT $save_dir_dir ; then 
+  exit 1 
+else 
+  printf "," 
+fi
 
 ## final NQ0
-if ! save_n_update NQ0 SOL NQ ; then exit 1 ; else printf "," ; fi
+if ! save_n_update NQ0 SOL NQ      F $SAVE_PRD_FORMAT $save_dir_dir ; then 
+  exit 1 
+else 
+  printf "," 
+fi
 
 ## reduced NQ0
-if ! save_n_update NQ0 SOL NQ R ; then exit 1 ; else printf "," ; fi
+if ! save_n_update NQ0 SOL NQ      R $SAVE_PRD_FORMAT $save_dir_dir ; then 
+  exit 1 
+else 
+  printf ","
+fi
 
 ## free-network NQ0
 #if ! save_n_update NQ0 SOL NQ N ; then exit 1 ; else printf "," ; fi
 
 ## final coordinates
-if ! save_n_update CRD STA CRD_FILE ; then exit 1 ; fi
+if ! save_n_update CRD STA CRD_FILE F $SAVE_PRD_FORMAT $save_dir_dir ; then 
+  exit 1
+fi
+ 
 } 1>>${JSON_OUT}
 
 printf 1>>${JSON_OUT} "],\n"

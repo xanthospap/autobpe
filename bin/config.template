@@ -163,12 +163,30 @@ REF_ULIMIT =
 ##  Note that the program 'ftp' will be used to do the transfer (if needed)
 ##
 ##  Warning: The saved products will actually be placed **not** in the folder 
-##+ 'SAVE_DIR_DIR' but in ${SAVE_DIR_DIR}/YYYY/DDD
+##+ 'SAVE_DIR_DIR' but in ${SAVE_DIR_DIR}/YYYY/DDD or ${SAVE_DIR_DIR}/WWWW ;
+##+ see also option 'SAVE_DIR_FORMAT'
 ##
 SAVE_DIR_HOST =
 SAVE_DIR_DIR  = pub/gnss/products
 SAVE_DIR_URN  =
 SAVE_DIR_PSS  =
+
+##  This option specifies the name of the directory where the products will
+##+ be saved, i.e. how the date is resolved into directories. You can either
+##+ set the save path to ${SAVE_DIR_DIR}/YYYY/DDD by setting this option to
+##+ 'YDOY' or to ${SAVE_DIR_DIR}/WWWW by setting the option to 'GPSW'
+##  If not set, the default option is 'YDOY'
+##  SAVE_DIR_FORMAT =
+
+##  This option specifies the filename of the product files, i.e. how the
+##+ date is resolved into the filename's string. The default format for
+##+ product filenames is 'cccyyddd0.*' where 'ccc' is the solution id, 'yy'
+##+ is the year and 'ddd' is the day of year. This corresponds to the option
+##+ 'YDOY'.
+##  In case you want to save the product using the gps week/day of week, then
+##+ set this option to 'GPSW', in which case the file is saved as 'cccwwwwd.*'
+##  If not set, the default option is 'YDOY'
+##  SAVE_PRD_FORMAT =
 
 ##  The following information affect the database with which the processing
 ##+ will interoperate. This database will be used for:
