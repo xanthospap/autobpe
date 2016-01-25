@@ -242,7 +242,7 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
   if filename_[0] == '/': filename_ = filename_[1:]
 
   ## set the filename (to save)
-  savef_ = filename_;
+  savef_ = infolist[1] + doy + session_identifier + '.' + year[2:] + 'd.Z';
   if toUpperCase:
     savef_ = savef_.upper()
   if odir != '':
