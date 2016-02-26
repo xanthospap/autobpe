@@ -1,9 +1,9 @@
 #! /usr/bin/python
 
 import datetime
-import bernutils.bsta
+import bernutils.bsta2
 
-x = bernutils.bsta.StaFile('CODE.STA')
+x = bernutils.bsta2.BernSta('CODE.STA')
 
 #x.match_old_name(['HARK', 'WTZR', 'EXWI', 'DYNG', 'S071'])
 #x.get_station_list()
@@ -17,12 +17,13 @@ for i in dict1:
     print '[%s]' %j
 print '////////////////////////////////////////////////////////////////////////'
 
-#dict2 = x.__match_type_002__(dict1)
-#for i in dict2:
-#  print 'ENTRIES FOR STATION %s' %i
-#  for j in dict2[i]:
-#    print '[%s]' %j
+dict2 = x.__match_type_002__(dict1)
+for i in dict2:
+  print 'ENTRIES FOR STATION %s' %i
+  for j in dict2[i]:
+    print '[%s]' %j
 
+'''
 print '////////////////////////////////////////////////////////////////////////'
 dict3 = bernutils.bsta.rearange_dictionary(dict1)
 for i in dict3:
@@ -30,3 +31,4 @@ for i in dict3:
   for j in dict3[i]:
     print '[%s]' %j
 print '////////////////////////////////////////////////////////////////////////'
+'''
