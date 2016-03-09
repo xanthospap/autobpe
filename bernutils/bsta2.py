@@ -4,6 +4,19 @@ import datetime
 
 __DEBUG_MODE__ = False
 
+def igs_log_rec_inf_block(rec_tp,rec_sn,rec_sw,dt_start,dt_stop):
+    stop = dt_stop.strftime('%Y-%m-%d') if dt_stop is not datetime.datetime.max else ''
+    return {'Receiver Type': rec_tp,
+            'Satellite System': 'GPS+GLO+GAL+BDS+QZSS+SBAS)',
+            'Serial Number': rec_sn,
+            'Firmware Version': rec_sw,
+            'Elevation Cutoff Setting': '',
+            'Date Installed':dt_start.strftime('%Y-%m-%d'),
+            'Date Removed': stop,
+            'Temperature Stabiliz.':'',
+            'Additional Information':''
+            }
+
 def _resolve_str_datetime_(strdt):
     ''' Resolve a datetime in the format "YYYY MM DD HH MM SS" to a Python
         datetime.datetime instance. The string passed as argument should follow
@@ -212,8 +225,40 @@ class StaRecord_002:
     def __str__(self):
         return self.__str_format__()
 
+    def __getitem__(self, key):
+        ''' This make possible code like:
+            x=StaRecord_002(#...#);
+            x['start'] = #...#
+        '''
+        return self.__dict[key]
+
     def station_name(self):
         return self.__dict['sta_name']
+
+def starecs2log(type2_rec_list):
+    ''' Given a list of StaRecord_002 entries (for a station) write a series of
+        IGS-log-sheet 3.x and 4.x blocks
+    '''
+    rec_entries = {}
+    cur_entry   = 3.1
+    ## sort the input list using the start dates
+    t2l = sorted(type2_rec_list, key=lambda x: x['start'], reverse=False)
+    ## The first epoch interval is the reference
+    ref_receiver_tp = t2l[0]['receiver_t']
+    ref_receiver_sn = t2l[0]['receiver_sn']
+    ref_receiver_nr = t2l[0]['receiver_nr']
+    rec_entries[cur_entry] = igs_log_rec_inf_block(ref_receiver_tp, ref_receiver_sn, ref_receiver_nr, t2l[0]['start'], t2l[0]['stop'])
+    for entry in t2l[1:]:
+        if ref_receiver_tp != entry['receiver_t'] or \
+           ref_receiver_sn != entry['receiver_sn'] or \
+           ref_receiver_nr != entry['receiver_nr']:
+            cur_entry += .1
+            ref_receiver_tp = entry['receiver_t']
+            ref_receiver_sn = entry['receiver_sn']
+            ref_receiver_nr = entry['receiver_nr']
+            rec_entries[cur_entry] = igs_log_rec_inf_block(ref_receiver_tp, ref_receiver_sn, ref_receiver_nr, entry['start'], entry['stop'])
+
+    return rec_entries
 
 class BernSta:
     ''' A class to represent a Bernese-format station information file (.STA)
@@ -390,7 +435,25 @@ class BernSta:
         ## for each station in the dictionary, add an entry
         sta_tp2 = {}
 
+        ## Rearange the type001 dictionary for more efficient searching
+        ## now, it looks like:
+        ## key=old_sta_name value=[ type001, type001, .. ] => make as =>
+        ## key=    sta_name value=[ type001, type001, .. ]
         sta_tp1 = dictnr
+        sta_tp1_tmp = {}
+        for key, val in sta_tp1.iteritems():
+            if not len(val):
+                pass
+            elif len(val) > 1:
+                stanam = val[0].station_name()
+                for nn in val[1:]:
+                    if nn.station_name() is not stanam:
+                        raise RuntimeError('[ERROR] Fucked up type 001 records')
+                sta_tp1_tmp[stanam] = val
+            else:
+                sta_tp1_tmp[val[0].station_name()] = val
+        sta_tp1 = sta_tp1_tmp
+
         ## walk through all entries of type 002
         line = self.__stream.readline()
         while line and len(line)>10 and self.__stream.tell() < to_p:
