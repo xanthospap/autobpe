@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
 ##
-##  This script will prepare thee run of the perl/Bernese PCF
+##  This script will prepare the run of the perl/Bernese PCF
 ##+ file ATX2PCV.PCF. Given the right command line arguments,
 ##+ it will:
 ##+ a. perform validation test (i.e. existance of files)
@@ -23,20 +23,18 @@ import subprocess
 import datetime
 import bernutils.bpcf
 
-
-
-def set_antnum( inpfile, option=False ):
+def set_antnum(inpfile, option=False):
     field_found = 0
-    with open( inpfile + 'tmp' , 'w' ) as out:
-        with open( inpfile, 'r' ) as f :
+    with open(inpfile + 'tmp' , 'w') as out:
+        with open(inpfile, 'r') as f :
             for line in f.readlines():
-                if re.match( '^ANTNUM 1  \"[0|1]\"', line ):
+                if re.match('^ANTNUM 1  \"[0|1]\"', line):
                     #gr = re.match( '^ANTNUM 1  \"([0|1])\"', line )
                     i_option = '0'
                     if option : i_option = '1'
                     print >> out, re.sub("\"([0|1])\"\s*$", "\"%s\""%(i_option), line).rstrip('\n')
                     field_found += 1
-                elif re.match( '^NOZERO 1  \"[0|1]\"', line ):
+                elif re.match('^NOZERO 1  \"[0|1]\"', line):
                    i_option = '1'
                    if option : i_option = '0'
                    print >> out, re.sub("\"([0|1])\"\s*$", "\"%s\""%(i_option), line).rstrip('\n')
@@ -46,12 +44,12 @@ def set_antnum( inpfile, option=False ):
     shutil.move( inpfile + 'tmp', inpfile )
     return ( field_found == 2 )
 
-def resolve_loadvar( gpsloadvar ):
+def resolve_loadvar(gpsloadvar):
 #''' Given a Bernese LOADGPS.setvar file, this function will return all
 #    exported variables in a dictionary; this dictionary will be returned.
 #'''
     var_dict = {}
-    with open( gpsloadvar ) as fin:
+    with open(gpsloadvar) as fin:
         for line in fin.readlines():
             ln_lst = line.split()
             if ln_lst and ln_lst[0] == 'export':
@@ -59,7 +57,7 @@ def resolve_loadvar( gpsloadvar ):
                 var_dict[ln2_lst[0]] = ln2_lst[1].strip('\"')
     return var_dict
 
-def resolve_bern_var_dict( bern_dict ):
+def resolve_bern_var_dict(bern_dict):
     bern_dict['HOME'] = os.environ['HOME'] ## add home variable
     del bern_dict['PATH']                  ## delete the PATH variable
     b_regex = re.compile('.*(\${.*}).*')
@@ -242,98 +240,98 @@ files_to_delete = []
 args = parser.parse_args()
 
 ##  get a dictionary with all Bernese variables.
-bern_vars = resolve_loadvar( args.loadgps )
+bern_vars = resolve_loadvar(args.loadgps)
 
 ##  get a dictionary of the resolved bernese variables
 ##+ bernese variables should now be accessible via e.g.
 ##+ bv[P] for ${P}.
-bv = resolve_bern_var_dict( bern_vars )
+bv = resolve_bern_var_dict(bern_vars)
 
 ##  campaign:
 ##  check that campaign exists
-campaign_dir = os.path.join( bv['P'], args.campaign )
-if not os.path.isdir( campaign_dir ):
+campaign_dir = os.path.join(bv['P'], args.campaign)
+if not os.path.isdir(campaign_dir):
     print >> sys.stderr, 'ERROR. Invalid campaign (%s)'%campaign_dir
     sys.exit(1)
 
 ##  Resolve the date
 dt      = datetime.datetime.strptime('%04i-%03i'%(args.year, args.doy), '%Y-%j')
-year    = int( dt.strftime('%Y') )
-doy     = int( dt.strftime('%j') )
+year    = int(dt.strftime('%Y'))
+doy     = int(dt.strftime('%j'))
 session = 0
 
 ##  antex file:
 ##+ check that it exists
 ##+ link to the campaigns OUT dir
 ##+ mark for delete (if needed)
-if not os.path.isfile( args.antex_file ):
+if not os.path.isfile(args.antex_file):
     print >> sys.stderr, 'ERROR. Invalid antex file (%s)'%args.antex_file
     sys.exit(1)
-antex_filename = os.path.basename( args.antex_file )
-antex_src_dir  = os.path.dirname( os.path.abspath( args.antex_file ) )
+antex_filename = os.path.basename(args.antex_file)
+antex_src_dir  = os.path.dirname(os.path.abspath( args.antex_file))
 symlink_source = os.path.join(antex_src_dir, antex_filename)
 symlink_target = os.path.join(campaign_dir, 'OUT', antex_filename)
 if symlink_source != symlink_target:
     ## if such file already exists, first move it
-    if os.path.isfile( symlink_target ):
-        shutil.move( symlink_target, symlink_target + '.bck' )
-    os.symlink( symlink_source, symlink_target )
-    files_to_delete.append( symlink_target )
+    if os.path.isfile(symlink_target):
+        shutil.move(symlink_target, symlink_target + '.bck')
+    os.symlink(symlink_source, symlink_target)
+    files_to_delete.append(symlink_target)
 
 ##  .sta file:
 ##+ check that it exists
 ##+ link to the campaigns OUT dir (if neccesary)
 ##+ mark for delete (if needed)
-if not os.path.isfile( args.sta_file + '.STA' ):
+if not os.path.isfile(args.sta_file + '.STA'):
     print >> sys.stderr, 'ERROR. Invalid sta file (%s)'%( args.sta_file + '.STA' )
     sys.exit(1)
-sta_filename   = os.path.basename( args.sta_file ) + '.STA'
-sta_src_dir    = os.path.dirname( os.path.abspath( args.sta_file ) )
-symlink_source = os.path.join(sta_src_dir, sta_filename )
-symlink_target = os.path.join(campaign_dir, 'STA', sta_filename )
+sta_filename   = os.path.basename(args.sta_file) + '.STA'
+sta_src_dir    = os.path.dirname(os.path.abspath( args.sta_file))
+symlink_source = os.path.join(sta_src_dir, sta_filename)
+symlink_target = os.path.join(campaign_dir, 'STA', sta_filename)
 if symlink_source != symlink_target:
     ## if such file already exists, first move it
-    if os.path.isfile( symlink_target ):
-        shutil.move( symlink_target, symlink_target + '.bck' )
-    os.symlink( symlink_source, symlink_target )
-    files_to_delete.append( symlink_target )
+    if os.path.isfile(symlink_target):
+        shutil.move(symlink_target, symlink_target + '.bck')
+    os.symlink(symlink_source, symlink_target)
+    files_to_delete.append(symlink_target)
 
 ##  input .pcv file (to be updated)
 ##+ check that it exists (default path is /GEN)
 ##+ if needed, link it to GEN dir
 if args.in_pcv_file != None:
-    if not os.path.isfile( args.in_pcv_file ):
-        print >> sys.stderr, 'ERROR. Invalid input pcv file (%s)'%( args.in_pcv_file )
+    if not os.path.isfile(args.in_pcv_file):
+        print >> sys.stderr, 'ERROR. Invalid input pcv file (%s)'%(args.in_pcv_file)
         sys.exit(1)
-    in_pcv_filename = os.path.basename( args.in_pcv_file )
-    in_pcv_dir      = os.path.dirname( os.path.abspath( args.in_pcv_file ) )
+    in_pcv_filename = os.path.basename(args.in_pcv_file)
+    in_pcv_dir      = os.path.dirname(os.path.abspath( args.in_pcv_file))
     if in_pcv_dir  != os.path.join(bv['X'], 'GEN'):
-        symlink_source = os.path.join( in_pcv_dir, in_pcv_filename )
+        symlink_source = os.path.join(in_pcv_dir, in_pcv_filename)
         symlink_target = os.path.join(bv['X'], 'GEN', in_pcv_filename)
-        os.symlink( symlink_source, symlink_target )
-        files_to_delete.append( symlink_target )
+        os.symlink(symlink_source, symlink_target)
+        files_to_delete.append(symlink_target)
 else:
     in_pcv_filename = ''
 
 ##  check that the satellite information file exists
-satellite_info_file = os.path.join( bv['X'], 'GEN',
-    args.sat_info_file + '.' + args.type_ext )
-if not os.path.isfile( satellite_info_file ):
+satellite_info_file = os.path.join(bv['X'], 'GEN',
+    args.sat_info_file + '.' + args.type_ext)
+if not os.path.isfile(satellite_info_file):
     print >> sys.stderr, 'ERROR. Invalid satellite info file (%s)'%satellite_info_file
     sys.exit(1)
 
 ##  the output pcv file should only be a filename
-if args.out_pcv_file != os.path.basename( args.out_pcv_file ):
+if args.out_pcv_file != os.path.basename(args.out_pcv_file):
     print >> sys.stderr, \
     'ERROR. Only provide a filename for the resulting pcv; no path (%s)'%satellite_info_file
     sys.exit(1)
 
 ##  set the variables in the PCF file
-pcf_file = os.path.join( bv['U'], 'PCF', PCF_FILENAME )
-if not os.path.isfile( pcf_file ):
+pcf_file = os.path.join(bv['U'], 'PCF', PCF_FILENAME)
+if not os.path.isfile(pcf_file):
     print >> sys.stderr, 'ERROR. Invalid pcf file (%s)'%pcf_file
     sys.exit(1)
-pcf_inst = bernutils.bpcf.PcfFile( pcf_file )
+pcf_inst = bernutils.bpcf.PcfFile(pcf_file)
 pcf_inst.set_variable(var_name='ATXINF', val=antex_filename)
 ## no extension in .sta !
 sta_filename_noext = os.path.splitext( sta_filename )[0]
@@ -345,17 +343,17 @@ pcf_inst.set_variable(var_name='PHGINF', val=args.out_pcv_file)
 pcf_inst.flush_variables()
 
 ##  set the option (or not) to enable individual calibration
-INP_FILE = os.path.join( bv['U'], 'OPT', 'A2P_GEN', INP_FILENAME )
-if not os.path.isfile( INP_FILE ):
+INP_FILE = os.path.join(bv['U'], 'OPT', 'A2P_GEN', INP_FILENAME)
+if not os.path.isfile(INP_FILE):
     print >> sys.stderr, "[ERROR] INP file \"%s\" does not exist."%(INP_FILE)
     sys.exit( 1 )
-if not set_antnum( INP_FILE, args.set_ind_clbr ):
+if not set_antnum(INP_FILE, args.set_ind_clbr):
     print >> sys.stderr, "[ERROR] Could not set varibles in the INP file \"%s\""%(INP_FILE)
     sys.exit( 1 )
 
 ##  ok, now call the perl script, that actually call atx2pcv ...
-perl_script = os.path.join( bv['U'], 'SCRIPT', PL_FILENAME )
-if not os.path.isfile( perl_script ):
+perl_script = os.path.join(bv['U'], 'SCRIPT', PL_FILENAME)
+if not os.path.isfile(perl_script):
     print >> sys.stderr, 'ERROR. Invalid pl file (%s)'%perl_script
     sys.exit(1)
 
@@ -372,7 +370,7 @@ if args.shell_script is not None:
     log_proc= os.path.join(bpe_dir, 'AP%02i%03i%01i_001_000.LOG'%(yr2, doy, session))
     phg_out = os.path.join(campaign_dir, 'OUT', args.out_pcv_file + '.PHG')
     phg_gen = os.path.join(bv['X'], 'GEN', args.out_pcv_file + '.' + args.type_ext)
-    with open( args.shell_script, 'w' ) as fout:
+    with open(args.shell_script, 'w') as fout:
         print >> fout, '#! /bin/bash'
         print >> fout, '## script automatically generated by prepare_atx2pcv.py'
         print >> fout, '%s'%(sys_command_1)
@@ -380,15 +378,17 @@ if args.shell_script is not None:
         print >> fout, 'if grep ERROR %s 1>/dev/null; then'%(os.path.join(bpe_dir, 'ATX2PCV.RUN'))
         print >> fout, '\techo \'[ERROR] Could not transform the atx file!\' 1>&2'
         print >> fout, '\techo \'        Check the log file \"%s\" for details.\' 1>&2'%(log_proc)
-        print >> fout, '\techo \'[INFO] error found at file: %s\''%(os.path.join(bpe_dir, 'ATX2PCV.RUN'))
-        print >> fout, '\tcat %s 1>&2'%(log_proc)
+        print >> fout, '\techo \'[INFO]  Error found at file: %s\''%(os.path.join(bpe_dir, 'ATX2PCV.RUN'))
+        print >> fout, '\t# cat %s 1>&2'%(log_proc)
         print >> fout, '\texit 1'
         print >> fout, 'fi'
-        print >> fout, '#if grep ERROR %s 1>/dev/null; then'%(os.path.join(bpe_dir, 'ATX2PCV.OUT'))
-        print >> fout, '#\techo \'ERROR. Could not transform the atx file!\' 1>&2'
-        print >> fout, '#\tcat %s 1>&2'%(log_proc)
-        print >> fout, '#\texit 1'
-        print >> fout, '#fi'
+        print >> fout, 'if grep ERROR %s 1>/dev/null; then'%(os.path.join(bpe_dir, 'ATX2PCV.OUT'))
+        print >> fout, '\techo \'ERROR. Could not transform the atx file!\' 1>&2'
+        print >> fout, '\techo \'       Check the log file \"%s\" for details.\' 1>&2'%(log_proc)
+        print >> fout, '\techo \'[INFO] Error found at file: %s\''%(os.path.join(bpe_dir, 'ATX2PCV.RUN'))
+        print >> fout, '\t# cat %s 1>&2'%(log_proc)
+        print >> fout, '\texit 1'
+        print >> fout, 'fi'
         print >> fout, 'if ! test -f %s ; then'%(phg_out)
         print >> fout, '\techo \'[ERROR] Could not transform the atx file!\' 1>&2'
         print >> fout, '\techo \'        Check the log file \"%s\" for details.\' 1>&2'%(log_proc)

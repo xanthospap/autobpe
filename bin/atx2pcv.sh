@@ -25,7 +25,9 @@ done
 ##  make it executable and run !
 chmod +x run_atx2pcv.sh
 ./run_atx2pcv.sh
+status=$?
 
 rm run_atx2pcv.sh 2>/dev/null
 
-exit $?
+##  return the status from run_atx2pcv.sh
+exit $status

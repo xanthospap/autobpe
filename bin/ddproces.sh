@@ -1718,7 +1718,7 @@ if ! check_bpe_run \
       ${P}/${CAMPAIGN}/BPE \
       "${CAMPAIGN:0:3}_${BERN_TASK_ID}.RUN" \
       "${CAMPAIGN:0:3}_${BERN_TASK_ID}.OUT" ; then
-  echoerr "[ERROR]. Fatal, processing stoped."
+  echoerr "[ERROR] Fatal, processing stoped."
   echoerr "         Check the log file \"${PROC_LOG}\" for details."
   clear_n_exit 1
 else
