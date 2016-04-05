@@ -121,35 +121,54 @@ def UnixCompress(inputf, outputf=None):
 
 def getRinexMarkerName(filename):
     ''' Given a rinex filename, this function will search the
-      header to find and return the marker name.
-      In case of error, an exception in thrown.
-      If the file is (UNIX) compressed, i.e. ends with '.Z'
-      then it is going to be de-compressed
+        header to find and return the marker name and marker number.
+        In case of error, an exception in thrown.
+        If the file is (UNIX) compressed, i.e. ends with '.Z'
+        then it is going to be de-compressed.
     '''
     ufilename = filename
+    info_dict = {"marker_name": "", "marker_number": "", "new_filename": filename}
 
-    if filename[-2:] == '.Z': ufilename = UnixUncompress(filename)
+    if filename[-2:] == '.Z':
+        info_dict["new_filename"] = UnixUncompress(filename)
 
-    with open(ufilename, 'r') as fin:
+    with open(info_dict["new_filename"], 'r') as fin:
         for line in fin.readlines():
-            if line.strip()[60:71] == 'MARKER NAME':
-                return line[0:4], ufilename
-    return '', ufilename
+            if   line.strip()[60:71] == 'MARKER NAME':
+                info_dict["marker_name"]  = line[0:4]
+            elif line.strip()[60:73] == 'MARKER NUMBER':
+                info_dict["marker_number"] = line[0:20].rstrip()
+            else:
+                if info_dict["marker_name"] is not "" and info_dict["marker_number"] is not "":
+                    break
+    return info_dict
 
-def subMarkerName( filename, marker_name ):
-    marker_in_rinex, rinex_filename = getRinexMarkerName( filename )
-    if marker_in_rinex == '':
+def subMarkerName(filename, marker_name):
+    ## FIXME
+    ## FIXME
+    ''' Given a rinex filename and a marker name, this function will alter the
+        RINEX records 'MARKER NAME' and 'MARKER NUMBER' to match them.
+    '''
+    #  split the station name to name and domes
+    name, domes = marker_name.split()
+
+    #marker_in_rinex, rinex_filename = getRinexMarkerName(filename)
+    info_dict = getRinexMarkerName(filename)
+    if info_dict["marker_name"] == '':
         print >> sys.stderr, '[ERROR] Cannot find \'MARKER NAME\' in Rinex file \'%s\''%(rinex_filename)
-    if marker_in_rinex != marker_name :
-        vprint('[DEBUG] Changing marker name from \'%s\' to \'%s\' for \'%s\''%(marker_in_rinex, marker_name, rinex_filename), 1)
-        with open(rinex_filename, 'r') as fin:
-            with open(rinex_filename+'.tmp', 'w') as fout:
-                for line in fin.readlines():
-                    if re.match('^%s.*\sMARKER NAME\s*$'%marker_in_rinex, line):
-                        print >> fout,'%s                                                        MARKER NAME'%(marker_name)
-                    else:
-                        print >> fout, line.rstrip('\n')
-        shutil.move( rinex_filename+'.tmp', rinex_filename )
+
+
+
+    if info_dict["marker_name"] != marker_name or :
+    #    vprint('[DEBUG] Changing marker name from \'%s\' to \'%s\' for \'%s\''%(marker_in_rinex, marker_name, rinex_filename), 1)
+    #    with open(rinex_filename, 'r') as fin:
+    #        with open(rinex_filename+'.tmp', 'w') as fout:
+    #            for line in fin.readlines():
+    #                if re.match('^%s.*\sMARKER NAME\s*$'%marker_in_rinex, line):
+    #                    print >> fout,'%s                                                        MARKER NAME'%(marker_name)
+    #                else:
+    #                    print >> fout, line.rstrip('\n')
+    #    shutil.move(rinex_filename+'.tmp', rinex_filename)
 
     return rinex_filename
 
@@ -381,10 +400,10 @@ args = parser.parse_args()
 
 ## Resolve the input date
 try:
-    dt = datetime.datetime.strptime( '%s-%s'%(args.year, args.doy), '%Y-%j' )
+    dt = datetime.datetime.strptime('%s-%s'%(args.year, args.doy), '%Y-%j')
 except:
     print >> sys.stderr, 'ERROR. Invalid date: year [%4i] doy = [%3i]'\
-        %( args.year, args.doy )
+        %(args.year, args.doy)
     sys.exit(1)
 
 ## Month as 3-char, e.g. Jan (sMon)
@@ -488,14 +507,14 @@ for row in station_info:
     ## WAIT !! do not download the file if it already exists AND has
     ## size > 0. Or just delete!
     rinex_already_exists = False
-    possible_duplicates = [ 
+    possible_duplicates  = [ 
                 sf, 
                 sf.replace('.Z', ''  ), 
                 sf.replace('d.Z', 'd'),
                 sf.replace('d.Z', 'o')
                 ]
     for pd in possible_duplicates : 
-        if os.path.isfile( pd ) and os.path.getsize( pd ):
+        if os.path.isfile(pd) and os.path.getsize(pd):
             if args.force_remove:
                 vprint ('[DEBUG] Removing rinex file \'%s\'.'%pd, 1, sys.stdout)
                 os.remove( pd )
@@ -518,7 +537,7 @@ for row in station_info:
         os.remove( sf )
         
     if os.path.isfile( sf ):
-        ## if needed, check/repair the marker name
-        if args.rename_markers: subMarkerName( sf, row[1].upper() )
+        ## if needed, check/repair the marker name and number
+        if args.rename_markers: subMarkerName(sf, row[1].upper())
 
 sys.exit(0)
