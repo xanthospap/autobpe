@@ -207,12 +207,12 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
       [10] password
       [11] network
       [12] mark_numb_OFF (i.e. DOMES)
-      e.g. (29L, 'akyr', 'akyr', '', 'NTUA', 'ssh', '147.102.110.69', '/media/WD/data/COMET/_YYYY_/_DDD_/', '/media/WD/data/COMET/_YYYY_/_DDD_/', 'gpsdata', 'gevdais;ia')
-           (29L, 'akyr', 'akyr', '', 'NTUA', 'ssh', '147.102.110.69', '/media/WD/data/COMET/_YYYY_/_DDD_/', '/media/WD/data/COMET/_YYYY_/_DDD_/', 'gpsdata', 'gevdais;ia')
+      e.g. (29L, 'akyr', 'akyr', '', 'NTUA', 'ssh', '147.102.110.69', '/media/WD/data/COMET/_YYYY_/_DDD_/', '/media/WD/data/COMET/_YYYY_/_DDD_/', 'gpsdata', 'gevdais;ia', '12345M001')
+           (29L, 'akyr', 'akyr', '', 'NTUA', 'ssh', '147.102.110.69', '/media/WD/data/COMET/_YYYY_/_DDD_/', '/media/WD/data/COMET/_YYYY_/_DDD_/', 'gpsdata', 'gevdais;ia', '12345M001')
     '''
   ## validate the number of fields
   if len(infolist) != 13:
-    raise ValueError('ERROR. Invalid info list: [%s]'%str(infolist))
+    raise ValueError('[ERROR]. Invalid info list: [%s]'%str(infolist))
 
   year, doy, month, dom = dtime.strftime('%Y-%j-%b-%d').split('-')
 
@@ -237,7 +237,7 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
   elif infolist[5] == 'https':
     host_ = 'https://' + infolist[6]
   else:
-    raise ValueError('ERROR. Invalid server protocol: [%s]'%infolist[5])
+    raise ValueError('[ERROR]. Invalid server protocol: [%s]'%infolist[5])
   # remove last "/" in host (if any)
   if host_[-1] == '/' : host_ = host_[:-1]
 
@@ -252,7 +252,7 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
       path_ = path_.replace('_MMMM_',month)
       path_ = path_.replace('_DOM_',dom)
     except:
-      raise ValueError('ERROR. Failed to make URANUS path: [%s]'%(infolist))
+      raise ValueError('[ERROR]. Failed to make URANUS path: [%s]'%(infolist))
   if path_[0] == '/': path_ = path_[1:]
 
   ## set the filename (to download)
@@ -260,7 +260,7 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
   if hour != None:
     print '[WARNING] Using hour-dependent info!'
     if not hour in ses_identifiers :
-      raise ValueError('ERROR. Invalid hour of day: %s'%hour)
+      raise ValueError('[ERROR]. Invalid hour of day: %s'%hour)
     else:
       session_identifier = ses_identifiers[hour];
   filename_ = infolist[2] + doy + session_identifier + '.' + year[2:] + 'd.Z'
@@ -465,7 +465,7 @@ try:
 
     # ok, now start asking for networks
     for w in args.networks :
-        QUERY='SELECT station.station_id, station.mark_name_DSO, stacode.mark_name_OFF, stacode.station_name, ftprnx.dc_name, ftprnx.protocol, ftprnx.url_domain, ftprnx.pth2rnx30s, ftprnx.pth2rnx01s, ftprnx.ftp_usname, ftprnx.ftp_passwd, network.network_name FROM station JOIN stacode ON station.stacode_id=stacode.stacode_id JOIN dataperiod ON station.station_id=dataperiod.station_id JOIN ftprnx ON dataperiod.ftprnx_id=ftprnx.ftprnx_id JOIN  sta2nets ON sta2nets.station_id=station.station_id JOIN network ON network.network_id=sta2nets.network_id WHERE network.network_name="%s" AND dataperiod.periodstart<"%s" AND dataperiod.periodstop>"%s";'%(w,dt.strftime('%Y-%m-%d'),dt.strftime('%Y-%m-%d'))
+        QUERY='SELECT station.station_id, station.mark_name_DSO, stacode.mark_name_OFF, stacode.station_name, ftprnx.dc_name, ftprnx.protocol, ftprnx.url_domain, ftprnx.pth2rnx30s, ftprnx.pth2rnx01s, ftprnx.ftp_usname, ftprnx.ftp_passwd, network.network_name, stacode.mark_numb_OFF FROM station JOIN stacode ON station.stacode_id=stacode.stacode_id JOIN dataperiod ON station.station_id=dataperiod.station_id JOIN ftprnx ON dataperiod.ftprnx_id=ftprnx.ftprnx_id JOIN  sta2nets ON sta2nets.station_id=station.station_id JOIN network ON network.network_id=sta2nets.network_id WHERE network.network_name="%s" AND dataperiod.periodstart<"%s" AND dataperiod.periodstop>"%s";'%(w,dt.strftime('%Y-%m-%d'),dt.strftime('%Y-%m-%d'))
         
         cur.execute( QUERY )
         
@@ -500,6 +500,7 @@ for row in station_info:
         svfiles.append(svfl)
     except ValueError as e:
         print >> sys.stderr, e.message
+        sys.exit(1)
 
     ## Now, execute each command in the commands array to actually download
     ## the data.
