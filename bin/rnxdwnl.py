@@ -52,7 +52,7 @@ ses_identifiers = {
   21:'v', 22:'w', 23:'x'
 }
 
-def vprint( message, min_verb_level, std_buf=None ):
+def vprint(message, min_verb_level, std_buf=None):
     if std_buf is None : std_buf = sys.stdout
     if args.verbosity >= min_verb_level: print >> std_buf, message
 
@@ -97,7 +97,7 @@ def UnixUncompress(inputf, outputf=None):
 
 def UnixCompress(inputf, outputf=None):
     ''' Compress the file inputf to outputf using UNIX-compress.
-      The function will return the name of the compressed file.
+        The function will return the name of the compressed file.
     '''
     sys_command = 'compress -f %s'%inputf
     dotZfile    = '%s.Z'%inputf
@@ -143,34 +143,38 @@ def getRinexMarkerName(filename):
                     break
     return info_dict
 
-def subMarkerName(filename, marker_name):
-    ## FIXME
-    ## FIXME
-    ''' Given a rinex filename and a marker name, this function will alter the
-        RINEX records 'MARKER NAME' and 'MARKER NUMBER' to match them.
+def subMarkerName(filename, marker_name, marker_number=""):
+    ''' Given a rinex filename, a marker name and number (i.e. domes), this 
+        function will alter the RINEX records 'MARKER NAME' and 'MARKER NUMBER'
+        to match them.
     '''
-    #  split the station name to name and domes
-    name, domes = marker_name.split()
+    # the domes is always 9-char long
+    if marker_number == "": marker_number = " "*9
 
-    #marker_in_rinex, rinex_filename = getRinexMarkerName(filename)
+    #  what the RINEX actualy has ...
     info_dict = getRinexMarkerName(filename)
     if info_dict["marker_name"] == '':
-        print >> sys.stderr, '[ERROR] Cannot find \'MARKER NAME\' in Rinex file \'%s\''%(rinex_filename)
+        print >> sys.stderr, '[ERROR] Cannot find \'MARKER NAME\' in Rinex file \'%s\''%(filename)
 
+    #  the RINEX may have been uncompressed, so use the right name!
+    filename = info_dict["new_filename"]
 
+    # print "Comparing [%s] to [%s] and [%s] to [%s]"%(info_dict["marker_name"], marker_name, info_dict["marker_number"], marker_number)
+    if info_dict["marker_name"] != marker_name or info_dict["marker_number"] != marker_number:
+        vprint('[DEBUG] Changing marker name  from \'%s\' to \'%s\' for \'%s\''%(info_dict["marker_name"], marker_name, filename), 1)
+        vprint('[DEBUG] Changing marker domes from \'%s\' to \'%s\' for \'%s\''%(info_dict["marker_number"], marker_number, filename), 1)
+        with open(filename, 'r') as fin:
+            with open(filename+'.tmp', 'w') as fout:
+                for line in fin.readlines():
+                    if   re.match('^%s.*\sMARKER NAME\s*$'%info_dict["marker_name"], line):
+                        print >> fout,'%s                                                        MARKER NAME'%(marker_name)
+                    elif re.match('^%s.*\sMARKER NUMBER\s*$'%info_dict["marker_number"], line):
+                        print >> fout, '%s                                                   MARKER NUMBER'%(marker_number)
+                    else:
+                        print >> fout, line.rstrip('\n')
+        shutil.move(filename+'.tmp', filename)
 
-    if info_dict["marker_name"] != marker_name or :
-    #    vprint('[DEBUG] Changing marker name from \'%s\' to \'%s\' for \'%s\''%(marker_in_rinex, marker_name, rinex_filename), 1)
-    #    with open(rinex_filename, 'r') as fin:
-    #        with open(rinex_filename+'.tmp', 'w') as fout:
-    #            for line in fin.readlines():
-    #                if re.match('^%s.*\sMARKER NAME\s*$'%marker_in_rinex, line):
-    #                    print >> fout,'%s                                                        MARKER NAME'%(marker_name)
-    #                else:
-    #                    print >> fout, line.rstrip('\n')
-    #    shutil.move(rinex_filename+'.tmp', rinex_filename)
-
-    return rinex_filename
+    return filename
 
 def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False):
   ''' Given a list (of information) as returned by the database query (for one
@@ -202,10 +206,12 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
       [9]  username
       [10] password
       [11] network
+      [12] mark_numb_OFF (i.e. DOMES)
       e.g. (29L, 'akyr', 'akyr', '', 'NTUA', 'ssh', '147.102.110.69', '/media/WD/data/COMET/_YYYY_/_DDD_/', '/media/WD/data/COMET/_YYYY_/_DDD_/', 'gpsdata', 'gevdais;ia')
+           (29L, 'akyr', 'akyr', '', 'NTUA', 'ssh', '147.102.110.69', '/media/WD/data/COMET/_YYYY_/_DDD_/', '/media/WD/data/COMET/_YYYY_/_DDD_/', 'gpsdata', 'gevdais;ia')
     '''
   ## validate the number of fields
-  if len(infolist) != 12:
+  if len(infolist) != 13:
     raise ValueError('ERROR. Invalid info list: [%s]'%str(infolist))
 
   year, doy, month, dom = dtime.strftime('%Y-%j-%b-%d').split('-')
@@ -345,8 +351,8 @@ parser.add_argument('-v', '--verbosity',
 parser.add_argument('-r', '--marker-rename',
     action   = 'store_true',
     help     = 'If this flag is set, then every downloaded rinex will be instpected'
-    'for the \'MARKER NAME\' field. If it is different from the DSO name, then'
-    'it will be altered.',
+    'for the \'MARKER NAME\' and \'MARKER NUMBER\' fields. If any of the two is '
+    'different from the DSO name, then it will be altered (i.e. within the RINEX).',
     dest     = 'rename_markers'
     )
 ## force remove any previous rinex that match the one (to be) downloaded 
@@ -429,7 +435,7 @@ try:
 
     ## ok, connected to db; now start quering for each station
     for s in args.stations :
-        QUERY='SELECT station.station_id, station.mark_name_DSO, stacode.mark_name_OFF, stacode.station_name, ftprnx.dc_name, ftprnx.protocol, ftprnx.url_domain, ftprnx.pth2rnx30s, ftprnx.pth2rnx01s, ftprnx.ftp_usname, ftprnx.ftp_passwd, network.network_name FROM station JOIN stacode ON station.stacode_id=stacode.stacode_id JOIN dataperiod ON station.station_id=dataperiod.station_id JOIN ftprnx ON dataperiod.ftprnx_id=ftprnx.ftprnx_id JOIN  sta2nets ON sta2nets.station_id=station.station_id JOIN network ON network.network_id=sta2nets.network_id WHERE station.mark_name_DSO="%s" AND dataperiod.periodstart<"%s" AND dataperiod.periodstop>"%s";'%(s,dt.strftime('%Y-%m-%d'),dt.strftime('%Y-%m-%d'))
+        QUERY='SELECT station.station_id, station.mark_name_DSO, stacode.mark_name_OFF, stacode.station_name, ftprnx.dc_name, ftprnx.protocol, ftprnx.url_domain, ftprnx.pth2rnx30s, ftprnx.pth2rnx01s, ftprnx.ftp_usname, ftprnx.ftp_passwd, network.network_name, stacode.mark_numb_OFF FROM station JOIN stacode ON station.stacode_id=stacode.stacode_id JOIN dataperiod ON station.station_id=dataperiod.station_id JOIN ftprnx ON dataperiod.ftprnx_id=ftprnx.ftprnx_id JOIN  sta2nets ON sta2nets.station_id=station.station_id JOIN network ON network.network_id=sta2nets.network_id WHERE station.mark_name_DSO="%s" AND dataperiod.periodstart<"%s" AND dataperiod.periodstop>"%s";'%(s,dt.strftime('%Y-%m-%d'),dt.strftime('%Y-%m-%d'))
         
         cur.execute( QUERY )
 
@@ -489,15 +495,15 @@ commands = []
 svfiles  = []
 for row in station_info:
     try:
-        cmd, svfl = setDownloadCommand( row, dt, None, args.output_dir, False )
-        commands.append( cmd )
-        svfiles.append( svfl )
+        cmd, svfl = setDownloadCommand(row, dt, None, args.output_dir, False)
+        commands.append(cmd)
+        svfiles.append(svfl)
     except ValueError as e:
         print >> sys.stderr, e.message
 
     ## Now, execute each command in the commands array to actually download
     ## the data.
-    for cmd, sf in zip( commands, svfiles ):
+    for cmd, sf in zip(commands, svfiles):
         ## replace variables (_YYYY_, _DDD_ )
         cmd = cmd.replace('_YYYY_', Year)
         cmd = cmd.replace('_DDD_', DoY)
@@ -517,7 +523,7 @@ for row in station_info:
         if os.path.isfile(pd) and os.path.getsize(pd):
             if args.force_remove:
                 vprint ('[DEBUG] Removing rinex file \'%s\'.'%pd, 1, sys.stdout)
-                os.remove( pd )
+                os.remove(pd)
             else:
                 vprint('[DEBUG] File \"%s\" already exists. Skipping download.'%sf, 1, sys.stdout)
                 rinex_already_exists = True
@@ -527,17 +533,17 @@ for row in station_info:
     if not rinex_already_exists :
         vprint('[DEBUG] Command = \"%s\", station = \"%s\"'%(cmd, sf), 2, sys.stdout)
         try:
-            executeShellCmd( cmd )
+            executeShellCmd(cmd)
         except ValueError as e:
             vprint('[ERROR] Failed to download file \"%s\"'%sf, 1, sys.stderr)
 
     ## check for empty file
-    if os.path.isfile( sf ) and not os.path.getsize( sf ):
+    if os.path.isfile(sf) and not os.path.getsize(sf):
         vprint('[DEBUG] Removing empty file \"%s\"'%sf, 2, sys.stderr)
-        os.remove( sf )
+        os.remove(sf)
         
-    if os.path.isfile( sf ):
-        ## if needed, check/repair the marker name and number
-        if args.rename_markers: subMarkerName(sf, row[1].upper())
+    if os.path.isfile(sf):
+    #    ## if needed, check/repair the marker name and number
+        if args.rename_markers: subMarkerName(sf, row[1].upper(), row[12])
 
 sys.exit(0)
