@@ -323,6 +323,11 @@ find_config_file () {
 }
 
 set_json_out () {
+##
+##  Search for the option --json-out and set the (global) JSON_OUT variable
+##+ accordingly. If no such option is give, then JSON_OUT is set to /dev/null
+##+ i.e. we'll be sending json output to god.
+##
   JSON_OUT=/dev/null
   OLD_IFS=${IFS}
   IFS='='
@@ -330,7 +335,7 @@ set_json_out () {
     read -ra arr <<< "$i"
     if test "${arr[0]}" == "--json-out" ; then
       if test ${#arr[@]} -ne 2; then
-        echoerr "ERROR. Invalid cmd: $i"
+        echoerr "[ERROR] Invalid cmd: $i"
         exit 1
       fi
       ##  echo "--Setting json-out to ${arr[1]}"
@@ -341,12 +346,14 @@ set_json_out () {
   IFS=${OLD_IFS}
 }
 
+set_hemlchk_limits () {
+##
 ##  This function will set the limits for reference system stations rejection.
 ##  argv1 -> The HELMCHK perl script where the limits are set
 ##  argv2 -> Limit for north offset (in mm)
 ##  argv3 -> Limit for east offset (in mm)
 ##  argv4 -> Limit for up offset (in mm)
-set_hemlchk_limits () {
+##
   if ! test -f ${1} ; then
     echoerr "[ERROR] Invalid file: \"${1}\". Cannot set limits for"
     echoerr "        reference station rejection."
@@ -465,7 +472,11 @@ touch ${TIME_STAMP_FILE}
 date > ${TIME_STAMP_FILE}
 tmp_file_array+=("${TIME_STAMP_FILE}")
 
-##  search through the cmd's to find the JSON_OUT (if any)
+##  search through the cmd's to find the JSON_OUT (if any). We do this here,
+##+ i.e before actually resolving any of the command-line-arguments, cause we
+##+ want to be able to write to the json file from the begining of the script.
+##  Note that the JSON_OUT variable can be re-set when we resolve the configuration
+##+ file.
 set_json_out $@
 
 ##  load the configuration file (if any). This has to be done before
@@ -475,6 +486,7 @@ if [ ! -z "${CONFIG_FILE+x}" ] && [ "${CONFIG_FILE}" != "" ] ; then
   eval $(etc/source_dd_config.sh $CONFIG_FILE)
   echo "[DEBUG] Found and loaded configuration file: \"${CONFIG_FILE}\"."
 fi
+
 ## ////////////////////////////////////////////////////////////////////////////
 ## GET/EXPAND COMMAND LINE ARGUMENTS
 ## ////////////////////////////////////////////////////////////////////////////
@@ -505,63 +517,63 @@ fi
 eval set -- $ARGS
 
 ##  extract options and their arguments into variables.
-printf 1>${JSON_OUT} "{\"command\":[\n"
+# printf 1>${JSON_OUT} "{\"command\":[\n"
 while true
 do
   case "$1" in
 
     --use-ntua-products)
       MY_PRODUCT_ID="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -r|--save-dir)
       SAVE_DIR_DIR="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -i|--solution-id)
       SOLUTION_ID="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -a|--analysis-center)
       AC="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -b|--bern-loadgps)
       B_LOADGPS="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -c|--campaign)
       CAMPAIGN="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --debug)
       DEBUG_MODE=1
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       ;;
     --logfile)
       LOGFILE="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -d|--doy) ## remove any leading zeros
       DOY=`echo "${2}" | sed 's|^0*||g'`
       DOY_3C=$( printf "%03i\n" $DOY )
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -g|--tables-dir)
       TABLES_DIR="${2%/}" ## trim last '/' if any
-      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -h|--help)
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       help
       exit 0
       ;;
@@ -571,7 +583,7 @@ do
         echoerr "ERROR. Invalid satellite system : ${SAT_SYS}"
         exit 1
       fi
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --stations-per-cluster)
@@ -580,7 +592,7 @@ do
         echoerr "ERROR. stations-per-cluster must be a positive integer!"
         exit 1
       fi
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --files-per-cluster)
@@ -589,96 +601,96 @@ do
         echoerr "ERROR. files-per-cluster must be a positive integer!"
         exit 1
       fi
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -e|--elevation-angle)
       ELEVATION_ANGLE="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --append-suffix)
       APND_SUFFIX="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -v|--version)
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       dversion
       exit 0
       ;;
     --repro2-prods)
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       USE_REPRO2=YES
       ;;
     --cod-repro13)
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       COD_REPRO13=YES
       ;;
     --atl-file)
       ATLINF="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -y|--year)
       YEAR="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --antex)
       ATXINF="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --stainf)
       STAINF="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -p|--pcv-file)
       PCVINF="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --fix-file)
       FIXINF="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --blq-file)
       BLQINF="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --json-out)
       ## This should have already been set !
       if [ "$JSON_OUT" != "$2" ]; then
-        echoerr "ERROR. json-out not parsed correctly! ($JSON_OUT \!= $2)"
+        echoerr "[ERROR] json-out not parsed correctly! ($JSON_OUT \!= $2)"
         exit 1
       fi
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --use-epn-exclude)
       USE_EUREF_EXCLUDE_LIST=YES
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       ;;
     --skip-remove)
       SKIP_REMOVE=YES
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       ;;
     --exclude-list)
       STA_EXCLUDE_FILE="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --config)
       CONFIG_FILE="${2}"
-      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --) # end of options
-      printf 1>>${JSON_OUT} "\n],\n"
+      # printf 1>>${JSON_OUT} "\n],\n"
       shift
       break
       ;;
@@ -689,7 +701,7 @@ do
 
   esac
   shift
-  if test "${#}" -gt 1 ; then printf 1>>${JSON_OUT} "," ; fi
+  # if test "${#}" -gt 1 ; then printf 1>>${JSON_OUT} "," ; fi
 done
 
 ## ////////////////////////////////////////////////////////////////////////////
@@ -707,6 +719,7 @@ else
 fi
 
 ## ////////////////////////////////////////////////////////////////////////////
+##
 ##  VALIDATE COMMAND LINE ARGUMENTS
 ##  ---------------------------------------------------------------------------
 ##  Note that we set the following variables:
@@ -730,13 +743,11 @@ fi
 ##
 ##  The directory specified for saving the results is checked for existance; if
 ##  it does not exist, it is created.
+##
 ## ////////////////////////////////////////////////////////////////////////////
 
 ##  year must be set
-if test -z ${YEAR+x}; then
-  echoerr "[ERROR] Year must be set!"
-  exit 1
-fi
+if test -z ${YEAR+x}; then echoerr "[ERROR] Year must be set!"; exit 1; fi
 
 ##  doy must be set
 if test -z ${DOY+x}; then
@@ -744,19 +755,23 @@ if test -z ${DOY+x}; then
   exit 1
 else
   DOY=$(echo "${DOY}" | sed 's|^0*||g')
-   DOY_3C=$( printf "%03i\n" $DOY )
+  DOY_3C=$( printf "%03i\n" $DOY )
 fi
 if test "${#DOY_3C}" -ne 3; then
   echoerr "[ERROR] Something funny happened with doy ..."
   exit 1
 fi
 
+##  elevation angle should be a positive integer
 if test -z ${ELEVATION_ANGLE+x}; then ELEVATION_ANGLE=3 ; fi
 if ! [[ $ELEVATION_ANGLE =~ ^[0-9]+$ ]]; then
   echoerr "[ERROR] Elevation angle must be a positive integer!"
   exit 1
 fi
 
+##  check the satellite system; valid options are:
+##    * GPS
+##    * MIXED
 SAT_SYS="${SAT_SYS^^}"
 if test ${SAT_SYS} != "GPS" && test ${SAT_SYS} != "MIXED" ; then
   echoerr "[ERROR] Invalid satellite system : ${SAT_SYS}"
@@ -764,7 +779,7 @@ if test ${SAT_SYS} != "GPS" && test ${SAT_SYS} != "MIXED" ; then
 fi
 
 ##  bernese-variable file must be set; if it is, check that it exists 
-##+ and source it.
+##+ and source it. By the way, check that we are using version 5.2
 if test -z ${B_LOADGPS+x}; then
   echoerr "[ERROR] LOADGPS.setvar must be set!"
   exit 1
@@ -828,7 +843,7 @@ if test -z "${SAVE_DIR_HOST+x}" ; then ##  using this host for saving
       fi
     fi
   fi
-else ##  need to see if we have access to host
+else ##  need to see if we have access to host via ftp
   ftp -inv $SAVE_DIR_HOST <<EOF > .ftp.log
 user $SAVE_DIR_URN $SAVE_DIR_PSS
 cd ${SAVE_DIR_DIR}
@@ -848,6 +863,7 @@ EOF
     exit 1
   fi
 fi
+## FIXME remove .ftp.log file (?)
 
 ##  set the format of the product filename; i.e. yyddd0 or wwwwd
 if [ -z "${SAVE_PRD_FORMAT+x}" ] || [ ${SAVE_PRD_FORMAT} == "GPSW" ] ; then
@@ -871,12 +887,13 @@ if test "${COD_REPRO13}" == "YES" ; then
   fi
 fi
 
-## ------------------------------------------------------------------------- ##
-##                                                                           ##
-##  Validate the station information file: see that it exists, and link it   ##
-##+ from tables directory the the campaign's sta dir.                        ##
-##                                                                           ##
-## ------------------------------------------------------------------------- ##
+## 
+##  Validate the station information file: see that it exists, and link it   
+##+ from tables directory the the campaign's sta dir. We are first trying to
+##+ locate the file in the tables directory; if found, we link it to the
+##+ campaign's STA/ folder. If the file is not found in the tables directory,
+##+ we search at the campaign's STA/ folder.
+## 
 if [ -z ${STAINF+x} ]; then
   echodbg "[DEBUG] Station information file not specified"
   echodbg "        seting it to \"${CAMPAIGN}\"."
@@ -903,11 +920,12 @@ fi
 
 echodbg "[DEBUG] Using the the station information file \"${P}/STA/${STAINF}.${STAINF_EXT}\""
 
-## ------------------------------------------------------------------------- ##
-##                                                                           ##
-##  Validate the blq file                                                    ##
-##                                                                           ##
-## ------------------------------------------------------------------------- ##
+## 
+##  Validate the blq file. If the variable BLQINF is not set, then we will not
+##+ use a BLQ file. If set, we are going to search for it, 1) in the tables/blq
+##+ directory and 2) in the campaign's STA/ directory. Whichever is found first
+##+ is going to be used.
+## 
 if [ -z "${BLQINF+x}" ] || [ "${BLQINF}" == "" ]; then
   echodbg "[DEBUG] Not using a BLQ file."
   BLQINF=
@@ -937,11 +955,12 @@ else
   fi
 fi
 
-## ------------------------------------------------------------------------- ##
-##                                                                           ##
-##  Validate the atl file                                                    ##
-##                                                                           ##
-## ------------------------------------------------------------------------- ##
+## 
+##  Validate the atl file. If the variable ATLINF is not set, then we will not
+##+ use an ATL file. If set, we are going to search for it, 1) in the tables/atl
+##+ directory and 2) in the campaign's STA/ directory. Whichever is found first
+##+ is going to be used.
+## 
 if [ -z "${ATLINF+x}" ] || [ "${ATLINF}" == "" ] ; then
   echodbg "[DEBUG] Not using an ATL file."
   ATLINF=
@@ -969,13 +988,15 @@ else
   fi
 fi
 
-## ------------------------------------------------------------------------- ##
-##                                                                           ##
-##  Validate the fix file.                                                   ##
-##  Note that we need the actaul fix file to be later used by validate_ntw   ##
-##+ Let's name that FIX_FILE                                                 ##
-##                                                                           ##
-## ------------------------------------------------------------------------- ##
+## 
+##  Validate the fix file. If set, we are going to search for it, 1) in the 
+##+ tables/fix directory and 2) in the campaign's STA/ directory. Whichever is 
+##+ found first is going to be used.
+##  Once found, the fix file is copied to the campaign's STA/ directory, as
+##+ 'REFYYDDD0.FIX'.
+##  Note that we need the actual fix file to be later used by validate_ntw 
+##+ Let's name that FIX_FILE
+## 
 if test -z "${FIXINF+x}" ; then
   echoerr "[ERROR] Must specify a \"FIX\" file for reference frame realization."
   clear_n_exit 1
@@ -1003,21 +1024,21 @@ echodbg "[DEBUG] Using FIX file \"${FIX_FILE}\"."
 FIX_FILE=${P}/${CAMPAIGN}/STA/REF${YEAR:2:2}${DOY_3C}0.FIX
 echodbg "        Renamed to: \"${FIX_FILE}\"."
 
-## ------------------------------------------------------------------------- ##
-##                                                                           ##
-##  Make the pcv file if neccessary and/or link, so that after this block,   ##
-##+ we have a valid PCVINF file at ${X}/GEN, i.e. there should be a file     ##
-##+ (or link) at ${X}/GEN/${PCVINF}.${PCV_EXT} holding pcv info for all      ##
-##+ antennas. The variable PCVINF and PCV_EXT are later to be fed to the     ##
-##+ PCF file as variables.                                                   ##
-##                                                                           ##
-##  At this point, all variables in the LOADGPS.setvar file should           ##
-##+ have been exported.                                                      ##
-##                                                                           ##
-##  Also, we need the .STA file to be properly placed at the                 ##
-##+ campaign-specific STA/ folder.                                           ##
-##                                                                           ##
-## ------------------------------------------------------------------------- ##
+## 
+##  Make the pcv file if neccessary and/or link, so that after this block, 
+##+ we have a valid PCVINF file at ${X}/GEN, i.e. there should be a file 
+##+ (or link) at ${X}/GEN/${PCVINF}.${PCV_EXT} holding pcv info for all 
+##+ antennas. The variable PCVINF and PCV_EXT are later to be fed to the
+##+ PCF file as variables.
+##  Note that (in contrast to most files), if a PCV file is specified, then it
+##+ is first searched at the GEN/ folder and then in the tables/pcv directory.
+## 
+##  At this point, all variables in the LOADGPS.setvar file should 
+##+ have been exported.
+## 
+##  Also, we need the .STA file to be properly placed at the 
+##+ campaign-specific STA/ folder.
+## 
 
 ##  Set the verbocity level for the atx2pcv.sh script
 A2P_VRB=0
@@ -1119,10 +1140,9 @@ if ! test -f "${X}/GEN/${PCVINF}.${PCV_EXT}" ; then
   clear_n_exit 1
 fi
 
-## ////////////////////////////////////////////////////////////////////////////
-##  DATETIME VARIABLES
-##  ---------------------------------------------------------------------------
-## ////////////////////////////////////////////////////////////////////////////
+##
+##  datetime variables. Evaluate the start and end of the (to be processed) day.
+##
 if ! START_OF_DAY_STR=$(ydoy2dt "${YEAR}" "${DOY_3C}") ; then
   echoerr "[ERROR] Failed to parse date."
   clear_n_exit 1
@@ -1133,9 +1153,9 @@ if ! END_OF_DAY_STR=$(ydoy2dt "${YEAR}" "${DOY_3C}" "23" "59" "30") ; then
   clear_n_exit 1
 fi
 
-## ////////////////////////////////////////////////////////////////////////////
-##  REPORT ..
-## ////////////////////////////////////////////////////////////////////////////
+##
+##  report to json
+##
 {
 printf "\n\"general_info\":{"
 printf "\n\"campaign\": \"%s\"," "${CAMPAIGN}"
@@ -1148,7 +1168,7 @@ printf "\n\"interval\": {\"from\":\"%s\", \"to\":\"%s\"}" "${START_OF_DAY_STR}" 
 printf "\n},\n"
 } 1>>${JSON_OUT}
 
-## ////////////////////////////////////////////////////////////////////////////
+## 
 ##  DOWNLOAD RINEX FILES
 ##  ---------------------------------------------------------------------------
 ##  Use the program rnxdwnl.py to download all available rinex files for
@@ -1157,12 +1177,23 @@ printf "\n},\n"
 ##+ are not going to be re-downloaded but they will be used).
 ##
 ##  The validate_ntwrnx.py script is then used to produce an informative table;
-##+ this table is used to filter/crete arrays holding the available rinex files
+##+ this table is used to filter/create arrays holding the available rinex files
 ##+ and the respective station names.
 ##
-##  Lastly, copy and uncompress (.Z && crx2rnx) the files in the campaign
-##+ directory /RAW.
-## ////////////////////////////////////////////////////////////////////////////
+##  Lastly, copy and uncompress (.Z && crx2rnx) the files in the campaign's /RAW
+##+ directory.
+##
+##  Note that if 'USE_EUREF_EXCLUDE_LIST' is set to 'YES', then we are going to
+##+ call the program get_euref_excl_list.sh to download EUREF's weekly station
+##+ exclusion list and append it to the file '.sta2exclude'.
+##  If the user has specified his own exclusion list (via the variable 'STA_EXCLUDE_FILE')
+##+ this file will (also) be appended it to the file '.sta2exclude'.
+##
+##  After this block, the file '.sta2exclude' will hold any stations to be
+##+ excluded from the processing. We are also going to have a file '.rnxsta.dat'
+##+ (from the program validate_ntwrnx.py) holding information on the rinex and
+##+ stations.
+##
 START_RD=$(date +%s.%N)
 
 >.rnxsta.dat ## temporary file
@@ -1209,7 +1240,7 @@ if ! test -z ${STA_EXCLUDE_FILE+x} ; then
 fi
 
 ##  make a table with available rinex/station names, reference stations, etc ..
-##  dump output to the .rnxsta.dat file (filter it later on)
+##+ dump output to the .rnxsta.dat file (filter it later on)
 if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
   ##  Consult the database ...
   if ! validate_ntwrnx.py \
@@ -1223,6 +1254,7 @@ if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
               --network="${CAMPAIGN}" \
               --rinex-path="${D}" \
               --exclude-file="${X_STA_FL}" \
+              --json \
               1> .rnxsta.dat; then
     echoerr "[ERROR] Failed to compile rinex/station summary."
     clear_n_exit 1
@@ -1242,11 +1274,13 @@ else
               --rinex-path="${P}/${CAMPAIGN}/RAW" \
               --exclude-file="${X_STA_FL}" \
               --skip-database \
+              --json \
               1> .rnxsta.dat; then
     echoerr "[ERROR] Failed to compile rinex/station summary."
     clear_n_exit 1
   fi
 fi
+exit 50
 
 ## FIXME : remove that shit
 #echodbg "[DEBUG] Going to show you the RINEX info (just for debuging)"

@@ -92,7 +92,7 @@ USE_EPN_A_SSC = YES
 ##  Specify the station information file (.STA) to be used. Only provide the
 ##+ filename, the extension is automatically set to '.STA'. The search path
 ##+ for this file, is either ${TABLES_DIR}/sta/ or the campaign's /STA
-##+ directory
+##+ directory.
 STAINF =
 
 ##  The filename of the atl (i.e atmospheric tidal loading) corrections file.
@@ -126,12 +126,13 @@ FIXINF =
 ##  Case B. The 'PCVINF' but 'ATXINF' is empty; this means that the file
 ##+         'PCVINF' is going to be used as is for the proccessing. In this
 ##+         case the 'PCVINF' should be found in either:
-##+         ${TABLES_DIR}/pcv/${PCVINF}.${PCVEXT} , or
 ##+         ${X}/GEN/${PCVINF}.${PCVEXT}
+##+         ${TABLES_DIR}/pcv/${PCVINF}.${PCVEXT} , or
 ##  Case C. Only 'ATXINF' is specified. In this case this (antex) file is
 ##+         going to be used to produce a PCV file. The antex file should be
 ##+         ${TABLES_DIR}/atx/${ATXINF}
-##
+##  Note that the PCV file (if specified) is first searched in the /GEN directory
+##+ and only if not found we are also going to search in the tables/pcv folder.
 PCVINF = PCV_COD
 ATXINF =
 PCVEXT = I08

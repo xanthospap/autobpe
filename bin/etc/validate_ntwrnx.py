@@ -38,6 +38,7 @@ import MySQLdb
 import traceback
 import argparse
 import glob
+import json
 
 ## Global variables / default values
 USE_MARKER_NR = True
@@ -46,13 +47,14 @@ FAILURE=1
 EXIT_STATUS=SUCCESS
 
 ##  get marker name from RINEX
-def get_marker_name( rinex ):
+def get_marker_name(rinex):
     with open(rinex, 'r') as fin:
         for line in fin.readlines():
             if line.strip()[60:71] == 'MARKER NAME':
                 return line[0:4]
     return ''
-def get_marker_number( rinex ):
+
+def get_marker_number(rinex):
     with open(rinex, 'r') as fin:
         for line in fin.readlines():
             if line.strip()[60:73] == 'MARKER NUMBER':
@@ -69,6 +71,7 @@ parser.add_argument('--db-host',
         help      = 'The hostname/ip of the MySQL server hosting the database.',
         metavar   = 'DB_HOST',
         dest      = 'db_host')
+
 ##  database user name
 parser.add_argument('--db-user',
         action   = 'store',
@@ -77,6 +80,7 @@ parser.add_argument('--db-user',
         help     = 'The user asking permission to query the database.',
         metavar  = 'DB_USER',
         dest     = 'db_user')
+
 ##  database password
 parser.add_argument('--db-pass',
         action   = 'store',
@@ -85,6 +89,7 @@ parser.add_argument('--db-pass',
         help     = 'The password to connect to the database.',
         metavar  = 'DB_PASS',
         dest     = 'db_pass')
+
 ##  database name 
 parser.add_argument('--db-name',
         action   = 'store',
@@ -93,6 +98,7 @@ parser.add_argument('--db-name',
         help     = 'The name of the database to query.',
         metavar  = 'DB_NAME',
         dest     = 'db_name')
+
 ##  The year (4-digit)
 parser.add_argument('-y', '--year',
         action   = 'store',
@@ -100,6 +106,7 @@ parser.add_argument('-y', '--year',
         help     = 'The year as a four-digit integer.',
         metavar  = 'YEAR',
         dest     = 'year')
+
 ##  The day of year (doy) 
 parser.add_argument('-d', '--doy',
         action   = 'store',
@@ -107,6 +114,7 @@ parser.add_argument('-d', '--doy',
         help     = 'The day of year (doy) as integer.',
         metavar  = 'DOY',
         dest     = 'doy')
+
 ##  The .FIX file, i.e. the list of reference files 
 parser.add_argument('-f', '--fix-file',
         action   = 'store',
@@ -115,6 +123,7 @@ parser.add_argument('-f', '--fix-file',
         'reference stations.',
         metavar  = 'FIX_FILE',
         dest     = 'fix_file')
+
 ##  The name of the network 
 parser.add_argument('-n', '--network',
         action   = 'store',
@@ -122,6 +131,7 @@ parser.add_argument('-n', '--network',
         help     = 'The name of the network.',
         metavar  = 'NETWORK',
         dest     = 'network')
+
 ##  The path to RINEX files 
 parser.add_argument('-p', '--rinex-path',
         action   = 'store',
@@ -129,6 +139,7 @@ parser.add_argument('-p', '--rinex-path',
         help     = 'The path to the rinex file to validate.',
         metavar  = 'PTH2RNX',
         dest     = 'pth2rnx') 
+
 ##  The session
 parser.add_argument('-s', '--session',
         action   = 'store',
@@ -137,41 +148,55 @@ parser.add_argument('-s', '--session',
         help     = 'The session.',
         metavar  = 'SESSION',
         dest     = 'session') 
+
 ##  Skip the database query
 parser.add_argument('--skip-database',
         action   = 'store_true',
         help     = 'Skip the database query.',
         dest     = 'skip_database')
+
 ##  File with stations to exclude
 parser.add_argument('-e', '--exclude-file',
         action   = 'store',
         required = False,
         help     = 'A file with stations to be ecluded.',
         metavar  = 'EXCLUDE_FILE',
-        dest     = 'exclude_file') 
+        dest     = 'exclude_file')
+
+##  also output an html table
+parser.add_argument('--html',
+        action   = 'store_true',
+        help     = 'Also output an html table, named \"validate_rnx.html\".',
+        dest     = 'make_html')
+
+##  also output in json format
+parser.add_argument('--json',
+        action   = 'store_true',
+        help     = 'Also output info in json format, named \"validate_rnx.json\".',
+        dest     = 'make_json')
 
 ##  Parse command line arguments
 args = parser.parse_args()
 
 ##  list of stations to be excluded
 if args.exclude_file is not None:
-    with open( args.exclude_file, 'r' ) as f: exclude_lines = f.readlines()
+    with open(args.exclude_file, 'r') as f: exclude_lines = f.readlines()
 else:
     exclude_lines = []
 
 ## validate cmd arguments
-if not os.path.isfile( args.fix_file ):
-    print >>sys.stderr, '[ERROR] Invalid Reference fix file: %s'%( args.fix_file )
+if not os.path.isfile(args.fix_file):
+    print >>sys.stderr, '[ERROR] Invalid Reference fix file: %s'%(args.fix_file)
     sys.exit(1)
-if not os.path.isdir( args.pth2rnx ):
-    print >>sys.stderr, '[ERROR] Invalid path to RINEX: %s'%( args.pth2rnx )
+if not os.path.isdir(args.pth2rnx):
+    print >>sys.stderr, '[ERROR] Invalid path to RINEX: %s'%(args.pth2rnx)
     sys.exit(1)
-if len( args.session ) != 1:
-    print >>sys.stderr, '[ERROR] Invalid session identifier: %s'%( args.session )
+if len(args.session) != 1:
+    print >>sys.stderr, '[ERROR] Invalid session identifier: %s'%(args.session)
     sys.exit(1)
 
 ## read all lines from the .FIX file
-with open( args.fix_file, 'r' ) as f: lines = f.readlines()
+with open(args.fix_file, 'r') as f: lines = f.readlines()
 
 ## Resolve the input date
 try:
@@ -187,6 +212,16 @@ except:
 ## Day of year a 3-char, e.g. 157 (DoY)
 Year, Cent, sMon, iMon, DoM, DoY = dt.strftime('%Y-%y-%b-%m-%d-%j').split('-')
 
+## if we are writing html ...
+if args.make_html:
+    htmlout = open('validate_rnx.html', 'w')
+    print >>htmlout, "<table style=\"width:100%\">"
+
+## if we are wrinting json ...
+if args.make_json:
+    jsonout   = open('validate_rnx.json', 'w')
+    json_list = []
+
 ##  Skip database
 if args.skip_database :
     ## get a list of all RINEX file in the rinex folder (args.pth2rnx)
@@ -197,6 +232,8 @@ if args.skip_database :
         sys.exit( 1 )
     print '%-15s %-16s %-9s %-9s %-8s'\
         %("RINEX", "MARKER NAME", "AVAILABLE", "REFERENCE", "EXCLUDED")
+    if args.make_html:
+        print >>htmlout, "<tr><th>RINEX</th><th>MARKER NAME</th><th>AVAILABLE</th><th>REFERENCE</th><th>EXCLUDED</th></tr>"
     for rnx in rinex_list :
         rnx_name = os.path.basename( rnx )
         rnx_path = os.path.dirname( rnx )
@@ -220,6 +257,12 @@ if args.skip_database :
             shutil.move( RNX_FILE, rnx_file )
             RNX_FILE    = rnx_file
         print '%-15s %-16s %-9s %-9s %-8s'%(os.path.basename(RNX_FILE), used_name.upper(), rnx_exists, rnx_is_ref, rnx_is_excl)
+        if args.make_html:
+            print >>htmlout, "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>"%(os.path.basename(RNX_FILE), used_name.upper(), rnx_exists, rnx_is_ref, rnx_is_excl)
+
+        if args.make_json:
+            json_list.append( {"rinex": os.path.basename(RNX_FILE), "station": used_name.upper(), "available": rnx_exists, "reference": rnx_is_ref, "exclude": rnx_is_excl} )
+
     sys.exit( 0 )
 
 ## try connecting to the database server
@@ -241,6 +284,8 @@ try:
     '''
     print '%-15s %-16s %-9s %-9s %-8s'\
         %("RINEX", "MARKER NAME", "AVAILABLE", "REFERENCE", "EXCLUDED")
+    if args.make_html:
+        print >>htmlout, "<tr><th>RINEX</th><th>MARKER NAME</th><th>AVAILABLE</th><th>REFERENCE</th><th>EXCLUDED</th></tr>"
     for tpl in SENTENCE:
         ## Rinex can be:
         ## Hatanaka & UNIX compressed,
@@ -264,7 +309,7 @@ try:
             used_name = '%s' %(marker_name)
 
         if len(marker_name) != 4:
-            print >> sys.stderr, 'ERROR ! Invalid marker number %s for station %s'%(marker_name, tpl[0])
+            print >> sys.stderr, '[ERROR] Invalid marker number %s for station %s'%(marker_name, tpl[0])
             raise RuntimeError('')
 
         rnx_file = ''
@@ -280,11 +325,22 @@ try:
             rnx_is_excl = 'Yes'
       
         print '%-15s %-16s %-9s %-9s %-8s'%(os.path.basename(rnx_file), used_name.upper(), rnx_exists, rnx_is_ref, rnx_is_excl)
+        if args.make_html:
+            print >>htmlout, "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>"%(os.path.basename(rnx_file), used_name.upper(), rnx_exists, rnx_is_ref, rnx_is_excl)
+
+        if args.make_json:
+            json_list.append( {"rinex": os.path.basename(rnx_file), "station": used_name.upper(), "available": rnx_exists, "reference": rnx_is_ref, "exclude": rnx_is_excl} )
 
 except:
+    traceback.print_exc()
     try: db.close()
     except: pass
     print >> sys.stderr, '[ERROR] Cannot connect/query database server.'
     EXIT_STATUS = FAILURE
 
-sys.exit( EXIT_STATUS )
+if args.make_html:
+    print >>htmlout, "</table>"
+
+if args.make_json: json.dump(json_list, jsonout)
+
+sys.exit(EXIT_STATUS)
