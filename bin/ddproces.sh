@@ -1903,9 +1903,9 @@ PD_RT=$(echo "scale=2; ($STOP_PD - $START_PD)/1" | bc)
 PD_PC=$(echo "scale=2; ($PD_RT / $DD_RT) * 100" | bc)
 BP_RT=$(echo "scale=2; ($STOP_BP - $START_BP)/1" | bc)
 BP_PC=$(echo "scale=2; ($BP_RT / $DD_RT) * 100" | bc)
-printf "[DEBUG] Total running time                : %6.2f ~ 100.0%%\n" "$DD_RT"
-printf "[DEBUG] Rinex download and manipulation   : %6.2f ~ %3.1f%%\n" "$RD_RT" "$RD_PC"
-printf "[DEBUG] Products download and manipulation: %6.2f ~ %3.1f%%\n" "$PD_RT" "$PD_PC"
-printf "[DEBUG] Bernese processing                : %6.2f ~ %3.1f%%\n" "$BP_RT" "$BP_PC"
+printf "[DEBUG] Total running time                : %6.2f(sec) ~ 100.0%%\n" "$DD_RT"
+printf "[DEBUG] Rinex download and manipulation   : %6.2f(sec) ~ %3.1f%%\n" "$RD_RT" "$RD_PC"
+printf "[DEBUG] Products download and manipulation: %6.2f(sec) ~ %3.1f%%\n" "$PD_RT" "$PD_PC"
+printf "[DEBUG] Bernese processing                : %6.2f(sec) ~ %3.1f%%\n" "$BP_RT" "$BP_PC"
 
 clear_n_exit 0
