@@ -224,8 +224,10 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
     command_ = 'wget'
     if infolist[4]  == 'TREECOMP' or infolist[4] == 'TREECOMP2': 
         command_ += ' --no-passive-ftp'
-    if infolist[9]  != '': command_ += (' --user=' + infolist[9])
-    if infolist[10] != '': command_ += (' --password=' + infolist[10])
+    if infolist[9]  is not None and infolist[9]  != '':
+        command_ += (' --user=' + infolist[9])
+    if infolist[10] is not None and infolist[10] != '':
+        command_ += (' --password=' + infolist[10])
 
   ## depending on protocol, set the server id
   if infolist[5] == 'ssh':

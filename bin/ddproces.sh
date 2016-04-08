@@ -942,11 +942,12 @@ else
     echoerr "[ERROR] Failed to link the station information file \'${STAINF_FILE}\'."
     clear_n_exit 1
   else
-    tmp_file_array+=("${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT}")
+    #tmp_file_array+=("${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT}")
+    :
   fi
 fi
 
-echodbg "[DEBUG] Using the the station information file \"${P}/STA/${STAINF}.${STAINF_EXT}\""
+echodbg "[DEBUG] Using the the station information file \"${P}/${CAMPAIGN}/STA/${STAINF}.${STAINF_EXT}\""
 
 ## 
 ##  Validate the blq file. If the variable BLQINF is not set, then we will not
@@ -1904,7 +1905,7 @@ AMBSM=${P}/${CAMPAIGN}/OUT/AMB${YEAR:2:2}${DOY_3C}0.SUM
 python - <<END 1>>${JSON_OUT}
 import sys, bernutils.bamb
 try:
-  ambf = bernutils.bamb.AmbFile( "${AMBSM}" )
+  ambf = bernutils.bamb.AmbFile("${AMBSM}")
   ambf.toJson()
 except:
   print>>sys.stderr,'[ERROR] Cannot translate amb file to json!'
