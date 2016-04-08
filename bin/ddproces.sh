@@ -19,11 +19,11 @@ echodbg () {
   test "${DEBUG_MODE}" -gt 0 && echo "$@" 
 }
 
-##  given a year and day of year, this function will return the
-##+ gps week, i.e. print it to stdout.
-##  arg1 -> year
-##  arg2 -> doy
 yd2gpsw () {
+  ##  given a year and day of year, this function will return the
+  ##+ gps week, i.e. print it to stdout.
+  ##  arg1 -> year
+  ##  arg2 -> doy
   local gweek=
   gweek=$(echo -ne "import bernutils.gpstime\nw,s = bernutils.gpstime.ydoy2gps(${1},${2})\nprint \"%4i\"%(w)" | python)
   if ! [[ $gweek =~ ^[0-9]{4}$ ]]; then
@@ -35,14 +35,22 @@ yd2gpsw () {
   fi
 }
 
-##  given a year and day of year, this function will return the
-##+ day of gps week, i.e. print it to stdout.
-##  arg1 -> year
-##  arg2 -> doy
 yd2gpsd () {
+  ##
+  ##  Function to compute the day of gps week, given a year and day of year.
+  ##  The day of week is printed and an integer is returned; anything other
+  ##+ than 0 denotes an error.
+  ##
+  ##  Arguments:
+  ##    arg1 -> year
+  ##    arg2 -> doy
+  ##
+  ##  Programs:
+  ##    python (incl. bernutils.gpstime)
+  ##
   local gweekd=
   gweekd=$(echo -ne "import bernutils.gpstime\nw,s = bernutils.gpstime.ydoy2gps(${1},${2})\nprint \"%1i\"%(s/bernutils.gpstime.SEC_PER_DAY)" | python)
-  if ! [[ $gweekd =~ ^[0-9]$ ]]; then
+  if ! [[ $gweekd =~ ^[0-6]$ ]]; then
     echoerr "[ERROR] Could not resolve gps day of week."
     return 1
   else
@@ -51,12 +59,27 @@ yd2gpsd () {
   fi
 }
 
-##  control perl script output
-##  argv1 -> path to BPE
-##  argv2 -> status filename (no path)
-##  argv3 -> output filename (no path)
 check_bpe_run () {
-
+  ##
+  ##  Function to inspect the output and status files of a BPE process for errors.
+  ##  If an error is found, the function will dump all relevant log files found
+  ##+ in the BPE folder (i.e. ${BERN_TASK_ID}${YEAR:2:2}${DOY_3C}*.LOG) to a log
+  ##+ file.
+  ##  The exit status id 0 if no error is found, else 1 is returned.
+  ##
+  ##  Arguments:
+  ##    argv1 -> path to BPE (i.e. something like /home/foo/GPSDATA/CAMPAIGN/bar/BPE)
+  ##    argv2 -> status filename (no path)
+  ##    argv3 -> output filename (no path)
+  ##
+  ##  Programs:
+  ##
+  ##  Global Vars:
+  ##    BERN_TASK_ID
+  ##    YEAR
+  ##    DOY_3C
+  ##    PROC_LOG
+  ##
   local bpe_path="$1"
   local status_f="${bpe_path}/${2}"
   local outout_f="${bpe_path}/${3}"
@@ -91,13 +114,23 @@ Purpose : Process a network using DD approach via a given PCF file
 Usage   :"
 }
 
-##  year - doy to datetime in format '%Y-%m-%d %H-%M-%S'
-##  argv1 -> year
-##  argv2 -> (3-digit) doy
-##  argv3 -> (optional) hours
-##  argv4 -> (optional) minutes
-##  argv5 -> (optional) seconds (integer)
 ydoy2dt () {
+  ##  
+  ##  Function to convert a date from YYYY DDD [HH MM SS] to YYYYMMDD HHMMSS,
+  ##+ i.e. year - doy to format '%Y-%m-%d %H-%M-%S'.
+  ##  The function will print the give date and return the conversion status;
+  ##+ anything other than 0 denotes an error.
+  ##  
+  ##  Arguments:
+  ##    argv1 -> year
+  ##    argv2 -> (3-digit) doy
+  ##    argv3 -> (optional) hours
+  ##    argv4 -> (optional) minutes
+  ##    argv5 -> (optional) seconds (integer)
+  ##
+  ##  Programs Used:
+  ##    python
+  ##
   if [ "$#" -ne 2 ] && [ "$#" -ne 5 ] ; then
     echoerr "[ERROR] Invalid argc in ydoy2dt(). Cannot parse date. ($#)"
     return 1
@@ -116,18 +149,14 @@ ydoy2dt () {
   fi
 
   python - <<END
-
 import datetime
 import sys
-
 exit_status=0
-
 try:
   print datetime.datetime.strptime('${year}-${doy} ${hour}:${min}:${sec}', \
     '%Y-%j %H:%M:%S').strftime("%Y-%m-%d %H:%M:%S")
 except:
   exit_status=1
-
 sys.exit(exit_status)
 END
 
@@ -141,22 +170,22 @@ END
   fi
 }
 
-##
-##  argv1 -> file extension (e.g. 'SNX')
-##  argv2 -> campaign dir   (e.g. 'SOL')
-##  argv3 -> product type   (e.g. 'SINEX')
-##  argv4 -> solution type:
-##+          'F' for final, 
-##+          'R' for size-reduced
-##+          'P' for preliminery
-##+          'N' for free-network
-##  argv5 -> type of date used in saved file:
-##+          'g' for gpsweek, day of week
-##+          'y' for year, day of year
-##  argv6 -> : (sub) directory where the products will be saved
-##+          i.e. ${SAVE_DIR_DIR}/${6}
-##
 save_n_update () {
+  ##
+  ##  argv1 -> file extension (e.g. 'SNX')
+  ##  argv2 -> campaign dir   (e.g. 'SOL')
+  ##  argv3 -> product type   (e.g. 'SINEX')
+  ##  argv4 -> solution type:
+  ##+          'F' for final, 
+  ##+          'R' for size-reduced
+  ##+          'P' for preliminery
+  ##+          'N' for free-network
+  ##  argv5 -> type of date used in saved file:
+  ##+          'g' for gpsweek, day of week
+  ##+          'y' for year, day of year
+  ##  argv6 -> : (sub) directory where the products will be saved
+  ##+          i.e. ${SAVE_DIR_DIR}/${6}
+  ##
 
   if test "$#" -ne 6 ; then
     echoerr "[ERROR] Invalid call to save_n_update()."
@@ -261,8 +290,8 @@ EOF
     fi
     return 1
   else
-    echodbg "[DEBUG] File \"$src_f\" saved at \"${host}/${save_dir_p}\" as"
-    echodbg "        \"$trg_f\"."
+    # echodbg "[DEBUG] File \"$src_f\" saved at \"${host}/${save_dir_p}\" as"
+    # echodbg "        \"$trg_f\"."
   fi
   
   if add_products_2db.py \
@@ -282,28 +311,28 @@ EOF
           --db-name="${DB_NAME}" ; then
     printf 1>>${JSON_OUT} "{\"prod_type\":\"%s\",\"extension\":\"%s\",\"local_dir\":\"%s\",\"sol_type\":\"%s\",\"filename\":\"%s\",\"savedas\":\"%s\",\"host\":\"%s\",\"host_dir\":\"%s\"}" \
       "${3}" "${1}" "${2}" "${solution_id}" "${src_f}" "${trg_f}" "${host}" "${SOL_DIR}/${save_dir_p}/"
-      echodbg "[DEBUG] DB updated to include file \"${src_f}\" as :"
-      echodbg "        \"${SAVE_DIR_DIR}/${save_dir_p}/${trg_f}.Z\" @ \"${host}\"."
+      # echodbg "[DEBUG] DB updated to include file \"${src_f}\" as :"
+      # echodbg "        \"${SAVE_DIR_DIR}/${save_dir_p}/${trg_f}.Z\" @ \"${host}\"."
     else
       echoerr "[ERROR] Failed to update DB."
       return 1
   fi
 }
 
-##  This function will remove all files within the
-##+ tmp_file_array array ant ehn exit with the integer
-##+ provided as the first command line argument.
 clear_n_exit () {
+  ##  This function will remove all files within the
+  ##+ tmp_file_array array ant ehn exit with the integer
+  ##+ provided as the first command line argument.
   for f in "${tmp_file_array[@]}" ; do rm $f 2>/dev/null ; done
   exit $1
 }
 
-##
-##  Search through a list of command line arguments (short and/or
-##+ long options included), find the long option '--config=<ARG>'
-##+ and return the <ARG>. If not found, return ''
-##
 find_config_file () {
+  ##
+  ##  Search through a list of command line arguments (short and/or
+  ##+ long options included), find the long option '--config=<ARG>'
+  ##+ and return the <ARG>. If not found, return ''
+  ##
   local cf=
   OLD_IFS=${IFS}
   IFS='='
@@ -323,11 +352,11 @@ find_config_file () {
 }
 
 set_json_out () {
-##
-##  Search for the option --json-out and set the (global) JSON_OUT variable
-##+ accordingly. If no such option is give, then JSON_OUT is set to /dev/null
-##+ i.e. we'll be sending json output to god.
-##
+  ##
+  ##  Search for the option --json-out and set the (global) JSON_OUT variable
+  ##+ accordingly. If no such option is give, then JSON_OUT is set to /dev/null
+  ##+ i.e. we'll be sending json output to god.
+  ##
   JSON_OUT=/dev/null
   OLD_IFS=${IFS}
   IFS='='
@@ -347,13 +376,13 @@ set_json_out () {
 }
 
 set_hemlchk_limits () {
-##
-##  This function will set the limits for reference system stations rejection.
-##  argv1 -> The HELMCHK perl script where the limits are set
-##  argv2 -> Limit for north offset (in mm)
-##  argv3 -> Limit for east offset (in mm)
-##  argv4 -> Limit for up offset (in mm)
-##
+  ##
+  ##  This function will set the limits for reference system stations rejection.
+  ##  argv1 -> The HELMCHK perl script where the limits are set
+  ##  argv2 -> Limit for north offset (in mm)
+  ##  argv3 -> Limit for east offset (in mm)
+  ##  argv4 -> Limit for up offset (in mm)
+  ##
   if ! test -f ${1} ; then
     echoerr "[ERROR] Invalid file: \"${1}\". Cannot set limits for"
     echoerr "        reference station rejection."
@@ -517,63 +546,63 @@ fi
 eval set -- $ARGS
 
 ##  extract options and their arguments into variables.
-# printf 1>${JSON_OUT} "{\"command\":[\n"
+printf 1>${JSON_OUT} "{\"command\":[\n"
 while true
 do
   case "$1" in
 
     --use-ntua-products)
       MY_PRODUCT_ID="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -r|--save-dir)
       SAVE_DIR_DIR="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -i|--solution-id)
       SOLUTION_ID="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -a|--analysis-center)
       AC="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -b|--bern-loadgps)
       B_LOADGPS="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -c|--campaign)
       CAMPAIGN="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --debug)
       DEBUG_MODE=1
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       ;;
     --logfile)
       LOGFILE="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -d|--doy) ## remove any leading zeros
       DOY=`echo "${2}" | sed 's|^0*||g'`
       DOY_3C=$( printf "%03i\n" $DOY )
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -g|--tables-dir)
       TABLES_DIR="${2%/}" ## trim last '/' if any
-      # printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -h|--help)
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       help
       exit 0
       ;;
@@ -583,7 +612,7 @@ do
         echoerr "ERROR. Invalid satellite system : ${SAT_SYS}"
         exit 1
       fi
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --stations-per-cluster)
@@ -592,7 +621,7 @@ do
         echoerr "ERROR. stations-per-cluster must be a positive integer!"
         exit 1
       fi
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --files-per-cluster)
@@ -601,65 +630,65 @@ do
         echoerr "ERROR. files-per-cluster must be a positive integer!"
         exit 1
       fi
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -e|--elevation-angle)
       ELEVATION_ANGLE="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --append-suffix)
       APND_SUFFIX="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -v|--version)
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       dversion
       exit 0
       ;;
     --repro2-prods)
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       USE_REPRO2=YES
       ;;
     --cod-repro13)
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       COD_REPRO13=YES
       ;;
     --atl-file)
       ATLINF="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -y|--year)
       YEAR="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --antex)
       ATXINF="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --stainf)
       STAINF="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     -p|--pcv-file)
       PCVINF="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --fix-file)
       FIXINF="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --blq-file)
       BLQINF="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --json-out)
@@ -668,29 +697,29 @@ do
         echoerr "[ERROR] json-out not parsed correctly! ($JSON_OUT \!= $2)"
         exit 1
       fi
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --use-epn-exclude)
       USE_EUREF_EXCLUDE_LIST=YES
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       ;;
     --skip-remove)
       SKIP_REMOVE=YES
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       ;;
     --exclude-list)
       STA_EXCLUDE_FILE="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --config)
       CONFIG_FILE="${2}"
-      # printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
     --) # end of options
-      # printf 1>>${JSON_OUT} "\n],\n"
+      printf 1>>${JSON_OUT} "\n],\n"
       shift
       break
       ;;
@@ -701,7 +730,7 @@ do
 
   esac
   shift
-  # if test "${#}" -gt 1 ; then printf 1>>${JSON_OUT} "," ; fi
+  if test "${#}" -gt 1 ; then printf 1>>${JSON_OUT} "," ; fi
 done
 
 ## ////////////////////////////////////////////////////////////////////////////
@@ -718,7 +747,6 @@ else
   exec 2>&1
 fi
 
-## ////////////////////////////////////////////////////////////////////////////
 ##
 ##  VALIDATE COMMAND LINE ARGUMENTS
 ##  ---------------------------------------------------------------------------
@@ -744,7 +772,6 @@ fi
 ##  The directory specified for saving the results is checked for existance; if
 ##  it does not exist, it is created.
 ##
-## ////////////////////////////////////////////////////////////////////////////
 
 ##  year must be set
 if test -z ${YEAR+x}; then echoerr "[ERROR] Year must be set!"; exit 1; fi
@@ -1280,7 +1307,6 @@ else
     clear_n_exit 1
   fi
 fi
-exit 50
 
 ## FIXME : remove that shit
 #echodbg "[DEBUG] Going to show you the RINEX info (just for debuging)"
@@ -1831,6 +1857,7 @@ fi
 } 1>>${JSON_OUT}
 
 printf 1>>${JSON_OUT} "],\n"
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  COMPILE (NON-FATAL) ERROR/WARNINGS FILE
 ##  ---------------------------------------------------------------------------
@@ -1861,6 +1888,7 @@ if test -s ${WRN_FILE} ; then
 else
   echodbg "[DEBUG] Warnings file is empty."
 fi
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  ADDNEQ SUMMARY TO HTML
 ##  ---------------------------------------------------------------------------
@@ -1900,6 +1928,7 @@ if test "$?" -ne 0 ; then
   echoerr "        to json format!"
   clear_n_exit 1
 fi
+
 ## ////////////////////////////////////////////////////////////////////////////
 ##  REMOVE CAMPAIGN FILES
 ##  ---------------------------------------------------------------------------
