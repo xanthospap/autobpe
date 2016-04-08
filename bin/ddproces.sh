@@ -292,6 +292,7 @@ EOF
   else
     # echodbg "[DEBUG] File \"$src_f\" saved at \"${host}/${save_dir_p}\" as"
     # echodbg "        \"$trg_f\"."
+    :
   fi
   
   if add_products_2db.py \
@@ -1916,7 +1917,7 @@ ADNQ=${P}/${CAMPAIGN}/OUT/${FINAL_SOLUTION_ID}${YEAR:2:2}${DOY_3C}0.OUT
 python - <<END 1>>${JSON_OUT}
 import sys, bernutils.badnq
 try:
-  adnf = bernutils.badnq.AddneqFile( "${ADNQ}" )
+  adnf = bernutils.badnq.AddneqFile("${ADNQ}")
   adnf.toJson()
 except:
   print>>sys.stderr,'[ERROR] Cannot translate addneq file to json!'
