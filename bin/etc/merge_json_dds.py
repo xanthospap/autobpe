@@ -6,7 +6,7 @@
 ##
 ##  Arguments:
 ##      sys.argv1 -> The json file containing station information, as outputed
-##                   from validate_rnx.py script.
+##                   from validate_ntwrnx.py script.
 ##      sys.argv2 -> The json file containing all info from a run of ddprocess
 ##
 ##  Ouput:

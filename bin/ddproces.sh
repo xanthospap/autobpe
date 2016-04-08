@@ -1267,8 +1267,13 @@ if ! test -z ${STA_EXCLUDE_FILE+x} ; then
   fi
 fi
 
+##
 ##  make a table with available rinex/station names, reference stations, etc ..
 ##+ dump output to the .rnxsta.dat file (filter it later on)
+##  The file validate_rnx.json is going to be used later on; make sure we use
+##+ the correct one and not a leftover from previous processing...
+##
+rm validate_rnx.json 2>/dev/null
 if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
   ##  Consult the database ...
   if ! validate_ntwrnx.py \
@@ -1956,6 +1961,16 @@ else
 fi
 
 printf 1>>${JSON_OUT} "\n}"
+
+##
+##  Merge the json file with the temporary json created from validate_ntwrnx.py
+##
+if ! ${P2ETC}/merge_json_dds.py validate_rnx.json ${JSON_OUT}; then
+  echoerr "[ERROR] Failed to merge json files \"validate_rnx.json\" and \"${JSON_OUT}\"".
+else
+  mv bar.json ${JSON_OUT}
+  rm validate_rnx.json
+fi
 
 STOP_DD=$(date +%s.%N)
 
