@@ -1969,7 +1969,7 @@ printf 1>>${JSON_OUT} "\n}"
 if ! ${P2ETC}/merge_json_dds.py validate_rnx.json ${JSON_OUT}; then
   echoerr "[ERROR] Failed to merge json files \"validate_rnx.json\" and \"${JSON_OUT}\"".
 else
-  mv bar.json ${JSON_OUT}
+  mv merged.json ${JSON_OUT}
   rm validate_rnx.json
 fi
 

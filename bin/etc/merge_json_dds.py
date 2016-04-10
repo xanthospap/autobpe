@@ -16,8 +16,7 @@
 ##      Anything other than 0 denotes an error.
 ##
 
-import json
-import sys
+import sys, json
 
 status = 0
 
@@ -34,10 +33,10 @@ def station_is_reference(name, d):
     return False
 
 try:
-    with open('validate_rnx.json') as data_file:
+    with open(sys.argv[1]) as data_file:
         data   = json.load(data_file)
 
-    with open('epndens.json') as solution_file:
+    with open(sys.argv[2]) as solution_file:
         solinf = json.load(solution_file)
 
     adnq_sum = solinf["addneq_summary"]
@@ -52,7 +51,7 @@ try:
 
     solinf.update({"stainf":data})
 
-    with open("bar.json", "w") as new_json:
+    with open("merged.json", "w") as new_json:
         json.dump(solinf, new_json, indent=4)
 except:
     status = 1

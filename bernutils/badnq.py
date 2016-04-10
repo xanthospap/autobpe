@@ -1,4 +1,4 @@
-import os
+import os, sys, json
 import datetime
 import bernutils.geodesy
 
@@ -52,6 +52,7 @@ class FullStationRecord:
     self.__latapr = _list[6]
     self.__lonapr = _list[7]
     self.__hgtapr = _list[8]
+    # print 'Constructing new obj:', _name
 
     xapr2  = _list[9][0]
     if xapr2 != self.__xapr:
@@ -485,6 +486,9 @@ class AddneqFile:
       raise RuntimeError('Invalid station block (E) [%s]' %rblock[5])
     e_apr, e_est, e_cor, e_rms, e_e3d, e_angle_e3d, e_e2d = [ float(i) for i in lns[1:] ]
 
+    ##  debug
+    ## print 'got point ->', name, '(__resolve_station_block__)'
+
     return [ name, \
       [x_apr, x_est, x_cor, x_rms], \
       [y_apr, y_est, y_cor, y_rms], \
@@ -565,6 +569,7 @@ class AddneqFile:
         block.append(line)
         for i in range(0, 7):
           block.append(fin.readline())
+        ## print 'resolving station block:', block
         tmp_list = self.__resolve_station_block__(block)
         ret_dict[tmp_list[0]] = tmp_list[1:]
         nr_sta += 1
@@ -636,6 +641,7 @@ class AddneqFile:
         x, y, z, lat, lon, hgt = [ float(x) for x in lns[2:] ]
         sta_dict[name] = [aa, obs, adjt, x, y, z, lat, lon, hgt]
         line = fin.readline()
+        ## print 'got new station (a-priori)', name
 
     return sta_dict
 
@@ -713,11 +719,13 @@ class AddneqFile:
   def toJson(self):
     lst1  = self.get_station_coordinates() ## in the old days, this was a list!
     dict1 = self.get_apriori_coordinates()
+    assert len(lst1) == len(dict1)
     ##  combine into a single dictionary, with name as key
     ##+ and values of type FullStationRecord
     for key, val in dict1.iteritems():
-      full_info = val + lst1[key]
+      full_info  = val + lst1[key]
       dict1[key] = FullStationRecord(key, full_info)
+    assert len(lst1) == len(dict1)
     print "\"addneq_summary\":["
     it = 0
     for sta, val in dict1.iteritems():
@@ -728,6 +736,7 @@ class AddneqFile:
       else:
         print ','
     print ']'
+    #json.dump(dict1, sys.stdout, indent=4)
 
   def toHtml(self, format_str, warnings_str=None):
     ''' Create an html table with adjustment information. The user can select the
