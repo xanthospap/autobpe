@@ -51,7 +51,7 @@ def get_marker_name(rinex):
     with open(rinex, 'r') as fin:
         for line in fin.readlines():
             if line.strip()[60:71] == 'MARKER NAME':
-                return line[0:4]
+                return line[0:4].rstrip()
     return ''
 
 def get_marker_number(rinex):
@@ -235,16 +235,16 @@ if args.skip_database :
     if args.make_html:
         print >>htmlout, "<tr><th>RINEX</th><th>MARKER NAME</th><th>AVAILABLE</th><th>REFERENCE</th><th>EXCLUDED</th></tr>"
     for rnx in rinex_list :
-        rnx_name = os.path.basename( rnx )
-        rnx_path = os.path.dirname( rnx )
-        RNX_FILE = os.path.join( rnx_path, rnx_name.upper() )
-        rnx_file = os.path.join( rnx_path, rnx_name.lower() )
-        if RNX_FILE != rnx : shutil.move( rnx, RNX_FILE )
-        marker_name   = get_marker_name( RNX_FILE )
-        marker_number = get_marker_number( RNX_FILE )
+        rnx_name = os.path.basename(rnx)
+        rnx_path = os.path.dirname(rnx)
+        RNX_FILE = os.path.join(rnx_path, rnx_name.upper())
+        rnx_file = os.path.join(rnx_path, rnx_name.lower())
+        if RNX_FILE != rnx : shutil.move(rnx, RNX_FILE)
+        marker_name   = get_marker_name(RNX_FILE)
+        marker_number = get_marker_number(RNX_FILE)
         if marker_name == '':
             print >> sys.stderr, '[ERROR] Failed to read RINEX marker name for \"%s\"'%(RNX_FILE)
-            sys.exit( 1 )
+            sys.exit(1)
         used_name  = '%s %s'%(marker_name, marker_number)
         rnx_is_ref = 'No'
         rnx_is_excl= 'No'
@@ -261,7 +261,7 @@ if args.skip_database :
             print >>htmlout, "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>"%(os.path.basename(RNX_FILE), used_name.upper(), rnx_exists, rnx_is_ref, rnx_is_excl)
 
         if args.make_json:
-            json_list.append( {"rinex": os.path.basename(RNX_FILE), "station": used_name.upper(), "available": rnx_exists, "reference": rnx_is_ref, "exclude": rnx_is_excl} )
+            json_list.append( {"rinex": os.path.basename(RNX_FILE), "station": used_name.upper().strip(), "available": rnx_exists, "reference": rnx_is_ref, "exclude": rnx_is_excl} )
 
     sys.exit( 0 )
 
@@ -329,7 +329,7 @@ try:
             print >>htmlout, "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>"%(os.path.basename(rnx_file), used_name.upper(), rnx_exists, rnx_is_ref, rnx_is_excl)
 
         if args.make_json:
-            json_list.append( {"rinex": os.path.basename(rnx_file), "station": used_name.upper(), "available": rnx_exists, "reference": rnx_is_ref, "exclude": rnx_is_excl} )
+            json_list.append( {"rinex": os.path.basename(rnx_file), "station": used_name.upper().strip(), "available": rnx_exists, "reference": rnx_is_ref, "exclude": rnx_is_excl} )
 
 except:
     traceback.print_exc()

@@ -29,7 +29,7 @@ def find_station_in_addneq(name, d):
 def station_is_reference(name, d):
     for i in d:
         if name == i["name"]:
-            return True if i["adj"] == "HELMR" else False
+            return True if i["adj"].strip() == "HELMR" else False
     return False
 
 try:
@@ -43,7 +43,7 @@ try:
     sta_inf  = {}
 
     for st in data:
-        sta_name = st["station"]
+        sta_name = st["station"].strip()
         processed = "Yes" if find_station_in_addneq(sta_name, adnq_sum) else "No"
         reference = "Yes" if station_is_reference(sta_name, adnq_sum) else "No"
         st["processed"] = processed
