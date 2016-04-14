@@ -454,6 +454,9 @@ STAINF_EXT="STA"            ##  the extension
 ## fix file
 # FIXINF=
 
+## reference coordinates/velocities
+# REFINF=
+
 ## blq file
 # BLQINF=
 
@@ -531,7 +534,7 @@ getopt -T > /dev/null ## check getopt version
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
   ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e:a:p: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,atl-file:,antex:,pcv-file:,stainf:,use-epn-exclude,exclude-list:,skip-remove,fix-file:,blq-file:,config: \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,atl-file:,antex:,pcv-file:,stainf:,use-epn-exclude,exclude-list:,skip-remove,fix-file:,blq-file:,config:,refinf: \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -711,6 +714,11 @@ do
       ;;
     --exclude-list)
       STA_EXCLUDE_FILE="${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      shift
+      ;;
+    --refinf)
+      REFINF="${2}"
       printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
@@ -1016,6 +1024,28 @@ else
     fi
   fi
 fi
+
+##
+##  Validate the reference coordinates/velocity file(s). these depend on the
+##+ variable FIXINF
+##
+if test -z "${REFINF+x}" ; then
+  echoerr "[ERROR] Must specify a reference .CRD/.VEL file for reference frame realization."
+  clear_n_exit 1
+fi
+for ext in CRD VEL ; do
+  if ! test -f ${TABLES_DIR}/crd/${REFINF}_R.${ext} ; then
+    if ! test -f ${P}/${CAMPAIGN}/STA/${REFINF}_R.${ext} ; then
+      echoerr "[ERROR] Cannot find file \"${REFINF}_R.${ext}\"."
+      clear_n_exit 1
+    fi
+  else
+    if ! ln -sf ${TABLES_DIR}/crd/${REFINF}_R.${ext} ${P}/${CAMPAIGN}/STA/${REFINF}_R.${ext} ; then
+      echoerr "[ERROR] Failed to link file \"${TABLES_DIR}/crd/${REFINF}_R.${ext}\"."
+      clear_n_exit 1
+    fi
+  fi
+done
 
 ## 
 ##  Validate the fix file. If set, we are going to search for it, 1) in the 
@@ -1658,7 +1688,8 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" 1>>${JSON_OUT} \
         PCV="${PCV_EXT}" \
         PCVINF="${PCVINF}" \
         ELANG="${ELEVATION_ANGLE}" \
-        FIXINF="${FIXINF}"\
+        FIXINF="${FIXINF}" \
+        REFINF="${REFINF}" \
         CLU="${FILES_PER_CLUSTER}"; then
   echoerr "[ERROR] Failed to set variables in PCF file."
   clear_n_exit 1
