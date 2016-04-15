@@ -220,13 +220,13 @@ save_n_update () {
 
   case "${5}" in
     G|g)
-      save_date=$(echo -ne "import bernutils.gpstime\nw,s = bernutils.gpstime.ydoy2gps(${YEAR},${DOY})\nprint \"%4i%1i\"%(w,s/bernutils.gpstime.SEC_PER_DAY)" | python)
+      save_date=$(echo -ne "import bernutils.gpstime\nw,s = bernutils.gpstime.ydoy2gps(${YEAR},${DOY})\nprint \"%04i%1i\"%(w,s/bernutils.gpstime.SEC_PER_DAY)" | python)
       ;;
     Y|y)
       save_date=${YEAR:2:2}${DOY_3C}0
       ;;
     *)
-      echoerr "[ERROR] Invalid one-char solution id!"
+      echoerr "[ERROR] Invalid one-char save id!"
       return 1
       ;;
   esac
