@@ -297,7 +297,7 @@ try:
         possible_rinex= [ os.path.join(args.pth2rnx, x) 
                         for x in [rnx_fn_a, rnx_fn_b, rnx_fn_c] ]
         #rnx_file      = os.path.join(args.pth2rnx, rnx_filename)
-        marker_name   = tpl[1]
+        marker_name   = tpl[0]
         marker_number = tpl[2]
         rnx_exists    = 'No' ##  initial guess ...
         rnx_is_ref    = 'No' ##  initial guess ...
@@ -314,7 +314,7 @@ try:
 
         rnx_file = ''
         for rnx in possible_rinex:
-            if os.path.isfile( rnx ):
+            if os.path.isfile(rnx):
                 rnx_file   = rnx
                 rnx_exists = 'Yes'
         
