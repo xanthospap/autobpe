@@ -25,7 +25,7 @@ yd2gpsw () {
   ##  arg1 -> year
   ##  arg2 -> doy
   local gweek=
-  gweek=$(echo -ne "import bernutils.gpstime\nw,s = bernutils.gpstime.ydoy2gps(${1},${2})\nprint \"%4i\"%(w)" | python)
+  gweek=$(echo -ne "import bernutils.gpstime\nw,s = bernutils.gpstime.ydoy2gps(${1},${2})\nprint \"%04i\"%(w)" | python)
   if ! [[ $gweek =~ ^[0-9]{4}$ ]]; then
     echoerr "[ERROR] Could not resolve gps week."
     return 1
@@ -33,6 +33,8 @@ yd2gpsw () {
     echo $gweek
     return 0
   fi
+
+  exit 66
 }
 
 yd2gpsd () {
@@ -189,6 +191,7 @@ save_n_update () {
 
   if test "$#" -ne 6 ; then
     echoerr "[ERROR] Invalid call to save_n_update()."
+    echoerr "        Call was: \"$*\""
     return 1
   fi
   
@@ -228,7 +231,7 @@ save_n_update () {
       ;;
   esac
   if ! [[ $save_date =~ ^[0-9]{5,6}$ ]]; then
-    echoerr "[ERROR] Could not resolve save date format."
+    echoerr "[ERROR] Could not resolve save date format (\"$save_date\")."
     return 1
   fi
   

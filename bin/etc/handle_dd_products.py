@@ -156,17 +156,17 @@ try:
   gpsw, sow = bernutils.gpstime.pydt2gps(py_date)
 
   sp3file = os.path.join(DEST_ORB,\
-    ("%s%4i%1i.PRE"%(AC, gpsw, int(dow))))
+    ("%s%04i%1i.PRE"%(AC, gpsw, int(dow))))
   if isUnixCompressed(info_dict['sp3'][0][0]):
     sp3file += '.Z'
   info_dict['sp3'].append(sp3file)
 
   if AC.lower() == 'cod':
     erpfile = os.path.join(DEST_ORB,\
-      "%s%4i%1i.ERP"%(AC, gpsw, int(dow)))
+      "%s%04i%1i.ERP"%(AC, gpsw, int(dow)))
   else:
     erpfile = os.path.join(DEST_ORB,\
-      "%s%4i%1i.IEP"%(AC, gpsw, int(dow)))
+      "%s%04i%1i.IEP"%(AC, gpsw, int(dow)))
   if isUnixCompressed(info_dict['erp'][0][0]):
     erpfile += '.Z'
   info_dict['erp'].append(erpfile)
@@ -179,7 +179,7 @@ try:
 
   if DWNL_ION:
     ionfile = os.path.join(DEST_ORB.replace('/ORB', '/ATM'),\
-        "COD%4i%1i.ION"%(gpsw, int(dow)))
+        "COD%04i%1i.ION"%(gpsw, int(dow)))
     if isUnixCompressed(info_dict['ion'][0][0]):
       ionfile += '.Z'
     info_dict['ion'].append(ionfile)

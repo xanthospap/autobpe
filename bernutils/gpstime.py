@@ -98,7 +98,7 @@ def ydoy2gps(year, doy, hour=0, minute=0, seconds=.0):
 
   '''
   try:
-    [mjd, fmjd] = ydoy2mjd(year,doy,hour,minute,seconds)
+    [mjd, fmjd] = ydoy2mjd(year, doy, hour, minute, seconds)
   except:
     raise
 
