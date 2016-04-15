@@ -86,7 +86,7 @@ def __getListOfPoints__(crd_filename, stalst=None):
     '''
 
     points = []
-    with open( crd_filename, 'r' ) as fin:
+    with open(crd_filename, 'r') as fin:
         ## Skip the first header lines
         for i in range(0,6):
             ln = fin.readline()
@@ -95,7 +95,7 @@ def __getListOfPoints__(crd_filename, stalst=None):
         while ln:
             ## ignore empty lines ...
             if not re.match('\s*$', ln) :
-                pt = CrdPoint( line=ln )
+                pt = CrdPoint(line=ln)
                 if stalst is not None:
                     if pt.name() in stalst:
                         points.append(pt)
@@ -119,6 +119,20 @@ class CrdFile:
 
   def getPointList(self): return self.point_list_
 
+  def removePoints(self, pts):
+    if len(self.point_list_) == 0:
+        return
+    if type(pts) is list:
+        self.point_list_ = [ x for x in self.point_list_ if x.name() not in pts ]
+    else:
+        self.point_list_ = [ x for x in self.point_list_ if x.name() is not pts ]
+    return
+
+  def onlyKeep(self, pts):
+    if len(self.point_list_) == 0:
+        return
+    self.point_list_ = [ x for x in self.point_list_ if x.name() in pts ]
+
   def addPoint(self, crdpoint):
     index = 0
     for i in self.point_list_:
@@ -126,18 +140,17 @@ class CrdFile:
             self.point_list_[index] = crdpoint
             return
         index += 1
-    self.point_list_.append( crdpoint )
+    self.point_list_.append(crdpoint)
 
   def flush(self):
     header = self.getFileHeader()
-    with open( self.filename_+'.tmp', 'w') as fout:
+    with open(self.filename_+'.tmp', 'w') as fout:
         for i in header: print >> fout, i
         aa = 1
         for j in self.point_list_: 
             print >> fout, j.asString(aa)
             aa += 1
-    shutil.move( self.filename_ + '.tmp', self.filename_ )
-
+    shutil.move(self.filename_ + '.tmp', self.filename_ )
 
   def getFileHeader(self):
     ''' Return the header of a .CRD file as a list of lines,
@@ -192,7 +205,7 @@ class CrdFile:
                       print >> outf, line.strip()
       shutil.move(self.filename_ + '.tmp', self.filename_)
 
-def create_crd_file( filename, **kwargs ):
+def create_crd_file(filename, **kwargs):
     if os.path.isfile( filename ):
         raise RuntimeError('Filed to crete crd file \"%s\". File already exists'%filename)
 
@@ -209,12 +222,12 @@ def create_crd_file( filename, **kwargs ):
     if not 'ref_system' in kwargs: ref_system = 'IGb08'
     else                         : ref_system = kwargs['ref_system']
 
-    with open( filename, 'w' ) as fout:
+    with open(filename, 'w') as fout:
         print >> fout, 'IGb08 coordinates for BERNESE GNSS SOFTWARE 5.2                      %s'%(created_at)
         print >> fout, '--------------------------------------------------------------------------------'
         print >> fout, 'LOCAL GEODETIC DATUM: %5s             EPOCH: %s'%(ref_system, epoch_str)
         print >> fout, ''
         print >> fout, 'NUM  STATION NAME           X (M)          Y (M)          Z (M)     FLAG'
         print >> fout, ''
-    x = CrdFile( filename )
+    x = CrdFile(filename)
     return x
