@@ -134,18 +134,18 @@ class FullStationRecord:
     return jstr;
 
 func_dict = { 'x': FullStationRecord.xest, 
-  'xapr': FullStationRecord.xapr,
-  'xcor': FullStationRecord.xcor,
-  'xrms': FullStationRecord.xrms,
-  'y'   : FullStationRecord.yest, 
-  'yapr': FullStationRecord.yapr,
-  'ycor': FullStationRecord.ycor,
-  'yrms': FullStationRecord.yrms,
-  'z'   : FullStationRecord.zest, 
-  'zapr': FullStationRecord.zapr,
-  'zcor': FullStationRecord.zcor,
-  'zrms': FullStationRecord.zrms,
-  'lat' : FullStationRecord.latest, 
+  'xapr'  : FullStationRecord.xapr,
+  'xcor'  : FullStationRecord.xcor,
+  'xrms'  : FullStationRecord.xrms,
+  'y'     : FullStationRecord.yest, 
+  'yapr'  : FullStationRecord.yapr,
+  'ycor'  : FullStationRecord.ycor,
+  'yrms'  : FullStationRecord.yrms,
+  'z'     : FullStationRecord.zest, 
+  'zapr'  : FullStationRecord.zapr,
+  'zcor'  : FullStationRecord.zcor,
+  'zrms'  : FullStationRecord.zrms,
+  'lat'   : FullStationRecord.latest, 
   'latapr': FullStationRecord.latapr,
   'latcor': FullStationRecord.latcor,
   'latrms': FullStationRecord.latrms,
@@ -576,7 +576,7 @@ class AddneqFile:
         line = fin.readline()
         block= []
 
-    return ret_dict
+    return ret_dict, reference_epoch
 
   def get_apriori_coordinates(self):
     '''Collect coordinates and other information of from a block of type: ::
