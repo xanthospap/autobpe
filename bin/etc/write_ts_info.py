@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
 import os, sys, argparse
+import datetime
 import bernutils.badnq
 
 ##  set the cmd parser
@@ -36,6 +37,15 @@ parser.add_argument('-s', '--sta-file',
     help     = 'A file containing a list of stations to be extracted.',
     metavar  = 'STA_FILE',
     dest     = 'sta_file'
+    )
+
+##  A description string to append to the records
+parser.add_argument('-d', '--description',
+    action   = 'store',
+    required = False,
+    help     = 'A description string to append to the records.',
+    metavar  = 'DESCRIPTION',
+    dest     = 'description'
     )
 
 ERROR = 1
@@ -92,6 +102,13 @@ if len(sta_lst) == 0: sta_lst = [ x.strip()[0:4].lower() for x in stad ]
 ##  Ok, now write the coordinates for all stations in the sta_lst list
 for key, val in stad.iteritems():
     if key.strip()[0:4].lower() in sta_lst:
-        print '{:4} {:+15.5f} {:9.5f} {:+15.5f} {:9.5f} {:+15.5f} {:9.5f} {:+13.8f} {:9.5f} {:+13.8f} {:9.5f} {:12.5f} {:9.5f}'.format(key.strip()[0:4].lower(), val[0][1], val[0][3], val[1][1], val[1][3], val[2][1], val[2][3], val[4][1], val[4][3], val[5][1], val[5][3], val[3][1], val[3][3])
+        sta_id = key.strip()[0:4].lower()
+        try:
+            tsf = open(os.path.join(args.pth2ts, sta_id, (sta_id+'.cts')), 'a')
+            print '{:4} {:+15.5f} {:9.5f} {:+15.5f} {:9.5f} {:+15.5f} {:9.5f} {:+13.8f} {:9.5f} {:+13.8f} {:9.5f} {:12.5f} {:9.5f} {:} {:}'.format(key.strip()[0:4].lower(), val[0][1], val[0][3], val[1][1], val[1][3], val[2][1], val[2][3], val[4][1], val[4][3], val[5][1], val[5][3], val[3][1], val[3][3], datetime.datetime.now(), args.description)
+        except:
+            print >> sys.stderr, '[ERROR] Failed to update time-series records for station \"{}\"'.format(sta_id)
+            status = ERROR
+    if status == ERROR: sys.exit(ERROR)
 
 sys.exit(ALLOK)

@@ -163,6 +163,16 @@ parser.add_argument('-e', '--exclude-file',
         metavar  = 'EXCLUDE_FILE',
         dest     = 'exclude_file')
 
+##  Write a list with stations for which the time-series files should be updated
+parser.add_argument('-u', '--update-ts-list',
+        action   = 'store',
+        required = False,
+        help     = 'Write a file with the list of stations for which the time-series '
+                   'files should be updated.',
+        metavar  = 'TS_UPDATE_LIST',
+        dest     = 'upd_ts_file',
+        default  = None )
+
 ##  also output an html table
 parser.add_argument('--html',
         action   = 'store_true',
@@ -263,24 +273,28 @@ if args.skip_database :
         if args.make_json:
             json_list.append( {"rinex": os.path.basename(RNX_FILE), "station": used_name.upper().strip(), "available": rnx_exists, "reference": rnx_is_ref, "exclude": rnx_is_excl} )
 
-    sys.exit( 0 )
+    sys.exit(0)
 
 ## try connecting to the database server
 try:
+    ## do we need to make a file with ts-update stations ?
+    if args.upd_ts_file is not None:
+        upd_ts_fout = open(args.upd_ts_file, 'w')
+
     db  = MySQLdb.connect(host   = args.db_host, 
                           user   = args.db_user, 
                           passwd = args.db_pass, 
                           db     = args.db_name)
     cur = db.cursor()
 
-    QUERY='SELECT stacode.mark_name_DSO, stacode.mark_name_OFF, stacode.mark_numb_OFF, stacode.station_name FROM stacode JOIN station ON stacode.stacode_id=station.stacode_id JOIN  sta2nets ON sta2nets.station_id=station.station_id JOIN network ON network.network_id=sta2nets.network_id WHERE network.network_name="%s";'%( args.network )
+    QUERY='SELECT stacode.mark_name_DSO, stacode.mark_name_OFF, stacode.mark_numb_OFF, stacode.station_name, sta2nets.upd_tssta FROM stacode JOIN station ON stacode.stacode_id=station.stacode_id JOIN sta2nets ON sta2nets.station_id=station.station_id JOIN network ON network.network_id=sta2nets.network_id WHERE network.network_name="%s";'%(args.network)
 
-    cur.execute( QUERY )
+    cur.execute(QUERY)
     SENTENCE = cur.fetchall()
     '''
     the answer should be a list of tuples, where each station of the network
     reports its name(DSO), name(official), number(official) full_name(?), e.g.
-    ('pdel', 'pdel', '31906M004', '')
+    ('pdel', 'pdel', '31906M004', '', [0 or 1])
     '''
     print '%-15s %-16s %-9s %-9s %-8s'\
         %("RINEX", "MARKER NAME", "AVAILABLE", "REFERENCE", "EXCLUDED")
@@ -296,6 +310,7 @@ try:
         rnx_fn_c      = tpl[0] + ('%s%s.%so'%(DoY, args.session, Cent))
         possible_rinex= [ os.path.join(args.pth2rnx, x) 
                         for x in [rnx_fn_a, rnx_fn_b, rnx_fn_c] ]
+        sta_ts_upd    = tpl[4]
         #rnx_file      = os.path.join(args.pth2rnx, rnx_filename)
         marker_name   = tpl[0]
         marker_number = tpl[2]
@@ -331,10 +346,16 @@ try:
         if args.make_json:
             json_list.append( {"rinex": os.path.basename(rnx_file), "station": used_name.upper().strip(), "available": rnx_exists, "reference": rnx_is_ref, "exclude": rnx_is_excl} )
 
+        if args.upd_ts_file is not None:
+            if sta_ts_upd == 1:
+                print >> upd_ts_fout, '{}'.format(used_name.upper().strip())
+
 except:
     traceback.print_exc()
     try: db.close()
     except: pass
+    if args.upd_ts_file is not None:
+        upd_ts_fout.close()
     print >> sys.stderr, '[ERROR] Cannot connect/query database server.'
     EXIT_STATUS = FAILURE
 
@@ -342,5 +363,7 @@ if args.make_html:
     print >>htmlout, "</table>"
 
 if args.make_json: json.dump(json_list, jsonout)
+
+if args.upd_ts_file is not None: upd_ts_fout.close()
 
 sys.exit(EXIT_STATUS)

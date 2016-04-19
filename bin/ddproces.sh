@@ -470,6 +470,10 @@ STAINF_EXT="STA"            ##  the extension
 # STA_EXCLUDE_FILE=
 USE_EUREF_EXCLUDE_LIST=NO
 
+##  Update station-specific time-series files
+UPDATE_STA_TS="NO"
+TS_DESCRIPTION=""
+
 ##  will we delete campaign files ?
 # SKIP_REMOVE=
 
@@ -537,7 +541,7 @@ getopt -T > /dev/null ## check getopt version
 if test $? -eq 4; then
   ##  GNU enhanced getopt is available
   ARGS=`getopt -o hvy:d:b:c:s:g:r:i:e:a:p: \
--l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,atl-file:,antex:,pcv-file:,stainf:,use-epn-exclude,exclude-list:,skip-remove,fix-file:,blq-file:,config:,refinf: \
+-l  help,version,year:,doy:,bern-loadgps:,campaign:,satellite-system:,tables-dir:,debug,logfile:,stations-per-cluster:,save-dir:,solution-id:,files-per-cluster:,elevation-angle:,analysis-center:,use-ntua-products:,append-suffix:,json-out:,repro2-prods,cod-repro13,atl-file:,antex:,pcv-file:,stainf:,use-epn-exclude,exclude-list:,skip-remove,fix-file:,blq-file:,config:,refinf:,update-ts,ts-description:,pth2ts: \
 -n 'ddprocess' -- "$@"`
 else
   ##  Original getopt is available (no long option names, no whitespace, no sorting)
@@ -727,6 +731,21 @@ do
       ;;
     --config)
       CONFIG_FILE="${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      shift
+      ;;
+    --update-ts)
+      UPDATE_STA_TS="YES"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
+      shift
+      ;;
+    --ts-description)
+      TS_DESCRIPTION="${2}"
+      printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
+      shift
+      ;;
+    --pth2ts)
+      PATH_TO_TS_FILES="${2}"
       printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\", \"arg\": \"%s\"}" "${1}" "${2}"
       shift
       ;;
@@ -926,6 +945,22 @@ if test "${COD_REPRO13}" == "YES" ; then
   fi
 fi
 
+##
+##  If we are going to update the stations time-series files, then the variable
+##+ 'PATH_TO_TS_FILES' should be set and valid.
+##
+if test ${UPDATE_STA_TS} = "YES" ; then
+  if [ -z ${PATH_TO_TS_FILES+x} ]; then
+    echoerr "[ERROR] Need to set the variable \"PATH_TO_TS_FILES\" to update station-specific time-series files."
+    exit 1
+  else
+    if ! test -d ${PATH_TO_TS_FILES} ; then
+      echoerr "[ERROR] Cannot find time-series directory: \"${PATH_TO_TS_FILES}\"."
+      exit 1
+    fi
+  fi
+fi
+
 ## 
 ##  Validate the station information file: see that it exists, and link it   
 ##+ from tables directory the the campaign's sta dir. We are first trying to
@@ -1029,7 +1064,7 @@ else
 fi
 
 ##
-##  Validate the reference coordinates/velocity file(s). these depend on the
+##  Validate the reference coordinates/velocity file(s). These depend on the
 ##+ variable FIXINF
 ##
 if test -z "${REFINF+x}" ; then
@@ -1322,6 +1357,7 @@ if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
               --rinex-path="${D}" \
               --exclude-file="${X_STA_FL}" \
               --json \
+              --update-ts-list=".sta-ts-upd" \
               1> .rnxsta.dat; then
     echoerr "[ERROR] Failed to compile rinex/station summary."
     clear_n_exit 1
@@ -1329,6 +1365,7 @@ if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
 else
   ##  Fuck the database; rinex should be placed in /RAW in lower and/or
   ##+ uppercase filenames.
+  ##  FIXME  This seems problematic! How can i skip the db ???
   if ! validate_ntwrnx.py \
               --db-host="" \
               --db-user="" \
@@ -1342,11 +1379,13 @@ else
               --exclude-file="${X_STA_FL}" \
               --skip-database \
               --json \
+              --update-ts-list=".sta-ts-upd" \
               1> .rnxsta.dat; then
     echoerr "[ERROR] Failed to compile rinex/station summary."
     clear_n_exit 1
   fi
 fi
+tmp_file_array+=(".sta-ts-upd")
 
 ## FIXME : remove that shit
 #echodbg "[DEBUG] Going to show you the RINEX info (just for debuging)"
@@ -1898,6 +1937,23 @@ fi
 } 1>>${JSON_OUT}
 
 printf 1>>${JSON_OUT} "],\n"
+
+##
+##  If needed, update the station-specific time-series files, using the list
+##+ made by validate_ntwrnx (i.e. the file '.sta-ts-upd')
+##
+if test ${UPDATE_STA_TS} = "YES"; then
+  echodbg "[DEBUG] Updating station-specific time-series files."
+  if ! ${P2ETC}/write_ts_info.py \
+      --addneq2-out=${P}/${CAMPAIGN}/OUT/${FINAL_SOLUTION_ID}${YEAR:2:2}${DOY_3C}0.OUT \
+      --ts-dir="${PATH_TO_TS_FILES}" \
+      --sta-file=".sta-ts-upd" ; then
+      echoerr "[ERRROR] Failed to update station-specific time-series files."
+      clear_n_exit 1
+  fi
+else
+  echodbg "[DEBUG] Skipping update of station-specific time-series files."
+fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ##  COMPILE (NON-FATAL) ERROR/WARNINGS FILE
