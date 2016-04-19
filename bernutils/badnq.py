@@ -717,7 +717,7 @@ class AddneqFile:
             print '[WARNING]', warn_str
 
   def toJson(self):
-    lst1  = self.get_station_coordinates() ## in the old days, this was a list!
+    lst1, refeph  = self.get_station_coordinates() ## in the old days, this was a list!
     dict1 = self.get_apriori_coordinates()
     assert len(lst1) == len(dict1)
     ##  combine into a single dictionary, with name as key

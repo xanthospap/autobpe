@@ -19,8 +19,16 @@ fi
 
 echo ""
 
+#grep "^\s*[^#].*=.*$" ${1} \
+#        | sed 's/ //g' \
+#        | awk -F"=" '/.*=.+/ {print "export",$0";"}'
+
+#grep "^TS_DESCRIPTION" ${1} \
+#        | sed 's/\s*=\s*/=/g'\
+#        | awk '{print "export",$0";"}'
+
 grep "^\s*[^#].*=.*$" ${1} \
-        | sed 's/ //g' \
+        | sed 's/\s*=\s*/=/g' \
         | awk -F"=" '/.*=.+/ {print "export",$0";"}'
 
 exit 0

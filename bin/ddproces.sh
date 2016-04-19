@@ -1947,7 +1947,8 @@ if test ${UPDATE_STA_TS} = "YES"; then
   if ! ${P2ETC}/write_ts_info.py \
       --addneq2-out=${P}/${CAMPAIGN}/OUT/${FINAL_SOLUTION_ID}${YEAR:2:2}${DOY_3C}0.OUT \
       --ts-dir="${PATH_TO_TS_FILES}" \
-      --sta-file=".sta-ts-upd" ; then
+      --sta-file=".sta-ts-upd" \
+      --description="${TS_DESCRIPTION}"; then
       echoerr "[ERRROR] Failed to update station-specific time-series files."
       clear_n_exit 1
   fi
