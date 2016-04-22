@@ -248,12 +248,12 @@ software      = software_dict[args.software]
 sat_sys       = satsys_dict[args.sat_sys]
 solution_type = soltype_dict[args.solution_type]
 try:
-    d = args.start_epoch; start_epoch = to_datetime( d )
-    d = args.stop_epoch ; stop_epoch  = to_datetime( d )
-    d = args.proc_epoch ; proc_epoch  = to_datetime( d )
+    d = args.start_epoch; start_epoch = to_datetime(d)
+    d = args.stop_epoch ; stop_epoch  = to_datetime(d)
+    d = args.proc_epoch ; proc_epoch  = to_datetime(d)
 except:
     print >> sys.stderr, '[ERROR] Failed to parse date: \"%s\"'%(d)
-    sys.exit( 1 )
+    sys.exit(1)
 
 SQL_INSERT_CMD = "INSERT INTO product \
 (\
@@ -310,4 +310,4 @@ except:
 try   : db.close()
 except: pass
 
-sys.exit( exit_status )
+sys.exit(exit_status)

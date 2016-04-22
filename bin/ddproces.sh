@@ -307,7 +307,7 @@ EOF
           --stop-epoch="${END_OF_DAY_STR/ /_}" \
           --save-host="${host}" \
           --save-dir="${SAVE_DIR_DIR}/${save_dir_p}/" \
-          --filename="${trg_f}.Z" \
+          --filename="${trg_f}" \
           --software=BERN52 \
           --db-host="${DB_HOST}" \
           --db-user="${DB_USER}" \
@@ -359,7 +359,7 @@ set_json_out () {
   ##
   ##  Search for the option --json-out and set the (global) JSON_OUT variable
   ##+ accordingly. If no such option is give, then JSON_OUT is set to /dev/null
-  ##+ i.e. we'll be sending json output to god.
+  ##+ i.e. we'll be sending json output to God.
   ##
   JSON_OUT=/dev/null
   OLD_IFS=${IFS}
@@ -512,11 +512,13 @@ touch ${TIME_STAMP_FILE}
 date > ${TIME_STAMP_FILE}
 tmp_file_array+=("${TIME_STAMP_FILE}")
 
+##
 ##  search through the cmd's to find the JSON_OUT (if any). We do this here,
 ##+ i.e before actually resolving any of the command-line-arguments, cause we
 ##+ want to be able to write to the json file from the begining of the script.
-##  Note that the JSON_OUT variable can be re-set when we resolve the configuration
-##+ file.
+##  Note that the JSON_OUT variable can be re-set when we resolve the
+##  configuration file.
+##
 set_json_out $@
 
 ##  load the configuration file (if any). This has to be done before
