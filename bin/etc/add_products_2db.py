@@ -61,7 +61,8 @@ prodtype_dict = {
   'ION'      : 'ION',
   'TRP_SNX'  : 'TRP_SINEX',
   'TRO_SNX'  : 'TRO_SINEX',
-  'CRD_FILE' : 'CRD_FILE'
+  'CRD_FILE' : 'CRD_FILE',
+  'DSO_JSON' : 'DSO_JSON'
 }
 
 software_dict = {

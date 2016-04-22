@@ -2066,6 +2066,18 @@ else
   rm validate_rnx.json
 fi
 
+##  Save the json out file and add an entry to the database. First copy the
+##+ json file to campaign's OUT dir
+if test ${JSON_OUT} != "/dev/null" ; then
+  if ! cp ${JSON_OUT} ${P}/${CAMPAIGN}/OUT/${FINAL_SOLUTION_ID}${YEAR:2:2}${DOY_3C}0.json ; then
+    echoerr "[ERROR] Failed to locate and copy json file \"${JSON_OUT}\"."
+    clear_n_exit 1
+  fi
+  if ! save_n_update json OUT DSO_JSON F $SAVE_PRD_FORMAT $save_dir_dir ; then
+    clear_n_exit 1
+  fi
+fi
+
 STOP_DD=$(date +%s.%N)
 
 ##  PRINT TIME INFO
