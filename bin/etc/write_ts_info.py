@@ -105,7 +105,7 @@ for key, val in stad.iteritems():
         sta_id = key.strip()[0:4].lower()
         try:
             tsf = open(os.path.join(args.pth2ts, sta_id, (sta_id+'.cts')), 'a')
-            print >> tsf, '{:+15.5f} {:9.5f} {:+15.5f} {:9.5f} {:+15.5f} {:9.5f} {:+13.8f} {:9.5f} {:+13.8f} {:9.5f} {:12.5f} {:9.5f} {:} {:}'.format(val[0][1], val[0][3], val[1][1], val[1][3], val[2][1], val[2][3], val[4][1], val[4][3], val[5][1], val[5][3], val[3][1], val[3][3], datetime.datetime.now(), args.description)
+            print >> tsf, '{:} {:+15.5f} {:9.5f} {:+15.5f} {:9.5f} {:+15.5f} {:9.5f} {:+13.8f} {:9.5f} {:+13.8f} {:9.5f} {:12.5f} {:9.5f} {:} {:}'.format(refeph, val[0][1], val[0][3], val[1][1], val[1][3], val[2][1], val[2][3], val[4][1], val[4][3], val[5][1], val[5][3], val[3][1], val[3][3], datetime.datetime.now(), args.description)
             tsf.close()
         except:
             print >> sys.stderr, '[ERROR] Failed to update time-series records for station \"{}\"'.format(sta_id)
