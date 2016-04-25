@@ -5,8 +5,8 @@ amb_dict  = {'cbwl': '#AR_WL',
   'cbnl': '#AR_NL',
   'pbwl': '#AR_L5',
   'pbnl': '#AR_L3',
-  'qif': '#AR_QIF',
-  'l12': '#AR_L12'
+  'qif' : '#AR_QIF',
+  'l12' : '#AR_L12'
 }
 ''' Ambiguity resolution method short names (id's) and their equivelant
     representation in Bernese v5.2 ambiguity summary files (.SUM).
@@ -108,7 +108,7 @@ class AmbLine:
     return sys, satsys_dict[sys]
 
   def tojson(self):
-    jstr = "{\"baseline\":\"%s\", \"station1\":\"%s\", \"station2\":\"%s\", \"length\": %6.1f, \"method\": \"%s\", \"num_of_ambs\": %5i, \"percent\": %4.1f, \"satsys\": \"%s\" }"%(self.baseline(),self.station1(), self.station2(), self.length(), self.method(), self.ambsbefore()[0], self.percent(),self.satsys()[1])
+    jstr = "{\"baseline\":\"%s\", \"station1\":\"%s\", \"station2\":\"%s\", \"length\": %6.1f, \"method\": \"%s\", \"num_of_ambs\": %5i, \"percent\": %4.1f, \"satsys\": \"%s\", \"receiver1\":\"%s\",\"receiver2\":\"%s\"}"%(self.baseline(),self.station1(), self.station2(), self.length(), self.method(), self.ambsbefore()[0], self.percent(),self.satsys()[1], self.receiver1(), self.receiver2())
     return jstr
 
 class AmbFile:

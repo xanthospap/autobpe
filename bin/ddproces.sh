@@ -945,6 +945,11 @@ if test "${COD_REPRO13}" == "YES" ; then
     echoerr "[ERROR] repro13 products only available from CODE"
     exit 1
   fi
+  if test ${YEAR} -gt 2013 ; then
+    echodbg "[DEBUG] CODE's REPRO13 campaign covers the years [1994 - 2013]"
+    echodbg "        Noe REPRO13 products will be used."
+    COD_REPRO13="NO"
+  fi
 fi
 
 ##
