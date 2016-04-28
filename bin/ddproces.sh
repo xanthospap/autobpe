@@ -313,8 +313,10 @@ EOF
           --db-user="${DB_USER}" \
           --db-pass="${DB_PASS}" \
           --db-name="${DB_NAME}" ; then
-    printf 1>>${JSON_OUT} "{\"prod_type\":\"%s\",\"extension\":\"%s\",\"local_dir\":\"%s\",\"sol_type\":\"%s\",\"filename\":\"%s\",\"savedas\":\"%s\",\"host\":\"%s\",\"host_dir\":\"%s\"}" \
+    if test "${3}" != "DSO_JSON" ; then
+      printf 1>>${JSON_OUT} "{\"prod_type\":\"%s\",\"extension\":\"%s\",\"local_dir\":\"%s\",\"sol_type\":\"%s\",\"filename\":\"%s\",\"savedas\":\"%s\",\"host\":\"%s\",\"host_dir\":\"%s\"}" \
       "${3}" "${1}" "${2}" "${solution_id}" "${src_f}" "${trg_f}" "${host}" "${SOL_DIR}/${save_dir_p}/"
+    fi
       # echodbg "[DEBUG] DB updated to include file \"${src_f}\" as :"
       # echodbg "        \"${SAVE_DIR_DIR}/${save_dir_p}/${trg_f}.Z\" @ \"${host}\"."
     else
@@ -2071,11 +2073,13 @@ printf 1>>${JSON_OUT} "\n}"
 ##
 ##  Merge the json file with the temporary json created from validate_ntwrnx.py
 ##
-if ! ${P2ETC}/merge_json_dds.py validate_rnx.json ${JSON_OUT}; then
-  echoerr "[ERROR] Failed to merge json files \"validate_rnx.json\" and \"${JSON_OUT}\"".
-else
-  mv merged.json ${JSON_OUT}
-  rm validate_rnx.json
+if test ${JSON_OUT} != "/dev/null" ; then
+  if ! ${P2ETC}/merge_json_dds.py validate_rnx.json ${JSON_OUT}; then
+    echoerr "[ERROR] Failed to merge json files \"validate_rnx.json\" and \"${JSON_OUT}\"".
+  else
+    mv merged.json ${JSON_OUT}
+    rm validate_rnx.json
+  fi
 fi
 
 ##  Save the json out file and add an entry to the database. First copy the
