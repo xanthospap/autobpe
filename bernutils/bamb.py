@@ -104,6 +104,11 @@ class AmbLine:
     ''' Return the satellite system id. '''
     sys = self.__lns[9].strip()
     if not sys in satsys_dict:
+      try: ## this is probably a bug in Bernese but the satsys string is sometimes missing!
+        float(sys)
+        return 'G', satsys_dict['G']
+      except:
+        pass
       raise RuntimeError('Invalid satellite system string %s' %sys)
     return sys, satsys_dict[sys]
 
