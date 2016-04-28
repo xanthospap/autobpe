@@ -1026,6 +1026,7 @@ else
       clear_n_exit 1
     else
       echodbg "[DEBUG] Using BLQ file: \"${blq_src}\"."
+      ls -l ${P}/${CAMPAIGN}/STA/${BLQINF}.BLQ
       tmp_file_array+=("${blq_trg}")
     fi
   else

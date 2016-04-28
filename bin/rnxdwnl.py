@@ -247,14 +247,15 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
   path_ = infolist[7]
   
   ## special case for uranus network
-  if infolist[4] == 'TREECOMP' or infolist[4] == 'TREECOMP2' :
-    try:
+  #if infolist[4] == 'TREECOMP' or infolist[4] == 'TREECOMP2' :
+  #  try:
       ## path_ += infolist[3] + '/' + year[2:2] + '/' + dom + '/'
-      path_ = path_.replace('_FULL_STA_NAME_',infolist[3])
-      path_ = path_.replace('_MMMM_',month)
-      path_ = path_.replace('_DOM_',dom)
-    except:
-      raise ValueError('[ERROR]. Failed to make URANUS path: [%s]'%(infolist))
+  path_ = path_.replace('_FULL_STA_NAME_',infolist[3])
+  path_ = path_.replace('_OFF_STA_NAME_',infolist[2])
+  path_ = path_.replace('_MMMM_',month)
+  path_ = path_.replace('_DOM_',dom)
+   # except:
+  #    raise ValueError('[ERROR]. Failed to make URANUS path: [%s]'%(infolist))
   if path_[0] == '/': path_ = path_[1:]
 
   ## set the filename (to download)
