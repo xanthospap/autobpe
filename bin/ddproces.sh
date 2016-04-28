@@ -1422,6 +1422,13 @@ if test ${#REF_STA_ARRAY[@]} -lt 5; then
   echoerr "[WARNING] Two few reference stations (${#REF_STA_ARRAY[@]})"
 fi
 
+## make sure we have at ;east some non-reference stations
+if test "${#REF_STA_ARRAY[@]}" -eq "${#STA_ARRAY[@]}" ; then
+  echoerr "[DEBUG] Only reference stations available; nothing to do."
+  echoerr "        ${#REF_STA_ARRAY[@]}/${#STA_ARRAY[@]} are reference."
+  exit 1
+fi
+
 ## transfer all available rinex to RAW/ and uncompress them
 unix_ucmpr() { ##  run uncompress if file ends with '.Z'
   if test "${1:(-2)}" == ".Z" ; then
