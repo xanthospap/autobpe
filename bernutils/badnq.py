@@ -719,6 +719,17 @@ class AddneqFile:
   def toJson(self):
     lst1, refeph  = self.get_station_coordinates() ## in the old days, this was a list!
     dict1 = self.get_apriori_coordinates()
+    #if len(lst1) > len(dict1):
+    #    l1 = lst1
+    #    l2 = dict1
+    #    l = 'dict'
+    #else:
+    #    l1 = dict1
+    #    l2 = lst1
+    #    l = 'lst1'
+    #for k in l1:
+    #    if k not in l2:
+    #        print 'missing station', k, 'from', l
     assert len(lst1) == len(dict1)
     ##  combine into a single dictionary, with name as key
     ##+ and values of type FullStationRecord

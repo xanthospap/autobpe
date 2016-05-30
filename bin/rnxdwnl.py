@@ -244,7 +244,7 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
   host_ = host_.rstrip('/')
 
   ## compile the path to the file
-  path_ = infolist[7]
+  path_ = infolist[7].strip('/')
   
   ## special case for uranus network
   #if infolist[4] == 'TREECOMP' or infolist[4] == 'TREECOMP2' :
@@ -277,10 +277,13 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
     savef_ = odir.rstrip('/') + '/' + savef_
 
   ## return the command as string
+  uri = '/'.join(s.lstrip('/') for s in [host_, path_, filename_])
   if infolist[5] == "ssh": ## scp -> saved file at the end (no -O switch)
-    return (command_ + ' ' + os.path.join(host_, path_, filename_) + ' ' + savef_), savef_
+    return (command_ + ' ' + uri + ' ' + savef_), savef_
   else:
-    return (command_ + ' -O ' + savef_ + ' ' + os.path.join(host_, path_, filename_)), savef_
+    # print '--MF joining [{:s}] + [{:s}] + [{:s}]'.format(host_, path_, filename_)
+    uri = '/'.join(s.rstrip('/') for s in [host_, path_, filename_])
+    return (command_ + ' -O ' + savef_ + ' ' + uri), savef_
 
 ##  set the cmd parser
 parser = argparse.ArgumentParser(

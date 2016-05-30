@@ -56,6 +56,10 @@ class CrdPoint:
 
   def name(self): return self.name_
 
+  def x(self): return self.xcmp_
+  def y(self): return self.ycmp_
+  def z(self): return self.zcmp_
+
   def asString(self, aa=1):
     ''' Compile a Bernese v5.2 .CRD file record line, using the instance's
         attributes. ``aa`` is the number of station (can be any positive 
