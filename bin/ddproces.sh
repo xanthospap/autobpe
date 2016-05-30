@@ -1306,6 +1306,20 @@ START_RD=$(date +%s.%N)
 >.rnxsta.dat ## temporary file
 tmp_file_array+=('.rnxsta.dat')
 
+##  Note: We need to clear the RAW/ and OBS/ folders of older data so that
+##+ they don't get processed.
+if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
+  if ls ${P}/${CAMPAIGN}/RAW/????${DOY_3C}0.${YEAR:2:2}O &>/dev/null ; then
+    echodbg "[DEBUG] Removing old rinex files from \"/RAW\" dir."
+    for i in ${P}/${CAMPAIGN}/RAW/????${DOY_3C}0.${YEAR:2:2}O ; do rm $i ; done
+  fi
+fi
+
+if ls ${P}/${CAMPAIGN}/OBS/????${DOY_3C}0.??? &>/dev/null ; then
+  echodbg "[DEBUG] Removing old observation files from \"/OBS\"."
+  for i in ${P}/${CAMPAIGN}/OBS/????${DOY_3C}0.??? ; do rm $i ; done
+fi
+
 if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
   ##  download the rinex files for the input network; the database knows 
   ##+ the details .... Call rnxdwnl.py
@@ -1315,6 +1329,7 @@ if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
                 --doy=${DOY} \
                 --path=${D} \
                 --marker-rename \
+                --min-file-size=5 \
                 --db-host="${DB_HOST}" \
                 --db-user="${DB_USER}" \
                 --db-pass="${DB_PASS}" \
@@ -1397,10 +1412,6 @@ else
 fi
 tmp_file_array+=(".sta-ts-upd")
 
-## FIXME : remove that shit
-#echodbg "[DEBUG] Going to show you the RINEX info (just for debuging)"
-#cat .rnxsta.dat
-
 declare -a RNX_ARRAY     ##  array to hold available rinex files;
                          ##+ no path; compressed
 declare -a STA_ARRAY     ##  array to hold available station names
@@ -1449,19 +1460,31 @@ crx2rnx_if() { ##  run CRX2RNX if file ends with 'd' or 'D'
     return 0
   fi
 }
-##  Note: We need to clear the RAW/ and OBS/ folders of older data so that
-##+ they don't get processed.
-if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
-  if ls ${P}/${CAMPAIGN}/RAW/????${DOY_3C}0.${YEAR:2:2}O &>/dev/null ; then
-    echodbg "[DEBUG] Removing old rinex files from \"/RAW\" dir."
-    for i in ${P}/${CAMPAIGN}/RAW/????${DOY_3C}0.${YEAR:2:2}O ; do rm $i ; done
-  fi
-fi
-
-if ls ${P}/${CAMPAIGN}/OBS/????${DOY_3C}0.??? &>/dev/null ; then
-  echodbg "[DEBUG] Removing old observation files from \"/OBS\"."
-  for i in ${P}/${CAMPAIGN}/OBS/????${DOY_3C}0.??? ; do rm $i ; done
-fi
+##  remove a station from the rinex/station lists
+rmrnxlst() {
+  sta=${1^^}
+  
+  del=
+  for l in "${RNX_ARRAY[@]}" ; do
+    s=${l^^}
+    if test ${sta:0:4} = ${s:0:4} ; then del=${l} ; fi
+  done
+  RNX_ARRAY=(${RNX_ARRAY[@]/$del})
+  
+  del=
+  for l in "${STA_ARRAY[@]}" ; do
+    s=${l^^}
+    if test ${sta:0:4} = ${s:0:4} ; then del=${l} ; fi
+  done
+  STA_ARRAY=(${STA_ARRAY[@]/$del})
+  
+  del=
+  for l in "${REF_STA_ARRAY[@]}" ; do
+    s=${l^^}
+    if test ${sta:0:4} = ${s:0:4} ; then del=${l} ; fi
+  done
+  REF_STA_ARRAY=(${REF_STA_ARRAY[@]/$del})
+}
 
 if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
   ## Uncompress/Copy/...
@@ -1476,6 +1499,7 @@ if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
       :
     else
       echoerr "[ERROR] Failed to manipulate rinex file \"${RNX}\"."
+      echoerr "        Removing rinex \"$RNX\"."
       clear_n_exit 1
     fi
   done

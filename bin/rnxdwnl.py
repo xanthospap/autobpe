@@ -241,7 +241,7 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
   else:
     raise ValueError('[ERROR]. Invalid server protocol: [%s]'%infolist[5])
   # remove last "/" in host (if any)
-  if host_[-1] == '/' : host_ = host_[:-1]
+  host_ = host_.rstrip('/')
 
   ## compile the path to the file
   path_ = infolist[7]
@@ -249,14 +249,14 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
   ## special case for uranus network
   #if infolist[4] == 'TREECOMP' or infolist[4] == 'TREECOMP2' :
   #  try:
-      ## path_ += infolist[3] + '/' + year[2:2] + '/' + dom + '/'
+  ## path_ += infolist[3] + '/' + year[2:2] + '/' + dom + '/'
   path_ = path_.replace('_FULL_STA_NAME_',infolist[3])
   path_ = path_.replace('_OFF_STA_NAME_',infolist[2])
   path_ = path_.replace('_MMMM_',month)
   path_ = path_.replace('_DOM_',dom)
-   # except:
+  # except:
   #    raise ValueError('[ERROR]. Failed to make URANUS path: [%s]'%(infolist))
-  if path_[0] == '/': path_ = path_[1:]
+  path_ = path_.rstrip('/')
 
   ## set the filename (to download)
   session_identifier = '0'
@@ -267,15 +267,14 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
     else:
       session_identifier = ses_identifiers[hour];
   filename_ = infolist[2] + doy + session_identifier + '.' + year[2:] + 'd.Z'
-  if filename_[0] == '/': filename_ = filename_[1:]
+  filename_ = filename_.lstrip('/')
 
   ## set the filename (to save)
   savef_ = infolist[1] + doy + session_identifier + '.' + year[2:] + 'd.Z';
   if toUpperCase:
     savef_ = savef_.upper()
   if odir != '':
-    if odir[-1] == '/': odir = odir[:-1]
-    savef_ = odir + '/' + savef_
+    savef_ = odir.rstrip('/') + '/' + savef_
 
   ## return the command as string
   if infolist[5] == "ssh": ## scp -> saved file at the end (no -O switch)
@@ -403,6 +402,15 @@ parser.add_argument('--db-name',
     dest     = 'db_name',
     default  = ''
     )
+##  Minimum file size in K
+parser.add_argument('--min-file-size',
+    action = 'store',
+    required = False,
+    help = 'The minimum file size; any file with size smaller than this will be deleted.',
+    metavar = 'MIN_SIZE_IN_K',
+    dest = 'min_file_size',
+    default = '0'
+)
 
 ##  Parse command line arguments
 args = parser.parse_args()
@@ -507,24 +515,19 @@ for row in station_info:
 
     ## Now, execute each command in the commands array to actually download
     ## the data.
-    for cmd, sf in zip(commands, svfiles):
-        ## replace variables (_YYYY_, _DDD_ )
-        cmd = cmd.replace('_YYYY_', Year)
-        cmd = cmd.replace('_DDD_', DoY)
-        cmd = cmd.replace('_YY_', Cent)
+    ## first, replace variables (_YYYY_, _DDD_ )
+    cmd =  cmd.replace('_YYYY_', Year).replace('_DDD_', DoY).replace('_YY_', Cent)
+    svfl= svfl.replace('_YYYY_', Year).replace('_DDD_', DoY).replace('_YY_', Cent)
+    sf  = svfl
 
     ## Execute the command
     ## WAIT !! do not download the file if it already exists AND has
     ## size > 0. Or just delete!
     rinex_already_exists = False
     possible_duplicates  = [ 
-                sf, 
-                sf.replace('.Z', ''  ), 
-                sf.replace('d.Z', 'd'),
-                sf.replace('d.Z', 'o')
-                ]
-    for pd in possible_duplicates : 
-        if os.path.isfile(pd) and os.path.getsize(pd):
+                sf, re.sub(r".Z$", "", sf), re.sub(r"d.Z$", "d", sf), re.sub(r"d.Z$", "o", sf), ]
+    for pd in possible_duplicates :
+        if os.path.isfile(pd) and os.path.getsize(pd)*1024 > max(0, int(args.min_file_size)):
             if args.force_remove:
                 vprint ('[DEBUG] Removing rinex file \'%s\'.'%pd, 1, sys.stdout)
                 os.remove(pd)
@@ -541,11 +544,11 @@ for row in station_info:
         except ValueError as e:
             vprint('[ERROR] Failed to download file \"%s\"'%sf, 1, sys.stderr)
 
-    ## check for empty file
-    if os.path.isfile(sf) and not os.path.getsize(sf):
-        vprint('[DEBUG] Removing empty file \"%s\"'%sf, 2, sys.stderr)
+    ## check for empty/small file
+    if os.path.isfile(sf) and os.path.getsize(sf)*1024 <= max(0, int(args.min_file_size)):
+        vprint('[DEBUG] Removing empty or small file \"%s\" (size %3i Kb)'%(sf, os.path.getsize(sf)*1024), 1, sys.stderr)
         os.remove(sf)
-        
+
     if os.path.isfile(sf):
     #    ## if needed, check/repair the marker name and number
         if args.rename_markers: subMarkerName(sf, row[1].upper(), row[12])
