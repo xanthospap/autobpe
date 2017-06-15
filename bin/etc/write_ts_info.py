@@ -7,7 +7,9 @@ import bernutils.badnq
 ##  set the cmd parser
 parser = argparse.ArgumentParser(
     description='Extract station coordinates from an ADDNEQ2 output file and '
-    'write them to station-specific time-series files.',
+    'write them to station-specific time-series files. Note that the station'
+    '-specific time-series files and folders, should be in LOWERCASE, regardless'
+    'of how they are mentioned in any other file/database.',
     epilog ='Ntua - 2016'
     )
 
@@ -34,7 +36,10 @@ parser.add_argument('-d', '--ts-dir',
 parser.add_argument('-s', '--sta-file',
     action   = 'store',
     required = False,
-    help     = 'A file containing a list of stations to be extracted.',
+    help     = 'A file containing a list of stations to be extracted. Even if a station name'
+               'is given in UPPERCASE, note that the script will translate the name to'
+               'LOWERCASE, and then try to match the correct file. Always keep the'
+               't-be-updated files LOWERCASE.',
     metavar  = 'STA_FILE',
     dest     = 'sta_file'
     )
@@ -76,6 +81,11 @@ if status == ERROR : sys.exit(ERROR)
 
 ##  list of stations to be etracted from ADDNEQ file. Station names are extracted
 ##+ as 4-char id's.
+##  -- Warning -- Station specific ts-files and folders, should be in lowercase.
+##+               That is, if we have a station named 'AKYR' in the (ADDNEQ)
+##+               output file (or wherever), the script will try to find the file
+##+               PATH_TO_TS/akyr/akyr.cts. Always lower, regardless the actual
+##+               station name (in any file or the database).
 sta_lst = []
 if args.sta_file is not None:
     if not os.path.isfile(args.sta_file):

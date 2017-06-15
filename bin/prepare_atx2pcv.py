@@ -153,9 +153,9 @@ parser.add_argument('-m', '--calibration-type',
     action='store',
     required=False,
     help='The atx/pcv calibration model; used as the extension of the'
-    'satellite information file (SATELLIT). Default value is \'I08\'',
-    default='I08',
-    choices=['I01', 'I08'],
+    'satellite information file (SATELLIT). Default value is \'I14\'',
+    default='I14',
+    choices=['I01', 'I08', 'I14'],
     metavar='PCVEXT',
     dest='type_ext'
     )
@@ -208,7 +208,7 @@ parser.add_argument('--no-link',
     action='store_false',
     help='If this switch is specified, then a link will **NOT** be made from'
     'the output PHG file to ${X}/EGN directory. By default, this link will'
-    'be made (changing .PHG to .I08).',
+    'be made (changing .PHG to .I14).',
     dest='link_to_gen'
     )
 

@@ -373,7 +373,7 @@ set_json_out () {
         echoerr "[ERROR] Invalid cmd: $i"
         exit 1
       fi
-      ##  echo "--Setting json-out to ${arr[1]}"
+      #echo "--Setting json-out to ${arr[1]}"
       JSON_OUT="${arr[1]}"
       break
     fi
@@ -447,7 +447,7 @@ USE_REPRO2=NO
 COD_REPRO13=NO
 
 ## pcv and antex related variables ##
-PCV_EXT=I08
+PCV_EXT=I14
 # PCVINF=
 # ATXINF=
 
@@ -470,7 +470,7 @@ STAINF_EXT="STA"            ##  the extension
 
 ##  exclude file/stations
 # STA_EXCLUDE_FILE=
-USE_EUREF_EXCLUDE_LIST=NO
+USE_EPN_EXCLUDE_LIST=NO
 
 ##  Update station-specific time-series files
 UPDATE_STA_TS="NO"
@@ -514,6 +514,14 @@ touch ${TIME_STAMP_FILE}
 date > ${TIME_STAMP_FILE}
 tmp_file_array+=("${TIME_STAMP_FILE}")
 
+##  load the configuration file (if any). This has to be done before
+##+ storing the command line args.
+CONFIG_FILE=$(find_config_file "$@")
+if [ ! -z "${CONFIG_FILE+x}" ] && [ "${CONFIG_FILE}" != "" ] ; then
+  eval $(etc/source_dd_config.sh $CONFIG_FILE)
+  echo "[DEBUG] Found and loaded configuration file: \"${CONFIG_FILE}\"."
+fi
+
 ##
 ##  search through the cmd's to find the JSON_OUT (if any). We do this here,
 ##+ i.e before actually resolving any of the command-line-arguments, cause we
@@ -522,14 +530,6 @@ tmp_file_array+=("${TIME_STAMP_FILE}")
 ##  configuration file.
 ##
 set_json_out $@
-
-##  load the configuration file (if any). This has to be done before
-##+ storing the command line args.
-CONFIG_FILE=$(find_config_file "$@")
-if [ ! -z "${CONFIG_FILE+x}" ] && [ "${CONFIG_FILE}" != "" ] ; then
-  eval $(etc/source_dd_config.sh $CONFIG_FILE)
-  echo "[DEBUG] Found and loaded configuration file: \"${CONFIG_FILE}\"."
-fi
 
 ## ////////////////////////////////////////////////////////////////////////////
 ## GET/EXPAND COMMAND LINE ARGUMENTS
@@ -716,7 +716,7 @@ do
       shift
       ;;
     --use-epn-exclude)
-      USE_EUREF_EXCLUDE_LIST=YES
+      USE_EPN_EXCLUDE_LIST=YES
       printf 1>>${JSON_OUT} "\n{\"switch\":\"%s\"}" "${1}"
       ;;
     --skip-remove)
@@ -1290,7 +1290,7 @@ printf "\n},\n"
 ##  Lastly, copy and uncompress (.Z && crx2rnx) the files in the campaign's /RAW
 ##+ directory.
 ##
-##  Note that if 'USE_EUREF_EXCLUDE_LIST' is set to 'YES', then we are going to
+##  Note that if 'USE_EPN_EXCLUDE_LIST' is set to 'YES', then we are going to
 ##+ call the program get_euref_excl_list.sh to download EUREF's weekly station
 ##+ exclusion list and append it to the file '.sta2exclude'.
 ##  If the user has specified his own exclusion list (via the variable 'STA_EXCLUDE_FILE')
@@ -1346,7 +1346,7 @@ X_STA_FL=.sta2exclude
 >${X_STA_FL}
 tmp_file_array+=("${X_STA_FL}")
 
-if test "${USE_EUREF_EXCLUDE_LIST}" = "YES" ; then
+if test "${USE_EPN_EXCLUDE_LIST}" = "YES" ; then
   echodbg "[DEBUG] Using EUREF's exclusion list."
   if ! ${P2ETC}/get_euref_excl_list.sh ${YEAR} ${DOY} 1>${X_STA_FL} ; then
     echoerr "[WARNING] Failed to download Euref exclusion list!"
@@ -1464,26 +1464,20 @@ crx2rnx_if() { ##  run CRX2RNX if file ends with 'd' or 'D'
 rmrnxlst() {
   sta=${1^^}
   
-  del=
-  for l in "${RNX_ARRAY[@]}" ; do
-    s=${l^^}
-    if test ${sta:0:4} = ${s:0:4} ; then del=${l} ; fi
+  for i in "${!RNX_ARRAY[@]}" ; do
+    s="${RNX_ARRAY[i]^^}"
+    if test "${sta:0:4}" = "${s:0:4}" ; then unset 'RNX_ARRAY[i]'; fi
   done
-  RNX_ARRAY=(${RNX_ARRAY[@]/$del})
   
-  del=
-  for l in "${STA_ARRAY[@]}" ; do
-    s=${l^^}
-    if test ${sta:0:4} = ${s:0:4} ; then del=${l} ; fi
+  for i in "${!STA_ARRAY[@]}" ; do
+    s="${STA_ARRAY[i]^^}"
+    if test "${sta:0:4}" = "${s:0:4}" ; then unset 'STA_ARRAY[i]'; fi
   done
-  STA_ARRAY=(${STA_ARRAY[@]/$del})
   
-  del=
-  for l in "${REF_STA_ARRAY[@]}" ; do
-    s=${l^^}
-    if test ${sta:0:4} = ${s:0:4} ; then del=${l} ; fi
+  for i in "${!REF_STA_ARRAY[@]}" ; do
+    s="${REF_STA_ARRAY[i]^^}"
+    if test "${sta:0:4}" = "${s:0:4}" ; then unset 'REF_STA_ARRAY[i]'; fi
   done
-  REF_STA_ARRAY=(${REF_STA_ARRAY[@]/$del})
 }
 
 if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
@@ -1500,7 +1494,10 @@ if ! test "${SKIP_RNX_DOWNLOAD}" == "YES"; then
     else
       echoerr "[ERROR] Failed to manipulate rinex file \"${RNX}\"."
       echoerr "        Removing rinex \"$RNX\"."
-      clear_n_exit 1
+      # clear_n_exit 1
+      rm ${P}/${CAMPAIGN}/RAW/${RNX:0:-1}* 2>/dev/null
+      echo "[DEBUG] Removing \"${P}/${CAMPAIGN}/RAW/${RNX:0:-1}\""
+      rmrnxlst ${i}
     fi
   done
 fi
@@ -1510,7 +1507,7 @@ fi
 >.station-names.dat
 for sta in "${STA_ARRAY[@]}"; do echo $sta >> .station-names.dat; done
 tmp_file_array+=('.station-names.dat')
- 
+
 STOP_RD=$(date +%s.%N)
 
 ## ////////////////////////////////////////////////////////////////////////////

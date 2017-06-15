@@ -152,7 +152,14 @@ def subMarkerName(filename, marker_name, marker_number=""):
     if marker_number == "": marker_number = " "*9
 
     #  what the RINEX actualy has ...
-    info_dict = getRinexMarkerName(filename)
+    try:
+        info_dict = getRinexMarkerName(filename)
+    except ValueError:
+        print >> sys.stderr, '[ERROR] Cannot uncompress file \'%s\'.'%(filename)
+        print >> sys.stderr, '        Rinex will be removed!'
+        os.remove(filename)
+        return
+
     if info_dict["marker_name"] == '':
         print >> sys.stderr, '[ERROR] Cannot find \'MARKER NAME\' in Rinex file \'%s\''%(filename)
 
@@ -250,7 +257,8 @@ def setDownloadCommand(infolist, dtime, hour=None, odir=None, toUpperCase=False)
   #if infolist[4] == 'TREECOMP' or infolist[4] == 'TREECOMP2' :
   #  try:
   ## path_ += infolist[3] + '/' + year[2:2] + '/' + dom + '/'
-  path_ = path_.replace('_FULL_STA_NAME_',infolist[3])
+  if infolist[3] is not None:
+    path_ = path_.replace('_FULL_STA_NAME_',infolist[3])
   path_ = path_.replace('_OFF_STA_NAME_',infolist[2])
   path_ = path_.replace('_MMMM_',month)
   path_ = path_.replace('_DOM_',dom)
@@ -553,7 +561,8 @@ for row in station_info:
         os.remove(sf)
 
     if os.path.isfile(sf):
-    #    ## if needed, check/repair the marker name and number
-        if args.rename_markers: subMarkerName(sf, row[1].upper(), row[12])
+        ## if needed, check/repair the marker name and number
+        if args.rename_markers:
+            subMarkerName(sf, row[1].upper(), row[12])
 
 sys.exit(0)

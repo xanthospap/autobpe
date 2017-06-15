@@ -329,6 +329,7 @@ try:
 
         rnx_file = ''
         for rnx in possible_rinex:
+            #print>>sys.stderr, "checking for rinex: %s"%(rnx)
             if os.path.isfile(rnx):
                 rnx_file   = rnx
                 rnx_exists = 'Yes'
