@@ -447,7 +447,7 @@ USE_REPRO2=NO
 COD_REPRO13=NO
 
 ## pcv and antex related variables ##
-PCV_EXT=I14
+PCV_EXT=I08
 # PCVINF=
 # ATXINF=
 
@@ -1754,6 +1754,11 @@ if ! test -f ${U}/PCF/${PCF_FILE}; then
   clear_n_exit 1
 fi
 
+if test "${PCV}" == "I14" ; then
+  REFPSD=IGS14
+else
+  REFPSD=
+fi
 if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" 1>>${JSON_OUT} \
         B="${AC^^}" \
         C="${PRELIM_SOLUTION_ID}" \
@@ -1770,6 +1775,7 @@ if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" 1>>${JSON_OUT} \
         ELANG="${ELEVATION_ANGLE}" \
         FIXINF="${FIXINF}" \
         REFINF="${REFINF}" \
+        REFPSD="${REFPSD}" \
         CLU="${FILES_PER_CLUSTER}"; then
   echoerr "[ERROR] Failed to set variables in PCF file."
   clear_n_exit 1
