@@ -447,7 +447,7 @@ USE_REPRO2=NO
 COD_REPRO13=NO
 
 ## pcv and antex related variables ##
-PCV_EXT=I08
+PCV_EXT=I14
 # PCVINF=
 # ATXINF=
 
@@ -518,7 +518,7 @@ tmp_file_array+=("${TIME_STAMP_FILE}")
 ##+ storing the command line args.
 CONFIG_FILE=$(find_config_file "$@")
 if [ ! -z "${CONFIG_FILE+x}" ] && [ "${CONFIG_FILE}" != "" ] ; then
-  eval $(etc/source_dd_config.sh $CONFIG_FILE)
+  eval $(source_dd_config.sh $CONFIG_FILE)
   echo "[DEBUG] Found and loaded configuration file: \"${CONFIG_FILE}\"."
 fi
 
@@ -1094,6 +1094,21 @@ for ext in CRD VEL ; do
     fi
   fi
 done
+## if using the IGS14 reference frame (aka REFINF=IGS14 or PCV_EXT=14) then
+## we must also check and set a .PSD file, aka REFINF.PSD
+REFPSD=""
+if test "${REFINF}" = "IGS14" || test "${PCV_EXT}" = "I14" ; then
+  echo "[DEBUG] Using a *14 Reference Frame; Checking for the respective PSD file"
+  REFPSD="${REFINF}"
+  if ! test -f ${P}/${CAMPAIGN}/STA/${REFINF}.PSD ; then
+    if ! test -f ${TABLES_DIR}/crd/${REFINF}.PSD ; then
+      echoerr "[ERROR] Cannot find file ${REFINF}.PSD in either ${P}/${CAMPAIGN}/STA or  ${TABLES_DIR}/crd dirs."
+      clear_n_exit 1
+    else
+      ln -s ${TABLES_DIR}/crd/${REFINF}.PSD ${P}/${CAMPAIGN}/STA/${REFINF}.PSD
+    fi
+  fi
+fi
 
 ## 
 ##  Validate the fix file. If set, we are going to search for it, 1) in the 
@@ -1754,11 +1769,6 @@ if ! test -f ${U}/PCF/${PCF_FILE}; then
   clear_n_exit 1
 fi
 
-if test "${PCV}" == "I14" ; then
-  REFPSD=IGS14
-else
-  REFPSD=
-fi
 if ! set_pcf_variables.py "${U}/PCF/${PCF_FILE}" 1>>${JSON_OUT} \
         B="${AC^^}" \
         C="${PRELIM_SOLUTION_ID}" \
@@ -1823,6 +1833,17 @@ if ! test -f ${TABLES_DIR}/crd/${APRINF}.CRD ; then
 else
   APRCRD_FILE=${TABLES_DIR}/crd/${APRINF}.CRD
   echodbg "[DEBUG] Using a-priori coordinate file: \"${APRCRD_FILE}\"."
+  if test "${REFINF}" = "IGS14" && ! grep ANKR &>/dev/null ${APRCRD_FILE} ; then
+    echo "[DEBUG] IGS14 ANKR Problem! Adding ANKR in the a-priori coordinate file"
+    if ! wget -q http://ftp.aiub.unibe.ch/BSWUSER52/STA/${YEAR}/COD${YEAR:2:2}${DOY_3C}.CRD.Z ; then
+      echoerr "[ERROR] Failed to download file http://ftp.aiub.unibe.ch/BSWUSER52/STA/${YEAR}/COD${YEAR:2:2}${DOY_3C}.CRD.Z"
+      clear_n_exit 1
+    fi
+    uncompress COD${YEAR:2:2}${DOY_3C}.CRD.Z
+    l=$(grep ANKR COD${YEAR:2:2}${DOY_3C}.CRD)
+    echo "$l" >> ${APRCRD_FILE}
+    echo "[DEBUG] Appended line \"$l\" to a-priori crd file"
+  fi
 fi
 
 ##  Set the flags of all stations in the apriori coordinate file to 'R'.

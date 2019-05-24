@@ -28,7 +28,8 @@
 ##                         DEC-2013 Added header
 ##                         NOV-2014 Major revision
 ##                         JUN-2015 Added better variable check
-                           LAST_UPDATE=JUN-2015
+##                         SEP-2017 Changed aiub ftp directory
+                           LAST_UPDATE=SEP-2017
 ##
 ################################################################################
 
@@ -92,8 +93,10 @@ function help {
 # //////////////////////////////////////////////////////////////////////////////
 TARGET=
 LOADVAR=
-SOURCE_FTP=ftp.unibe.ch
-SOURCE_DIR=aiub/BSWUSER52/GEN/
+# SOURCE_FTP=ftp.unibe.ch
+# SOURCE_DIR=aiub/BSWUSER52/GEN/
+SOURCE_FTP=ftp.aiub.unibe.ch
+SOURCE_DIR=BSWUSER52/GEN/
 LOG_FILE=
 QUITE_MODE=NO
 STAMP_FILE=/dev/null

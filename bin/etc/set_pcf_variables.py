@@ -62,7 +62,6 @@ def main(argv):
 
   for vr, vl in var_dict.iteritems():
     pcf.set_variable(vr, val=vl)
-    ## print "Setting PCF variable [%s] to [%s]"%(vr, vl)
 
   pcf.flush_variables()
 

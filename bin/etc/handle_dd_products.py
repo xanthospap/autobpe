@@ -33,7 +33,6 @@ def isUnixCompressed(fn): return len(fn) > 2 and fn[-2:] == '.Z'
 
 ## Resolve command line arguments
 def main(argv):
-
   try:
     opts, args = getopt.getopt(argv,'y:d:p:o:a:s:ir:',[
       'year=', 'doy=', 'datapool=', 'destination=', 'analysis-center=','satellite-system=', 'download-ion','report=', 'use-repro2', 'use-repro13'])
@@ -86,13 +85,13 @@ def main(argv):
 
 ## Start main
 if __name__ == "__main__":
-  main( sys.argv[1:] )
+  main(sys.argv[1:])
 
 if not DATAPOOL or not os.path.isdir(DATAPOOL):
-  print>>sys.stderr,"ERROR. Invalid datapool area."
+  print>>sys.stderr,"ERROR. Invalid datapool area \"%s\"" %DATAPOOL
   sys.exit(1)
 if not DEST_ORB or not os.path.isdir(DEST_ORB):
-  print>>sys.stderr,"Invalid campaign area."
+  print>>sys.stderr,"Invalid campaign area \"%s\"" %DEST_ORB
   sys.exit(1)
 
 try:

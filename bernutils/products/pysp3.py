@@ -656,7 +656,8 @@ def getCodSp3(datetm, out_dir=None, use_repro_13=False, use_one_day_sol=False, i
       pass
 
   if len(ret_list) == 0:
-    raise RuntimeError('Failed to download sp3 file (0/%1i)' %len(options))
+    msg = 'Failed to download sp3 file (0/%1i)' %len(options)
+    raise RuntimeError(msg)
 
   if __DEBUG_MODE__ == True:
     print 'Tries: %1i/%1i Downloaded %s to %s' %(nr_tries, len(options), ret_list[1], ret_list[0])
@@ -779,7 +780,6 @@ def getOrb(**kwargs):
            the CDDIS ftp host.
 
   '''
-
   ##  default function (input) parameters
   _args = { 'ac'             : 'cod', 
             'out_dir'        : None, 
