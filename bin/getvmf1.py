@@ -10,7 +10,8 @@ import bernutils.webutils
 ## global
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
-HOST         = 'http://ggosatm.hg.tuwien.ac.at'
+#HOST         = 'http://ggosatm.hg.tuwien.ac.at'
+HOST          = 'http://vmf.geo.tuwien.ac.at'
 
 def vprint( message, min_verb_level, std_buf=None ):
     if std_buf is None : std_buf = sys.stdout
@@ -117,11 +118,12 @@ daydif = today - dt.date()
 
 # date requested older than today (use normal folders)
 if daydif.days >= 1:
-    DIRN = ( '/DELAY/GRID/VMFG/%04i' %args.year )
+    #DIRN = ( '/DELAY/GRID/VMFG/%04i' %args.year )
+    DIRN = ( '/trop_products/GRID/2.5x2/VMF1/VMF1_OP/%04i' %args.year )
     vprint('[DEBUG] Delta days = %+3i'%(daydif.days), 1)
     vprint('[DEBUG] Using standard VMF dealy folder: \"%s\"'%DIRN, 1)
 else: # else, use prediction folder
-    DIRN = ( '/DELAY/GRID/VMFG_FC/%04i' %args.year )
+    DIRN = ( '/trop_products/GRID/2.5x2/VMF1/VMF1_FC/%04i' %args.year )
     vprint('[DEBUG] Using predicted VMF dealy folder: \"%s\"'%DIRN, 1)
 
 # make a list with the file(s) we want, i.e. request_list
@@ -149,8 +151,8 @@ except Exception, e:
     ## try for prediction if delta days == 1
     if daydif.days == 1:
         try:
-            NOR_DIRN      = ( '/DELAY/GRID/VMFG/%04i' %args.year )
-            PRE_DIRN      = ( '/DELAY/GRID/VMFG_FC/%04i' %args.year )
+            NOR_DIRN      = ( '/trop_products/GRID/2.5x2/VMF1/VMF1_OP/%04i' %args.year )
+            PRE_DIRN      = ( '/trop_products/GRID/2.5x2/VMF1/VMF1_FC/%04i' %args.year )
             request_list2 = [ i.replace(NOR_DIRN, PRE_DIRN) for i in request_list ]
             vprint('[DEBUG] Final VMF1 grid not found! Trying for prediction', 1)
             retlist = bernutils.webutils.grabHttpFile(URL,request_list2,saveas_list)
